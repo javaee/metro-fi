@@ -160,4 +160,23 @@ public class Util {
         return nanos / 1000000.0;
     }
     
+    public static double standardDev(double[] sample) {
+        // Compute sample's mean
+        double mean = 0.0;
+        for (int i = 0; i < sample.length; i++) {
+            mean += sample[i];
+        }
+        mean /= sample.length;
+        
+        // Compute biased variance
+        double variance = 0.0;
+        for (int i = 0; i < sample.length; i++) {
+            variance += (sample[i] - mean) * (sample[i] - mean);
+        }
+        variance /= sample.length;
+        
+        // Return standard deviation
+        return Math.sqrt(variance);
+    }
+    
 }

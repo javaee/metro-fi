@@ -67,6 +67,9 @@ public class Constants {
     public static final String WARMUP_ITERATIONS = "japex.warmupIterations";
     public static final String WARMUP_TIME       = "japex.warmupTime";
     public static final String RUN_TIME          = "japex.runTime";
+    public static final String STDDEV_THRESHOLD  = "japex.stddevThreshold";
+    public static final String MIN_WARMUP_ITERATIONS = "japex.minWarmupIterations";
+    public static final String MAX_WARMUP_ITERATIONS = "japex.maxWarmupIterations";
     
     // Testcase output parameters
     public static final String ACTUAL_RUN_ITERATIONS = "japex.actualRunIterations";

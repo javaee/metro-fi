@@ -62,6 +62,9 @@ public class Engine {
             Iterator jdi = testSuite.getDriverInfoList().iterator();
             while (jdi.hasNext()) {                               
                 DriverInfo di = (DriverInfo) jdi.next();
+                
+                // Display driver's name
+                System.out.print("  " + di.getName() + "\n    ");
 
                 // Allocate nOfThreads instance of this driver and
                 // initialize them
@@ -90,7 +93,9 @@ public class Engine {
                 // Iterate through list of test cases
                 Iterator tci = tcList.iterator();
                 while (tci.hasNext()) {
-                    TestCase tc = (TestCase) tci.next();                    
+                    TestCase tc = (TestCase) tci.next();               
+                    
+                    System.out.print(tc.getTestName() + ",");
                     
                     // Create one thread for each driver instance
                     Thread threads[] = new Thread[nOfThreads];
@@ -169,6 +174,11 @@ public class Engine {
                            + "the drivers for the results to be comparable");
                     }            
                                         
+                    // Display results for this test
+                    System.out.print(
+                        tc.getDoubleParam(Constants.RESULT_VALUE) + ",");
+                    System.out.flush();
+                    
                     // Compute running means 
                     aritMeanresult += result / nOfTests;
                     geomMeanresult *= Math.pow(result, 1.0 / nOfTests);
@@ -183,7 +193,16 @@ public class Engine {
                 // Set driver-specific params
                 di.setDoubleParam(Constants.RESULT_ARIT_MEAN, aritMeanresult);
                 di.setDoubleParam(Constants.RESULT_GEOM_MEAN, geomMeanresult);
-                di.setDoubleParam(Constants.RESULT_HARM_MEAN, 1.0 / harmMeanresultInverse);                
+                di.setDoubleParam(Constants.RESULT_HARM_MEAN, 1.0 / harmMeanresultInverse);      
+                
+                // Display driver's means
+                System.out.println(
+                    "aritmean," +
+                    di.getDoubleParam(Constants.RESULT_ARIT_MEAN) + 
+                    ",geommean," +
+                    di.getDoubleParam(Constants.RESULT_GEOM_MEAN) + 
+                    ",harmmean," +
+                    di.getDoubleParam(Constants.RESULT_HARM_MEAN));                    
             }
         }
         catch (Exception e) {
