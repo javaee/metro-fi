@@ -520,10 +520,12 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
                 encodeElementQualifiedNameOnThirdBit(_currentUri, _currentPrefix, _currentLocalName);
 
                 for (int i = 0; i < _attributes.size();) {
-                    QualifiedName name = (QualifiedName)_attributes.get(i++);
-                    String value = (String)_attributes.get(i++);
-                    encodeAttributeQualifiedNameOnSecondBit(name.namespaceName, name.prefix, name.localName);
+                    final QualifiedName name = (QualifiedName)_attributes.get(i++);
+                    if (encodeAttributeQualifiedNameOnSecondBit(name.namespaceName, name.prefix, name.localName) == false) {
+                        continue;
+                    }
 
+                    final String value = (String)_attributes.get(i++);
                     final boolean addToTable = (value.length() < _v.attributeValueSizeConstraint) ? true : false;
                     encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
                     
@@ -569,10 +571,12 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
             encodeElementQualifiedNameOnThirdBit(_currentUri, _currentPrefix, _currentLocalName);
 
             for (int i = 0; i < _attributes.size();) {
-                QualifiedName name = (QualifiedName)_attributes.get(i++);
-                String value = (String)_attributes.get(i++);
-                encodeAttributeQualifiedNameOnSecondBit(name.namespaceName, name.prefix, name.localName);
+                final QualifiedName name = (QualifiedName)_attributes.get(i++);
+                if (encodeAttributeQualifiedNameOnSecondBit(name.namespaceName, name.prefix, name.localName) == false) {
+                    continue;
+                }
 
+                final String value = (String)_attributes.get(i++);
                 final boolean addToTable = (value.length() < _v.attributeValueSizeConstraint) ? true : false;
                 encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
 

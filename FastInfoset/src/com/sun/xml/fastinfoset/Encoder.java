@@ -289,7 +289,7 @@ public abstract class Encoder extends DefaultHandler {
     /*
      * C.17
      */
-    protected final void encodeAttributeQualifiedNameOnSecondBit(String namespaceURI, String prefix, String localName) throws IOException {
+    protected final boolean encodeAttributeQualifiedNameOnSecondBit(String namespaceURI, String prefix, String localName) throws IOException {
         LocalNameQualifiedNamesMap.Entry entry = _v.attributeName.obtainEntry(localName);
         if (entry._valueIndex > 0) {
             QualifiedName[] names = entry._value;
@@ -297,19 +297,19 @@ public abstract class Encoder extends DefaultHandler {
                 if ((prefix == names[i].prefix || prefix.equals(names[i].prefix)) 
                         && (namespaceURI == names[i].namespaceName || namespaceURI.equals(names[i].namespaceName))) {
                     encodeNonZeroIntegerOnSecondBitFirstBitZero(names[i].index);
-                    return;
+                    return true;
                 }
             }                
         } 
 
-        encodeLiteralAttributeQualifiedNameOnSecondBit(namespaceURI, prefix, 
+        return encodeLiteralAttributeQualifiedNameOnSecondBit(namespaceURI, prefix, 
                 localName, entry);
     }
     
     /*
      * C.17
      */
-    protected final void encodeLiteralAttributeQualifiedNameOnSecondBit(String namespaceURI, String prefix, String localName,
+    protected final boolean encodeLiteralAttributeQualifiedNameOnSecondBit(String namespaceURI, String prefix, String localName,
                 LocalNameQualifiedNamesMap.Entry entry) throws IOException {
         int namespaceURIIndex = KeyIntMap.NOT_PRESENT;
         int prefixIndex = KeyIntMap.NOT_PRESENT;
@@ -322,7 +322,7 @@ public abstract class Encoder extends DefaultHandler {
                 } else if (namespaceURI == "http://www.w3.org/2000/xmlns/"
                         || namespaceURI.equals("http://www.w3.org/2000/xmlns/")) {
                     // Ignore XMLNS attributes
-                    return;
+                    return false;
                 } else {
                     throw new IOException("namespace name not declared by namespace AII: " + namespaceURI);
                 }                    
@@ -370,7 +370,9 @@ public abstract class Encoder extends DefaultHandler {
             encodeNonZeroIntegerOnSecondBitFirstBitOne(localNameIndex);
         } else {
             encodeNonEmptyOctetStringOnSecondBit(localName);
-        }        
+        }
+        
+        return true;
     }
     
     /*
