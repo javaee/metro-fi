@@ -1,0 +1,24 @@
+
+Bugs
+----
+
+ o Re-defining parameters such as japex.runIterations for a specific driver
+ does not seem to have the desired effect.
+
+Enhancements
+------------
+
+ o Global parameter japex.testsPerChart should be defined. Current value is
+ 8 but cannot be changed.
+
+ o Result normalization? Certain charts are hard to read because of very
+ large and very small absolute values.
+
+ o Automatic detection of steady state. Is this possible at all? Santiago
+ tried a simple algorithm using a standard deviation of a small set of
+ of samples, but results were mixed.
+
+ o Display progress information (including throughputs, etc.)
+
+ o Include VM parameters such as -X??? or -mx??? in the output report.
+
