@@ -32,3 +32,7 @@ Enhancements
 
  o Include VM parameters such as -X??? or -mx??? in the output report.
 
+ o Output extended report so that the HTML report can be generate offline.
+ This is very useful if a run fails due due to the incorrect setting of
+ the DISPLAY variable.
+
