@@ -50,8 +50,8 @@ import com.sun.japex.*;
 public class FastInfosetDriver extends JapexDriverBase {
     
     String _xmlFile;
-    byte[] _fastInfosetDocumentByteArray;
-    
+    ByteArrayInputStream _inputStream;
+
     SAXDocumentParser _fidp;
     
     public FastInfosetDriver() {
@@ -88,7 +88,7 @@ public class FastInfosetDriver extends JapexDriverBase {
             parser.parse(fis, ds);
             fis.close();
 
-            _fastInfosetDocumentByteArray = baos.toByteArray();
+            _inputStream = new ByteArrayInputStream(baos.toByteArray());
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -97,10 +97,8 @@ public class FastInfosetDriver extends JapexDriverBase {
     
     public void warmup(TestCase testCase) {
         try {
-            _fidp.reset();
-            _fidp.parse(
-                new InputSource(
-                    new ByteArrayInputStream(_fastInfosetDocumentByteArray)));
+            _inputStream.reset();
+            _fidp.parse(_inputStream);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -109,10 +107,8 @@ public class FastInfosetDriver extends JapexDriverBase {
     
     public void run(TestCase testCase) {
         try {
-            _fidp.reset();
-            _fidp.parse(
-                new InputSource(
-                    new ByteArrayInputStream(_fastInfosetDocumentByteArray)));
+            _inputStream.reset();
+            _fidp.parse(_inputStream);
         }
         catch (Exception e) {
             e.printStackTrace();
