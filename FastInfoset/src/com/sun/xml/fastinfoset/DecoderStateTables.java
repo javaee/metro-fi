@@ -631,15 +631,15 @@ public class DecoderStateTables {
     };
     
     // UTF-8 states
-    public final static int UTF8_NCNAME         = 0;
-    public final static int UTF8_NCNAME_CHAR    = 1;
-    public final static int UTF8_TWO_BYTES      = 2;
-    public final static int UTF8_THREE_BYTES    = 3;
-    public final static int UTF8_FOUR_BYTES     = 4;
+    public final static int UTF8_NCNAME_NCNAME         = 0;
+    public final static int UTF8_NCNAME_NCNAME_CHAR    = 1;
+    public final static int UTF8_TWO_BYTES             = 2;
+    public final static int UTF8_THREE_BYTES           = 3;
+    public final static int UTF8_FOUR_BYTES            = 4;
 
-    public static final int[] UTF8 = new int[256];
+    public static final int[] UTF8_NCNAME = new int[256];
     
-    private static int[][] UTF8_RANGES = {
+    private static int[][] UTF8_NCNAME_RANGES = {
         
         // Basic Latin
         
@@ -648,35 +648,35 @@ public class DecoderStateTables {
                 
         // '-' '.'        
         // %%00101101 to %00101110 [#x002D-#x002E]
-        { 0x2E, UTF8_NCNAME_CHAR },
+        { 0x2E, UTF8_NCNAME_NCNAME_CHAR },
 
         // %00101111
         { 0x2F, STATE_ILLEGAL },
         
         // [0-9]        
         // %0011000 to %00111001  [#x0030-#x0039]
-        { 0x39, UTF8_NCNAME_CHAR },
+        { 0x39, UTF8_NCNAME_NCNAME_CHAR },
 
         // %01000000
         { 0x40, STATE_ILLEGAL },
 
         // [A-Z]        
         // %01000001 to %01011010 [#x0041-#x005A]
-        { 0x5A, UTF8_NCNAME },
+        { 0x5A, UTF8_NCNAME_NCNAME },
         
         // %01011110
         { 0x5E, STATE_ILLEGAL },
         
         // '_'
         // %01011111 [#x005F]
-        { 0x5F, UTF8_NCNAME },
+        { 0x5F, UTF8_NCNAME_NCNAME },
                 
         // %01100000
         { 0x60, STATE_ILLEGAL },
               
         // [a-z]        
         // %01100001 to %01111010 [#x0061-#x007A]
-        { 0x7A, UTF8_NCNAME },
+        { 0x7A, UTF8_NCNAME_NCNAME },
                 
         // %01111011 to %01111111
         { 0x7F, STATE_ILLEGAL },
@@ -706,7 +706,60 @@ public class DecoderStateTables {
         // %11111000 to %11111111                
         { 0xFF, STATE_ILLEGAL }
     };
+
+    public final static int UTF8_ONE_BYTE              = 1;
     
+    public static final int[] UTF8 = new int[256];
+    
+    private static int[][] UTF8_RANGES = {
+        
+        // Basic Latin
+        
+        // %00000000 to %00001000
+        { 0x08, STATE_ILLEGAL },
+                
+        // CHARACTER TABULATION, LINE FEED        
+        // %%00001001 to %00001010 [#x0009-#x000A]
+        { 0x0A, UTF8_ONE_BYTE },
+
+        // %00001011 to %00001100
+        { 0x0C, STATE_ILLEGAL },
+        
+        // CARRIAGE RETURN       
+        // %00001101 [#x000D]
+        { 0x0D, UTF8_ONE_BYTE },
+
+        // %00001110 to %00011111
+        { 0x1F, STATE_ILLEGAL },
+                
+        // %0010000 to %01111111
+        { 0x7F, UTF8_ONE_BYTE },
+                
+                
+        // Two bytes
+
+        // %10000000 to %11000001                
+        { 0xC1, STATE_ILLEGAL },
+                
+        // %11000010 to %11011111
+        { 0xDF, UTF8_TWO_BYTES },
+
+                
+        // Three bytes
+                
+        // %11100000 to %11101111
+        { 0xEF, UTF8_THREE_BYTES },
+
+                
+        // Four bytes 
+                
+        // %11110000 to %11110111                
+        { 0xF7, UTF8_FOUR_BYTES },
+
+                
+        // %11111000 to %11111111                
+        { 0xFF, STATE_ILLEGAL }
+    };
     
     private static void constructTable(int[] table, int[][] ranges) {
         int start = 0x00;
@@ -739,6 +792,9 @@ public class DecoderStateTables {
         // Identifying string
         constructTable(ISTRING_PREFIX_NAMESPACE, ISTRING_PREFIX_NAMESPACE_RANGES);        
         
+        // UTF-8 NCNAME states
+        constructTable(UTF8_NCNAME, UTF8_NCNAME_RANGES);        
+
         // UTF-8 states
         constructTable(UTF8, UTF8_RANGES);        
     }

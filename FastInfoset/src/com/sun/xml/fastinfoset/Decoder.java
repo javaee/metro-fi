@@ -1029,7 +1029,7 @@ public abstract class Decoder implements FastInfosetParser {
             _octetBufferEnd = bytesRemaining + bytesRead;
         }
     }
-
+    
     public final void decodeUtf8StringIntoCharBuffer() throws IOException {
         _charBufferLength = 0;
         if (_charBuffer.length < _octetBufferLength) {
@@ -1039,12 +1039,20 @@ public abstract class Decoder implements FastInfosetParser {
         int b1;
         final int end = _octetBufferLength + _octetBufferOffset;
         while (end != _octetBufferOffset) {
-            b1 = _octetBuffer[_octetBufferOffset++] & 0xFF;
-            if (b1 < 0x80) {
+            b1 = _octetBuffer[_octetBufferOffset++];
+            // Optimal checking for characters in the range 0x20 to 0x7F
+            if (b1 > 0x19) {
                 _charBuffer[_charBufferLength++] = (char) b1;
             } else {
+                b1 = (b1 < 0) ? (b1 & 0x7F) | 0x80 : b1;
                 final int state = DecoderStateTables.UTF8[b1];
                 switch(state) {
+                    // Check for 0x09, 0x0A and 0x0D
+                    case DecoderStateTables.UTF8_ONE_BYTE:
+                    {
+                        _charBuffer[_charBufferLength++] = (char) b1;
+                        break;
+                    }
                     case DecoderStateTables.UTF8_TWO_BYTES:
                     {
                         // Decode byte 2
@@ -1062,10 +1070,10 @@ public abstract class Decoder implements FastInfosetParser {
                         break;
                     }
                     case DecoderStateTables.UTF8_THREE_BYTES:
-                        decodeUtf8ThreeByteChar(end, b1);
+                        decodeUtf8ThreeByteChar(_charBuffer, end, b1);
                         break;
                     case DecoderStateTables.UTF8_FOUR_BYTES:
-                        decodeUtf8FourByteChar(end, b1);
+                        decodeUtf8FourByteChar(_charBuffer, end, b1);
                         break;
                     default:
                         decodeUtf8StringIllegalState();
@@ -1088,8 +1096,8 @@ public abstract class Decoder implements FastInfosetParser {
         final int end = _octetBufferLength + _octetBufferOffset;
 
         int b1 = _octetBuffer[_octetBufferOffset++] & 0xFF;
-        int state = DecoderStateTables.UTF8[b1];
-        if (state == DecoderStateTables.UTF8_NCNAME) {
+        int state = DecoderStateTables.UTF8_NCNAME[b1];
+        if (state == DecoderStateTables.UTF8_NCNAME_NCNAME) {
             _charBuffer[_charBufferLength++] = (char) b1;
         } else {
             switch(state) {
@@ -1110,12 +1118,12 @@ public abstract class Decoder implements FastInfosetParser {
                     break;
                 }
                 case DecoderStateTables.UTF8_THREE_BYTES:
-                    decodeUtf8ThreeByteChar(end, b1);
+                    decodeUtf8ThreeByteChar(_charBuffer, end, b1);
                     break;
                 case DecoderStateTables.UTF8_FOUR_BYTES:
-                    decodeUtf8FourByteChar(end, b1);
+                    decodeUtf8FourByteChar(_charBuffer, end, b1);
                     break;
-                case DecoderStateTables.UTF8_NCNAME_CHAR:
+                case DecoderStateTables.UTF8_NCNAME_NCNAME_CHAR:
                 default:
                     decodeUtf8NCNameIllegalState();
             }
@@ -1123,7 +1131,7 @@ public abstract class Decoder implements FastInfosetParser {
 
         while (end != _octetBufferOffset) {
             b1 = _octetBuffer[_octetBufferOffset++] & 0xFF;
-            state = DecoderStateTables.UTF8[b1];
+            state = DecoderStateTables.UTF8_NCNAME[b1];
             if (state < DecoderStateTables.UTF8_TWO_BYTES) {
                 _charBuffer[_charBufferLength++] = (char) b1;
             } else {
@@ -1145,10 +1153,10 @@ public abstract class Decoder implements FastInfosetParser {
                         break;
                     }
                     case DecoderStateTables.UTF8_THREE_BYTES:
-                        decodeUtf8ThreeByteChar(end, b1);
+                        decodeUtf8ThreeByteChar(_charBuffer, end, b1);
                         break;
                     case DecoderStateTables.UTF8_FOUR_BYTES:
-                        decodeUtf8FourByteChar(end, b1);
+                        decodeUtf8FourByteChar(_charBuffer, end, b1);
                         break;
                     default:
                         decodeUtf8NCNameIllegalState();
@@ -1157,7 +1165,7 @@ public abstract class Decoder implements FastInfosetParser {
         }
     }
 
-    public final void decodeUtf8ThreeByteChar(int end, int b1) throws IOException {
+    public final void decodeUtf8ThreeByteChar(char[] c, int end, int b1) throws IOException {
         // Decode byte 2
         if (end == _octetBufferOffset) {
             decodeUtf8StringLengthTooSmall();
@@ -1178,13 +1186,13 @@ public abstract class Decoder implements FastInfosetParser {
             decodeUtf8StringIllegalState();
         }
 
-        _charBuffer[_charBufferLength++] = (char) (
+        c[_charBufferLength++] = (char) (
             (b1 & 0x0F) << 12
             | (b2 & 0x3F) << 6
             | (b3 & 0x3F));
     }
 
-    public final void decodeUtf8FourByteChar(int end, int b1) throws IOException {
+    public final void decodeUtf8FourByteChar(char[] c, int end, int b1) throws IOException {
         // Decode byte 2
         if (end == _octetBufferOffset) {
             decodeUtf8StringLengthTooSmall();
@@ -1224,8 +1232,8 @@ public abstract class Decoder implements FastInfosetParser {
              ((b3 >> 4) & 0x0003);
         final int ls = 0xDC00 | ((b3 << 6) & 0x03C0) | (b4 & 0x003F);
 
-        _charBuffer[_charBufferLength++] = (char)hs;
-        _charBuffer[_charBufferLength++] = (char)ls;
+        c[_charBufferLength++] = (char)hs;
+        c[_charBufferLength++] = (char)ls;
     }
 
     public final void decodeUtf8StringLengthTooSmall() throws IOException {
