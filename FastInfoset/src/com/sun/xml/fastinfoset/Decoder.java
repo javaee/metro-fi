@@ -207,6 +207,7 @@ public abstract class Decoder implements FastInfosetParser {
     
     public void reset() {
         _terminate = _doubleTerminate = false;
+        _b = 0;     // needed for enconding algorithms
     }
 
     public void setVocabulary(ParserVocabulary v) {
