@@ -54,19 +54,22 @@
     <table width="80%" border="1">
         <thead>
 	       <tr><th width="15%"><b>driver</b></th>
-                   <xsl:for-each select="rep:driver[1]/*[not(@name)]">
-                       <xsl:sort select="name()"/>
+                   <xsl:for-each select="rep:driver[1]/*[not(@name) and namespace-uri(.)!='']">
+                      <th><b><xsl:value-of select="name()"/></b></th>
+                   </xsl:for-each>
+                   <xsl:for-each select="rep:driver[1]/*[not(@name) and namespace-uri(.)='']">
                       <th><b><xsl:value-of select="name()"/></b></th>
                    </xsl:for-each>
                </tr>
         </thead>
         <tbody>
             <xsl:for-each select="rep:driver">
-	       <tr><td align="right">
-                      <xsl:value-of select="@name"/></td>
-                   <xsl:for-each select="*[not(@name)]">
-                       <xsl:sort select="name()"/>
-                       <td align="right"><xsl:value-of select="."/></td>
+	       <tr><td align="right"><xsl:value-of select="@name"/></td>
+                   <xsl:for-each select="*[not(@name) and namespace-uri(.)!='']">
+                       <td align="right"><nobr><xsl:value-of select="."/></nobr></td>
+                   </xsl:for-each>
+                   <xsl:for-each select="*[not(@name) and namespace-uri(.)='']">
+                       <td align="left"><nobr><xsl:value-of select="."/></nobr></td>
                    </xsl:for-each>
                </tr>
             </xsl:for-each>
@@ -80,8 +83,10 @@
     <table width="80%" border="1">
         <thead>
 	       <tr><th><b>testCase</b></th>
-                   <xsl:for-each select="rep:testCase[1]/*">
-                      <xsl:sort select="name()"/>
+                   <xsl:for-each select="rep:testCase[1]/*[namespace-uri(.)!='']">
+                      <th><b><xsl:value-of select="name()"/></b></th>
+                   </xsl:for-each>
+                   <xsl:for-each select="rep:testCase[1]/*[namespace-uri(.)='']">
                       <th><b><xsl:value-of select="name()"/></b></th>
                    </xsl:for-each>
                </tr>
@@ -90,9 +95,11 @@
             <xsl:for-each select="rep:testCase">
 	       <tr><td align="right">
                       <xsl:value-of select="@name"/></td>
-                   <xsl:for-each select="*">
-                       <xsl:sort select="name()"/>
-                       <td align="right"><xsl:value-of select="."/></td>
+                   <xsl:for-each select="*[namespace-uri(.)!='']">
+                       <td align="right"><nobr><xsl:value-of select="."/></nobr></td>
+                   </xsl:for-each>
+                   <xsl:for-each select="*[namespace-uri(.)='']">
+                       <td align="left"><nobr><xsl:value-of select="."/></nobr></td>
                    </xsl:for-each>
                </tr>
             </xsl:for-each>
