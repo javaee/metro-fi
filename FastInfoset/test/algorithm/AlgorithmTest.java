@@ -101,7 +101,7 @@ public class AlgorithmTest extends TestCase {
         fea.decodeFromBytesToFloatArray(f, 0, b, 0, b.length);
 
         for (int is = 0; is < ARRAY_SIZE; is++) {
-            assertEquals(_floatArray[is], f[is]);
+            assertEquals(_floatArray[is], f[is], 0.0);
         }
     }
 
@@ -217,7 +217,7 @@ public class AlgorithmTest extends TestCase {
                     assertEquals(true, eas.getAlgorithmData(0) instanceof float[]);
                     float[] f = (float[])eas.getAlgorithmData(0);
                     for (int is = 0; is < ARRAY_SIZE; is++) {
-                        assertEquals(_floatArray[is], f[is]);
+                        assertEquals(_floatArray[is], f[is], 0.0);
                     }
                 }
             } else {
@@ -249,7 +249,7 @@ public class AlgorithmTest extends TestCase {
             assertEquals(ARRAY_SIZE, length);
 
             for (int i = 0; i < ARRAY_SIZE; i++) {
-                assertEquals(_floatArray[i], f[i + start]);
+                assertEquals(_floatArray[i], f[i + start], 0.0);
             }
         }        
     }
@@ -451,7 +451,7 @@ public class AlgorithmTest extends TestCase {
                     assertEquals(true, eas.getAlgorithmData(0) instanceof float[]);
                     float[] b = (float[])eas.getAlgorithmData(0);
                     for (int is = 0; is < ARRAY_SIZE; is++) {
-                        assertEquals(_floatArray[is], b[is]);
+                        assertEquals(_floatArray[is], b[is], 0.0);
                     }
                 }
             } else {
@@ -470,7 +470,7 @@ public class AlgorithmTest extends TestCase {
             assertEquals(true, data instanceof float[]);
             float[] b = (float[])data;
             for (int is = 0; is < ARRAY_SIZE; is++) {
-                assertEquals(_floatArray[is], b[is]);
+                assertEquals(_floatArray[is], b[is], 0.0);
             }
         }
         
