@@ -940,6 +940,16 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         return _algorithmData;
     }
     
+    public final byte[] getTextAlgorithmBytesClone() {
+        if (_algorithmData == null) {
+            return null;
+        }
+        
+        byte[] algorithmData = new byte[_algorithmDataLength];
+        System.arraycopy(_algorithmData, _algorithmDataOffset, algorithmData, 0, _algorithmDataLength);
+        return algorithmData;
+    }
+    
     public final int getTextAlgorithmStart() {
         return _algorithmDataOffset;
     }
@@ -1339,7 +1349,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         _algorithmDataLength = _octetBufferLength;
             
         if (_algorithmId >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
-            _algorithmURI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
+            _algorithmURI = _v.encodingAlgorithm.get(_algorithmId - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
             if (_algorithmURI == null) {
                 throw new EncodingAlgorithmException("URI not present for encoding algorithm identifier " + _identifier);
             }
