@@ -58,8 +58,6 @@ public class DOMParserDriver extends JapexDriverBase {
     ByteArrayInputStream _inputStream;
     
     DocumentBuilder _docBuilder;
-    Document _document;
-    DOMSource _source;
     
     /** Creates a new instance of DOMParserDriver */
     public DOMParserDriver() {
@@ -97,9 +95,7 @@ public class DOMParserDriver extends JapexDriverBase {
     public void warmup(TestCase testCase) {
         try {
             _inputStream.reset();
-            _document = _docBuilder.parse(_inputStream);
-            _source = new DOMSource(_document);
-            _source = null;
+            Document document = _docBuilder.parse(_inputStream);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -109,9 +105,7 @@ public class DOMParserDriver extends JapexDriverBase {
     public void run(TestCase testCase) {
         try {
             _inputStream.reset();
-            _document = _docBuilder.parse(_inputStream);
-            _source = new DOMSource(_document);
-            _source = null;
+            Document document = _docBuilder.parse(_inputStream);
         }
         catch (Exception e) {
             e.printStackTrace();

@@ -64,7 +64,6 @@ public class JAXPDriver extends JapexDriverBase {
 
     Transformer _transformer;
     SAXSource _source;
-    DOMResult _result;
     
     /** Creates a new instance of JAXPDriver */
     public JAXPDriver() {
@@ -94,7 +93,6 @@ public class JAXPDriver extends JapexDriverBase {
             fis.close();
             
             _source = new SAXSource(new InputSource(_inputStream));
-            _result = new DOMResult();
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -104,10 +102,9 @@ public class JAXPDriver extends JapexDriverBase {
 
     public void warmup(TestCase testCase) {
         try {
-            _result = new DOMResult();
+            DOMResult result = new DOMResult();
             _inputStream.reset();
-            _transformer.transform(_source, _result);
-            _result = null;
+            _transformer.transform(_source, result);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -116,10 +113,9 @@ public class JAXPDriver extends JapexDriverBase {
     
     public void run(TestCase testCase) {
         try {
-            _result = new DOMResult();
+            DOMResult result = new DOMResult();
             _inputStream.reset();
-            _transformer.transform(_source, _result);
-            _result = null;
+            _transformer.transform(_source, result);
         }
         catch (Exception e) {
             e.printStackTrace();

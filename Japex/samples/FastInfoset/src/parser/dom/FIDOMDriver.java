@@ -39,33 +39,29 @@
 
 package parser.dom;
 
+import com.sun.japex.JapexDriverBase;
+import com.sun.japex.TestCase;
+import com.sun.xml.fastinfoset.sax.SAXDocumentParser;
+import com.sun.xml.fastinfoset.sax.SAXDocumentSerializer;
 import java.io.File;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
-import java.io.IOException;
 
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.parsers.SAXParser;
-
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.sax.SAXSource;
 
-import org.w3c.dom.Document;
-import com.sun.japex.*;
-
-import com.sun.xml.fastinfoset.sax.*;
-import com.sun.xml.fastinfoset.api.*;
+import org.jvnet.fastinfoset.FastInfosetSource;
 
 public class FIDOMDriver extends JapexDriverBase {
     ByteArrayInputStream _inputStream;
 
     SAXDocumentParser _fidp;
     Transformer _transformer;
-    FISource _source;
+    FastInfosetSource _source;
     DOMResult _result;
     
     /** Creates a new instance of FIDOMDriver */
@@ -104,8 +100,7 @@ public class FIDOMDriver extends JapexDriverBase {
             fis.close();
 
             _inputStream = new ByteArrayInputStream(baos.toByteArray());
-            _source = new FISource(_inputStream);
-            _result = new DOMResult();
+            _source = new FastInfosetSource(_inputStream);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -114,11 +109,9 @@ public class FIDOMDriver extends JapexDriverBase {
 
     public void warmup(TestCase testCase) {
         try {
-            _result = new DOMResult();
+            DOMResult result = new DOMResult();
             _inputStream.reset();
-            _transformer.transform(_source, _result);
-            _result = null;
-            
+            _transformer.transform(_source, result);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -127,10 +120,9 @@ public class FIDOMDriver extends JapexDriverBase {
     
     public void run(TestCase testCase) {
         try {
-            _result = new DOMResult();
+            DOMResult result = new DOMResult();
             _inputStream.reset();
-            _transformer.transform(_source, _result);
-            _result = null;
+            _transformer.transform(_source, result);
         }
         catch (Exception e) {
             e.printStackTrace();
