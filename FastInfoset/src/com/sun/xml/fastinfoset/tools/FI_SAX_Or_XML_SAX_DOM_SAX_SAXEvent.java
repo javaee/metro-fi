@@ -40,7 +40,7 @@
 package com.sun.xml.fastinfoset.tools;
 
 import com.sun.xml.fastinfoset.Decoder;
-import com.sun.xml.fastinfoset.FISource;
+import com.sun.xml.fastinfoset.api.sax.FISource;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;

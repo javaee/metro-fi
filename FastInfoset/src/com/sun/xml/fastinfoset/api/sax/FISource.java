@@ -37,12 +37,13 @@
  */ 
 
 
-package com.sun.xml.fastinfoset;
+package com.sun.xml.fastinfoset.api.sax;
 
 import java.io.InputStream;
 import org.xml.sax.InputSource;
 import javax.xml.transform.sax.SAXSource;
 import com.sun.xml.fastinfoset.sax.SAXDocumentParser;
+import com.sun.xml.fastinfoset.*;
 
 public class FISource extends SAXSource {
    
