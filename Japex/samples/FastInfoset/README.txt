@@ -8,13 +8,24 @@ Introduction:
  This sample Japex project can be used to compare the performance of
  Fast Infoset against mainstream XML parsers. There are two sub-projects
  that can be used to measure parsing performance and document size, 
- respectively. For each sub-project there are two configuration files 
- that can be used:
+ respectively. The latter includes a measurements that compare the use
+ of FI with and without external vocabularies as well as with and without
+ an additional GZIP compression. Here is the relation between config
+ files and sub-projects:
  
- o Document size: size-config.xml and size-config-short.xml
- o Parsing performance: parsing-config.xml and parsing-config-short.xml
- 
- that differ simply on the number of test cases. 
+ o Document size: 
+   - size-config.xml: measure size for complete set of tests
+   - size-config-short.xml: measure size for a family of instance 
+     documents of increasing sizes
+   - size-config-small.xml: measure size for a set of small XML
+     instances (< 5K). This test shows the advantage of using
+     external vocabularies
+
+ o Parsing performance: 
+   - parsing-config.xml: measure parsing performance for the complete
+     set of tests
+   - parsing-config-short.xml: measure parsing performance for a
+     family of instance documents of increasing sizes.
  
  Parsing performance is measured against Xerces [1], Piccolo [2], 
  XPP3[3], StAX RI parser [4] and Sun's StAX implementation [5] (of
