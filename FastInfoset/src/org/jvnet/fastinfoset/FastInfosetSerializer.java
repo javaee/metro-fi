@@ -36,11 +36,32 @@
  *
  */
 
+
 package org.jvnet.fastinfoset;
 
-public interface VocabularyWriter {
+import java.util.Map;
 
-    // Before writing
+/**
+ *
+ * @author Paul.Sandoz@Sun.Com
+ */
+public interface FastInfosetSerializer {
+    
+    /**
+     * Sets the set of registered encoding algorithms.
+     *
+     * @param algorithms The set of registered algorithms.
+     */
+    public void setRegisteredEncodingAlgorithms(Map algorithms);
+    
+    /**
+     * Gets the set of registered encoding algorithms.
+     *
+     * @return The set of registered algorithms.
+     */
+    public Map getRegisteredEncodingAlgorithms();
+    
+    // Before serializing
     
     public void setExternalVocabulary(ReferencedVocabulary referencedVocabulary);
     
@@ -49,10 +70,9 @@ public interface VocabularyWriter {
     public void setDynamicVocabulary(Vocabulary dynamicVocabulary);
 
     
-    // After writing
+    // After serializing
 
     public Vocabulary getDynamicVocabulary();
 
-    public Vocabulary getFinalVocabulary();
-    
+    public Vocabulary getFinalVocabulary();    
 }

@@ -54,9 +54,12 @@ import org.jvnet.fastinfoset.EncodingAlgorithm;
 import org.jvnet.fastinfoset.EncodingAlgorithmException;
 import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
 import org.jvnet.fastinfoset.FastInfosetException;
+import org.jvnet.fastinfoset.FastInfosetSerializer;
+import org.jvnet.fastinfoset.ReferencedVocabulary;
+import org.jvnet.fastinfoset.Vocabulary;
 import org.xml.sax.helpers.DefaultHandler;
 
-public abstract class Encoder extends DefaultHandler {
+public abstract class Encoder extends DefaultHandler implements FastInfosetSerializer {
     protected int _characterCount = 0;
 
     protected Map _registeredEncodingAlgorithms = new HashMap();
@@ -71,6 +74,42 @@ public abstract class Encoder extends DefaultHandler {
 
     protected OutputStream _s;
 
+    
+    // FastInfosetSerializer
+
+    public void setRegisteredEncodingAlgorithms(Map algorithms) {
+        _registeredEncodingAlgorithms = algorithms;
+        if (_registeredEncodingAlgorithms == null) {
+            _registeredEncodingAlgorithms = new HashMap();
+        }
+    }
+
+    public Map getRegisteredEncodingAlgorithms() {
+        return _registeredEncodingAlgorithms;
+    }
+
+    public void setExternalVocabulary(ReferencedVocabulary referencedVocabulary) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setIntitialVocabulary(Vocabulary initialVocabulary) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setDynamicVocabulary(Vocabulary dynamicVocabulary) {
+        throw new UnsupportedOperationException();
+    }
+
+    public Vocabulary getDynamicVocabulary() {
+        throw new UnsupportedOperationException();
+    }
+
+    public Vocabulary getFinalVocabulary() {
+        throw new UnsupportedOperationException();
+    }
+
+    
+    
     public void setOutputStream(OutputStream s) {
         _s = s;
     }

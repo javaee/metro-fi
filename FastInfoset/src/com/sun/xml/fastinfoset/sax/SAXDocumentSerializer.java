@@ -64,27 +64,6 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
     public SAXDocumentSerializer() {
     }
 
-    // VocabularyWriter
-
-    public void setExternalVocabulary(ReferencedVocabulary referencedVocabulary) {
-        throw new UnsupportedOperationException();
-    }
-
-    public void setIntitialVocabulary(Vocabulary initialVocabulary) {
-        throw new UnsupportedOperationException();
-    }
-
-    public void setDynamicVocabulary(Vocabulary dynamicVocabulary) {
-        throw new UnsupportedOperationException();
-    }
-
-    public Vocabulary getDynamicVocabulary() {
-        throw new UnsupportedOperationException();
-    }
-
-    public Vocabulary getFinalVocabulary() {
-        throw new UnsupportedOperationException();
-    }
 
 
     // ContentHandler
@@ -399,18 +378,6 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
     }
 
 
-    // FastInfosetWriter
-
-    public void setRegisteredEncodingAlgorithms(Map algorithms) {
-        _registeredEncodingAlgorithms = algorithms;
-        if (_registeredEncodingAlgorithms == null) {
-            _registeredEncodingAlgorithms = new HashMap();
-        }
-    }
-
-    public Map getRegisteredEncodingAlgorithms() {
-        return _registeredEncodingAlgorithms;
-    }
 
 
 

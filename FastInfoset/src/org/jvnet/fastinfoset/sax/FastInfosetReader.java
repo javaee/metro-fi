@@ -38,11 +38,11 @@
 
 package org.jvnet.fastinfoset.sax;
 
-import org.jvnet.fastinfoset.VocbularyReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import org.jvnet.fastinfoset.FastInfosetException;
+import org.jvnet.fastinfoset.FastInfosetParser;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.ext.LexicalHandler;
@@ -142,7 +142,23 @@ import org.xml.sax.ext.LexicalHandler;
  * @see org.xml.sax.XMLReader
  * @see org.xml.sax.ContentHandler
  */
-public interface FastInfosetReader extends XMLReader, VocbularyReader {    
+public interface FastInfosetReader extends XMLReader, FastInfosetParser {
+    /**
+     * The property name to be used for getting and setting the 
+     * EncodingAlgorithmContentHandler.
+     *
+     */    
+    public static final String ENCODING_ALGORITHM_CONTENT_HANDLER_PROPERTY =
+            "http://jvnet.org/fastinfoset/sax/properties/encoding-algorithm-content-handler";
+    
+    /**
+     * The property name to be used for getting and setting the 
+     * PrimtiveTypeContentHandler.
+     *
+     */    
+    public static final String PRIMITIVE_TYPE_CONTENT_HANDLER_PROPERTY =
+            "http://jvnet.org/fastinfoset/sax/properties/primitive-type-content-handler";
+    
     /**
      * Parse a fast infoset document from an InputStream.
      *
@@ -164,21 +180,6 @@ public interface FastInfosetReader extends XMLReader, VocbularyReader {
      * @param s The byte stream to parse from.
      */
     public void parse(InputStream s) throws IOException, FastInfosetException, SAXException;
-
-    
-    /**
-     * Sets the set of registered encoding algorithms.
-     *
-     * @param algorithms The set of registered algorithms.
-     */
-    public void setRegisteredEncodingAlgorithms(Map algorithms);
-    
-    /**
-     * Gets the set of registered encoding algorithms.
-     *
-     * @return The set of registered algorithms.
-     */
-    public Map getRegisteredEncodingAlgorithms();
 
     /**
      * Allow an application to register a lexical handler.

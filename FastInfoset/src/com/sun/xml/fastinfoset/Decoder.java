@@ -50,17 +50,57 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.jvnet.fastinfoset.FastInfosetException;
+import org.jvnet.fastinfoset.FastInfosetParser;
+import org.jvnet.fastinfoset.ReferencedVocabulary;
+import org.jvnet.fastinfoset.Vocabulary;
 
-public abstract class Decoder {
+public abstract class Decoder implements FastInfosetParser {
+
+    // String interning system property
+    public static final String STRING_INTERNING_SYSTEM_PROPERTY =
+        "com.sun.xml.fastinfoset.property.string-interning";
+
+    // Buffer size system property
+    public static final String BUFFER_SIZE_SYSTEM_PROPERTY =
+        "com.sun.xml.fastinfoset.property.buffer-size";
+
+    protected static boolean _stringInterningSystemDefault = true;
+    
+    protected static int _bufferSizeSystemDefault = 1024;
+
+    static {
+        String p = System.getProperty(STRING_INTERNING_SYSTEM_PROPERTY,
+            Boolean.toString(_stringInterningSystemDefault));
+        _stringInterningSystemDefault = Boolean.valueOf(p).booleanValue();
+
+        p = System.getProperty(BUFFER_SIZE_SYSTEM_PROPERTY,
+            Integer.toString(_bufferSizeSystemDefault));
+        try {
+            int i = Integer.valueOf(p).intValue();
+            if (i > 0) {
+                _bufferSizeSystemDefault = i;
+            }
+        } catch (NumberFormatException e) {
+        }
+    }
+
+    
+    protected boolean _stringInterning = _stringInterningSystemDefault;
+
+    protected int _bufferSize = _bufferSizeSystemDefault;
+    
     protected InputStream _s;
 
-    protected Map _externalVocabularies;
+    protected Map _externalVocabularies;    
 
+    protected Map _registeredEncodingAlgorithms = new HashMap();
+    
     protected ParserVocabulary _v;
-
+    
     protected boolean _vIsInternal;
 
     protected List _notations;
@@ -81,7 +121,7 @@ public abstract class Decoder {
 
     protected int _identifier;
 
-    protected byte[] _octetBuffer = new byte[1024];
+    protected byte[] _octetBuffer = new byte[_bufferSizeSystemDefault];
 
     protected int _octetBufferStart;
 
@@ -102,6 +142,64 @@ public abstract class Decoder {
         _vIsInternal = true;
     }
 
+    
+    // FastInfosetParser
+        
+    public void setStringInterning(boolean stringInterning) {
+        _stringInterning = stringInterning;
+    } 
+    
+    public boolean getStringInterning() {
+        return _stringInterning;
+    }
+    
+    public void setBufferSize(int bufferSize) {
+        if (_bufferSize > _octetBuffer.length) {
+            _bufferSize = bufferSize;
+        }
+    }
+    
+    public int getBufferSize() {
+        return _bufferSize;
+    }
+    
+    public void setRegisteredEncodingAlgorithms(Map algorithms) {
+        _registeredEncodingAlgorithms = algorithms;
+        if (_registeredEncodingAlgorithms == null) {
+            _registeredEncodingAlgorithms = new HashMap();
+        }
+    }
+    
+    public Map getRegisteredEncodingAlgorithms() {
+        return _registeredEncodingAlgorithms;
+    }
+    
+    public void setExternalVocabularies(Map referencedVocabualries) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setDynamicVocabulary(Vocabulary v) {
+        throw new UnsupportedOperationException();
+    }
+
+    public ReferencedVocabulary getExternalVocabulary() {
+        throw new UnsupportedOperationException();
+    }
+
+    public Vocabulary getIntitialVocabulary() {
+        throw new UnsupportedOperationException();
+    }
+
+    public Vocabulary getDynamicVocabulary() {
+        throw new UnsupportedOperationException();
+    }
+
+    public Vocabulary getFinalVocabulary() {
+        throw new UnsupportedOperationException();
+    }
+    
+    
+    
     public void reset() {
         _terminate = _doubleTerminate = _elementWithAttributesNoChildrenTermination = false;
     }
@@ -659,7 +757,6 @@ public abstract class Decoder {
             final int bytesRemaining = _octetBufferEnd - _octetBufferOffset;
 
             if (_octetBuffer.length < _octetBufferLength) {
-System.out.println("Realloc octet buffer: " +  _octetBufferLength);
                 byte[] newOctetBuffer = new byte[_octetBufferLength];
                 System.arraycopy(_octetBuffer, _octetBufferOffset, newOctetBuffer, 0, bytesRemaining);
                 _octetBuffer = newOctetBuffer;
