@@ -5,7 +5,6 @@
     <property name="FastInfoset.dir" value="FastInfoset"/>
     <property name="samples.dir" value="samples"/>
     <property name="Japex.dir" value="Japex"/>
-    <property name="Japex.samples.FastInfoset.dir" value="${Japex.dir}/samples/FastInfoset"/>
     
     <property name="package.dir"  value="package" />
 
@@ -20,14 +19,12 @@
         <ant antfile="build-without-nb.xml" dir="${FastInfoset.dir}" target="clean"/>
         <ant dir="${samples.dir}" target="clean"/>
         <ant dir="${Japex.dir}" target="clean"/>
-        <ant dir="${Japex.samples.FastInfoset.dir}" target="clean"/>
     </target>
     
     <target name="dist">
         <ant antfile="build-without-nb.xml" dir="${FastInfoset.dir}" target="doc"/>
         <ant dir="${samples.dir}"/>
         <ant dir="${Japex.dir}"/>
-        <ant dir="${Japex.samples.FastInfoset.dir}"/>
     </target>
     
     <target name="source-package" depends="dist, prepare">
