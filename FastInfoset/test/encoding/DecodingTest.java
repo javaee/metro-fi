@@ -41,7 +41,6 @@ package encoding;
 
 import com.sun.xml.fastinfoset.sax.SAXDocumentParser;
 import com.sun.xml.fastinfoset.sax.SAXDocumentSerializer;
-import com.sun.xml.fastinfoset.sax.Properties;
 import com.sun.xml.fastinfoset.sax.VocabularyGenerator;
 import com.sun.xml.fastinfoset.vocab.ParserVocabulary;
 import com.sun.xml.fastinfoset.vocab.SerializerVocabulary;
@@ -56,6 +55,7 @@ import javax.xml.parsers.SAXParserFactory;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import org.jvnet.fastinfoset.FastInfosetParser;
 
 public class DecodingTest extends TestCase {
 
@@ -112,7 +112,7 @@ public class DecodingTest extends TestCase {
         documentSerializer.setOutputStream(baos);
 
         SAXDocumentParser documentParser = new SAXDocumentParser();
-        documentParser.setProperty(Properties.EXTERNAL_VOCABULARIES_PROPERTY, externalVocabularies);
+        documentParser.setProperty(FastInfosetParser.EXTERNAL_VOCABULARIES_PROPERTY, externalVocabularies);
         documentParser.setContentHandler(documentSerializer);
         documentParser.parse(_finfRefVocabDocumentURL.openStream());        
 

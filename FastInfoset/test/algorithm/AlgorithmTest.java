@@ -57,6 +57,7 @@ import java.util.HashMap;
 import java.util.Map;
 import junit.framework.*;
 import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
+import org.jvnet.fastinfoset.FastInfosetParser;
 import org.jvnet.fastinfoset.sax.EncodingAlgorithmAttributes;
 import org.jvnet.fastinfoset.sax.FastInfosetDefaultHandler;
 import org.xml.sax.Attributes;
@@ -311,7 +312,7 @@ public class AlgorithmTest extends TestCase {
 
         Map externalVocabularies = new HashMap();
         externalVocabularies.put(EXTERNAL_VOCABULARY_URI_STRING, externalVocabulary);
-        p.setProperty(Properties.EXTERNAL_VOCABULARIES_PROPERTY, externalVocabularies);
+        p.setProperty(FastInfosetParser.EXTERNAL_VOCABULARIES_PROPERTY, externalVocabularies);
 
         GenericTestHandler h = new GenericTestHandler();
 
@@ -419,7 +420,7 @@ public class AlgorithmTest extends TestCase {
 
         Map externalVocabularies = new HashMap();
         externalVocabularies.put(EXTERNAL_VOCABULARY_URI_STRING, externalVocabulary);
-        p.setProperty(Properties.EXTERNAL_VOCABULARIES_PROPERTY, externalVocabularies);
+        p.setProperty(FastInfosetParser.EXTERNAL_VOCABULARIES_PROPERTY, externalVocabularies);
 
         Map algorithms = new HashMap();
         algorithms.put(APPLICATION_DEFINED_ALGORITHM_URI, new FloatEncodingAlgorithm());
