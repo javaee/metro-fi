@@ -17,13 +17,15 @@ Introduction:
  that differ simply on the number of test cases. 
  
  Parsing performance is measured against Xerces [1], Piccolo [2], 
- XPP3[3], and the StAX RI parser [4]. However, none of these parsers are 
- bundled with this distribution and they must be downloaded separately 
- (it is assumed that Xerces is the default XML parser of your JRE, so 
- it does not need to be downloaded separately). The build file for
- this project assumes that the jars for all these parsers are located in
- ./lib. No additional downloads are required to run the document size 
- tests.
+ XPP3[3], StAX RI parser [4] and Sun's StAX implementation [5] (of
+ course, any of these parsers can be commented out from a config
+ if your are uninterested or unable to test it).
+ However, none of these parsers are bundled with this distribution 
+ and they must be downloaded separately (it is assumed that Xerces 
+ is the default XML parser of your JRE, so it does not need to be 
+ downloaded separately). The build file for this project assumes that 
+ the jars for all these parsers are located in ./lib. No additional 
+ downloads are required to run the document size tests.
 
 Drivers:
  
@@ -55,6 +57,7 @@ References:
 [2] http://piccolo.sourceforge.net/
 [3] http://www.extreme.indiana.edu/xgws/xsoap/xpp/
 [4] http://dev2dev.bea.com/technologies/stax/index.jsp
+[5] http://java.sun.com/webservices/docs/1.5/sjsxp/ReleaseNotes.html
  
 --
 Contact: Santiago.PericasGeertsen@sun.com
