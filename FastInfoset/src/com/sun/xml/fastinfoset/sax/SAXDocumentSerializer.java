@@ -302,8 +302,53 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
         }
     }
 
-    public final void object(String URI, int algorithm, Object o)  throws SAXException {
-        throw new UnsupportedOperationException("Non Implemented");
+    public final void object(String URI, int id, Object data)  throws SAXException {
+        try {
+            encodeTermination();
+            
+            if (id <= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
+                switch(id) {
+                    case EncodingAlgorithmIndexes.HEXADECIMAL:
+                        throw new UnsupportedOperationException("HEXADECIMAL");
+                    case EncodingAlgorithmIndexes.BASE64:
+                    {
+                        byte[] d = (byte[])data;
+                        encodeCIIBuiltInAlgorithmData(id, d, 0, d.length);
+                        break;
+                    }
+                    case EncodingAlgorithmIndexes.SHORT:
+                        throw new UnsupportedOperationException("SHORT");
+                    case EncodingAlgorithmIndexes.INT:
+                    {
+                        int[] d = (int[])data;
+                        encodeCIIBuiltInAlgorithmData(id, d, 0, d.length);
+                        break;
+                    }
+                    case EncodingAlgorithmIndexes.LONG:
+                        throw new UnsupportedOperationException("LONG");
+                    case EncodingAlgorithmIndexes.BOOLEAN:
+                        throw new UnsupportedOperationException("BOOLEAN");
+                    case EncodingAlgorithmIndexes.FLOAT:
+                        float[] d = (float[])data;
+                        encodeCIIBuiltInAlgorithmData(id, d, 0, d.length);
+                        break;
+                    case EncodingAlgorithmIndexes.DOUBLE:
+                        throw new UnsupportedOperationException("DOUBLE");
+                    case EncodingAlgorithmIndexes.UUID:
+                        throw new UnsupportedOperationException("UUID");
+                    case EncodingAlgorithmIndexes.CDATA:      
+                        throw new UnsupportedOperationException("CDATA");
+                    default:
+                        throw new IOException("Unsupported built-in encoding algorithm: " + id);
+                }            
+            } else {
+                throw new UnsupportedOperationException("Non Implemented");
+            }
+        } catch (IOException e) {
+            throw new SAXException(e);
+        } catch (FastInfosetException e) {
+            throw new SAXException(e);
+        }
     }
     
     
