@@ -542,52 +542,5 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         } catch (IOException e) {
             throw new XMLStreamException(e);
         }
-    }
-    
-    private void encodeAndPushCurrentElement() 
-        throws XMLStreamException 
-    {
-        try {
-            encodeTermination();
-            
-            _b = EncodingConstants.ELEMENT;
-            if (_attributes.size() > 0) {
-                _b |= EncodingConstants.ELEMENT_ATTRIBUTE_FLAG;
-            }
-            
-            // Encode namespace decls associated with this element
-            if (_namespaces.getSize() > 0) {
-                write(_b | EncodingConstants.ELEMENT_NAMESPACES_FLAG);
-                for (int i = 0; i < _namespaces.getSize(); i++) {
-                    QualifiedName name = _namespaces.get(i);
-                    encodeNamespaceAttribute(name.prefix, name.namespaceName);
-                }
-                _namespaces.clear();
-
-                _b = 0;
-            }
-                        
-            // Encode element and its attributes
-            encodeElementQualifiedNameOnThirdBit(_currentUri, _currentPrefix, _currentLocalName);
-
-            for (int i = 0; i < _attributes.size();) {
-                final QualifiedName name = (QualifiedName)_attributes.get(i++);
-                if (encodeAttributeQualifiedNameOnSecondBit(name.namespaceName, name.prefix, name.localName) == false) {
-                    continue;
-                }
-
-                final String value = (String)_attributes.get(i++);
-                final boolean addToTable = (value.length() < _v.attributeValueSizeConstraint) ? true : false;
-                encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
-
-                _b = EncodingConstants.TERMINATOR;
-                _terminate = true;
-            }
-            _attributes.clear();
-        }
-        catch (IOException e) {
-            throw new XMLStreamException(e);
-        }
-    }
-    
+    }    
 }

@@ -242,14 +242,8 @@ public class DOMDocumentSerializer extends Encoder {
         final String data = pi.getNodeValue();
         encodeProcessingInstruction(target, data);
     }
-
-    
-    int[] _data = new int[100];
-    int _dataIndex = 0;
-    int _index = 0;
     
     protected final void encodeElement(String namespaceURI, String qName, String localName) throws IOException {
-        // encodeNonZeroIntegerOnThirdBit(_data[_data[_index]] - _dataIndex);
         LocalNameQualifiedNamesMap.Entry entry = _v.elementName.obtainEntry(qName);
         if (entry._valueIndex > 0) {
             QualifiedName[] names = entry._value;
