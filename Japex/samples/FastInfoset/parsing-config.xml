@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testSuite name="ParsingPerformance" xmlns="http://www.sun.com/japex/testSuite">
+    <!-- 
+      - 0 or more global params 
+      -
+      - Default global params are:
+      -    japex.warmupIterations = 300 
+      -    japex.runIterations = 300
+      -    japex.warmupTime = (undefined)
+      -    japex.runTime = (undefined)
+      -    japex.numberOfThreads = 1
+      -    japex.resultUnit = TPS
+      -    japex.classPath = (undefined)
+      -
+      - If both iterations and time are specified (e.g. japex.warmupIterations
+      - and japex.warmupTime) the latter takes precedence. Any user-defined
+      - global parameter (not starting with "japex.") is simply copied to the
+      - output report.
+      -
+      -->
+    <param name="libraryDir" value="lib"/>
+    <param name="japex.classPath" value="${libraryDir}/../dist/classes"/>
+    <param name="japex.classPath" value="${libraryDir}/FastInfoset.jar"/>
+    <!-- The following jars must be downloaded -->
+    <param name="japex.classPath" value="${libraryDir}/jsr173_api.jar"/>
+    <param name="japex.classPath" value="${libraryDir}/jsr173_1.0_ri.jar"/>
+    <param name="japex.classPath" value="${libraryDir}/xpp3-1.1.3.4.G.jar"/>
+    <param name="japex.classPath" value="${libraryDir}/Piccolo.jar"/>
+    
+    <!-- 1 or more drivers 
+      -
+      - Driver parameters can override global parameters. The optional
+      - parameter "japex.driverClass" can be used to the define the
+      - name of the class implementing the driver. If absent, the 
+      - driver's name is used as the class name as well.
+      - Japex will set the value of the following output parameters
+      - after the run for each driver is completed:
+      -
+      - japex.resultAritMean: results arithmetic mean
+      - japex.resultGeomMean: results geometric mean
+      - japex.resultHarmMean: results harmonic mean
+      -
+      -->
+    <driver name="FastInfosetDriver">
+        <param name="japex.driverClass" value="FastInfosetDriver"/>
+    </driver>
+    <driver name="XercesDriver">
+        <param name="japex.driverClass" value="XercesDriver"/>
+    </driver>
+    <driver name="StAXRIDriver">
+        <param name="japex.driverClass" value="StAXRIDriver"/>
+    </driver>    
+    <driver name="XPP3Driver">
+        <param name="japex.driverClass" value="XPP3Driver"/>
+    </driver>
+    <driver name="PiccoloDriver">
+        <param name="japex.driverClass" value="PiccoloDriver"/>
+    </driver>
+    
+    <!-- 
+      - 1 or more test cases
+      -
+      - Test case parameters can override global parameters (e.g. japex.RunTime)
+      - User-defined parameters (not starting with "japex.") are made available 
+      - to each driver via getParam(). Typically, these parameters will be used
+      - to define the location of the input/output for each test. 
+      -
+      -->
+    <!-- RPC Invoices -->
+    <testCase name="inv1.xml">
+        <param name="xmlfile" value="data/inv1.xml"/>
+    </testCase>
+    <testCase name="inv10.xml">
+        <param name="xmlfile" value="data/inv10.xml"/>
+    </testCase>
+    <testCase name="inv50.xml">
+        <param name="xmlfile" value="data/inv50.xml"/>
+    </testCase>
+    <testCase name="inv100.xml">
+        <param name="xmlfile" value="data/inv100.xml"/>
+    </testCase>
+    <testCase name="inv500.xml">
+        <param name="xmlfile" value="data/inv500.xml"/>
+    </testCase>
+    <testCase name="inv1000.xml">
+        <param name="xmlfile" value="data/inv1000.xml"/>
+    </testCase>
+    <!-- More SOAP -->
+    <testCase name="soap1.xml">
+        <param name="xmlfile" value="data/soap1.xml"/>
+    </testCase>
+    <testCase name="soap2.xml">
+        <param name="xmlfile" value="data/soap2.xml"/>
+    </testCase>
+    <testCase name="soap3.xml">
+        <param name="xmlfile" value="data/soap3.xml"/>
+    </testCase>
+    <testCase name="soap4.xml">
+        <param name="xmlfile" value="data/soap4.xml"/>
+    </testCase>
+    <!-- DBs files -->
+    <testCase name="db10.xml">
+        <param name="xmlfile" value="data/db10.xml"/>
+    </testCase>
+    <testCase name="db50.xml">
+        <param name="xmlfile" value="data/db50.xml"/>
+    </testCase>
+    <testCase name="db100.xml">
+        <param name="xmlfile" value="data/db100.xml"/>
+    </testCase>
+    <testCase name="db500.xml">
+        <param name="xmlfile" value="data/db500.xml"/>
+    </testCase>
+    <testCase name="db1000.xml">
+        <param name="xmlfile" value="data/db1000.xml"/>
+    </testCase>
+    <testCase name="db10000.xml">
+        <param name="xmlfile" value="data/db10000.xml"/>
+    </testCase>
+    <!-- XSL Stylesheets -->
+    <testCase name="xsl1.xml">
+        <param name="xmlfile" value="data/xsl1.xml"/>
+    </testCase>
+    <testCase name="xsl2.xml">
+        <param name="xmlfile" value="data/xsl2.xml"/>
+    </testCase>
+    <testCase name="xsl3.xml">
+        <param name="xmlfile" value="data/xsl3.xml"/>
+    </testCase>
+    <testCase name="xsl4.xml">
+        <param name="xmlfile" value="data/xsl4.xml"/>
+    </testCase>
+    <!-- Large XML files -->
+    <testCase name="periodic.xml">
+        <param name="xmlfile" value="data/periodic.xml"/>
+    </testCase>
+    <testCase name="weblog.xml">
+        <param name="xmlfile" value="data/weblog.xml"/>
+    </testCase>
+    <testCase name="factbook.xml">
+        <param name="xmlfile" value="data/factbook.xml"/>
+    </testCase>
+</testSuite>
