@@ -937,35 +937,19 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     }
     
     public final byte[] getTextAlgorithmBytes() {
-        if (_algorithmData == null) {
-            throw new IllegalStateException("Method getTextAlgorithmBytes() called in invalid state");
-        }
-        
         return _algorithmData;
     }
     
     public final int getTextAlgorithmStart() {
-        if (_algorithmData == null) {
-            throw new IllegalStateException("Method getTextAlgorithmStart() called in invalid state");
-        }
-                
         return _algorithmDataOffset;
     }
     
     public final int getTextAlgorithmLength() {
-        if (_algorithmData == null) {
-            throw new IllegalStateException("Method getTextAlgorithmStart() called in invalid state");
-        }
-        
         return _algorithmDataLength;
     }
     
     public final int getTextAlgorithmBytes(int sourceStart, byte[] target,
-            int targetStart, int length) throws XMLStreamException {
-        if (_algorithmData == null) {
-            throw new IllegalStateException("Method getTextAlgorithmBytes() called in invalid state");
-        }
-        
+            int targetStart, int length) throws XMLStreamException {        
         try {
             System.arraycopy(_algorithmData, sourceStart, target,
                     targetStart, length);
