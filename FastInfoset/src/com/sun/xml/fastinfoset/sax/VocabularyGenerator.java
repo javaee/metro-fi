@@ -39,12 +39,10 @@
 
 package com.sun.xml.fastinfoset.sax;
 
-import com.sun.xml.fastinfoset.NameSurrogate;
 import com.sun.xml.fastinfoset.QualifiedName;
 import com.sun.xml.fastinfoset.util.CharArray;
 import com.sun.xml.fastinfoset.util.KeyIntMap;
 import com.sun.xml.fastinfoset.util.LocalNameQualifiedNamesMap;
-import com.sun.xml.fastinfoset.util.NameSurrogateIntMap;
 import com.sun.xml.fastinfoset.util.QualifiedNameArray;
 import com.sun.xml.fastinfoset.util.StringArray;
 import com.sun.xml.fastinfoset.util.StringIntMap;
