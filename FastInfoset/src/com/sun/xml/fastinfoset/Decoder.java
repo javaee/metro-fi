@@ -55,11 +55,6 @@ import java.util.Map;
 import org.jvnet.fastinfoset.FastInfosetException;
 
 public abstract class Decoder {
-    public static final int EA_NONE                     = 0;
-    public static final int EA_GENERIC                  = 1;
-    public static final int EA_PRIMITIVE                = 2;
-    public static final int EA_PRIMITIVE_APPLICATION    = EA_GENERIC | EA_PRIMITIVE;
-    
     protected InputStream _s;
     
     protected Map _externalVocabularies;

@@ -120,9 +120,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
     protected PrimitiveTypeContentHandler _primitiveHandler;
 
     protected Map _registeredEncodingAlgorithms = new HashMap();
-    
-    protected int _algorithmReportingState = EA_NONE;
-    
+        
     protected BuiltInEncodingAlgorithmState builtInAlgorithmState = 
             new BuiltInEncodingAlgorithmState();
     
@@ -298,13 +296,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
     }
     
     public void setEncodingAlgorithmContentHandler(EncodingAlgorithmContentHandler handler) {
-        _algorithmHandler = handler;
-        
-        if (_algorithmHandler != null) {
-            _algorithmReportingState |= EA_GENERIC;
-        } else {
-            _algorithmReportingState &= ~EA_GENERIC;            
-        }            
+        _algorithmHandler = handler;        
     }
 
     public EncodingAlgorithmContentHandler getEncodingAlgorithmContentHandler() {
@@ -313,12 +305,6 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
 
     public void setPrimitiveTypeContentHandler(PrimitiveTypeContentHandler handler) {
         _primitiveHandler = handler;
-        
-        if (_primitiveHandler != null) {
-            _algorithmReportingState |= EA_PRIMITIVE;
-        } else {
-            _algorithmReportingState &= ~EA_PRIMITIVE;
-        }       
     }
 
     public PrimitiveTypeContentHandler getPrimitiveTypeContentHandler() {
@@ -384,7 +370,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         try {
             _contentHandler.startDocument();
         } catch (SAXException e) {
-            throw new IOException("processDII");
+            throw new FastInfosetException("processDII", e);
         }
 
         _b = read();
@@ -1237,70 +1223,51 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
 
     protected final void processCIIEncodingAlgorithm() throws FastInfosetException, IOException {
         if (_identifier <= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
-            switch (_algorithmReportingState) {
-                case EA_NONE:
-                {
-                    StringBuffer buffer = new StringBuffer();
-                    processBuiltInEncodingAlgorithmAsCharacters(buffer);
+            if (_primitiveHandler != null) {
+                processCIIBuiltInEncodingAlgorithmAsPrimitive();
+            } else if (_algorithmHandler != null) {
+                Object array = processBuiltInEncodingAlgorithmAsObject();
 
-                    try {
-                        _contentHandler.characters(buffer.toString().toCharArray(), 0, buffer.length());
-                    } catch (SAXException e) {
-                        throw new FastInfosetException(e);
-                    }
-                    break;
+                try {
+                    _algorithmHandler.object(null, _identifier, array);
+                } catch (SAXException e) {
+                    throw new FastInfosetException(e);
                 }
-                case EA_GENERIC:
-                {
-                    Object array = processBuiltInEncodingAlgorithmAsObject();
-                    
-                    try {
-                        _algorithmHandler.object(null, _identifier, array);
-                    } catch (SAXException e) {
-                        throw new FastInfosetException(e);
-                    }
-                    break;
+            } else {
+                StringBuffer buffer = new StringBuffer();
+                processBuiltInEncodingAlgorithmAsCharacters(buffer);
+
+                try {
+                    _contentHandler.characters(buffer.toString().toCharArray(), 0, buffer.length());
+                } catch (SAXException e) {
+                    throw new FastInfosetException(e);
                 }
-                case EA_PRIMITIVE:
-                case EA_PRIMITIVE_APPLICATION:
-                    processCIIBuiltInEncodingAlgorithmAsPrimitive();
-                    break;
             }
-            // Built-in algorithms
+        } else if (_identifier >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START && _algorithmHandler != null) {
+            final String URI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
+            if (URI == null) {
+                throw new EncodingAlgorithmException("URI not present for encoding algorithm identifier " + _identifier);
+            }
+
+            final EncodingAlgorithm ea = (EncodingAlgorithm)_registeredEncodingAlgorithms.get(URI);
+            if (ea != null) {
+                final Object data = ea.decodeFromBytes(_octetBuffer, _octetBufferStart, _octetBufferLength);
+                try {
+                    _algorithmHandler.object(URI, _identifier, data);
+                } catch (SAXException e) {
+                    throw new FastInfosetException(e);
+                }                        
+            } else {
+                try {
+                    _algorithmHandler.octets(URI, _identifier, _octetBuffer, _octetBufferStart, _octetBufferLength);
+                } catch (SAXException e) {
+                    throw new FastInfosetException(e);
+                }
+            }
         } else if (_identifier >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
-            switch (_algorithmReportingState) {
-                case EA_PRIMITIVE:
-                case EA_NONE:
-                    // TODO should have property to ignore
-                    throw new EncodingAlgorithmException(
-                            "Document contains application-defined encoding algorithm data that cannot be reported");
-                case EA_GENERIC:
-                case EA_PRIMITIVE_APPLICATION:
-                {
-                    final String URI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
-                    if (URI == null) {
-                        throw new EncodingAlgorithmException("URI not present for encoding algorithm identifier " + _identifier);
-                    }
-                    
-                    final EncodingAlgorithm ea = (EncodingAlgorithm)_registeredEncodingAlgorithms.get(URI);
-                    if (ea != null) {
-                        final Object data = ea.decodeFromBytes(_octetBuffer, _octetBufferStart, _octetBufferLength);
-                        try {
-                            _algorithmHandler.object(URI, _identifier, data);
-                        } catch (SAXException e) {
-                            throw new FastInfosetException(e);
-                        }                        
-                    } else {
-                        try {
-                            _algorithmHandler.octets(URI, _identifier, _octetBuffer, _octetBufferStart, _octetBufferLength);
-                        } catch (SAXException e) {
-                            throw new FastInfosetException(e);
-                        }
-                    }
-                    
-                    break;
-                }
-            }
+                // TODO should have property to ignore
+                throw new EncodingAlgorithmException(
+                        "Document contains application-defined encoding algorithm data that cannot be reported");
         } else {
             // Reserved built-in algorithms for future use
             // TODO should use sax property to decide if event will be
@@ -1371,53 +1338,33 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
     
     protected final void processAIIEncodingAlgorithm(QualifiedName name) throws FastInfosetException, IOException {
         if (_identifier <= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
-            switch (_algorithmReportingState) {
-                case EA_NONE:
-                {
-                    StringBuffer buffer = new StringBuffer();
-                    processBuiltInEncodingAlgorithmAsCharacters(buffer);
-                    _attributes.addAttribute(name, buffer.toString());
-                    break;
-                }
-                case EA_GENERIC:
-                case EA_PRIMITIVE:
-                case EA_PRIMITIVE_APPLICATION:
-                {
-                    Object data = processBuiltInEncodingAlgorithmAsObject();
-                    _attributes.addAttributeWithAlgorithmData(name, null, _identifier, data);
-                    break;
-                }
+            if (_primitiveHandler != null || _algorithmHandler != null) {
+                Object data = processBuiltInEncodingAlgorithmAsObject();
+                _attributes.addAttributeWithAlgorithmData(name, null, _identifier, data);
+            } else {
+                StringBuffer buffer = new StringBuffer();
+                processBuiltInEncodingAlgorithmAsCharacters(buffer);
+                _attributes.addAttribute(name, buffer.toString());
+            }            
+        } else if (_identifier >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START && _algorithmHandler != null) {
+            final String URI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
+            if (URI == null) {
+                throw new EncodingAlgorithmException("URI not present for encoding algorithm identifier " + _identifier);
             }
-            // Built-in algorithms
-        } else if (_identifier >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
-            switch (_algorithmReportingState) {
-                case EA_PRIMITIVE:
-                case EA_NONE:
-                    // TODO should have property to ignore
-                    throw new EncodingAlgorithmException(
-                            "Document contains application-defined encoding algorithm data that cannot be reported");
-                case EA_GENERIC:
-                case EA_PRIMITIVE_APPLICATION:
-                {
-                    final String URI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
-                    if (URI == null) {
-                        throw new EncodingAlgorithmException("URI not present for encoding algorithm identifier " + _identifier);
-                    }
-                    
-                    final EncodingAlgorithm ea = (EncodingAlgorithm)_registeredEncodingAlgorithms.get(URI);
-                    if (ea != null) {
-                        final Object data = ea.decodeFromBytes(_octetBuffer, _octetBufferStart, _octetBufferLength);
-                        _attributes.addAttributeWithAlgorithmData(name, URI, _identifier, data);
-                    } else {
-                        final byte[] data = new byte[_octetBufferLength];
-                        System.arraycopy(_octetBuffer, _octetBufferStart, data, 0, _octetBufferLength);
-                        _attributes.addAttributeWithAlgorithmData(name, URI, _identifier, data);
-                    }
 
-                    break;
-                    
-                }
+            final EncodingAlgorithm ea = (EncodingAlgorithm)_registeredEncodingAlgorithms.get(URI);
+            if (ea != null) {
+                final Object data = ea.decodeFromBytes(_octetBuffer, _octetBufferStart, _octetBufferLength);
+                _attributes.addAttributeWithAlgorithmData(name, URI, _identifier, data);
+            } else {
+                final byte[] data = new byte[_octetBufferLength];
+                System.arraycopy(_octetBuffer, _octetBufferStart, data, 0, _octetBufferLength);
+                _attributes.addAttributeWithAlgorithmData(name, URI, _identifier, data);
             }
+        } else if (_identifier >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
+            // TODO should have property to ignore
+            throw new EncodingAlgorithmException(
+                    "Document contains application-defined encoding algorithm data that cannot be reported");
         } else {
             // Reserved built-in algorithms for future use
             // TODO should use sax property to decide if event will be
