@@ -47,6 +47,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.EmptyStackException;
+import java.util.Enumeration;
+import java.util.Iterator;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -90,6 +92,8 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
      */
     protected NamespaceSupport _nsSupport = new NamespaceSupport();
     
+    protected NamespaceContext _nsContext = new NamespaceContextImpl();
+    
     /**
      * List of namespaces defined in the current element.
      */
@@ -121,32 +125,14 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
     
     // -- XMLStreamWriter Interface -------------------------------------------
             
-    /**
-     * Write the XML Declaration. Defaults the XML version to 1.0, and the encoding to utf-8
-     * @throws XMLStreamException
-     */
     public void writeStartDocument() throws XMLStreamException {
         writeStartDocument("finf", "1.0");
     }
     
-    /**
-     * Write the XML Declaration. Defaults the XML version to 1.0
-     * @param version version of the xml document
-     * @throws XMLStreamException
-     */
     public void writeStartDocument(String version) throws XMLStreamException {
         writeStartDocument("finf", version);
     }
     
-    /**
-     * Write the XML Declaration.  Note that the encoding parameter does
-     * not set the actual encoding of the underlying output.  That must
-     * be set when the instance of the XMLStreamWriter is created using the
-     * XMLOutputFactory
-     * @param encoding encoding of the xml declaration
-     * @param version version of the xml document
-     * @throws XMLStreamException
-     */
     public void writeStartDocument(String encoding, String version)
         throws XMLStreamException
     {
@@ -160,10 +146,6 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         }
     }
     
-    /**
-     * Closes any start tags and writes corresponding end tags.
-     * @throws XMLStreamException
-     */
     public void writeEndDocument() throws XMLStreamException {
         // Need to flush a pending empty element?
         if (_inStartElement) {
@@ -183,19 +165,10 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         }
     }
     
-    /**
-     * Close this writer and free any resources associated with the
-     * writer.  This must not close the underlying output stream.
-     * @throws XMLStreamException
-     */
     public void close() throws XMLStreamException {
         reset();
     }
     
-    /**
-     * Write any cached data to the underlying output mechanism.
-     * @throws XMLStreamException
-     */
     public void flush() throws XMLStreamException {
         try {
             _s.flush();
@@ -205,13 +178,6 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         }
     }
     
-    /**
-     * Writes a start tag to the output.  All writeStartElement methods
-     * open a new scope in the internal namespace context.  Writing the
-     * corresponding EndElement causes the scope to be closed.
-     * @param localName local name of the tag, may not be null
-     * @throws XMLStreamException
-     */
     public void writeStartElement(String localName)
         throws XMLStreamException
     {
@@ -219,26 +185,12 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         writeStartElement("", localName, "");
     }
     
-    /**
-     * Writes a start tag to the output
-     * @param namespaceURI the namespaceURI of the prefix to use, may not be null
-     * @param localName local name of the tag, may not be null
-     * @throws XMLStreamException if the namespace URI has not been bound to a prefix and
-     * javax.xml.stream.isPrefixDefaulting has not been set to true
-     */
     public void writeStartElement(String namespaceURI, String localName)
         throws XMLStreamException
     {
         writeStartElement(getPrefix(namespaceURI), localName, namespaceURI);
     }
     
-    /**
-     * Writes a start tag to the output
-     * @param localName local name of the tag, may not be null
-     * @param prefix the prefix of the tag, may not be null
-     * @param namespaceURI the uri to bind the prefix to, may not be null
-     * @throws XMLStreamException
-     */
     public void writeStartElement(String prefix, String localName,
         String namespaceURI) throws XMLStreamException
     {
@@ -254,37 +206,18 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         _nsSupport.pushContext();
     }
     
-    /**
-     * Writes an empty element tag to the output
-     * @param localName local name of the tag, may not be null
-     * @throws XMLStreamException
-     */
     public void writeEmptyElement(String localName)
         throws XMLStreamException
     {
         writeEmptyElement("", localName, "");
     }
     
-    /**
-     * Writes an empty element tag to the output
-     * @param namespaceURI the uri to bind the tag to, may not be null
-     * @param localName local name of the tag, may not be null
-     * @throws XMLStreamException if the namespace URI has not been bound to a prefix and
-     * javax.xml.stream.isPrefixDefaulting has not been set to true
-     */
     public void writeEmptyElement(String namespaceURI, String localName)
         throws XMLStreamException
     {
         writeEmptyElement(getPrefix(namespaceURI), localName, namespaceURI);
     }
     
-    /**
-     * Writes an empty element tag to the output
-     * @param prefix the prefix of the tag, may not be null
-     * @param localName local name of the tag, may not be null
-     * @param namespaceURI the uri to bind the tag to, may not be null
-     * @throws XMLStreamException
-     */
     public void writeEmptyElement(String prefix, String localName, 
         String namespaceURI) throws XMLStreamException
     {
@@ -299,12 +232,6 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         _nsSupport.pushContext();
     }
         
-    /**
-     * Writes an end tag to the output relying on the internal
-     * state of the writer to determine the prefix and local name
-     * of the event.
-     * @throws XMLStreamException
-     */
     public void writeEndElement() throws XMLStreamException {
         if (_inStartElement) {
             encodeTerminationAndCurrentElement(false);
@@ -323,29 +250,12 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
     }
 
     
-    /**
-     * Writes an attribute to the output stream without
-     * a prefix.
-     * @param localName the local name of the attribute
-     * @param value the value of the attribute
-     * @throws IllegalStateException if the current state does not allow Attribute writing
-     * @throws XMLStreamException
-     */
     public void writeAttribute(String localName, String value)
         throws XMLStreamException
     {
         writeAttribute("", "", localName, value);
     }
     
-    /**
-     * Writes an attribute to the output stream
-     * @param namespaceURI the uri of the prefix for this attribute
-     * @param localName the local name of the attribute
-     * @param value the value of the attribute
-     * @throws IllegalStateException if the current state does not allow Attribute writing
-     * @throws XMLStreamException if the namespace URI has not been bound to a prefix and
-     * javax.xml.stream.isPrefixDefaulting has not been set to true
-     */
     public void writeAttribute(String namespaceURI, String localName,
         String value) throws XMLStreamException
     {
@@ -374,18 +284,7 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         }
         writeAttribute(prefix, namespaceURI, localName, value);
     }
-    
-    /**
-     * Writes an attribute to the output stream
-     * @param prefix the prefix for this attribute
-     * @param namespaceURI the uri of the prefix for this attribute
-     * @param localName the local name of the attribute
-     * @param value the value of the attribute
-     * @throws IllegalStateException if the current state does not allow Attribute writing
-     * @throws XMLStreamException if the namespace URI has not been bound to a prefix and
-     * javax.xml.stream.isPrefixDefaulting has not been set to true
-     */
-    
+        
     public void writeAttribute(String prefix, String namespaceURI,
         String localName, String value) throws XMLStreamException
     {
@@ -407,16 +306,6 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         _attributes.add(value);
     }
     
-    /**
-     * Writes a namespace to the output stream
-     * If the prefix argument to this method is the empty string,
-     * "xmlns", or null this method will delegate to writeDefaultNamespace
-     *
-     * @param prefix the prefix to bind this namespace to
-     * @param namespaceURI the uri to bind the prefix to
-     * @throws IllegalStateException if the current state does not allow Namespace writing
-     * @throws XMLStreamException
-     */
     public void writeNamespace(String prefix, String namespaceURI)
         throws XMLStreamException
     {
@@ -431,12 +320,6 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         }
     }
     
-    /**
-     * Writes the default namespace to the stream
-     * @param namespaceURI the uri to bind the default namespace to
-     * @throws IllegalStateException if the current state does not allow Namespace writing
-     * @throws XMLStreamException
-     */
     public void writeDefaultNamespace(String namespaceURI)
         throws XMLStreamException
     {
@@ -446,11 +329,6 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         _namespaces.add(new QualifiedName("", namespaceURI));
     }
     
-    /**
-     * Writes an xml comment with the data enclosed
-     * @param data the data contained in the comment, may be null
-     * @throws XMLStreamException
-     */
     public void writeComment(String data) throws XMLStreamException {
         try {
             if (data.length() == 0) {
@@ -467,23 +345,12 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         }
     }
     
-    /**
-     * Writes a processing instruction
-     * @param target the target of the processing instruction, may not be null
-     * @throws XMLStreamException
-     */
     public void writeProcessingInstruction(String target)
         throws XMLStreamException
     {
         writeProcessingInstruction(target, "");
     }
     
-    /**
-     * Writes a processing instruction
-     * @param target the target of the processing instruction, may not be null
-     * @param data the data contained in the processing instruction, may not be null
-     * @throws XMLStreamException
-     */
     public void writeProcessingInstruction(String target, String data)
         throws XMLStreamException
     {
@@ -497,40 +364,18 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         }
     }
     
-    /**
-     * Writes a CData section
-     * @param data the data contained in the CData Section, may not be null
-     * @throws XMLStreamException
-     */
     public void writeCData(String data) throws XMLStreamException {
         throw new UnsupportedOperationException("Not implemented");
    }
     
-    /**
-     * Write a DTD section.  This string represents the entire doctypedecl production
-     * from the XML 1.0 specification.
-     *
-     * @param dtd the DTD to be written
-     * @throws XMLStreamException
-     */
     public void writeDTD(String dtd) throws XMLStreamException {
         throw new UnsupportedOperationException("Not implemented");
     }
     
-    /**
-     * Writes an entity reference
-     * @param name the name of the entity
-     * @throws XMLStreamException
-     */
     public void writeEntityRef(String name) throws XMLStreamException {
         throw new UnsupportedOperationException("Not implemented");
     }
         
-    /**
-     * Write text to the output
-     * @param text the value to write
-     * @throws XMLStreamException
-     */
     public void writeCharacters(String text) throws XMLStreamException {
          try {
             if (text.length() == 0) {
@@ -546,13 +391,6 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         }
     }
     
-    /**
-     * Write text to the output
-     * @param text the value to write
-     * @param start the starting position in the array
-     * @param len the number of characters to write
-     * @throws XMLStreamException
-     */
     public void writeCharacters(char[] text, int start, int len)
         throws XMLStreamException
     {
@@ -570,39 +408,16 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         }
     }
 
-    /**
-     * Gets the prefix the uri is bound to
-     * @return the prefix or null
-     * @throws XMLStreamException
-     */
     public String getPrefix(String uri) throws XMLStreamException {
         return _nsSupport.getPrefix(uri);
     }
     
-    /**
-     * Sets the prefix the uri is bound to.  This prefix is bound
-     * in the scope of the current START_ELEMENT / END_ELEMENT pair.
-     * If this method is called before a START_ELEMENT has been written
-     * the prefix is bound in the root scope.
-     * @param prefix the prefix to bind to the uri, may not be null
-     * @param uri the uri to bind to the prefix, may be null
-     * @throws XMLStreamException
-     */
     public void setPrefix(String prefix, String uri) 
         throws XMLStreamException 
     {
         _nsSupport.declarePrefix(prefix, uri);
     }
     
-    /**
-     * Binds a URI to the default namespace
-     * This URI is bound
-     * in the scope of the current START_ELEMENT / END_ELEMENT pair.
-     * If this method is called before a START_ELEMENT has been written
-     * the uri is bound in the root scope.
-     * @param uri the uri to bind to the default namespace, may be null
-     * @throws XMLStreamException
-     */
     public void setDefaultNamespace(String uri) throws XMLStreamException {
         setPrefix("", uri);
     }
@@ -624,24 +439,13 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
     public void setNamespaceContext(NamespaceContext context)
         throws XMLStreamException 
     {
-        throw new UnsupportedOperationException("Not implemented");
+        throw new UnsupportedOperationException("setNamespaceContext");
     }
     
-    /**
-     * Returns the current namespace context.
-     * @return the current NamespaceContext
-     */
     public NamespaceContext getNamespaceContext() {
-        throw new UnsupportedOperationException("Not implemented");
+        return _nsContext;
     }
     
-    /**
-     * Get the value of a feature/property from the underlying implementation
-     * @param name The name of the property, may not be null
-     * @return The value of the property
-     * @throws IllegalArgumentException if the property is not supported
-     * @throws NullPointerException if the name is null
-     */
     public Object getProperty(java.lang.String name) 
         throws IllegalArgumentException 
     {
@@ -657,6 +461,34 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
     
     public void setEncoding(String encoding) {
         _encoding = encoding;
+    }
+    
+    protected class NamespaceContextImpl implements NamespaceContext {
+        public final String getNamespaceURI(String prefix) {
+            return _nsSupport.getURI(prefix);
+        }
+  
+        public final String getPrefix(String namespaceURI) {
+            return _nsSupport.getPrefix(namespaceURI);
+        }
+
+        public final Iterator getPrefixes(String namespaceURI) {
+            final Enumeration e = _nsSupport.getPrefixes(namespaceURI);
+            
+            return new Iterator() {
+                    public boolean hasNext() {
+                        return e.hasMoreElements();
+                    }
+
+                    public Object next() {
+                        return e.nextElement();
+                    }
+
+                    public void remove() {
+                        throw new UnsupportedOperationException();
+                    }                    
+                };
+        }
     }
     
     private void encodeTerminationAndCurrentElement(boolean terminateAfter) throws XMLStreamException {
