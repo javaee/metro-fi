@@ -96,7 +96,7 @@ public interface PrimitiveTypeContentHandler {
      * @throws org.xml.sax.SAXException any SAX exception, possibly
      *            wrapping another exception
      */    
-    void booleans(boolean [] b, int start, int length) throws SAXException;
+    public void booleans(boolean [] b, int start, int length) throws SAXException;
 
     /**
      * Receive notification of character data as an array of byte.
@@ -119,7 +119,7 @@ public interface PrimitiveTypeContentHandler {
      * @throws org.xml.sax.SAXException any SAX exception, possibly
      *            wrapping another exception
      */    
-    void bytes(byte[] b, int start, int length) throws SAXException;
+    public void bytes(byte[] b, int start, int length) throws SAXException;
     
     /**
      * Receive notification of character data as an array of short.
@@ -137,7 +137,7 @@ public interface PrimitiveTypeContentHandler {
      * @throws org.xml.sax.SAXException any SAX exception, possibly
      *            wrapping another exception
      */    
-    void shorts(short[] s, int start, int length) throws SAXException;
+    public void shorts(short[] s, int start, int length) throws SAXException;
     
     /**
      * Receive notification of character data as an array of int.
@@ -155,7 +155,7 @@ public interface PrimitiveTypeContentHandler {
      * @throws org.xml.sax.SAXException any SAX exception, possibly
      *            wrapping another exception
      */    
-    void ints(int [] i, int start, int length) throws SAXException;
+    public void ints(int [] i, int start, int length) throws SAXException;
     
     /**
      * Receive notification of character data as an array of long.
@@ -173,7 +173,7 @@ public interface PrimitiveTypeContentHandler {
      * @throws org.xml.sax.SAXException any SAX exception, possibly
      *            wrapping another exception
      */    
-    void longs(long [] l, int start, int length) throws SAXException;
+    public void longs(long [] l, int start, int length) throws SAXException;
     
     /**
      * Receive notification of character data as an array of float.
@@ -191,7 +191,7 @@ public interface PrimitiveTypeContentHandler {
      * @throws org.xml.sax.SAXException any SAX exception, possibly
      *            wrapping another exception
      */    
-    void floats(float [] f, int start, int length) throws SAXException;
+    public void floats(float [] f, int start, int length) throws SAXException;
     
     /**
      * Receive notification of character data as an array of double.
@@ -209,7 +209,7 @@ public interface PrimitiveTypeContentHandler {
      * @throws org.xml.sax.SAXException any SAX exception, possibly
      *            wrapping another exception
      */    
-    void doubles(double [] d, int start, int length) throws SAXException;
+    public void doubles(double [] d, int start, int length) throws SAXException;
 
     /**
      * Receive notification of character data as an two array of UUID.
@@ -230,5 +230,5 @@ public interface PrimitiveTypeContentHandler {
      * @throws org.xml.sax.SAXException any SAX exception, possibly
      *            wrapping another exception
      */    
-    void uuids(long[] msb, long[] lsb, int start, int length) throws SAXException;
+    public void uuids(long[] msb, long[] lsb, int start, int length) throws SAXException;
 }
