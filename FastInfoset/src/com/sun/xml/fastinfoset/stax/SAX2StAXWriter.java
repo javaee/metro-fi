@@ -65,6 +65,10 @@ public class SAX2StAXWriter extends DefaultHandler implements LexicalHandler {
         _writer = writer;
     }
     
+    public XMLStreamWriter getWriter() {
+        return _writer;
+    }
+    
     public void startDocument() throws SAXException {
         try {
             _writer.writeStartDocument();

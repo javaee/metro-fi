@@ -96,15 +96,15 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
     protected QualifiedNameArray _namespaces = new QualifiedNameArray(4);
     
     
-    public StAXDocumentSerializer() {
-        
+    public StAXDocumentSerializer() {    
     }
+    
     public StAXDocumentSerializer(OutputStream outputStream) {
-        super.setOutputStream(outputStream);
+        setOutputStream(outputStream);
     }
 
     public StAXDocumentSerializer(OutputStream outputStream, StAXManager manager) {
-        super.setOutputStream(outputStream);
+        setOutputStream(outputStream);
         _manager = manager;
     }
     
@@ -112,16 +112,11 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         _attributes.clear();
         _namespaces.clear();
         _nsSupport.reset();
-        
-        try {
-            setPrefix("xml", "http://www.w3.org/XML/1998/namespace");
-        }
-        catch (XMLStreamException e) {
-            // falls through
-        }
-        
+                
         _currentUri = _currentPrefix = null;
-        _currentLocalName = null;    
+        _currentLocalName = null;
+        
+        _inStartElement = _isEmptyElement = false;
     }
     
     // -- XMLStreamWriter Interface -------------------------------------------
@@ -155,6 +150,8 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
     public void writeStartDocument(String encoding, String version)
         throws XMLStreamException
     {
+        reset();
+        
         try {
             encodeHeader(false);
             encodeInitialVocabulary();
@@ -355,11 +352,22 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         String prefix = "";
         
         // Find prefix for attribute, ignoring default namespace
-        if (namespaceURI.length() > 0) {
+        if (namespaceURI.length() > 0) {            
             prefix = _nsSupport.getPrefix(namespaceURI);
 
             // Undeclared prefix or ignorable default ns?
             if (prefix == null || prefix.length() == 0) {
+                // Workaround for BUG in SAX NamespaceSupport helper
+                // which incorrectly defines namespace declaration URI
+                if (namespaceURI == "http://www.w3.org/2000/xmlns/" || 
+                        namespaceURI.equals("http://www.w3.org/2000/xmlns/")) {
+                    // TODO
+                    // Need to check carefully the rule for the writing of
+                    // namespaces in StAX. Is it safe to ignore such 
+                    // attributes, as declarations will be made using the
+                    // writeNamespace method
+                    return;
+                }
                 throw new XMLStreamException("URI '" + namespaceURI 
                     + "' is unbound for this attribute");
             }
@@ -383,6 +391,16 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
     {
         if (!_inStartElement) {
             throw new IllegalStateException("Current state does not allow attribute writing");
+        }
+
+        // TODO
+        // Need to check carefully the rule for the writing of
+        // namespaces in StAX. Is it safe to ignore such 
+        // attributes, as declarations will be made using the
+        // writeNamespace method
+        if (namespaceURI == "http://www.w3.org/2000/xmlns/" || 
+                namespaceURI.equals("http://www.w3.org/2000/xmlns/")) {
+            return;
         }
 
         _attributes.add(new QualifiedName(prefix, namespaceURI, localName, ""));
@@ -636,11 +654,6 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
     public void setManager(StAXManager manager) {
         _manager = manager;
     }
-
-    public void setOutputStream(OutputStream outputStream) {
-        super.setOutputStream(outputStream);
-        reset();
-    }
     
     public void setEncoding(String encoding) {
         _encoding = encoding;
@@ -734,6 +747,3 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
     }
     
 }
-
-
-
