@@ -50,8 +50,9 @@ import org.xml.sax.SAXException;
  *
  * <p>This interface may be used with with a Fast Infoset
  * SAX parser to receive notification of data encoded using the
- * built-in encoding algorithms specified in ITU-T Rec. X.891 | ISO/IEC 24824-1
- * (Fast Infoset), clause 10.<p>
+ * following built-in encoding algorithms specified in ITU-T Rec. X.891 | ISO/IEC 24824-1
+ * (Fast Infoset), clause 10: "boolean", "base64", "short", "int", "long",
+ * "float", "double" and "uuid" encoding algorithms.<p>
  *
  * <p>To set the PrimitiveTypeContentHandler for an XML reader, use the
  * {@link org.xml.sax.XMLReader#setProperty setProperty} method
@@ -61,6 +62,10 @@ import org.xml.sax.SAXException;
  * If the reader does not report primitive data types, it will throw a
  * {@link org.xml.sax.SAXNotRecognizedException SAXNotRecognizedException}</p>
  *
+ * <p>To set the PrimitiveTypeContentHandler for an Fast Infoset reader, use
+ * {@link com.sun.xml.fastinfoset.api.sax.FastInfosetReader#setPrimitiveTypeContentHandler
+ *  setPrimitiveTypeContentHandler} method.<p>
+
  * <p>The Parser will call methods of this interface to report each 
  * chunk of character data that has been converted to an array of primitive 
  * types, for example an array of integer or an array of float. Parsers may 
@@ -70,8 +75,9 @@ import org.xml.sax.SAXException;
  * <p>The application must not attempt to read from the array
  * outside of the specified range.</p>
  * @version 0.1
+ * @see com.sun.xml.fastinfoset.api.sax.EncodingAlgorithmContentHandler
+ * @see com.sun.xml.fastinfoset.api.sax.FastInfosetReader
  * @see org.xml.sax.XMLReader
- * @see org.xml.sax.ContentHandler
  */
 public interface PrimitiveTypeContentHandler {
     /**

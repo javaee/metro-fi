@@ -46,7 +46,8 @@ package com.sun.xml.fastinfoset.api;
  * 10.<p>
  *
  * @version 0.1
- * @see com.sun.xml.fastinfoset.api.sax.AlphabetAndAlgorithmContentHandler
+ * @see com.sun.xml.fastinfoset.api.sax.EncodingAlgorithmContentHandler
+ * @see com.sun.xml.fastinfoset.api.sax.EncodingAlgorithmAttributes
  */
 public final class EncodingAlgorithmIndexes {
     public static final int HEXADECIMAL = 1;
