@@ -38,19 +38,22 @@
 
 package com.sun.xml.fastinfoset.algorithm;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 public interface EncodingAlgorithm {
     
     public Object decodeFromBytes(byte[] b, int start, int length);
     
-    public byte[] encodeToBytes(Object data, byte[] b, int start);
-
-    // These method may also be required for application-defined algorithm 
-    // void decodeFromInputStream(Object data, InputStream s) throws IOException;
+    public Object decodeFromInputStream(InputStream s) throws IOException;
     
-    // void encodeToOutputStream(Object data, OutputStream s) throws IOException;
+
+    public void encodeToOutputStream(Object data, OutputStream s) throws IOException;
+    
     
     public Object convertFromCharacters(char[] ch, int start, int length);
     
-    public char[] convertToCharacters(Object data, char ch[], int start);
+    public void convertToCharacters(Object data, StringBuffer s);
     
 }

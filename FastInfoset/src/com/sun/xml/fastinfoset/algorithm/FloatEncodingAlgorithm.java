@@ -39,93 +39,73 @@
 
 package com.sun.xml.fastinfoset.algorithm;
 
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
+import java.util.List;
+
 
 
 public class FloatEncodingAlgorithm extends IEEE754FloatingPointEncodingAlgorithm {
     
-    public FloatEncodingAlgorithm() {
-    }
-
     public final Object decodeFromBytes(byte[] b, int start, int length) {
         if (length % FLOAT_SIZE != 0) {
             throw new IllegalArgumentException("'length' is not a multiple of " +
-                    FLOAT_SIZE + 
+                    FLOAT_SIZE +
                     " bytes correspond to the size of the IEEE 754 floating-point \"single format\"");
         }
-
+        
         float[] data = new float[length / FLOAT_SIZE];
         decodeFromBytesToFloatArray(data, 0, b, start, length);
         
         return data;
     }
     
-    public final byte[] encodeToBytes(Object data, byte[] b, int start) {
+    public final Object decodeFromInputStream(InputStream s) throws IOException {
+        return decodeFromInputStreamToFloatArray(s);
+    }
+    
+    
+    public void encodeToOutputStream(Object data, OutputStream s) throws IOException {
         if (!(data instanceof float[])) {
             throw new IllegalArgumentException("'data' not an instance of float[]");
         }
-
+        
         final float[] fdata = (float[])data;
-
-        final int encodedSize = fdata.length * FLOAT_SIZE;
-        if (encodedSize > (b.length - start)) {
-            b = new byte[encodedSize];
-            start = 0;
-        }
-
-        encodeToBytes(fdata, 0, fdata.length, b, start);
-        return b;
+        
+        encodeToOutputStreamFromFloatArray(fdata, s);
     }
     
     public final Object convertFromCharacters(char[] ch, int start, int length) {
         final CharBuffer cb = CharBuffer.wrap(ch, start, length);
-        final ArrayList fValues = new ArrayList();
+        final List floatList = new ArrayList();
         
-        matchWhiteSpaceDelimnatedWords(cb, 
-                new WordListener () {
-                    public void word(int start, int end) {
-                        String fStringValue = cb.subSequence(start, end).toString();
-                        fValues.add(Float.valueOf(fStringValue));
-                    }
-                }
+        matchWhiteSpaceDelimnatedWords(cb,
+                new WordListener() {
+            public void word(int start, int end) {
+                String fStringValue = cb.subSequence(start, end).toString();
+                floatList.add(Float.valueOf(fStringValue));
+            }
+        }
         );
         
-        float[] fdata = new float[fValues.size()];
-        for (int i = 0; i < fdata.length; i++) {
-            fdata[i] = ((Float)fValues.get(i)).floatValue();
-        }
-        
-        return fdata;
+        return generateArrayFromList(floatList);
     }
     
-    public final char[] convertToCharacters(Object data, char ch[], int start) {
+    public final void convertToCharacters(Object data, StringBuffer s) {
         if (!(data instanceof float[])) {
             throw new IllegalArgumentException("'data' not an instance of float[]");
         }
-
+        
         final float[] fdata = (float[])data;
-
-        if (fdata.length * FLOAT_MAX_CHARACTER_SIZE > (ch.length - start)) {
-            ch = new char[fdata.length * FLOAT_MAX_CHARACTER_SIZE];
-            start = 0;
-        }
-
-        return convertToCharacters(fdata, ch, start);
+        
+        convertToCharactersFromFloatArray(fdata, s);
     }
     
-    public final void encodeToBytes(float[] data, int fstart, int flength, byte[] b, int start) {
-        final int fend = fstart + flength;
-        for (int i = fstart; i < fend; i++) {
-            final int bits = Float.floatToIntBits(data[i]);
-            b[start++] = (byte)((bits >>> 24) & 0xFF);
-            b[start++] = (byte)((bits >>> 16) & 0xFF);
-            b[start++] = (byte)((bits >>>  8) & 0xFF);
-            b[start++] = (byte)((bits >>>  0) & 0xFF);
-        }
-    }
-
+    
     public final void decodeFromBytesToFloatArray(float[] data, int fstart, byte[] b, int start, int length) {
         final int size = length / FLOAT_SIZE;
         for (int i = 0; i < size; i++) {
@@ -134,16 +114,73 @@ public class FloatEncodingAlgorithm extends IEEE754FloatingPointEncodingAlgorith
         }
     }
     
-    public final char[] convertToCharacters(float[] fdata, char ch[], int start) {
-        final CharBuffer buffer = CharBuffer.wrap(ch, start, ch.length - start);
-        for (int i = 0; i < fdata.length; i++) {
-            buffer.put(Float.toString(fdata[i]));            
-            if (i != fdata.length) {
-                buffer.put(' ');
+    public final float[] decodeFromInputStreamToFloatArray(InputStream s) throws IOException {
+        final List floatList = new ArrayList();
+        final byte[] b = new byte[FLOAT_SIZE];
+        
+        while (true) {
+            int n = s.read(b);
+            if (n != 4) {
+                if (n == -1) {
+                    break;
+                }
+                
+                while(n != 4) {
+                    final int m = s.read(b, n, FLOAT_SIZE - n);
+                    if (m == -1) {
+                        throw new EOFException();
+                    }
+                    n += m;
+                }
             }
+            
+            int bits = (b[0] << 24) | (b[1]<< 16) | (b[2] << 8) | b[3];
+            floatList.add(new Float(Float.intBitsToFloat(bits)));
         }
         
-        return ch;
+        return generateArrayFromList(floatList);
     }
-
+    
+    
+    public final void encodeToOutputStreamFromFloatArray(float[] fdata, OutputStream s) throws IOException {
+        for (int i = 0; i < fdata.length; i++) {
+            final int bits = Float.floatToIntBits(fdata[i]);
+            s.write((bits >>> 24) & 0xFF);
+            s.write((bits >>> 16) & 0xFF);
+            s.write((bits >>> 8) & 0xFF);
+            s.write(bits & 0xFF);
+        }
+    }
+    
+    public final void encodeToBytes(float[] fdata, int fstart, int flength, byte[] b, int start) {
+        final int fend = fstart + flength;
+        for (int i = fstart; i < fend; i++) {
+            final int bits = Float.floatToIntBits(fdata[i]);
+            b[start++] = (byte)((bits >>> 24) & 0xFF);
+            b[start++] = (byte)((bits >>> 16) & 0xFF);
+            b[start++] = (byte)((bits >>>  8) & 0xFF);
+            b[start++] = (byte)((bits >>>  0) & 0xFF);
+        }
+    }
+    
+    
+    public final void convertToCharactersFromFloatArray(float[] fdata, StringBuffer s) {
+        for (int i = 0; i < fdata.length; i++) {
+            s.append(Float.toString(fdata[i]));
+            if (i != fdata.length) {
+                s.append(' ');
+            }
+        }
+    }
+    
+    
+    public final float[] generateArrayFromList(List array) {
+        float[] fdata = new float[array.size()];
+        for (int i = 0; i < fdata.length; i++) {
+            fdata[i] = ((Float)array.get(i)).floatValue();
+        }
+        
+        return fdata;
+    }
+    
 }

@@ -39,9 +39,14 @@
 
 package com.sun.xml.fastinfoset.algorithm;
 
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
+import java.util.List;
+
 
 
 public class IntEncodingAlgorithm extends IntegerEncodingAlgorithm {
@@ -49,99 +54,131 @@ public class IntEncodingAlgorithm extends IntegerEncodingAlgorithm {
     public final Object decodeFromBytes(byte[] b, int start, int length) {
         if (length % INT_SIZE != 0) {
             throw new IllegalArgumentException("'length' is not a multiple of " +
-                    INT_SIZE + 
+                    INT_SIZE +
                     " bytes correspond to the size of the 'int' primitive type");
         }
         
         int[] data = new int[length / INT_SIZE];
-        decodeFromBytesToFloatArray(data, 0, b, start, length);
+        decodeFromBytesToIntArray(data, 0, b, start, length);
         
         return data;
     }
     
-    public final byte[] encodeToBytes(Object data, byte[] b, int start) {
+    public final Object decodeFromInputStream(InputStream s) throws IOException {
+        return decodeFromInputStreamToIntArray(s);
+    }
+    
+    
+    public void encodeToOutputStream(Object data, OutputStream s) throws IOException {
         if (!(data instanceof int[])) {
             throw new IllegalArgumentException("'data' not an instance of int[]");
         }
-
+        
         final int[] idata = (int[])data;
-
-        final int encodedSize = idata.length * INT_SIZE;
-        if (encodedSize > (b.length - start)) {
-            b = new byte[encodedSize];
-            start = 0;
-        }
-
-        encodeToBytes(idata, 0, idata.length, b, start);
-        return b;
+        
+        encodeToOutputStreamFromIntArray(idata, s);
     }
+    
     
     public final Object convertFromCharacters(char[] ch, int start, int length) {
         final CharBuffer cb = CharBuffer.wrap(ch, start, length);
-        final ArrayList iValues = new ArrayList();
-
-        matchWhiteSpaceDelimnatedWords(cb, 
-                new WordListener () {
-                    public void word(int start, int end) {
-                        String iStringValue = cb.subSequence(start, end).toString();
-                        iValues.add(Integer.valueOf(iStringValue));
-                    }
-                }
+        final List integerList = new ArrayList();
+        
+        matchWhiteSpaceDelimnatedWords(cb,
+                new WordListener() {
+            public void word(int start, int end) {
+                String iStringValue = cb.subSequence(start, end).toString();
+                integerList.add(Integer.valueOf(iStringValue));
+            }
+        }
         );
         
-        int[] idata = new int[iValues.size()];
-        for (int i = 0; i < idata.length; i++) {
-            idata[i] = ((Float)iValues.get(i)).intValue();
-        }
-        
-        return idata;
+        return generateArrayFromList(integerList);
     }
     
-    public final char[] convertToCharacters(Object data, char ch[], int start) {
+    public final void convertToCharacters(Object data, StringBuffer s) {
         if (!(data instanceof int[])) {
             throw new IllegalArgumentException("'data' not an instance of int[]");
         }
-
+        
         final int[] idata = (int[])data;
-
-        if (idata.length * INT_MAX_CHARACTER_SIZE > (ch.length - start)) {
-            ch = new char[idata.length * INT_MAX_CHARACTER_SIZE];
-            start = 0;
-        }
-
-        return convertToCharacters(idata, ch, start);
+        
+        convertToCharactersFromIntArray(idata, s);
     }
-
     
     
-    public final void encodeToBytes(int[] data, int istart, int ilength, byte[] b, int start) {
+    public final void decodeFromBytesToIntArray(int[] idata, int istart, byte[] b, int start, int length) {
+        final int size = length / INT_SIZE;
+        for (int i = 0; i < size; i++) {
+            idata[istart++] = (b[start++] << 24) | (b[start++]<< 16) | (b[start++] << 8) | b[start++];
+        }
+    }
+    
+    public final int[] decodeFromInputStreamToIntArray(InputStream s) throws IOException {
+        final List integerList = new ArrayList();
+        final byte[] b = new byte[INT_SIZE];
+        
+        while (true) {
+            int n = s.read(b);
+            if (n != 4) {
+                if (n == -1) {
+                    break;
+                }
+                
+                while(n != 4) {
+                    final int m = s.read(b, n, INT_SIZE - n);
+                    if (m == -1) {
+                        throw new EOFException();
+                    }
+                    n += m;
+                }
+            }
+            
+            integerList.add(new Integer((b[0] << 24) | (b[1]<< 16) | (b[2] << 8) | b[3]));
+        }
+        
+        return generateArrayFromList(integerList);
+    }
+    
+    
+    public final void encodeToOutputStreamFromIntArray(int[] idata, OutputStream s) throws IOException {
+        for (int i = 0; i < idata.length; i++) {
+            final int bits = idata[i];
+            s.write((bits >>> 24) & 0xFF);
+            s.write((bits >>> 16) & 0xFF);
+            s.write((bits >>> 8) & 0xFF);
+            s.write(bits & 0xFF);
+        }
+    }
+    
+    public final void encodeToBytesFromIntArray(int[] idata, int istart, int ilength, byte[] b, int start) {
         final int iend = istart + ilength;
         for (int i = istart; i < iend; i++) {
-            final int bits = data[i];
+            final int bits = idata[i];
             b[start++] = (byte)((bits >>> 24) & 0xFF);
             b[start++] = (byte)((bits >>> 16) & 0xFF);
             b[start++] = (byte)((bits >>>  8) & 0xFF);
             b[start++] = (byte)((bits >>>  0) & 0xFF);
         }
     }
-
-    public final void decodeFromBytesToFloatArray(int[] data, int istart, byte[] b, int start, int length) {
-        final int size = length / INT_SIZE;
-        for (int i = 0; i < size; i++) {
-            data[istart++] = (b[start++] << 24) | (b[start++]<< 16) | (b[start++] << 8) | b[start++];
-        }
-    }
     
-    public final char[] convertToCharacters(int[] idata, char ch[], int start) {
-        final CharBuffer buffer = CharBuffer.wrap(ch, start, ch.length - start);
+    
+    public final void convertToCharactersFromIntArray(int[] idata, StringBuffer s) {
         for (int i = 0; i < idata.length; i++) {
-            buffer.put(Integer.toString(idata[i]));            
+            s.append(Integer.toString(idata[i]));
             if (i != idata.length) {
-                buffer.put(' ');
+                s.append(' ');
             }
         }
-        
-        return ch;
     }
     
+    
+    public final int[] generateArrayFromList(List array) {
+        int[] idata = new int[array.size()];
+        for (int i = 0; i < idata.length; i++) {
+            idata[i] = ((Integer)array.get(i)).intValue();
+        }
+        
+        return idata;
+    }
 }
