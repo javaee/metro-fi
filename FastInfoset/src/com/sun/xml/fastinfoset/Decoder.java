@@ -573,7 +573,7 @@ public abstract class Decoder implements FastInfosetParser {
     }
 
     public final void decodeOctetsOfNonIdentifyingStringOnFirstBit(int b) throws FastInfosetException, IOException {
-        // Remove lower bits of restricted alphabet or encoding algorithm integer
+        // Remove top 4 bits of restricted alphabet or encoding algorithm integer
         b &= 0x0F;
         // Reuse UTF8 length states
         switch(DecoderStateTables.NISTRING[b]) {
@@ -599,26 +599,26 @@ public abstract class Decoder implements FastInfosetParser {
     }
 
     public final void decodeOctetsOfNonIdentifyingStringOnThirdBit(int b) throws FastInfosetException, IOException {
-        // Remove lower bits of restricted alphabet or encoding algorithm integer
-        b &= 0x02;
-        // Reuse UTF8 length states, necessary to mask with CII identifier bits
-        switch(DecoderStateTables.EII[b | 0x80]) {
-            case DecoderStateTables.CII_UTF8_SMALL_LENGTH:
-                _octetBufferLength = b + 1;
+        // Remove top 6 bits of restricted alphabet or encoding algorithm integer
+        switch (b & 0x03) {
+            case 0:
+                _octetBufferLength = 1;
                 break;
-            case DecoderStateTables.CII_UTF8_MEDIUM_LENGTH:
+            case 1:
+                _octetBufferLength = 2;
+                break;
+            case 2:
                 _octetBufferLength = read() + EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_LIMIT;
                 break;
-            case DecoderStateTables.CII_UTF8_LARGE_LENGTH:
+            case 3:
                 _octetBufferLength = (read() << 24) |
                     (read() << 16) |
                     (read() << 8) |
                     read();
                 _octetBufferLength += EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_MEDIUM_LIMIT;
                 break;
-            default:
-                throw new FastInfosetException("Illegal state when decoding octets");
         }
+
         ensureOctetBufferSize();
         _octetBufferStart = _octetBufferOffset;
         _octetBufferOffset += _octetBufferLength;
