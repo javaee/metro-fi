@@ -75,11 +75,7 @@ public class StAXInputFactory extends XMLInputFactory {
     }    
     
     public XMLStreamReader createXMLStreamReader(InputStream s) throws XMLStreamException {
-        StAXDocumentParser sr = new StAXDocumentParser();
-        sr.setInputStream(s);
-        sr.setManager(_manager);
-        return sr;
-        //return new StAXDocumentParser(s, _manager);
+        return new StAXDocumentParser(s, _manager);
     }
     
     public XMLStreamReader createXMLStreamReader(String systemId, Reader xmlfile) throws XMLStreamException {

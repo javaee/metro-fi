@@ -50,6 +50,7 @@ import com.sun.xml.fastinfoset.util.QualifiedNameArray;
 import com.sun.xml.fastinfoset.util.XMLChar;
 import com.sun.xml.fastinfoset.util.EventLocation;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -117,7 +118,15 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     public StAXDocumentParser() {
         _eventType = START_DOCUMENT;
     }
-
+    public StAXDocumentParser(InputStream s) {
+        this();
+        setInputStream(s);
+    }
+    public StAXDocumentParser(InputStream s, StAXManager manager) {
+        this(s);
+        _manager = manager;
+    }
+    
     public void reset() {
         super.reset();
         
