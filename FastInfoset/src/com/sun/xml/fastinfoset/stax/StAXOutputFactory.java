@@ -62,19 +62,23 @@ public class StAXOutputFactory extends XMLOutputFactory {
     }
     
     public XMLEventWriter createXMLEventWriter(Result result) throws XMLStreamException {
-        return new StAXEventWriter(createXMLStreamWriter(result));
+        return null;
+        // return new StAXEventWriter(createXMLStreamWriter(result));
     }
     
     public XMLEventWriter createXMLEventWriter(Writer writer) throws XMLStreamException {
-        return new StAXEventWriter(createXMLStreamWriter(writer));
+        return null;
+        // return new StAXEventWriter(createXMLStreamWriter(writer));
     }
     
     public XMLEventWriter createXMLEventWriter(OutputStream outputStream) throws XMLStreamException {
-        return new StAXEventWriter(createXMLStreamWriter(outputStream));
+        return null;
+        // return new StAXEventWriter(createXMLStreamWriter(outputStream));
     }
     
     public XMLEventWriter createXMLEventWriter(OutputStream outputStream, String encoding) throws XMLStreamException {
-        return new StAXEventWriter(createXMLStreamWriter(outputStream, encoding));
+        return null;
+        // return new StAXEventWriter(createXMLStreamWriter(outputStream, encoding));
     }
     
     public XMLStreamWriter createXMLStreamWriter(Result result) throws XMLStreamException {
