@@ -553,7 +553,7 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         }
     }
     
-    private void encodeTerminationAndCurrentElement(boolean terminateAfter) throws XMLStreamException {
+    protected void encodeTerminationAndCurrentElement(boolean terminateAfter) throws XMLStreamException {
         try {
             encodeTermination();
             
