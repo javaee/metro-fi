@@ -39,7 +39,6 @@
 
 package algorithm;
 
-import com.sun.rsasign.b;
 import com.sun.xml.fastinfoset.QualifiedName;
 import com.sun.xml.fastinfoset.algorithm.BASE64EncodingAlgorithm;
 import com.sun.xml.fastinfoset.algorithm.FloatEncodingAlgorithm;
@@ -48,6 +47,8 @@ import com.sun.xml.fastinfoset.algorithm.ShortEncodingAlgorithm;
 import com.sun.xml.fastinfoset.sax.AttributesHolder;
 import com.sun.xml.fastinfoset.sax.SAXDocumentParser;
 import com.sun.xml.fastinfoset.sax.SAXDocumentSerializer;
+import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
+import com.sun.xml.fastinfoset.stax.StAXDocumentSerializer;
 import com.sun.xml.fastinfoset.vocab.ParserVocabulary;
 import com.sun.xml.fastinfoset.vocab.SerializerVocabulary;
 import java.io.ByteArrayInputStream;
@@ -56,6 +57,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import javax.xml.stream.XMLStreamReader;
 import junit.framework.*;
 import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
 import org.jvnet.fastinfoset.FastInfosetParser;
@@ -615,4 +617,54 @@ public class AlgorithmTest extends TestCase {
         }
     }
     
+    public void testStAXBase64EncodingAlgorithm() throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        StAXDocumentSerializer ds = new StAXDocumentSerializer(baos);
+
+        byte[] data = new byte[256];
+        for (int i = 0; i < 256; i++) {
+            data[i] = (byte)i;
+        }
+        
+        ds.writeStartDocument();
+            ds.writeStartElement("element");
+                ds.writeOctets(data, 0, data.length);
+            ds.writeEndElement();
+        ds.writeEndDocument();
+        ds.close();
+        
+        String s = "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygp" +
+                "KissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJT" +
+                "VFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9" +
+                "fn+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaan" +
+                "qKmqq6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR" +
+                "0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7" +
+                "/P3+/w==";
+        
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        StAXDocumentParser dp = new StAXDocumentParser(bais);
+        while(dp.hasNext()) {
+            int e = dp.next();
+            if (e == XMLStreamReader.CHARACTERS) {
+                byte[] b = dp.getTextAlgorithmBytes();
+                assertEquals(EncodingAlgorithmIndexes.BASE64, dp.getTextAlgorithmIndex());
+                assertTrue(b != null);
+                assertEquals(data.length, dp.getTextAlgorithmLength());
+                for (int i = 0; i < data.length; i++) {
+                    assertEquals(data[i], b[dp.getTextAlgorithmStart() + i]);
+                }
+                
+                b = dp.getTextAlgorithmBytesClone();
+                assertTrue(b != null);
+                assertEquals(data.length, b.length);
+                for (int i = 0; i < data.length; i++) {
+                    assertEquals(data[i], b[i]);
+                }
+
+                String c = dp.getText();
+                assertEquals(s.length(), c.length());
+                assertEquals(s, c);
+            }
+        }
+    }
 }
