@@ -466,13 +466,9 @@ public abstract class Encoder extends DefaultHandler {
         // length cannot be zero since sequence of CIIs has to be > 0
         
         if (addToTable) {
-            CharArray c = new CharArray(array, start, length, false);
-            int index = map.obtainIndex(c);
+            int index = map.obtainIndex(array, start, length, clone);
             if (index == KeyIntMap.NOT_PRESENT) {
                 _b |= EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG;
-                if (clone) {
-                    c.cloneArray();
-                }
                 encodeEncodedCharacterStringAsUTF8OnFifthBit(array, start, length);
             } else {
                 _b |= 0x20;
@@ -788,9 +784,17 @@ public abstract class Encoder extends DefaultHandler {
         }
     }
 
+    protected char[] _charBuffer = new char[512];
+    
     protected final int encodeUTF8String(String s) throws IOException {
-        final char[] ch = s.toCharArray();
-        return encodeUTF8String(ch, 0, ch.length);
+        final int length = s.length();
+        if (length < _charBuffer.length) {
+            s.getChars(0, length, _charBuffer, 0);
+            return encodeUTF8String(_charBuffer, 0, length);
+        } else {
+            char[] ch = s.toCharArray();
+            return encodeUTF8String(ch, 0, length);
+        }
     }
 
     

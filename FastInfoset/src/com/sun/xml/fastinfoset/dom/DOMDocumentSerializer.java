@@ -76,6 +76,9 @@ public class DOMDocumentSerializer extends Encoder {
         }
         encodeDocumentTermination();
     }
+
+    public final void serialize(Node d) throws IOException {
+    }
     
     protected Node[] _namespaceAttributes = new Node[4];
     protected Node[] _attributes = new Node[32];
@@ -183,14 +186,28 @@ public class DOMDocumentSerializer extends Encoder {
     
     protected final void serializeText(Node t) throws IOException {
         final String text = t.getNodeValue();
-        final char ch[] = text.toCharArray();
-        encodeCharactersNoClone(ch, 0, ch.length);
+        
+        final int length = text.length();
+        if (length < _charBuffer.length) {
+            text.getChars(0, length, _charBuffer, 0);
+            encodeCharactersNoClone(_charBuffer, 0, length);
+        } else {
+            final char ch[] = text.toCharArray();
+            encodeCharactersNoClone(ch, 0, length);
+        }
     }
 
     protected final void serializeComment(Node c) throws IOException {
         final String comment = c.getNodeValue();
-        final char ch[] = comment.toCharArray();
-        encodeCommentNoClone(ch, 0, ch.length);
+        
+        final int length = comment.length();
+        if (length < _charBuffer.length) {
+            comment.getChars(0, length, _charBuffer, 0);
+            encodeCommentNoClone(_charBuffer, 0, length);
+        } else {
+            final char ch[] = comment.toCharArray();
+            encodeCommentNoClone(ch, 0, length);
+        }
     }
     
     protected final void serializeProcessingInstruction(Node pi) throws IOException {
@@ -200,8 +217,12 @@ public class DOMDocumentSerializer extends Encoder {
     }
 
     
+    int[] _data = new int[100];
+    int _dataIndex = 0;
+    int _index = 0;
     
     protected final void encodeElement(String namespaceURI, String qName, String localName) throws IOException {
+        // encodeNonZeroIntegerOnThirdBit(_data[_data[_index]] - _dataIndex);
         LocalNameQualifiedNamesMap.Entry entry = _v.elementName.obtainEntry(qName);
         if (entry._valueIndex > 0) {
             QualifiedName[] names = entry._value;

@@ -119,6 +119,28 @@ public class CharArrayIntMap extends KeyIntMap {
         addEntry(key, hash, _size + _readOnlyMapSize, tableIndex);        
         return NOT_PRESENT;
     }
+
+    public final int obtainIndex(char[] ch, int start, int length, boolean clone) {
+        final int hash = hashHash(CharArray.hashCode(ch, start, length));
+        
+        if (_readOnlyMap != null) {
+            final int index = _readOnlyMap.get(ch, start, length, hash);
+            if (index != -1) {
+                return index;
+            }
+        }
+        
+        final int tableIndex = indexFor(hash, _table.length);
+        for (Entry e = _table[tableIndex]; e != null; e = e._next) {
+            if (e._hash == hash && e._key.equalsCharArray(ch, start, length)) {
+                return e._value;
+            }
+        }
+
+        CharArray key = new CharArray(ch, start, length, clone);
+        addEntry(key, hash, _size + _readOnlyMapSize, tableIndex);        
+        return NOT_PRESENT;
+    }
     
     public final int get(CharArray key) {
         return get(key, hashHash(key.hashCode()));
@@ -135,6 +157,24 @@ public class CharArrayIntMap extends KeyIntMap {
         final int tableIndex = indexFor(hash, _table.length);
         for (Entry e = _table[tableIndex]; e != null; e = e._next) {
             if (e._hash == hash && key.equalsCharArray(e._key)) {
+                return e._value;
+            }
+        }
+                
+        return -1;
+    }
+
+    private final int get(char[] ch, int start, int length, int hash) {
+        if (_readOnlyMap != null) {
+            final int i = _readOnlyMap.get(ch, start, length, hash);
+            if (i != -1) {
+                return i;
+            }
+        }
+
+        final int tableIndex = indexFor(hash, _table.length);
+        for (Entry e = _table[tableIndex]; e != null; e = e._next) {
+            if (e._hash == hash && e._key.equalsCharArray(ch, start, length)) {
                 return e._value;
             }
         }

@@ -44,7 +44,7 @@ public class CharArray implements CharSequence {
     public int start;
     public int length;
                                                                                 
-    protected int _hash = 0;
+    protected int _hash;
 
     protected CharArray() {
     }
@@ -64,6 +64,7 @@ public class CharArray implements CharSequence {
             start = _start;
             length = _length;
         }
+        _hash = 0;
     }
     
     public final void cloneArray() {
@@ -88,6 +89,15 @@ public class CharArray implements CharSequence {
         return _hash;
     }
 
+    public static final int hashCode(char[] ch, int start, int length) {
+        int hash = 0;
+        for (int i = start; i < start + length; i++) {
+            hash = 31*hash + ch[i];
+        }
+        
+        return hash;
+    }
+    
     public final boolean equalsCharArray(CharArray cha) {
         if (this == cha) {
             return true;
@@ -99,6 +109,21 @@ public class CharArray implements CharSequence {
             int j = cha.start;
             while (n-- != 0) {
                 if (ch[i++] != cha.ch[j++])
+                    return false;
+            }
+            return true;
+        }
+        
+        return false;
+    }
+
+    public final boolean equalsCharArray(char[] ch, int start, int length) {
+        if (this.length == length) {
+            int n = this.length;
+            int i = this.start;
+            int j = start;
+            while (n-- != 0) {
+                if (this.ch[i++] != ch[j++])
                     return false;
             }
             return true;
@@ -138,6 +163,6 @@ public class CharArray implements CharSequence {
     }
 
     public final CharSequence subSequence(int start, int end) {
-        return new CharArray(ch, this.start + start, length - (end - start), false);
+        return new CharArray(ch, this.start + start, end - start, false);
     }
 }
