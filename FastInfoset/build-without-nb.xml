@@ -46,6 +46,7 @@
                         packagenames="com.sun.xml.fastinfoset.*"
 			destdir="${dist.dir}/javadoc"
                         version="true">
+			<classpath refid="compile.class.path"/>
                 </javadoc>
 	</target>
 
