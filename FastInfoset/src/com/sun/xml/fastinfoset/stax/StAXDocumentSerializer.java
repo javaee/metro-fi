@@ -378,13 +378,20 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         
     public void writeCharacters(String text) throws XMLStreamException {
          try {
-            if (text.length() == 0) {
+            final int length = text.length();
+            if (length == 0) {
                 return;
+            } else if (length < _charBuffer.length) {
+                encodeTerminationAndCurrentElement(true);
+                
+                text.getChars(0, length, _charBuffer, 0);
+                encodeCharacters(_charBuffer, 0, length);
+            } else {
+                encodeTerminationAndCurrentElement(true);
+                
+                final char ch[] = text.toCharArray();
+                encodeCharactersNoClone(ch, 0, length);
             }
-            
-            encodeTerminationAndCurrentElement(true);
-
-            encodeCharactersNoClone(text.toCharArray(), 0, text.length());
         }
         catch (IOException e) {
             throw new XMLStreamException(e);
