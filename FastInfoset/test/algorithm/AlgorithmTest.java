@@ -267,8 +267,7 @@ public class AlgorithmTest extends TestCase {
         externalVocabulary.encodingAlgorithm.add(APPLICATION_DEFINED_ALGORITHM_URI);
         
         Map externalVocabularies = new HashMap();
-        externalVocabularies.put(EXTERNAL_VOCABULARY_URI_STRING, externalVocabulary);
-        
+        externalVocabularies.put(EXTERNAL_VOCABULARY_URI_STRING, externalVocabulary);        
         p.setProperty(Properties.EXTERNAL_VOCABULARIES_PROPERTY, externalVocabularies);
                 
         GenericTestHandler h = new GenericTestHandler();
@@ -349,8 +348,13 @@ public class AlgorithmTest extends TestCase {
         
         // EncodingAlgorithmContentHandler
 
+        public final void object(String URI, int algorithm, Object data)  throws SAXException {
+            assertTrue(true);
+        }
+        
         public final void octets(String URI, int algorithm, byte[] b, int start, int length)  throws SAXException {
             assertEquals(APPLICATION_DEFINED_ALGORITHM_ID, algorithm);
+            assertEquals(APPLICATION_DEFINED_ALGORITHM_URI, URI);
             assertEquals(ARRAY_SIZE, length);
 
             for (int i = 0; i < ARRAY_SIZE; i++) {
@@ -359,6 +363,116 @@ public class AlgorithmTest extends TestCase {
         }        
     }
         
+    public void testRegisteredAlgorithms() throws Exception {
+        createArrayValues();
+        
+        byte[] b = createRegisteredTestFastInfosetDocument();
+        InputStream bais = new ByteArrayInputStream(b);
+        
+        SAXDocumentParser p = new SAXDocumentParser();
+
+        ParserVocabulary externalVocabulary = new ParserVocabulary();
+        externalVocabulary.encodingAlgorithm.add(APPLICATION_DEFINED_ALGORITHM_URI);
+        
+        Map externalVocabularies = new HashMap();
+        externalVocabularies.put(EXTERNAL_VOCABULARY_URI_STRING, externalVocabulary);        
+        p.setProperty(Properties.EXTERNAL_VOCABULARIES_PROPERTY, externalVocabularies);
+
+        Map algorithms = new HashMap();
+        algorithms.put(APPLICATION_DEFINED_ALGORITHM_URI, new FloatEncodingAlgorithm());
+        p.setRegisteredEncodingAlgorithms(algorithms);
+        
+        RegisteredTestHandler h = new RegisteredTestHandler();
+        
+        p.setContentHandler(h);
+        p.setLexicalHandler(h);
+        p.setEncodingAlgorithmContentHandler(h);
+        
+        p.parse(bais);
+    }
+    
+    protected byte[] createRegisteredTestFastInfosetDocument() throws Exception {
+        SAXDocumentSerializer s = new SAXDocumentSerializer();
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        s.setOutputStream(baos);
+
+        SerializerVocabulary externalVocabulary = new SerializerVocabulary();
+        externalVocabulary.encodingAlgorithm.add(APPLICATION_DEFINED_ALGORITHM_URI);
+
+        SerializerVocabulary initialVocabulary = new SerializerVocabulary();
+        initialVocabulary.setExternalVocabulary(
+                new URI(EXTERNAL_VOCABULARY_URI_STRING),
+                externalVocabulary, false);
+        
+        s.setVocabulary(initialVocabulary);
+        
+        Map algorithms = new HashMap();
+        algorithms.put(APPLICATION_DEFINED_ALGORITHM_URI, new FloatEncodingAlgorithm());
+        s.setRegisteredEncodingAlgorithms(algorithms);
+        
+        _attributes.clear();
+        
+        
+        s.startDocument();
+
+        s.startElement("", "e", "e", _attributes);
+        
+        // Application-defined algorithm 31
+        _attributes.addAttributeWithAlgorithmData(new QualifiedName("", "", "algorithm", "algorithm"), 
+                APPLICATION_DEFINED_ALGORITHM_URI, APPLICATION_DEFINED_ALGORITHM_ID, _floatArray);
+        s.startElement("", "algorithm", "algorithm", _attributes);
+        _attributes.clear();
+        s.object(APPLICATION_DEFINED_ALGORITHM_URI, APPLICATION_DEFINED_ALGORITHM_ID, _floatArray);
+        s.endElement("", "algorithm", "algorithm");
+        
+        
+        s.endElement("", "e", "e");
+        
+        s.endDocument();
+        
+        return baos.toByteArray();
+    }
+
+    public class RegisteredTestHandler extends FastInfosetDefaultHandler {
+        
+        // ContentHandler
+        
+        public final void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException {
+            if (atts.getLength() > 0) {
+                EncodingAlgorithmAttributes eas = (EncodingAlgorithmAttributes)atts;
+                
+                assertEquals(1, atts.getLength());
+                
+                if (localName.equals("algorithm")) {
+                    assertEquals("algorithm", eas.getLocalName(0));
+                    assertEquals(APPLICATION_DEFINED_ALGORITHM_ID, eas.getAlgorithmIndex(0));
+                    assertEquals(APPLICATION_DEFINED_ALGORITHM_URI, eas.getAlgorithmURI(0));
+                    assertEquals(true, eas.getAlgorithmData(0) instanceof float[]);
+                    float[] b = (float[])eas.getAlgorithmData(0);
+                    for (int is = 0; is < ARRAY_SIZE; is++) {
+                        assertEquals(_floatArray[is], b[is]);
+                    }
+                }
+            } else {
+                assertEquals("e", localName);
+            }
+        }
+        
+        public final void endElement(String namespaceURI, String localName, String qName) throws SAXException {
+        }
+        
+        // EncodingAlgorithmContentHandler
+
+        public final void object(String URI, int algorithm, Object data)  throws SAXException {
+            assertEquals(APPLICATION_DEFINED_ALGORITHM_ID, algorithm);
+            assertEquals(APPLICATION_DEFINED_ALGORITHM_URI, URI);
+        }
+        
+        public final void octets(String URI, int algorithm, byte[] b, int start, int length)  throws SAXException {
+            assertTrue(true);
+        }        
+    }
     
     protected void createArrayValues() {
         for (int i = 0; i < ARRAY_SIZE; i++) {
