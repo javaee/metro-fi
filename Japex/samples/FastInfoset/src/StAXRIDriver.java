@@ -50,7 +50,6 @@ public class StAXRIDriver extends JapexDriverBase {
     ByteArrayInputStream _inputStream;
     XMLInputFactory _factory;
     XMLStreamReader _reader;
-    long _bytesParsed;
     
     public StAXRIDriver() {
     }
@@ -81,8 +80,6 @@ public class StAXRIDriver extends JapexDriverBase {
         catch (IOException e) {
             e.printStackTrace();
         }
-        
-        _bytesParsed = 0;
     }
     
     public void warmup(TestCase testCase) {
@@ -105,8 +102,6 @@ public class StAXRIDriver extends JapexDriverBase {
             while (_reader.hasNext()) {
                 _reader.next();
             }
-            
-            _bytesParsed += _xmlFileByteArray.length;
         }
         catch (Exception e) {
             e.printStackTrace();

@@ -53,7 +53,6 @@ public class FastInfosetDriver extends JapexDriverBase {
     byte[] _fastInfosetDocumentByteArray;
     
     SAXDocumentParser _fidp;
-    int _bytesParsed;
     
     public FastInfosetDriver() {
     }
@@ -94,8 +93,6 @@ public class FastInfosetDriver extends JapexDriverBase {
         catch (Exception e) {
             e.printStackTrace();
         }
-        
-        _bytesParsed = 0;
     }
     
     public void warmup(TestCase testCase) {
@@ -116,7 +113,6 @@ public class FastInfosetDriver extends JapexDriverBase {
             _fidp.parse(
                 new InputSource(
                     new ByteArrayInputStream(_fastInfosetDocumentByteArray)));
-            _bytesParsed += _fastInfosetDocumentByteArray.length;
         }
         catch (Exception e) {
             e.printStackTrace();

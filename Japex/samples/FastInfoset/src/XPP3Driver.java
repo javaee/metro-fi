@@ -52,7 +52,6 @@ public class XPP3Driver extends JapexDriverBase {
     byte[] _xmlFileByteArray;
     ByteArrayInputStream _inputStream;
     XmlPullParser _parser;
-    long _bytesParsed;
     
     public XPP3Driver() {
     }
@@ -85,8 +84,6 @@ public class XPP3Driver extends JapexDriverBase {
         catch (IOException e) {
             e.printStackTrace();
         }
-        
-        _bytesParsed = 0;
     }
     
     public void warmup(TestCase testCase) {
@@ -105,8 +102,6 @@ public class XPP3Driver extends JapexDriverBase {
             _inputStream.reset();
             _parser.setInput(_inputStream, null);   // unknown encoding
             while (_parser.next() != XmlPullParser.END_DOCUMENT);
-            
-            _bytesParsed += _xmlFileByteArray.length;
         }
         catch (Exception e) {
             e.printStackTrace();

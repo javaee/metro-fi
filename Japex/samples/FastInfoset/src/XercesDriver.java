@@ -49,7 +49,6 @@ public class XercesDriver extends JapexDriverBase {
     byte[] _xmlFileByteArray;
     ByteArrayInputStream _inputStream;
     SAXParser _parser;
-    long _bytesParsed;
     
     public XercesDriver() {
     }
@@ -82,8 +81,6 @@ public class XercesDriver extends JapexDriverBase {
         catch (IOException e) {
             e.printStackTrace();
         }
-        
-        _bytesParsed = 0;
     }
     
     public void warmup(TestCase testCase) {
@@ -102,8 +99,6 @@ public class XercesDriver extends JapexDriverBase {
             _inputStream.reset();
             _parser.parse(_inputStream, 
                           new org.xml.sax.helpers.DefaultHandler());
-            
-            _bytesParsed += _xmlFileByteArray.length;
         }
         catch (Exception e) {
             e.printStackTrace();
