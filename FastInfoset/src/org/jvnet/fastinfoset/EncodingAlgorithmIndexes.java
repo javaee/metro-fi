@@ -46,8 +46,8 @@ package org.jvnet.fastinfoset;
  * 10. The indexes start from 0 instead of 1 as specified.<p>
  *
  * @version 0.1
- * @see com.sun.xml.fastinfoset.api.sax.EncodingAlgorithmContentHandler
- * @see com.sun.xml.fastinfoset.api.sax.EncodingAlgorithmAttributes
+ * @see org.jvnet.fastinfoset.sax.EncodingAlgorithmContentHandler
+ * @see org.jvnet.fastinfoset.sax.EncodingAlgorithmAttributes
  */
 public final class EncodingAlgorithmIndexes {
     public static final int HEXADECIMAL = 0;

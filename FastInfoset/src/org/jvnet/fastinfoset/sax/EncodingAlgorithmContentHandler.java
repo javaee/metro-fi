@@ -62,12 +62,12 @@ import org.xml.sax.SAXException;
  * {@link org.xml.sax.SAXNotRecognizedException SAXNotRecognizedException}</p>
  *
  * <p>To set the EncodingAlgorithmContentHandler for an Fast Infoset reader, use
- * {@link com.sun.xml.fastinfoset.api.sax.FastInfosetReader#setEncodingAlgorithmContentHandler 
+ * {@link org.jvnet.fastinfoset.sax.FastInfosetReader#setEncodingAlgorithmContentHandler 
  *  setEncodingAlgorithmContentHandler} method.<p>
  *
  * @version 0.1
- * @see com.sun.xml.fastinfoset.api.sax.PrimitiveTypeContentHandler
- * @see com.sun.xml.fastinfoset.api.sax.FastInfosetReader
+ * @see org.jvnet.fastinfoset.sax.PrimitiveTypeContentHandler
+ * @see org.jvnet.fastinfoset.sax.FastInfosetReader
  * @see org.xml.sax.XMLReader
  */
 public interface EncodingAlgorithmContentHandler {
@@ -97,7 +97,7 @@ public interface EncodingAlgorithmContentHandler {
      * @param length the number of byte to read from the array
      * @throws org.xml.sax.SAXException any SAX exception, possibly
      *            wrapping another exception
-     * @see com.sun.xml.fastinfoset.api.EncodingAlgorithmIndexes
+     * @see org.jvnet.fastinfoset.EncodingAlgorithmIndexes
      */    
     public void octets(String URI, int algorithm, byte[] b, int start, int length)  throws SAXException;    
 
@@ -113,7 +113,7 @@ public interface EncodingAlgorithmContentHandler {
      * @param o the encoding algorithm object
      * @throws org.xml.sax.SAXException any SAX exception, possibly
      *            wrapping another exception
-     * @see com.sun.xml.fastinfoset.api.EncodingAlgorithmIndexes
+     * @see org.jvnet.fastinfoset.EncodingAlgorithmIndexes
      */    
     public void object(String URI, int algorithm, Object o)  throws SAXException;    
 }

@@ -50,45 +50,95 @@ import org.xml.sax.ext.LexicalHandler;
 /**
  * Interface for reading an Fast Infoset document using callbacks.
  *
- * <p>FastInfosetReader is the interface that an Fast Infoset parser's 
+ * <p>FastInfosetReader is the interface that a Fast Infoset parser's 
  * SAX2 driver must implement. This interface allows an application to 
  * to register Fast Infoset specific event handlers for encoding algorithms.</p>
  *
- * <p>The support for encoding algorithms is categorised into four categories:
- *  1) None ; 2) Generic; 3) Primitive; and 4) Primitive and application. The 
- *  category of support is enabled by the registration (or not) of 
- *  EncodingAlgorithmContentHandler and PrimitiveTypeContentHandler as follows.<p>
+ * <p>The reception of encoding algorithm events is determined by 
+ * the registration of:
+ * <ul>
+ *    <li>A {@link PrimitiveTypeContentHandler}, for the recieving of events, 
+ *        associated with built-in encoding algorithms, for decoded data that 
+ *        can be reported as Java primitive types.</li>
+ *    <li>A {@link EncodingAlgorithmContentHandler}, for the recieving of events,
+ *        associated with built-in and application-defined encoding algorithms, for
+ *        decoded data that can be reported as an array of octets or as a Java 
+ *        Object.</li>
+ *    <li>{@link org.jvnet.fastinfoset.EncodingAlgorithm} implementations, for
+ *        the receiving of events, associated with application defined algorithms.
+ *        for decoded data that shall be reported as a Java Object by way of the
+ *        registered EncodingAlgorithmContentHandler.</li>
+ * </ul>
+ * </p>
  *
- * <p>"None": If the EncodingAlgorithmContentHandler and PrimitiveTypeContentHandler are 
- * not registered then encoding algorithm data for the built-in encoding
- * algorithms shall be notified as character data using the 
- * {@link org.xml.sax.ContentHandler#characters characters } method. The occurence
- * of encoding algorithm data for application defined encoding algorithms 
- * shall result in the throwing of a java.io.IOException.<p>
+ * <p>The reporting of element content events for built-in algorithms 
+ *    is determimed by the following:
+ * <ul>
+ *    <li>If a PrimitiveContentHandler is registered then decoded data is reported
+ *        as Java primitive types using the corresponding methods on the PrimitiveContentHandler
+ *        interface.</li>
+ *    <li>If a PrimitiveContentHandler is not registered and a 
+ *        EncodingAlgorithmContentHandler is registered then decoded data is reported
+ *        as Java Objects using {@link EncodingAlgorithmContentHandler#object(String, int, Object)}. 
+ *        An Object shall correspond to the Java primitive type that
+ *        would otherwise be reported using the PrimitiveContentHandler.</li>
+ *    <li>If neither is registered then then decoded data is reported as characters.</li>
+ * </ul>
+ * </p>
  *
- * <p>"Generic": If the EncodingAlgorithmContentHandler is registered and the 
- * PrimitiveTypeContentHandler is not registered then encoding algorithm data
- * for the built-in and application defined encoding algorithms shall be notified
- * through the callback methods of the EncodingAlgorithmContentHandler.<p>
+ * <p>The reporting of element content events for application-defined algorithms 
+ *    is determimed by the following:
+ * <ul>
+ *    <li>If an EncodingAlgorithmContentHandler is registered and there is no 
+ *        EncodingAlgorithm registered for an application-defined encoding algorithm
+ *        then decoded data for such an algoroithm is reported as an array of octets
+ *        using {@link EncodingAlgorithmContentHandler#octets(String, int, byte[], int, int)}; 
+ *        otherwise</li> 
+ *    <li>If there is an EncodingAlgorithm registered for the application-defined 
+ *        encoding algorithm then the decoded data is reported as a Java Object,
+ *        returned by decoding according to the EncodingAlgorithm, using
+ *        {@link EncodingAlgorithmContentHandler#object(String, int, Object)}.</li>
+ * </ul>
+ * </p>
+ * 
+ * <p>The reporting of attribute values for encoding algorithms is achieved using
+ * {@link EncodingAlgorithmAttributes} that extends {@link org.xml.sax.Attributes}.
+ * The registered ContentHandler may cast the attr paramter of the 
+ * {@link org.xml.sax.ContentHandler#startElement(String, String, String, org.xml.sax.Attributes)} 
+ * to the EncodingAlgorithmAttributes interface to access to encoding algorithm information.
+ * </p>
  *
- * <p>"Primitive": If the EncodingAlgorithmContentHandler is not registered and the 
- * PrimitiveTypeContentHandler is registered then encoding algorithm data
- * for the built-in encoding algorithms shall be notified through the callback 
- * methods of the PrimitiveTypeContentHandler. The occurence of encoding 
- * algorithm data for application defined encoding algorithms shall
- * result in the throwing of a java.io.IOException.<p>
+ * <p>The reporting of attribute values for built-in algorithms 
+ *    is determimed by the following:
+ * <ul>
+ *    <li>If a PrimitiveContentHandler or EncodingAlgorithmContentHandler is 
+ *        registered then decoded data is reported as Java Objects corresponding
+ *        to the Java primitive types. The Java Objects may be obtained using 
+ *        {@link EncodingAlgorithmAttributes#getAlgorithmData(int)}.
+ *    <li>If neither is registered then then decoded data is reported as characters.</li>
+ * </ul>
+ * </p>
  *
- * <p>"Primitive and application": If the EncodingAlgorithmContentHandler 
- * and PrimitiveTypeContentHandler are registered then then encoding algorithm 
- * data for the built-in encoding algorithms shall be notified through the 
- * callback methods of the PrimitiveTypeContentHandler, and the encoding 
- * algorithm data for the application defined encoding algorithms shall be 
- * notified through the callback methods of the EncodingAlgorithmContentHandler.<p>
+ * <p>The reporting of attribute values for application-defined algorithms 
+ *    is determimed by the following:
+ * <ul>
+ *    <li>If an EncodingAlgorithmContentHandler is registered and there is no 
+ *        EncodingAlgorithm registered for an application-defined encoding algorithm
+ *        then decoded data for such an algoroithm is reported as Java Object,
+ *        that is an instance of <code>byte[]</code>,
+ *        using {@link EncodingAlgorithmAttributes#getAlgorithmData(int)}; 
+ *        otherwise</li> 
+ *    <li>If there is an EncodingAlgorithm registered for the application-defined 
+ *        encoding algorithm then the decoded data is reported as a Java Object,
+ *        returned by decoding according to the EncodingAlgorithm, using
+ *        {@link EncodingAlgorithmAttributes#getAlgorithmData(int)}.</li>
+ * </ul>
+ * </p>
  *
  * @version 0.1
- * @see com.sun.xml.fastinfoset.api.VocabularyReader
- * @see com.sun.xml.fastinfoset.api.sax.PrimitiveTypeContentHandler
- * @see com.sun.xml.fastinfoset.api.sax.EncodingAlgorithmContentHandler
+ * @see org.jvnet.fastinfoset.VocbularyReader
+ * @see org.jvnet.fastinfoset.sax.PrimitiveTypeContentHandler
+ * @see org.jvnet.fastinfoset.sax.EncodingAlgorithmContentHandler
  * @see org.xml.sax.XMLReader
  * @see org.xml.sax.ContentHandler
  */
@@ -115,19 +165,44 @@ public interface FastInfosetReader extends XMLReader, VocbularyReader {
      */
     public void parse(InputStream s) throws IOException, FastInfosetException, SAXException;
 
+    
+    /**
+     * Sets the set of registered encoding algorithms.
+     *
+     * @param algorithms The set of registered algorithms.
+     */
     public void setRegisteredEncodingAlgorithms(Map algorithms);
     
+    /**
+     * Gets the set of registered encoding algorithms.
+     *
+     * @return The set of registered algorithms.
+     */
     public Map getRegisteredEncodingAlgorithms();
 
-    public LexicalHandler getLexicalHandler();
-   
+    /**
+     * Allow an application to register a lexical handler.
+     *
+     * <p>Applications may register a new or different handler in the
+     * middle of a parse, and the SAX parser must begin using the new
+     * handler immediately.</p>
+     *
+     * @param handler The lexical handler.
+     * @see #getLexicalHandler
+     */
     public void setLexicalHandler(LexicalHandler handler);
 
     /**
-     * Allow an application to register an encoding algorithm handler.
+     * Return the current lexical handler.
      *
-     * <p>If the application does not register an encoding algorithm handler, 
-     * TODO</p>
+     * @return The current lexical handler, or null if none
+     *         has been registered.
+     * @see #setLexicalHandler
+     */
+    public LexicalHandler getLexicalHandler();
+   
+    /**
+     * Allow an application to register an encoding algorithm handler.
      *
      * <p>Applications may register a new or different handler in the
      * middle of a parse, and the SAX parser must begin using the new
@@ -149,9 +224,6 @@ public interface FastInfosetReader extends XMLReader, VocbularyReader {
 
     /**
      * Allow an application to register a primitive type handler.
-     *
-     * <p>If the application does not register a primitive type handler, 
-     * TODO</p>
      *
      * <p>Applications may register a new or different handler in the
      * middle of a parse, and the SAX parser must begin using the new

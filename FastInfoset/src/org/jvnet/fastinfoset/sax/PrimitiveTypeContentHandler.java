@@ -63,7 +63,7 @@ import org.xml.sax.SAXException;
  * {@link org.xml.sax.SAXNotRecognizedException SAXNotRecognizedException}</p>
  *
  * <p>To set the PrimitiveTypeContentHandler for an Fast Infoset reader, use
- * {@link com.sun.xml.fastinfoset.api.sax.FastInfosetReader#setPrimitiveTypeContentHandler
+ * {@link org.jvnet.fastinfoset.sax.FastInfosetReader#setPrimitiveTypeContentHandler
  *  setPrimitiveTypeContentHandler} method.<p>
 
  * <p>The Parser will call methods of this interface to report each 
@@ -75,8 +75,8 @@ import org.xml.sax.SAXException;
  * <p>The application must not attempt to read from the array
  * outside of the specified range.</p>
  * @version 0.1
- * @see com.sun.xml.fastinfoset.api.sax.EncodingAlgorithmContentHandler
- * @see com.sun.xml.fastinfoset.api.sax.FastInfosetReader
+ * @see org.jvnet.fastinfoset.sax.EncodingAlgorithmContentHandler
+ * @see org.jvnet.fastinfoset.sax.FastInfosetReader
  * @see org.xml.sax.XMLReader
  */
 public interface PrimitiveTypeContentHandler {

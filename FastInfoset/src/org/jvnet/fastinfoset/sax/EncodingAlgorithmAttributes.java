@@ -46,7 +46,7 @@ import org.xml.sax.Attributes;
  * data.
  *
  * @version 0.1
- * @see com.sun.xml.fastinfoset.api.sax.FastInfosetReader
+ * @see org.jvnet.fastinfoset.sax.FastInfosetReader
  * @see org.xml.sax.XMLReader
  */
 public interface EncodingAlgorithmAttributes extends Attributes {
@@ -54,13 +54,11 @@ public interface EncodingAlgorithmAttributes extends Attributes {
     /**
      * Return the URI of the encoding algorithm.
      *
-     * <p>If the encoding algorithm support is "None" then rull is returned.<p>
+     * <p>If the algorithm data corresponds to a built-in encoding algorithm
+     *    then the null is returned.</p>
      *
-     * <p> If "Generic" and "Primitive and application" then null is returned 
-     * if the encoding algorithm data is for a built-in encoding algorithm and 
-     * the URI is returned for an application defined encoding algorithm.<p>
-     *
-     * <p> If "Primitive" then null is returned.<p>
+     * <p>If the algorithm data corresponds to an application-defined encoding 
+     *    algorithm then the URI of the algorithm is returned.</p>
      *
      * @param index The attribute index (zero-based).
      * @return The URI.
@@ -68,42 +66,28 @@ public interface EncodingAlgorithmAttributes extends Attributes {
     public String getAlgorithmURI(int index);
  
     /**
-     * Return the index of the encoding algorithm
-     *
-     * <p>If the encoding algorithm support is "None" then 0 is returned.<p>
-     *
-     * <p> If "Generic" and "Primitive and application" then the index of the
-     * built-in or application defined encoding algorithm is returned.<p>
-     *
-     * <p> If "Primitive" then the index of the built-in encoding algorithm 
-     * is returned, otherwise 0 is returned.<p>
+     * Return the index of the encoding algorithm.
      *
      * @param index The attribute index (zero-based).
      * @return The index
-     * @see com.sun.xml.fastinfoset.api.EncodingAlgorithmIndexes       
+     * @see org.jvnet.fastinfoset.EncodingAlgorithmIndexes       
      */
     public int getAlgorithmIndex(int index);
     
     /**
      * Return the data of the encoding algorithm.
      *
-     * <p>If the encoding algorithm support is "None" then null is returned.<p>
+     * <p>If the algorithm data corresponds to a built-in encoding algorithm
+     *    then an Object corresponding to the Java primitive type is returned.</p>
      *
-     * <p> If "Generic" then a byte[] object is returned for built-in and
-     * application defined encoding algorithms.<p>
-     *
-     * <p> If "Primitive" then an object that is an array of the primitive type
-     * is returned for a built-in encoding algorithm, otherwise null is
-     * returned.<p>
-     *
-     * <p> If "Primitive and application" then an object that is an array of 
-     * the primitive type is returned for a built-in encoding algorithm and a 
-     * byte[] object is returned for application defined encoding algorithms.
-     * <p>
+     * <p>If the algorithm data corresponds to an application-defined encoding 
+     *    algorithm then an Object that is an instance of <code>byte[]</code>
+     *    is returned if there is no EncodingAlgorithm registered for the 
+     *    application-defined encoding algorithm URI. Otherwise, an Object produced 
+     *    from the registeredEncodingAlgorithm is returned.</p>
      *
      * @param index The attribute index (zero-based).
      * @return The data
-     * @see com.sun.xml.fastinfoset.api.EncodingAlgorithmIndexes       
      */
     public Object getAlgorithmData(int index);    
 }
