@@ -45,7 +45,7 @@
                 </javadoc>
 	</target>
 
-        <target name="package" depends="doc">
+        <target name="package-contents" depends="doc">
             <copy todir="package/${ant.project.name}_${version}_${DSTAMP}_${TSTAMP}">
                 <fileset dir="dist">
                     <include name="javadoc/**"/>
@@ -60,6 +60,14 @@
                     <include name="LICENSE.txt"/>
                 </fileset>
             </copy>
+        </target>
+
+        <target name="package" depends="package-contents">
+            <zip destfile="package/${ant.project.name}_${version}_${DSTAMP}_${TSTAMP}.zip">
+                <fileset dir="package">
+                    <include name="${ant.project.name}_${version}_${DSTAMP}_${TSTAMP}/**"/>
+                </fileset>                
+            </zip>
         </target>
         
 </project>
