@@ -910,6 +910,46 @@ public class SAXDocumentParser extends Decoder implements XMLReader {
                     _attributes.addAttribute(name, value);
                     break;
                 }
+                case DecoderStateTables.NISTRING_UTF16_SMALL_LENGTH:
+                {
+                    final boolean addToTable = (b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0;
+                    _octetBufferLength = (b & EncodingConstants.OCTET_STRING_LENGTH_5TH_BIT_SMALL_MASK) + 1;
+                    value = decodeUtf16StringAsString();
+                    if (addToTable) {
+                        _v.attributeValue.add(value);
+                    }
+                    
+                    _attributes.addAttribute(name, value);
+                    break;
+                }
+                case DecoderStateTables.NISTRING_UTF16_MEDIUM_LENGTH:
+                {
+                    final boolean addToTable = (b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0;
+                    _octetBufferLength = read() + EncodingConstants.OCTET_STRING_LENGTH_5TH_BIT_SMALL_LIMIT;
+                    value = decodeUtf16StringAsString();
+                    if (addToTable) {
+                        _v.attributeValue.add(value);
+                    }
+                    
+                    _attributes.addAttribute(name, value);
+                    break;
+                }
+                case DecoderStateTables.NISTRING_UTF16_LARGE_LENGTH:
+                {
+                    final boolean addToTable = (b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0;
+                    final int length = (read() << 24) |
+                        (read() << 16) |
+                        (read() << 8) |
+                        read();
+                    _octetBufferLength = length + EncodingConstants.OCTET_STRING_LENGTH_5TH_BIT_MEDIUM_LIMIT;
+                    value = decodeUtf16StringAsString();
+                    if (addToTable) {
+                        _v.attributeValue.add(value);
+                    }
+
+                    _attributes.addAttribute(name, value);
+                    break;
+                }
                 case DecoderStateTables.NISTRING_RA:
                 {
                     final boolean addToTable = (b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0;
