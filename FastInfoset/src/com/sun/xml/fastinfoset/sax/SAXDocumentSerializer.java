@@ -65,10 +65,17 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
     }
 
 
+    public void reset() {
+        super.reset();
+        
+        _elementHasNamespaces = false;
+    }
+    
     // ContentHandler
 
     public final void startDocument() throws SAXException {
         try {
+            reset();
             encodeHeader(false);
             encodeInitialVocabulary();
         } catch (IOException e) {

@@ -70,6 +70,7 @@ public class DOMDocumentSerializer extends Encoder {
     }
     
     public final void serialize(Document d) throws IOException {
+        reset();
         encodeHeader(false);
         encodeInitialVocabulary();
         

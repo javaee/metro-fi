@@ -156,14 +156,28 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     
     public void resetNamespaces() {
         _prefixMap.clear();
-        pushNamespaceDecl("", "");
-        pushNamespaceDecl("xml", "http://www.w3.org/XML/1998/namespace");
+        _prefixMap.put("", "");
+        _prefixMap.put(EncodingConstants.XML_NAMESPACE_PREFIX, EncodingConstants.XML_NAMESPACE_NAME);
+    }
+
+    public void setInputStream(InputStream s) {
+        super.setInputStream(s);        
+        reset();
     }
     
     public void reset() {
         super.reset();
-        _stackCount = -1;
-        _namespaceAIIsIndex = 0;
+        
+        if (_internalState != INTERNAL_STATE_START_DOCUMENT &&
+            _internalState != INTERNAL_STATE_END_DOCUMENT) {
+            resetNamespaces();
+        
+            _stackCount = -1;
+
+            _namespaceAIIsIndex = 0;
+            _characters = null;
+            _algorithmData = null;
+        }
         
         _eventType = START_DOCUMENT;
         _internalState = INTERNAL_STATE_START_DOCUMENT;        
@@ -464,9 +478,9 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                      */
                     String entity_reference_name = decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherNCName);
                     
-                    String system_identifier = ((_b & EncodingConstants.UNEXPANDED_ENTITY_SYSTEM_IDENTIFIER_FLAG) > 0)
+                    String system_identifier = ((b & EncodingConstants.UNEXPANDED_ENTITY_SYSTEM_IDENTIFIER_FLAG) > 0)
                     ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
-                    String public_identifier = ((_b & EncodingConstants.UNEXPANDED_ENTITY_PUBLIC_IDENTIFIER_FLAG) > 0)
+                    String public_identifier = ((b & EncodingConstants.UNEXPANDED_ENTITY_PUBLIC_IDENTIFIER_FLAG) > 0)
                     ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
                     return _eventType;
                 }
@@ -505,17 +519,14 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
             }
         } catch (IOException e) {
             reset();
-            resetNamespaces();
             e.printStackTrace();
             throw new XMLStreamException(e);
         } catch (FastInfosetException e) {
             reset();
-            resetNamespaces();
             e.printStackTrace();
             throw new XMLStreamException(e);
         } catch (RuntimeException e) {
             reset();
-            resetNamespaces();
             e.printStackTrace();
             throw e;
         }

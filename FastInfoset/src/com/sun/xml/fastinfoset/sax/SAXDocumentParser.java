@@ -130,6 +130,12 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         
     }
     
+    protected void resetOnError() {
+        _clearAttributes = false;
+        _attributes.clear();
+        _namespaceAIIsIndex = 0;
+    }
+    
     // XMLReader interface
     
     public boolean getFeature(String name)
@@ -335,6 +341,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 _errorHandler.fatalError(new SAXParseException(e.getClass().getName(), null, e));
             } catch (Exception ee) {
             }
+            resetOnError();
             // Wrap runtime exception
             throw new FastInfosetException(e);
         } catch (FastInfosetException e) {
@@ -342,12 +349,14 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 _errorHandler.fatalError(new SAXParseException(e.getClass().getName(), null, e));
             } catch (Exception ee) {
             }
+            resetOnError();
             throw e;
         } catch (IOException e) {
             try {
                 _errorHandler.fatalError(new SAXParseException(e.getClass().getName(), null, e));
             } catch (Exception ee) {
             }
+            resetOnError();
             throw e;
         }
     }
