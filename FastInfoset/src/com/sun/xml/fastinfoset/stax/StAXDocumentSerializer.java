@@ -94,8 +94,11 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
      */
     protected NamespaceSupport _nsSupport = new NamespaceSupport();
     
-    protected NamespaceContext _nsContext = new NamespaceContextImpl();
+    protected boolean[] _nsSupportContextStack = new boolean[32];
+    protected int _stackCount = -1;    
     
+    protected NamespaceContext _nsContext = new NamespaceContextImpl();
+
     /**
      * List of namespaces defined in the current element.
      */
@@ -118,6 +121,7 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         _attributesArrayIndex = 0;
         _namespacesArrayIndex = 0;
         _nsSupport.reset();
+        _stackCount = -1;
                 
         _currentUri = _currentPrefix = null;
         _currentLocalName = null;
@@ -204,8 +208,16 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         _currentLocalName = localName;
         _currentPrefix = prefix;
         _currentUri = namespaceURI;
+
+        _stackCount++;
+        if (_stackCount == _nsSupportContextStack.length) {
+            boolean[] nsSupportContextStack = new boolean[_stackCount * 2];
+            System.arraycopy(_nsSupportContextStack, 0, nsSupportContextStack, 0, _nsSupportContextStack.length);
+            _nsSupportContextStack = nsSupportContextStack;
+        }
         
-        _nsSupport.pushContext();
+        _nsSupportContextStack[_stackCount] = false;
+        // _nsSupport.pushContext();
     }
     
     public void writeEmptyElement(String localName)
@@ -231,7 +243,15 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         _currentPrefix = prefix;
         _currentUri = namespaceURI;
         
-        _nsSupport.pushContext();
+        _stackCount++;
+        if (_stackCount == _nsSupportContextStack.length) {
+            boolean[] nsSupportContextStack = new boolean[_stackCount * 2];
+            System.arraycopy(_nsSupportContextStack, 0, nsSupportContextStack, 0, _nsSupportContextStack.length);
+            _nsSupportContextStack = nsSupportContextStack;
+        }
+        
+        _nsSupportContextStack[_stackCount] = false;
+        //_nsSupport.pushContext();
     }
         
     public void writeEndElement() throws XMLStreamException {
@@ -241,7 +261,9 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
             
         try {            
             encodeElementTermination();
-            _nsSupport.popContext();
+            if (_nsSupportContextStack[_stackCount--] == true) {
+                _nsSupport.popContext();
+            }
         }
         catch (IOException e) {
             throw new XMLStreamException(e);
@@ -448,6 +470,11 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
     public void setPrefix(String prefix, String uri) 
         throws XMLStreamException 
     {
+        if (_stackCount > -1 && _nsSupportContextStack[_stackCount] == false) {
+            _nsSupportContextStack[_stackCount] = true;
+            _nsSupport.pushContext();
+        }
+        
         _nsSupport.declarePrefix(prefix, uri);
     }
     
@@ -566,6 +593,15 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
                 _attributesArrayIndex = 0;
                 _inStartElement = false;
 
+                if (_isEmptyElement) {
+                    encodeElementTermination();
+                    if (_nsSupportContextStack[_stackCount--] == true) {
+                        _nsSupport.popContext();
+                    }
+                    
+                    _isEmptyElement = false;
+                }
+                
                 if (terminateAfter) {
                     encodeTermination();
                 }
