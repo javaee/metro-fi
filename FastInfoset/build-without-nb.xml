@@ -1,6 +1,8 @@
 <project name="FastInfoset" default="dist" basedir=".">
 
-	<property name="app.jar" value="FastInfoset.jar"/>
+	<property name="version" value="0.1"/>
+        
+	<property name="app.jar" value="${ant.project.name}.jar"/>
 
 	<property name="jsr173_api.jar" value="lib/jsr173_api.jar"/>
 
@@ -9,17 +11,21 @@
 	</path>
 
 	<target name="prepare">
+                <tstamp>
+                    <format property="TSTAMP" pattern="hhmmss"/>
+                </tstamp>
 		<mkdir dir="build/classes"/>
 		<mkdir dir="dist"/>
+		<mkdir dir="package"/>
 	</target>
 
 	<target name="clean">
-		<delete file="dist/${app.jar}"/>
+		<delete dir="dist"/>
 		<delete dir="build/classes"/>
 	</target>
 
 	<target name="compile" depends="prepare">
-		<javac srcdir="src" destdir="build/classes"
+		<javac source="1.4" srcdir="src" destdir="build/classes"
 			debug="on" optimize="on" deprecation="on">
 			<classpath refid="compile.class.path"/>
 		</javac>
@@ -27,7 +33,33 @@
 
 	<target name="dist" depends="compile">
 		<jar jarfile="dist/${app.jar}"
-			basedir="build/classes/"/>
+			basedir="build/classes"/>
 	</target>
 
+	<target name="doc" depends="dist">
+		<javadoc source="1.4"
+                        sourcepath="src"
+                        packagenames="com.sun.xml.fastinfoset.*"
+			destdir="dist/javadoc"
+                        version="true">
+                </javadoc>
+	</target>
+
+        <target name="package" depends="doc">
+            <copy todir="package/${ant.project.name}_${version}_${DSTAMP}_${TSTAMP}">
+                <fileset dir="dist">
+                    <include name="javadoc/**"/>
+                </fileset>
+                <fileset dir=".">
+                    <include name="README-PACKAGE.txt"/>
+                    <include name="bin/*"/>
+                    <include name="lib/*.jar"/>
+                    <include name="dist/${app.jar}"/>
+                </fileset>
+                <fileset dir="..">
+                    <include name="LICENSE.txt"/>
+                </fileset>
+            </copy>
+        </target>
+        
 </project>
