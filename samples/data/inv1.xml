@@ -1,4 +1,5 @@
-<ns1:invoice xmlns:ns1="http://www.sun.com/schema/spidermarkexpress/sm-inv">
+<?xml version="1.0" encoding="UTF-8"?>
+<invoice xmlns:ns1="http://www.sun.com/schema/spidermarkexpress/sm-inv" ns1="http://www.sun.com/schema/spidermarkexpress/sm-inv">
   <Header>
     <IssueDateTime>2003-03-13T13:13:32-08:00</IssueDateTime>
     <Identifier schemeAgencyName="ISO" schemeName="Invoice">15570720</Identifier>
@@ -111,4 +112,4 @@
     <PriceAmount currencyId="USD">18222.80</PriceAmount>
     <PackingSlipIdentifier schemeAgencyName="ISO" schemeName="Packing Slip">156263</PackingSlipIdentifier>
   </Summary>
-</ns1:invoice>
+</invoice>

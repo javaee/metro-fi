@@ -61,6 +61,11 @@ import com.sun.xml.fastinfoset.stax.SAX2StAXWriter;
 
 /** <p>Serializes an XML input stream into FI document using 
  *  StAX document serializer defined in the fastinfoset.stax package.</p>
+ *  The sample demonstrates how to use StAXDocumentSerializer as a SAX handler and JAXP
+ *  transformer to convert an XML file into a FI document. As shown in the sample, 
+ *  transforming a DOM source to SAX Result involves very little coding. However, the process
+ *  may not be efficient due to the construction of DOM source. 
+ * 
  *  In the sample, a DOMSource is constructed out of an XML file input (see method getDOMSource)
  *  and a SAXResult is instantiated using an instance of SAX2StAXWriter as handlers (see method 
  *  getSAXResult). Utility class 

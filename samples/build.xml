@@ -6,6 +6,7 @@
     <property name="finf-file" value="data/inv1.finf"/>
     <property name="simple-xml-file" value="data/inv1a.xml"/>
     <property name="simple-finf-file" value="data/inv1a.finf"/>
+    <property name="serializer-finf-file" value="data/inv1c.finf"/>
     
     <property name="lib-dir" value="lib"/>
     <property name="dist-dir" value="dist"/>
@@ -44,36 +45,46 @@
     </target>
         
     <target name="XMLToFI" depends="compile">
-        <java dir="." fork="true" classname="samples.sax.XMLToFI">
+        <java dir="." fork="true" classname="samples.common.XMLToFastInfoset">
             <classpath refid="class.path"/>
             <arg line="${xml-file}"/>
             <arg line="${simple-xml-file}"/>
         </java>
     </target>
 
-    <target name="FISAXParser" depends="XMLToFI">
-        <java dir="." fork="true" classname="samples.sax.FIParser">
+    <!-- SAX samples -->
+    <target name="SAXParser" depends="XMLToFI">
+        <java dir="." fork="true" classname="samples.sax.FastInfosetParser">
             <classpath refid="class.path"/>
             <arg line="${simple-finf-file}"/>
         </java>
     </target>
 
-    <target name="FISAXSerializer" depends="compile">
-        <java dir="." fork="true" classname="samples.sax.FISerializer">
+    <target name="SAXSerializer" depends="compile">
+        <java dir="." fork="true" classname="samples.sax.FastInfosetSerializer">
+            <classpath refid="class.path"/>
+            <arg line="${serializer-finf-file}"/>
+        </java>
+    </target>
+
+    <!-- transform samples -->
+    <target name="XMLToFI_SAX" depends="compile">
+        <java dir="." fork="true" classname="samples.transform.XMLToFastInfosetSAXSerializer">
             <classpath refid="class.path"/>
             <arg line="${xml-file}"/>
             <arg line="${finf-file}"/>
         </java>
     </target>
 
-    <target name="FIStAXSerializer" depends="compile">
-        <java dir="." fork="true" classname="samples.stax.DocumentSerializer">
+    <target name="XMLToFI_StAX" depends="compile">
+        <java dir="." fork="true" classname="samples.transform.XMLToFastInfosetStAXSerializer">
             <classpath refid="class.path"/>
             <arg line="${xml-file}"/>
             <arg line="${finf-file}"/>
         </java>
     </target>
 
+    <!-- StAX samples -->
     <target name="StreamReader" depends="XMLToFI">
         <java dir="." fork="true" classname="samples.stax.StreamReader">
             <classpath refid="class.path"/>
@@ -88,7 +99,15 @@
             <arg line="${simple-xml-file}"/>
         </java>
     </target>
+    <target name="StAXSerializer" depends="compile">
+        <java dir="." fork="true" classname="samples.stax.FastInfosetSerializer">
+            <classpath refid="class.path"/>
+            <arg line="${serializer-finf-file}"/>
+        </java>
+    </target>
 
+    
+    <!-- JavaDocs -->
     <target name="doc" depends="compile">
             
             <javadoc source="1.4"
