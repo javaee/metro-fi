@@ -117,7 +117,9 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         _manager = manager;
     }
     
-    public void reset() {        
+    public void reset() {
+        super.reset();
+        
         _attributesArrayIndex = 0;
         _namespacesArrayIndex = 0;
         _nsSupport.reset();

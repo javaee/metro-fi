@@ -74,9 +74,21 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
 
     protected OutputStream _s;
 
+    protected char[] _charBuffer = new char[512];
+
+    protected byte[] _octetBuffer = new byte[1024];
+    
+    protected int _octetBufferIndex;
+   
+    protected int _markIndex = -1;
+
     
     // FastInfosetSerializer
 
+    public void reset() {
+        _terminate = false;
+    }
+    
     public void setRegisteredEncodingAlgorithms(Map algorithms) {
         _registeredEncodingAlgorithms = algorithms;
         if (_registeredEncodingAlgorithms == null) {
@@ -111,6 +123,8 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     
     
     public void setOutputStream(OutputStream s) {
+        _octetBufferIndex = 0;
+        _markIndex = -1;
         _s = s;
     }
 
@@ -1063,8 +1077,6 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
 
 
 
-    protected char[] _charBuffer = new char[512];
-
     protected final int encodeUTF8String(String s) throws IOException {
         final int length = s.length();
         if (length < _charBuffer.length) {
@@ -1075,11 +1087,6 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
             return encodeUTF8String(ch, 0, length);
         }
     }
-
-
-    protected byte[] _octetBuffer = new byte[1024];
-    protected int _octetBufferIndex;
-    protected int _markIndex = -1;
 
     protected final void mark() throws IOException {
         _markIndex = _octetBufferIndex;

@@ -133,6 +133,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     
     public StAXDocumentParser() {
         reset();
+        resetNamespaces();
     }
     
     public StAXDocumentParser(InputStream s) {
@@ -145,13 +146,19 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         _manager = manager;
     }
     
-    public void reset() {        
-        _eventType = START_DOCUMENT;
-        _internalState = INTERNAL_STATE_START_DOCUMENT;
-        
+    public void resetNamespaces() {
         _prefixMap.clear();
         pushNamespaceDecl("", "");
         pushNamespaceDecl("xml", "http://www.w3.org/XML/1998/namespace");
+    }
+    
+    public void reset() {
+        super.reset();
+        _stackCount = -1;
+        _namespaceAIIsIndex = 0;
+        
+        _eventType = START_DOCUMENT;
+        _internalState = INTERNAL_STATE_START_DOCUMENT;        
     }
     
     // -- XMLStreamReader Interface -------------------------------------------
@@ -450,42 +457,53 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     return _eventType;
                 }
                 case DecoderStateTables.TERMINATOR_DOUBLE:
-                    if (_stackCount == -1) {
-                        _internalState = INTERNAL_STATE_END_DOCUMENT;
-                        return _eventType = END_DOCUMENT;
-                    }
+                    if (_stackCount != -1) {
+                        // Pop information off the stack
+                        _qualifiedName = _qNameStack[_stackCount];
+                        _currentNamespaceAIIsStart = _namespaceAIIsStartStack[_stackCount];
+                        _currentNamespaceAIIsEnd = _namespaceAIIsEndStack[_stackCount];
+                        _qNameStack[_stackCount--] = null;
 
-                    // Pop information off the stack
-                    _qualifiedName = _qNameStack[_stackCount];
-                    _currentNamespaceAIIsStart = _namespaceAIIsStartStack[_stackCount];
-                    _currentNamespaceAIIsEnd = _namespaceAIIsEndStack[_stackCount];
-                    _qNameStack[_stackCount--] = null;
-
-                    _internalState = INTERNAL_STATE_DOUBLE_TERMINATE_ELEMENT;
-                    return _eventType = END_ELEMENT;
+                        _internalState = INTERNAL_STATE_DOUBLE_TERMINATE_ELEMENT;
+                        return _eventType = END_ELEMENT;
+                    } 
+                     
+                    _internalState = INTERNAL_STATE_END_DOCUMENT;
+                    return _eventType = END_DOCUMENT;
                 case DecoderStateTables.TERMINATOR_SINGLE:
-                    if (_stackCount == -1) {
-                        _internalState = INTERNAL_STATE_END_DOCUMENT;
-                        return _eventType = END_DOCUMENT;
-                    }
+                    if (_stackCount != -1) {
+                        // Pop information off the stack
+                        _qualifiedName = _qNameStack[_stackCount];
+                        _currentNamespaceAIIsStart = _namespaceAIIsStartStack[_stackCount];
+                        _currentNamespaceAIIsEnd = _namespaceAIIsEndStack[_stackCount];
+                        _qNameStack[_stackCount--] = null;
 
-                    // Pop information off the stack
-                    _qualifiedName = _qNameStack[_stackCount];
-                    _currentNamespaceAIIsStart = _namespaceAIIsStartStack[_stackCount];
-                    _currentNamespaceAIIsEnd = _namespaceAIIsEndStack[_stackCount];
-                    _qNameStack[_stackCount--] = null;
-
-                    if (_currentNamespaceAIIsEnd > 0) {
-                        _internalState = INTERNAL_STATE_SINGLE_TERMINATE_ELEMENT_WITH_NAMESPACES;
+                        if (_currentNamespaceAIIsEnd > 0) {
+                            _internalState = INTERNAL_STATE_SINGLE_TERMINATE_ELEMENT_WITH_NAMESPACES;
+                        }
+                        return _eventType = END_ELEMENT;
                     }
-                    return _eventType = END_ELEMENT;
+                    
+                    _internalState = INTERNAL_STATE_END_DOCUMENT;
+                    return _eventType = END_DOCUMENT;
                 default:
                     throw new FastInfosetException("Illegal state when decoding a child of an EII");
             }
         } catch (IOException e) {
+            reset();
+            resetNamespaces();
+            e.printStackTrace();
             throw new XMLStreamException(e);
         } catch (FastInfosetException e) {
+            reset();
+            resetNamespaces();
+            e.printStackTrace();
             throw new XMLStreamException(e);
+        } catch (RuntimeException e) {
+            reset();
+            resetNamespaces();
+            e.printStackTrace();
+            throw e;
         }
     }
     
@@ -998,8 +1016,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         }
         _qNameStack[_stackCount] = _qualifiedName;
         _namespaceAIIsStartStack[_stackCount] = _currentNamespaceAIIsStart;
-        _namespaceAIIsEndStack[_stackCount] = _currentNamespaceAIIsEnd;
-        
+        _namespaceAIIsEndStack[_stackCount] = _currentNamespaceAIIsEnd;        
     }
     
     protected final void processAIIs() throws FastInfosetException, IOException {
