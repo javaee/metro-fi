@@ -219,7 +219,7 @@ public class DOMDocumentSerializer extends Encoder {
             return;
         } else if (length < _charBuffer.length) {
             text.getChars(0, length, _charBuffer, 0);
-            encodeCharactersNoClone(_charBuffer, 0, length);
+            encodeCharacters(_charBuffer, 0, length);
         } else {
             final char ch[] = text.toCharArray();
             encodeCharactersNoClone(ch, 0, length);
@@ -234,7 +234,7 @@ public class DOMDocumentSerializer extends Encoder {
             return;
         } else if (length < _charBuffer.length) {
             comment.getChars(0, length, _charBuffer, 0);
-            encodeCommentNoClone(_charBuffer, 0, length);
+            encodeComment(_charBuffer, 0, length);
         } else {
             final char ch[] = comment.toCharArray();
             encodeCommentNoClone(ch, 0, length);
