@@ -498,7 +498,7 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
      */
     public void setNamespaceContext(NamespaceContext context)
         throws XMLStreamException 
-    {
+    {           
         throw new UnsupportedOperationException("setNamespaceContext");
     }
     

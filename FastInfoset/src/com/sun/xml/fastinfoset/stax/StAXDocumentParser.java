@@ -282,7 +282,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                             + 1;
                     decodeUtf8StringAsCharBuffer();
                     if ((b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
+                        _v.characterContentChunk.add(_charBuffer, _charBufferLength);
                     }
                     
                     _characters = _charBuffer;
@@ -293,7 +293,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     _octetBufferLength = read() + EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_LIMIT;
                     decodeUtf8StringAsCharBuffer();
                     if ((b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
+                        _v.characterContentChunk.add(_charBuffer, _charBufferLength);
                     }
                     
                     _characters = _charBuffer;
@@ -308,7 +308,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     _octetBufferLength += EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_MEDIUM_LIMIT;
                     decodeUtf8StringAsCharBuffer();
                     if ((b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
+                        _v.characterContentChunk.add(_charBuffer, _charBufferLength);
                     }
                     
                     _characters = _charBuffer;
@@ -320,7 +320,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     + 1;
                     decodeUtf16StringAsCharBuffer();
                     if ((b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
+                        _v.characterContentChunk.add(_charBuffer, _charBufferLength);
                     }
                     
                     _characters = _charBuffer;
@@ -331,7 +331,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     _octetBufferLength = read() + EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_LIMIT;
                     decodeUtf16StringAsCharBuffer();
                     if ((b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
+                        _v.characterContentChunk.add(_charBuffer, _charBufferLength);
                     }
                     
                     _characters = _charBuffer;
@@ -346,7 +346,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     _octetBufferLength += EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_MEDIUM_LIMIT;
                     decodeUtf16StringAsCharBuffer();
                     if ((b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
+                        _v.characterContentChunk.add(_charBuffer, _charBufferLength);
                     }
                     
                     _characters = _charBuffer;
@@ -364,7 +364,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     // TODO obtain restricted alphabet given _identifier value
                     decodeRAOctetsAsCharBuffer(null);
                     if ((b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
+                        _v.characterContentChunk.add(_charBuffer, _charBufferLength);
                     }
                     
                     _characters = _charBuffer;
@@ -773,7 +773,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         }
         
         
-        return 0;
+        return _charactersOffset;
     }
     
     public final int getTextLength() {

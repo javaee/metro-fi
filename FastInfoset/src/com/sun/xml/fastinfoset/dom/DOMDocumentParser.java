@@ -301,7 +301,7 @@ public class DOMDocumentParser extends Decoder {
                         + 1;
                     String v = decodeUtf8StringAsString();
                     if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _v.characterContentChunk.add(new CharArrayString(v, false));
+                        _v.characterContentChunk.add(_charBuffer, _charBufferLength);
                     }
                     
                     _currentNode.appendChild(_document.createTextNode(v));
@@ -312,7 +312,7 @@ public class DOMDocumentParser extends Decoder {
                     _octetBufferLength = read() + EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_LIMIT;
                     String v = decodeUtf8StringAsString();
                     if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _v.characterContentChunk.add(new CharArrayString(v, false));
+                        _v.characterContentChunk.add(_charBuffer, _charBufferLength);
                     }
                     
                     _currentNode.appendChild(_document.createTextNode(v));
@@ -327,7 +327,7 @@ public class DOMDocumentParser extends Decoder {
                     _octetBufferLength += EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_MEDIUM_LIMIT;
                     String v = decodeUtf8StringAsString();
                     if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                         _v.characterContentChunk.add(new CharArrayString(v, false));
+                        _v.characterContentChunk.add(_charBuffer, _charBufferLength);
                     }
                     
                     _currentNode.appendChild(_document.createTextNode(v));
@@ -339,7 +339,7 @@ public class DOMDocumentParser extends Decoder {
                         + 1;
                     String v = decodeUtf16StringAsString();
                     if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                         _v.characterContentChunk.add(new CharArrayString(v, false));
+                        _v.characterContentChunk.add(_charBuffer, _charBufferLength);
                     }
                     
                     _currentNode.appendChild(_document.createTextNode(v));
@@ -350,7 +350,7 @@ public class DOMDocumentParser extends Decoder {
                     _octetBufferLength = read() + EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_LIMIT;
                     String v = decodeUtf16StringAsString();
                     if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                         _v.characterContentChunk.add(new CharArrayString(v, false));
+                        _v.characterContentChunk.add(_charBuffer, _charBufferLength);
                     }
                     
                     _currentNode.appendChild(_document.createTextNode(v));
@@ -365,7 +365,7 @@ public class DOMDocumentParser extends Decoder {
                     _octetBufferLength += EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_MEDIUM_LIMIT;
                     String v = decodeUtf16StringAsString();
                     if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                         _v.characterContentChunk.add(new CharArrayString(v, false));
+                        _v.characterContentChunk.add(_charBuffer, _charBufferLength);
                     }
                     
                     _currentNode.appendChild(_document.createTextNode(v));
@@ -382,7 +382,7 @@ public class DOMDocumentParser extends Decoder {
                     // TODO obtain restricted alphabet given _identifier value
                     decodeRAOctetsAsCharBuffer(null);                    
                     if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
+                        _v.characterContentChunk.add(_charBuffer, _charBufferLength);
                     }
                     
                     throw new UnsupportedOperationException("Restricted alphabet");

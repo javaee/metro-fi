@@ -40,6 +40,7 @@
 package com.sun.xml.fastinfoset.vocab;
 
 import com.sun.xml.fastinfoset.util.CharArrayArray;
+import com.sun.xml.fastinfoset.util.ContiguousCharArrayArray;
 import com.sun.xml.fastinfoset.util.QualifiedNameArray;
 import com.sun.xml.fastinfoset.util.StringArray;
 import com.sun.xml.fastinfoset.util.ValueArray;
@@ -57,7 +58,7 @@ public class ParserVocabulary extends Vocabulary {
     public final StringArray attributeValue = new StringArray();
     public final CharArrayArray otherString = new CharArrayArray();
 
-    public final CharArrayArray characterContentChunk = new CharArrayArray();
+    public final ContiguousCharArrayArray characterContentChunk = new ContiguousCharArrayArray();
 
     public final QualifiedNameArray elementName = new QualifiedNameArray();
     public final QualifiedNameArray attributeName = new QualifiedNameArray();

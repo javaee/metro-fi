@@ -41,6 +41,7 @@ package com.sun.xml.fastinfoset;
 
 import com.sun.xml.fastinfoset.util.CharArray;
 import com.sun.xml.fastinfoset.util.CharArrayArray;
+import com.sun.xml.fastinfoset.util.ContiguousCharArrayArray;
 import com.sun.xml.fastinfoset.util.QualifiedNameArray;
 import com.sun.xml.fastinfoset.util.StringArray;
 import com.sun.xml.fastinfoset.vocab.ParserVocabulary;
@@ -321,6 +322,18 @@ public abstract class Decoder implements FastInfosetParser {
         }
     }
 
+    public final void decodeTableItems(ContiguousCharArrayArray array) throws FastInfosetException, IOException {
+        for (int i = 0; i < decodeIntegerTableItems(); i++) {
+            switch(decodeNonIdentifyingStringOnFirstBit()) {
+                case NISTRING_STRING:
+                    array.add(_charBuffer, _charBufferLength);
+                    break;
+                default:
+                    throw new FastInfosetException("Illegal state for decoding of EncodedCharacterString");
+            }
+        }
+    }
+    
     public final void decodeTableItems(CharArrayArray array) throws FastInfosetException, IOException {
         for (int i = 0; i < decodeIntegerTableItems(); i++) {
             switch(decodeNonIdentifyingStringOnFirstBit()) {
@@ -1060,7 +1073,7 @@ public abstract class Decoder implements FastInfosetParser {
             }
         }
     }
-
+    
     /*
      * TODO, use the Xerces org.apache.Xerces.util.XMLChar class
      * to detemine valid NCName characters for characters not in

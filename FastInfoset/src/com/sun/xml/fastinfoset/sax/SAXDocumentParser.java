@@ -589,7 +589,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     + 1;
                     decodeUtf8StringAsCharBuffer();
                     if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
+                        _v.characterContentChunk.add(_charBuffer, _charBufferLength);
                     }
                     
                     try {
@@ -602,7 +602,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     _octetBufferLength = read() + EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_LIMIT;
                     decodeUtf8StringAsCharBuffer();
                     if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
+                        _v.characterContentChunk.add(_charBuffer, _charBufferLength);
                     }
                     
                     try {
@@ -619,7 +619,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     _octetBufferLength += EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_MEDIUM_LIMIT;
                     decodeUtf8StringAsCharBuffer();
                     if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
+                        _v.characterContentChunk.add(_charBuffer, _charBufferLength);
                     }
                     
                     try {
@@ -633,7 +633,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     + 1;
                     decodeUtf16StringAsCharBuffer();
                     if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
+                        _v.characterContentChunk.add(_charBuffer, _charBufferLength);
                     }
                     
                     try {
@@ -646,7 +646,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     _octetBufferLength = read() + EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_LIMIT;
                     decodeUtf16StringAsCharBuffer();
                     if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
+                        _v.characterContentChunk.add(_charBuffer, _charBufferLength);
                     }
                     
                     try {
@@ -663,7 +663,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     _octetBufferLength += EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_MEDIUM_LIMIT;
                     decodeUtf16StringAsCharBuffer();
                     if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
+                        _v.characterContentChunk.add(_charBuffer, _charBufferLength);
                     }
                     
                     try {
@@ -683,7 +683,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     // TODO obtain restricted alphabet given _identifier value
                     decodeRAOctetsAsCharBuffer(null);
                     if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
+                        _v.characterContentChunk.add(_charBuffer, _charBufferLength);
                     }
                     
                     try {
@@ -725,7 +725,6 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     final int index = (((_b & EncodingConstants.INTEGER_4TH_BIT_MEDIUM_MASK) << 8) | read())
                     + EncodingConstants.INTEGER_4TH_BIT_SMALL_LIMIT;
                     final CharArray ca = _v.characterContentChunk.get(index);
-                    
                     try {
                         _contentHandler.characters(ca.ch, ca.start, ca.length);
                     } catch (SAXException e) {
