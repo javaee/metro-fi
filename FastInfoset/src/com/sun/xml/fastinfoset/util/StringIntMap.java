@@ -65,7 +65,7 @@ public class StringIntMap extends KeyIntMap {
         _table = new Entry[_capacity];
     }
     
-    public StringIntMap(int initialCapacity, boolean supportArray) {
+    public StringIntMap(int initialCapacity) {
         this(initialCapacity, DEFAULT_LOAD_FACTOR);
     }
 
