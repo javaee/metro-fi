@@ -181,8 +181,8 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 case END_ELEMENT:
                     // Undeclare namespaces
                     if (_namespaces != null) {
-                        for (int i = 0; i < _namespaces.size(); i++) {
-                            popNamespaceDecl(_namespaces._array[i].prefix);
+                        for (int i = 0; i < _namespaces.getSize(); i++) {
+                            popNamespaceDecl(_namespaces.getArray()[i].prefix);
                         }
                     }
 
@@ -710,7 +710,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     
     public int getNamespaceCount() {
         if (_eventType == START_ELEMENT || _eventType == END_ELEMENT) {
-            return (_namespaces != null) ? _namespaces.size() : 0;
+            return (_namespaces != null) ? _namespaces.getSize() : 0;
         } else {
             throw new IllegalStateException("Method getNamespaceCount() called in invalid state");        
         }
@@ -718,7 +718,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     
     public String getNamespacePrefix(int index) {
         if (_eventType == START_ELEMENT || _eventType == END_ELEMENT) {
-            return _namespaces._array[index].prefix;
+            return _namespaces.getArray()[index].prefix;
         } else {
             throw new IllegalStateException("Method getNamespacePrefix() called in invalid state");        
         }
@@ -726,7 +726,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     
     public String getNamespaceURI(int index) {
         if (_eventType == START_ELEMENT || _eventType == END_ELEMENT) {
-            return _namespaces._array[index].namespaceName;
+            return _namespaces.getArray()[index].namespaceName;
         } else {
             throw new IllegalStateException("Method getNamespacePrefix() called in invalid state");        
         }

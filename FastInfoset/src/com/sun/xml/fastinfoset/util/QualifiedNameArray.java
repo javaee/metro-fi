@@ -43,9 +43,9 @@ import com.sun.xml.fastinfoset.QualifiedName;
 
 public class QualifiedNameArray extends ValueArray {
     
-    public QualifiedName[] _array;
+    private QualifiedName[] _array;
     
-    QualifiedNameArray _readOnlyArray;
+    private QualifiedNameArray _readOnlyArray;
         
     public QualifiedNameArray(int initialCapacity) {
         _array = new QualifiedName[initialCapacity];
@@ -55,14 +55,18 @@ public class QualifiedNameArray extends ValueArray {
         this(DEFAULT_CAPACITY);
     }
     
-    public void clear() {
+    public final void clear() {
         for (int i = 0; i < _size; i++) {
             _array[i] = null;
         }
         _size = 0;
     }
 
-    public void setReadOnlyArray(ValueArray readOnlyArray, boolean clear) {
+    public final QualifiedName[] getArray() {
+        return _array;
+    }
+    
+    public final void setReadOnlyArray(ValueArray readOnlyArray, boolean clear) {
         if (!(readOnlyArray instanceof QualifiedNameArray)) {
             throw new IllegalArgumentException("Illegal class: "
                 + readOnlyArray);
@@ -71,10 +75,10 @@ public class QualifiedNameArray extends ValueArray {
         setReadOnlyArray((QualifiedNameArray)readOnlyArray, clear);
     }
 
-    public void setReadOnlyArray(QualifiedNameArray readOnlyArray, boolean clear) {
+    public final void setReadOnlyArray(QualifiedNameArray readOnlyArray, boolean clear) {
         if (readOnlyArray != null) {
             _readOnlyArray = readOnlyArray;
-            _readOnlyArraySize = readOnlyArray.size();
+            _readOnlyArraySize = readOnlyArray.getSize();
                         
             if (clear) {
                 clear();
@@ -82,21 +86,21 @@ public class QualifiedNameArray extends ValueArray {
         }
     }
     
-    public QualifiedName get(int i) {
-        if (_readOnlyArray != null) {
+    public final QualifiedName get(int i) {
+        if (_readOnlyArray == null) {
+            return _array[i];
+        } else {
             if (i < _readOnlyArraySize) {
                return _readOnlyArray.get(i); 
             } else {
                 return _array[i - _readOnlyArraySize];
             }
-        } else {
-            return _array[i];
         }
    }
     
-    public void add(QualifiedName s) {
+    public final void add(QualifiedName s) {
         if (_size == _array.length) {
-            QualifiedName[] newArray = new QualifiedName[_size * 3 / 2 + 1];
+            final QualifiedName[] newArray = new QualifiedName[_size * 3 / 2 + 1];
             System.arraycopy(_array, 0, newArray, 0, _size);
             _array = newArray;
         }

@@ -73,25 +73,21 @@ public class SerializerVocabulary extends Vocabulary {
     
     protected SerializerVocabulary _readOnlyVocabulary;
     
-    public SerializerVocabulary(boolean supportArrays) {
-        tables[RESTRICTED_ALPHABET] = restrictedAlphabet = new StringIntMap(supportArrays);
-        tables[ENCODING_ALGORITHM] = encodingAlgorithm = new StringIntMap(supportArrays);
-        tables[PREFIX] = prefix = new StringIntMap(supportArrays);
-        tables[NAMESPACE_NAME] = namespaceName = new StringIntMap(supportArrays);
-        tables[LOCAL_NAME] = localName = new StringIntMap(supportArrays);
-        tables[OTHER_NCNAME] = otherNCName = new StringIntMap(supportArrays);
-        tables[OTHER_URI] = otherURI = new StringIntMap(supportArrays);
-        tables[ATTRIBUTE_VALUE] = attributeValue = new StringIntMap(supportArrays);
-        tables[OTHER_STRING] = otherString = new CharArrayIntMap(supportArrays);
-        tables[CHARACTER_CONTENT_CHUNK] = characterContentChunk = new CharArrayIntMap(supportArrays);
-        tables[ELEMENT_NAME] = elementName = new LocalNameQualifiedNamesMap(supportArrays);
-        tables[ATTRIBUTE_NAME] = attributeName = new LocalNameQualifiedNamesMap(supportArrays);        
-    }
-    
     public SerializerVocabulary() {
-        this(false);
+        tables[RESTRICTED_ALPHABET] = restrictedAlphabet = new StringIntMap();
+        tables[ENCODING_ALGORITHM] = encodingAlgorithm = new StringIntMap();
+        tables[PREFIX] = prefix = new StringIntMap();
+        tables[NAMESPACE_NAME] = namespaceName = new StringIntMap();
+        tables[LOCAL_NAME] = localName = new StringIntMap();
+        tables[OTHER_NCNAME] = otherNCName = new StringIntMap();
+        tables[OTHER_URI] = otherURI = new StringIntMap();
+        tables[ATTRIBUTE_VALUE] = attributeValue = new StringIntMap();
+        tables[OTHER_STRING] = otherString = new CharArrayIntMap();
+        tables[CHARACTER_CONTENT_CHUNK] = characterContentChunk = new CharArrayIntMap();
+        tables[ELEMENT_NAME] = elementName = new LocalNameQualifiedNamesMap();
+        tables[ATTRIBUTE_NAME] = attributeName = new LocalNameQualifiedNamesMap();        
     }
-    
+        
     public SerializerVocabulary getReadOnlyVocabulary() {
         return _readOnlyVocabulary;
     }

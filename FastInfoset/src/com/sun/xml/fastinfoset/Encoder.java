@@ -89,15 +89,15 @@ public abstract class Encoder extends DefaultHandler {
         
         if (_v.hasInitialVocabulary()) {
             _b = EncodingConstants.DOCUMENT_INITIAL_VOCABULARY_FLAG;
-            _s.write(_b);
+            write(_b);
 
             SerializerVocabulary initialVocabulary = _v.getReadOnlyVocabulary();
 
             // TODO check for contents of vocabulary to assign bits
             if (initialVocabulary.hasExternalVocabulary()) {
                 _b = EncodingConstants.INITIAL_VOCABULARY_EXTERNAL_VOCABULARY_FLAG;
-                _s.write(_b);
-                _s.write(0);
+                write(_b);
+                write(0);
             }
             
             if (initialVocabulary.hasExternalVocabulary()) {
@@ -107,21 +107,22 @@ public abstract class Encoder extends DefaultHandler {
             // TODO check for contents of vocabulary to encode values
         } else if (_v.hasExternalVocabulary()) {
             _b = EncodingConstants.DOCUMENT_INITIAL_VOCABULARY_FLAG;
-            _s.write(_b);
+            write(_b);
             
             _b = EncodingConstants.INITIAL_VOCABULARY_EXTERNAL_VOCABULARY_FLAG;
-            _s.write(_b);
-            _s.write(0);
+            write(_b);
+            write(0);
             
             encodeNonEmptyOctetStringOnSecondBit(_v.getExternalVocabularyURI().toString());           
         } else {
-            _s.write(0);
+            write(0);
         }        
     }
 
     protected final void encodeDocumentTermination() throws IOException {
         encodeElementTermination();
         encodeTermination();
+        _flush();
         _s.flush();
     }
     
@@ -132,7 +133,7 @@ public abstract class Encoder extends DefaultHandler {
                 _b = EncodingConstants.DOUBLE_TERMINATOR;
                 break;
             case EncodingConstants.DOUBLE_TERMINATOR:
-                _s.write(EncodingConstants.DOUBLE_TERMINATOR);
+                write(EncodingConstants.DOUBLE_TERMINATOR);
             default:
                 _b = EncodingConstants.TERMINATOR;
         }        
@@ -140,7 +141,7 @@ public abstract class Encoder extends DefaultHandler {
 
     protected final void encodeTermination() throws IOException {
         if (_terminate) {
-            _s.write(_b);
+            write(_b);
             _terminate = false;
         }
     }
@@ -159,7 +160,7 @@ public abstract class Encoder extends DefaultHandler {
         // TODO needs to investigate how the startPrefixMapping works in
         // relation to undeclaration
         
-        _s.write(_b);
+        write(_b);
 
         if (prefix != "") {
             encodeIdentifyingNonEmptyStringOnFirstBit(prefix, _v.prefix);
@@ -184,7 +185,7 @@ public abstract class Encoder extends DefaultHandler {
      }
     
     protected final void encodeProcessingInstruction(String target, String data) throws IOException {
-        _s.write(EncodingConstants.PROCESSING_INSTRUCTION);
+        write(EncodingConstants.PROCESSING_INSTRUCTION);
 
         // Target
         encodeIdentifyingNonEmptyStringOnFirstBit(target, _v.otherNCName);
@@ -195,7 +196,7 @@ public abstract class Encoder extends DefaultHandler {
     }
     
     protected final void encodeComment(char[] ch, int start, int length) throws IOException {
-        _s.write(EncodingConstants.COMMENT);
+        write(EncodingConstants.COMMENT);
 
         boolean addToTable = (length < _v.characterContentChunkSizeContraint) ? true : false;
         encodeNonIdentifyingStringOnFirstBit(ch, start, length, _v.otherString, addToTable, true);
@@ -217,6 +218,15 @@ public abstract class Encoder extends DefaultHandler {
             }                
         } 
 
+        encodeLiteralElementQualifiedNameOnThirdBit(namespaceURI, prefix, 
+                localName, entry);
+    }
+    
+    /*
+     * C.18
+     */
+    protected final void encodeLiteralElementQualifiedNameOnThirdBit(String namespaceURI, String prefix, String localName, 
+            LocalNameQualifiedNamesMap.Entry entry) throws IOException {
         QualifiedName name = new QualifiedName(prefix, namespaceURI, localName, "", _v.elementName.getNextIndex());
         entry.addQualifiedName(name);
         
@@ -245,7 +255,7 @@ public abstract class Encoder extends DefaultHandler {
                 _b |= EncodingConstants.LITERAL_QNAME_PREFIX_FLAG;                
             }
         }
-        _s.write(_b);
+        write(_b);
 
         if (namespaceURIIndex >= 0) {
             if (prefixIndex >= 0) {
@@ -280,6 +290,15 @@ public abstract class Encoder extends DefaultHandler {
             }                
         } 
 
+        encodeLiteralAttributeQualifiedNameAndValueOnSecondBit(namespaceURI, prefix, 
+                localName, value, entry);
+    }
+    
+    /*
+     * C.17
+     */
+    protected final void encodeLiteralAttributeQualifiedNameAndValueOnSecondBit(String namespaceURI, String prefix, String localName, String value, 
+                LocalNameQualifiedNamesMap.Entry entry) throws IOException {
         int namespaceURIIndex = KeyIntMap.NOT_PRESENT;
         int prefixIndex = KeyIntMap.NOT_PRESENT;
         if (namespaceURI != "") {
@@ -322,7 +341,7 @@ public abstract class Encoder extends DefaultHandler {
             }
         }
 
-        _s.write(_b);
+        write(_b);
 
         if (namespaceURIIndex >= 0) {
             if (prefixIndex >= 0) {
@@ -351,7 +370,7 @@ public abstract class Encoder extends DefaultHandler {
     protected final void encodeNonIdentifyingStringOnFirstBit(String s, StringIntMap map, boolean addToTable) throws IOException {
         if (s == null || s.length() == 0) {
             // C.26 an index (first bit '1') with seven '1' bits for an empty string
-            _s.write(0xFF);
+            write(0xFF);
         } else {  
             if (addToTable) {
                 int index = map.obtainIndex(s);
@@ -374,7 +393,7 @@ public abstract class Encoder extends DefaultHandler {
     protected final void encodeNonIdentifyingStringOnFirstBit(String s, CharArrayIntMap map, boolean addToTable) throws IOException {        
         if (s == null || s.length() == 0) {
             // C.26 an index (first bit '1') with seven '1' bits for an empty string
-            _s.write(0xFF);
+            write(0xFF);
         } else {
             if (addToTable) {
                 CharArray c = new CharArrayString(s);
@@ -398,7 +417,7 @@ public abstract class Encoder extends DefaultHandler {
     protected final void encodeNonIdentifyingStringOnFirstBit(char[] array, int start, int length, CharArrayIntMap map, boolean addToTable, boolean clone) throws IOException {        
         if (length == 0) {
             // C.26 an index (first bit '1') with seven '1' bits for an empty string
-            _s.write(0xFF);
+            write(0xFF);
         } else {
             if (addToTable) {
                 CharArray c = new CharArray(array, start, length, clone);
@@ -484,7 +503,7 @@ public abstract class Encoder extends DefaultHandler {
     protected final void encodeNonEmptyOctetStringOnSecondBit(String s) throws IOException {
         final int length = encodeUTF8String(s);
         encodeNonZeroOctetStringLengthOnSecondBit(length);
-        _s.write(_utf8Buffer, 0, length);
+        write(_utf8Buffer, length);
     }
     
     /*
@@ -493,19 +512,19 @@ public abstract class Encoder extends DefaultHandler {
     protected final void encodeNonZeroOctetStringLengthOnSecondBit(int length) throws IOException {
         if (length < EncodingConstants.OCTET_STRING_LENGTH_2ND_BIT_SMALL_LIMIT) {
             // [1, 64]
-            _s.write(length - 1);
+            write(length - 1);
         } else if (length < EncodingConstants.OCTET_STRING_LENGTH_2ND_BIT_MEDIUM_LIMIT) {
             // [65, 320]
-            _s.write(EncodingConstants.OCTET_STRING_LENGTH_2ND_BIT_MEDIUM_FLAG); // 010 00000
-            _s.write(length - EncodingConstants.OCTET_STRING_LENGTH_2ND_BIT_SMALL_LIMIT);
+            write(EncodingConstants.OCTET_STRING_LENGTH_2ND_BIT_MEDIUM_FLAG); // 010 00000
+            write(length - EncodingConstants.OCTET_STRING_LENGTH_2ND_BIT_SMALL_LIMIT);
         } else {
             // [321, 4294967296]
-            _s.write(EncodingConstants.OCTET_STRING_LENGTH_2ND_BIT_LARGE_FLAG); // 0110 0000
+            write(EncodingConstants.OCTET_STRING_LENGTH_2ND_BIT_LARGE_FLAG); // 0110 0000
             length -= EncodingConstants.OCTET_STRING_LENGTH_2ND_BIT_MEDIUM_LIMIT;
-            _s.write(length >>> 24);
-            _s.write((length >> 16) & 0xFF);
-            _s.write((length >> 8) & 0xFF);
-            _s.write(length & 0xFF);
+            write(length >>> 24);
+            write((length >> 16) & 0xFF);
+            write((length >> 8) & 0xFF);
+            write(length & 0xFF);
         }        
     }
 
@@ -516,7 +535,7 @@ public abstract class Encoder extends DefaultHandler {
     protected final void encodeNonEmptyOctetStringOnFifthBit(String s) throws IOException {    
         final int length = encodeUTF8String(s);
         encodeNonZeroOctetStringLengthOnFifthBit(length);
-        _s.write(_utf8Buffer, 0, length);
+        write(_utf8Buffer, length);
     }
 
     /*
@@ -525,7 +544,7 @@ public abstract class Encoder extends DefaultHandler {
     protected final void encodeNonEmptyOctetStringOnFifthBit(char[] array, int start, int length) throws IOException {    
         length = encodeUTF8String(array, start, length);
         encodeNonZeroOctetStringLengthOnFifthBit(length);
-        _s.write(_utf8Buffer, 0, length);
+        write(_utf8Buffer, length);
     }
     
     /*
@@ -534,19 +553,19 @@ public abstract class Encoder extends DefaultHandler {
     protected final void encodeNonZeroOctetStringLengthOnFifthBit(int length) throws IOException {
         if (length < EncodingConstants.OCTET_STRING_LENGTH_5TH_BIT_SMALL_LIMIT) {
             // [1, 8]
-            _s.write(_b | (length - 1));
+            write(_b | (length - 1));
         } else if (length < EncodingConstants.OCTET_STRING_LENGTH_5TH_BIT_MEDIUM_LIMIT) {
             // [9, 264]
-            _s.write(_b | EncodingConstants.OCTET_STRING_LENGTH_5TH_BIT_MEDIUM_FLAG); // 000010 00
-            _s.write(length - EncodingConstants.OCTET_STRING_LENGTH_5TH_BIT_SMALL_LIMIT);
+            write(_b | EncodingConstants.OCTET_STRING_LENGTH_5TH_BIT_MEDIUM_FLAG); // 000010 00
+            write(length - EncodingConstants.OCTET_STRING_LENGTH_5TH_BIT_SMALL_LIMIT);
         } else {
             // [265, 4294967296]
-            _s.write(_b | EncodingConstants.OCTET_STRING_LENGTH_5TH_BIT_LARGE_FLAG); // 000011 00
+            write(_b | EncodingConstants.OCTET_STRING_LENGTH_5TH_BIT_LARGE_FLAG); // 000011 00
             length -= EncodingConstants.OCTET_STRING_LENGTH_5TH_BIT_MEDIUM_LIMIT;
-            _s.write(length >>> 24);
-            _s.write((length >> 16) & 0xFF);
-            _s.write((length >> 8) & 0xFF);
-            _s.write(length & 0xFF);
+            write(length >>> 24);
+            write((length >> 16) & 0xFF);
+            write((length >> 8) & 0xFF);
+            write(length & 0xFF);
         }        
     }
     
@@ -556,7 +575,7 @@ public abstract class Encoder extends DefaultHandler {
     protected final void encodeNonEmptyOctetStringOnSeventhBit(char[] array, int start, int length) throws IOException {
         length = encodeUTF8String(array, start, length);
         encodeNonZeroOctetStringLengthOnSenventhBit(length);
-        _s.write(_utf8Buffer, 0, length);
+        write(_utf8Buffer, length);
     }
 
     /*
@@ -565,19 +584,19 @@ public abstract class Encoder extends DefaultHandler {
     protected final void encodeNonZeroOctetStringLengthOnSenventhBit(int length) throws IOException {    
         if (length < EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_LIMIT) {
             // [1, 2]
-            _s.write(_b | (length - 1));
+            write(_b | (length - 1));
         } else if (length < EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_MEDIUM_LIMIT) {
             // [3, 258]
-            _s.write(_b | EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_MEDIUM_FLAG); // 00000010
-            _s.write(length - EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_LIMIT);
+            write(_b | EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_MEDIUM_FLAG); // 00000010
+            write(length - EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_LIMIT);
         } else {
             // [259, 4294967296]
-            _s.write(_b | EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_LARGE_FLAG); // 00000011
+            write(_b | EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_LARGE_FLAG); // 00000011
             length -= EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_MEDIUM_LIMIT;
-            _s.write(length >>> 24);
-            _s.write((length >> 16) & 0xFF);
-            _s.write((length >> 8) & 0xFF);
-            _s.write(length & 0xFF);
+            write(length >>> 24);
+            write((length >> 16) & 0xFF);
+            write((length >> 8) & 0xFF);
+            write(length & 0xFF);
         }                
     }
     
@@ -593,22 +612,22 @@ public abstract class Encoder extends DefaultHandler {
     protected final void encodeNonZeroIntegerOnSecondBitFirstBitOne(int i) throws IOException {
         if (i < EncodingConstants.INTEGER_2ND_BIT_SMALL_LIMIT) {
             // [1, 64] ( [0, 63] ) 6 bits
-            _s.write(0x80 | i);
+            write(0x80 | i);
         } else if (i < EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT) {
             // [65, 8256] ( [64, 8255] ) 13 bits
             i -= EncodingConstants.INTEGER_2ND_BIT_SMALL_LIMIT;
             _b = (0x80 | EncodingConstants.INTEGER_2ND_BIT_MEDIUM_FLAG) | (i >> 8); // 010 00000
             // _b = 0xC0 | (i >> 8); // 010 00000
-            _s.write(_b);
-            _s.write(i & 0xFF);
+            write(_b);
+            write(i & 0xFF);
         } else {
             // [8257, 1048576] ( [8256, 1048575] ) 20 bits
             i -= EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT;
             _b = (0x80 | EncodingConstants.INTEGER_2ND_BIT_LARGE_FLAG) | (i >> 16); // 0110 0000
             // _b = 0xE0 | (i >> 16); // 0110 0000
-            _s.write(_b);
-            _s.write((i >> 8) & 0xFF);
-            _s.write(i & 0xFF);
+            write(_b);
+            write((i >> 8) & 0xFF);
+            write(i & 0xFF);
         }
     }
 
@@ -624,20 +643,20 @@ public abstract class Encoder extends DefaultHandler {
     protected final void encodeNonZeroIntegerOnSecondBitFirstBitZero(int i) throws IOException {
         if (i < EncodingConstants.INTEGER_2ND_BIT_SMALL_LIMIT) {
             // [1, 64] ( [0, 63] ) 6 bits
-            _s.write(i);
+            write(i);
         } else if (i < EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT) {
             // [65, 8256] ( [64, 8255] ) 13 bits
             i -= EncodingConstants.INTEGER_2ND_BIT_SMALL_LIMIT;
             _b = EncodingConstants.INTEGER_2ND_BIT_MEDIUM_FLAG | (i >> 8); // 010 00000
-            _s.write(_b);
-            _s.write(i & 0xFF);
+            write(_b);
+            write(i & 0xFF);
         } else {
             // [8257, 1048576] ( [8256, 1048575] ) 20 bits
             i -= EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT;
             _b = EncodingConstants.INTEGER_2ND_BIT_LARGE_FLAG | (i >> 16); // 0110 0000
-            _s.write(_b);
-            _s.write((i >> 8) & 0xFF);
-            _s.write(i & 0xFF);
+            write(_b);
+            write((i >> 8) & 0xFF);
+            write(i & 0xFF);
         }
     }
 
@@ -652,28 +671,28 @@ public abstract class Encoder extends DefaultHandler {
     protected final void encodeNonZeroIntegerOnThirdBit(int i) throws IOException {
         if (i < EncodingConstants.INTEGER_3RD_BIT_SMALL_LIMIT) {
             // [1, 32] ( [0, 31] ) 5 bits
-            _s.write(_b | i);
+            write(_b | i);
         } else if (i < EncodingConstants.INTEGER_3RD_BIT_MEDIUM_LIMIT) {
             // [33, 2080] ( [32, 2079] ) 11 bits
             i -= EncodingConstants.INTEGER_3RD_BIT_SMALL_LIMIT;
             _b |= EncodingConstants.INTEGER_3RD_BIT_MEDIUM_FLAG | (i >> 8); // 00100 000
-            _s.write(_b);
-            _s.write(i & 0xFF);
+            write(_b);
+            write(i & 0xFF);
         } else if (i < EncodingConstants.INTEGER_3RD_BIT_LARGE_LIMIT) {
             // [2081, 526368] ( [2080, 526367] ) 19 bits
             i -= EncodingConstants.INTEGER_3RD_BIT_MEDIUM_LIMIT;
             _b |= EncodingConstants.INTEGER_3RD_BIT_LARGE_FLAG | (i >> 16); // 00101 000
-            _s.write(_b);
-            _s.write((i >> 8) & 0xFF);
-            _s.write(i & 0xFF);            
+            write(_b);
+            write((i >> 8) & 0xFF);
+            write(i & 0xFF);            
         } else {
             // [526369, 1048576] ( [526368, 1048575] ) 20 bits
             i -= EncodingConstants.INTEGER_3RD_BIT_LARGE_LIMIT;
             _b |= EncodingConstants.INTEGER_3RD_BIT_LARGE_LARGE_FLAG; // 00110 000
-            _s.write(_b);
-            _s.write(i >> 16);
-            _s.write((i >> 8) & 0xFF);
-            _s.write(i & 0xFF);
+            write(_b);
+            write(i >> 16);
+            write((i >> 8) & 0xFF);
+            write(i & 0xFF);
         }
     }
 
@@ -687,28 +706,28 @@ public abstract class Encoder extends DefaultHandler {
     protected final void encodeNonZeroIntegerOnFourthBit(int i) throws IOException {
         if (i < EncodingConstants.INTEGER_4TH_BIT_SMALL_LIMIT) {
             // [1, 16] ( [0, 15] ) 4 bits
-            _s.write(_b | i);
+            write(_b | i);
         } else if (i < EncodingConstants.INTEGER_4TH_BIT_MEDIUM_LIMIT) {
             // [17, 1040] ( [16, 1039] ) 10 bits
             i -= EncodingConstants.INTEGER_4TH_BIT_SMALL_LIMIT;
             _b |= EncodingConstants.INTEGER_4TH_BIT_MEDIUM_FLAG | (i >> 8); // 000 100 00
-            _s.write(_b);
-            _s.write(i & 0xFF);
+            write(_b);
+            write(i & 0xFF);
         } else if (i < EncodingConstants.INTEGER_4TH_BIT_LARGE_LIMIT) {
             // [1041, 263184] ( [1040, 263183] ) 18 bits
             i -= EncodingConstants.INTEGER_4TH_BIT_MEDIUM_LIMIT;
             _b |= EncodingConstants.INTEGER_4TH_BIT_LARGE_FLAG | (i >> 16); // 000 101 00
-            _s.write(_b);
-            _s.write((i >> 8) & 0xFF);
-            _s.write(i & 0xFF);            
+            write(_b);
+            write((i >> 8) & 0xFF);
+            write(i & 0xFF);            
         } else {
             // [263185, 1048576] ( [263184, 1048575] ) 20 bits
             i -= EncodingConstants.INTEGER_4TH_BIT_LARGE_LIMIT;
             _b |= EncodingConstants.INTEGER_4TH_BIT_LARGE_LARGE_FLAG; // 000 110 00
-            _s.write(_b);
-            _s.write(i >> 16);
-            _s.write((i >> 8) & 0xFF);
-            _s.write(i & 0xFF);
+            write(_b);
+            write(i >> 16);
+            write((i >> 8) & 0xFF);
+            write(i & 0xFF);
         }
     }
     
@@ -720,43 +739,43 @@ public abstract class Encoder extends DefaultHandler {
     protected final void encodeNonEmptyUTF8StringAsOctetString(int b, char ch[], int start, int length, int[] constants) throws IOException {
         length = encodeUTF8String(ch, start, length);
         encodeNonZeroOctetStringLength(b, length, constants);
-        _s.write(_utf8Buffer, 0, length);
+        write(_utf8Buffer, length);
     }
 
     protected final void encodeNonZeroOctetStringLength(int b, int length, int[] constants) throws IOException {
         if (length < constants[EncodingConstants.OCTET_STRING_LENGTH_SMALL_LIMIT]) {
-            _s.write(b | (length - 1));
+            write(b | (length - 1));
         } else if (length < constants[EncodingConstants.OCTET_STRING_LENGTH_MEDIUM_LIMIT]) {
-            _s.write(b | constants[EncodingConstants.OCTET_STRING_LENGTH_MEDIUM_FLAG]);
-            _s.write(length - constants[EncodingConstants.OCTET_STRING_LENGTH_SMALL_LIMIT]);
+            write(b | constants[EncodingConstants.OCTET_STRING_LENGTH_MEDIUM_FLAG]);
+            write(length - constants[EncodingConstants.OCTET_STRING_LENGTH_SMALL_LIMIT]);
         } else {
-            _s.write(b | constants[EncodingConstants.OCTET_STRING_LENGTH_LARGE_FLAG]);
+            write(b | constants[EncodingConstants.OCTET_STRING_LENGTH_LARGE_FLAG]);
             length -= constants[EncodingConstants.OCTET_STRING_LENGTH_MEDIUM_LIMIT];
-            _s.write(length >>> 24);
-            _s.write((length >> 16) & 0xFF);
-            _s.write((length >> 8) & 0xFF);
-            _s.write(length & 0xFF);
+            write(length >>> 24);
+            write((length >> 16) & 0xFF);
+            write((length >> 8) & 0xFF);
+            write(length & 0xFF);
         }
     }
     
     protected final void encodeNonZeroInteger(int b, int i, int[] constants) throws IOException {        
         if (i < constants[EncodingConstants.INTEGER_SMALL_LIMIT]) {
-            _s.write(b | i);
+            write(b | i);
         } else if (i < constants[EncodingConstants.INTEGER_MEDIUM_LIMIT]) {
             i -= constants[EncodingConstants.INTEGER_SMALL_LIMIT];
-            _s.write(b | constants[EncodingConstants.INTEGER_MEDIUM_FLAG] | (i >> 8));
-            _s.write(i & 0xFF);
+            write(b | constants[EncodingConstants.INTEGER_MEDIUM_FLAG] | (i >> 8));
+            write(i & 0xFF);
         } else if (i < constants[EncodingConstants.INTEGER_LARGE_LIMIT]) {
             i -= constants[EncodingConstants.INTEGER_MEDIUM_LIMIT];
-            _s.write(b | constants[EncodingConstants.INTEGER_LARGE_FLAG] | (i >> 16));
-            _s.write((i >> 8) & 0xFF);
-            _s.write(i & 0xFF);                        
+            write(b | constants[EncodingConstants.INTEGER_LARGE_FLAG] | (i >> 16));
+            write((i >> 8) & 0xFF);
+            write(i & 0xFF);                        
         } else if (i < EncodingConstants.INTEGER_MAXIMUM_SIZE) {
             i -= constants[EncodingConstants.INTEGER_LARGE_LIMIT];
-            _s.write(b | constants[EncodingConstants.INTEGER_LARGE_LARGE_FLAG]);
-            _s.write(i >> 16);
-            _s.write((i >> 8) & 0xFF);
-            _s.write(i & 0xFF);
+            write(b | constants[EncodingConstants.INTEGER_LARGE_LARGE_FLAG]);
+            write(i >> 16);
+            write((i >> 8) & 0xFF);
+            write(i & 0xFF);
         } else {
             throw new IOException("Integer > " + EncodingConstants.INTEGER_MAXIMUM_SIZE);
         }
@@ -765,6 +784,64 @@ public abstract class Encoder extends DefaultHandler {
     protected final int encodeUTF8String(String s) throws IOException {
         final char[] ch = s.toCharArray();
         return encodeUTF8String(ch, 0, ch.length);
+    }
+
+    
+    protected byte[] _octetBuffer = new byte[1024];
+    protected int _octetBufferIndex;
+    protected int _markIndex = -1;
+
+    protected final void mark() throws IOException {
+        _markIndex = _octetBufferIndex;
+    }
+
+    protected final void resetMark() throws IOException {
+        _markIndex = -1;
+    }
+    
+    protected final void write(int i) throws IOException {
+        if (_octetBufferIndex < _octetBuffer.length) {
+            _octetBuffer[_octetBufferIndex++] = (byte)i;
+        } else {
+            if (_markIndex == -1) {
+                _s.write(_octetBuffer);
+                _octetBufferIndex = 1;
+                _octetBuffer[0] = (byte)i;
+            } else {
+                resize(_octetBuffer.length * 3 / 2);
+                _octetBuffer[_octetBufferIndex++] = (byte)i;
+            }
+        }
+    }
+
+    protected final void write(byte[] b, int length) throws IOException {
+        if ((_octetBufferIndex + length) < _octetBuffer.length) {
+            System.arraycopy(b, 0, _octetBuffer, _octetBufferIndex, length);
+            _octetBufferIndex += length;
+        } else {
+            if (_markIndex == -1) {
+                _s.write(_octetBuffer, 0, _octetBufferIndex);
+                _s.write(b, 0, length);
+                _octetBufferIndex = 0;
+            } else {
+                resize((_octetBuffer.length + length) * 3 / 2);
+                System.arraycopy(b, 0, _octetBuffer, _octetBufferIndex, length);
+                _octetBufferIndex += length;
+            }
+        } 
+    }
+        
+    protected final void resize(int length) {
+        byte[] b = new byte[length];
+        System.arraycopy(_octetBuffer, 0, b, 0, _octetBufferIndex);
+        _octetBuffer = b;
+    }
+
+    protected final void _flush() throws IOException {
+        if (_octetBufferIndex > 0) {
+            _s.write(_octetBuffer, 0, _octetBufferIndex);
+            _octetBufferIndex = 0;
+        }
     }
     
     protected byte[] _utf8Buffer = new byte[512];

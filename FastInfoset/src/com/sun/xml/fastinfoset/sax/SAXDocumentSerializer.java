@@ -41,10 +41,9 @@ package com.sun.xml.fastinfoset.sax;
 
 import com.sun.xml.fastinfoset.Encoder;
 import com.sun.xml.fastinfoset.EncodingConstants;
+import com.sun.xml.fastinfoset.QualifiedName;
 import com.sun.xml.fastinfoset.util.AccessibleByteArrayOutputStream;
-import com.sun.xml.fastinfoset.util.CharArray;
-import com.sun.xml.fastinfoset.util.CharArrayString;
-import com.sun.xml.fastinfoset.vocab.SerializerVocabulary;
+import com.sun.xml.fastinfoset.util.LocalNameQualifiedNamesMap;
 import java.io.IOException;
 import java.io.OutputStream;
 import org.xml.sax.Attributes;
@@ -87,12 +86,13 @@ public class SAXDocumentSerializer extends Encoder implements LexicalHandler {
         try {
             if (_elementHasNamespaces == false) {
                 encodeTermination();
+
+                // Mark the current buffer position to flag attributes if necessary
+                mark();                
                 _elementHasNamespaces = true;
-                _elementWithNamespacesOutputStream.reset();
-                _s = _elementWithNamespacesOutputStream;
                 
                 // Write out Element byte with namespaces
-                _s.write(EncodingConstants.ELEMENT | EncodingConstants.ELEMENT_NAMESPACES_FLAG);
+                write(EncodingConstants.ELEMENT | EncodingConstants.ELEMENT_NAMESPACES_FLAG);
             }
             
             encodeNamespaceAttribute(prefix, uri);
@@ -108,14 +108,13 @@ public class SAXDocumentSerializer extends Encoder implements LexicalHandler {
             if (_elementHasNamespaces) {
                 _elementHasNamespaces = false;
 
-                byte[] buffer = _elementWithNamespacesOutputStream.getByteArray();
                 if (attributeCount > 0) {
-                    buffer[0] |= EncodingConstants.ELEMENT_ATTRIBUTE_FLAG;
+                    // Flag the marked byte with attributes
+                    _octetBuffer[_markIndex] |= EncodingConstants.ELEMENT_ATTRIBUTE_FLAG;
                 }
+                resetMark();
                 
-                _s = _outputStream;
-                _s.write(buffer, 0, _elementWithNamespacesOutputStream.size());
-                _s.write(EncodingConstants.TERMINATOR);
+                write(EncodingConstants.TERMINATOR);
                 
                 _b = 0;
             } else {
@@ -127,13 +126,11 @@ public class SAXDocumentSerializer extends Encoder implements LexicalHandler {
                 }
             }
 
-            String prefix = getPrefixFromQualifiedName(qName);
-            encodeElementQualifiedNameOnThirdBit(namespaceURI, prefix, localName);
+            encodeElement(namespaceURI, qName, localName);
             
             if (attributeCount > 0) {
                 for (int i = 0; i < atts.getLength(); i++) {
-                    prefix = getPrefixFromQualifiedName(atts.getQName(i));
-                    encodeAttributeQualifiedNameAndValueOnSecondBit(atts.getURI(i), prefix, atts.getLocalName(i), atts.getValue(i));
+                    encodeAttribute(atts.getURI(i), atts.getQName(i), atts.getLocalName(i), atts.getValue(i));
                 }
                 _b = EncodingConstants.TERMINATOR;
                 _terminate = true;
@@ -230,5 +227,40 @@ public class SAXDocumentSerializer extends Encoder implements LexicalHandler {
     }
 
     public final void endEntity(String name) throws SAXException {
-    }    
+    }
+    
+    
+    protected final void encodeElement(String namespaceURI, String qName, String localName) throws IOException {
+        LocalNameQualifiedNamesMap.Entry entry = _v.elementName.obtainEntry(qName);
+        if (entry._valueIndex > 0) {
+            QualifiedName[] names = entry._value;
+            for (int i = 0; i < entry._valueIndex; i++) {
+                if ((namespaceURI == names[i].namespaceName || namespaceURI.equals(names[i].namespaceName))) {
+                    encodeNonZeroIntegerOnThirdBit(names[i].index);
+                    return;
+                }
+            }                
+        }
+        
+        encodeLiteralElementQualifiedNameOnThirdBit(namespaceURI, getPrefixFromQualifiedName(qName), 
+                localName, entry);
+    }
+
+    protected final void encodeAttribute(String namespaceURI, String qName, String localName, String value) throws IOException {
+        LocalNameQualifiedNamesMap.Entry entry = _v.attributeName.obtainEntry(qName);
+        if (entry._valueIndex > 0) {
+            QualifiedName[] names = entry._value;
+            for (int i = 0; i < entry._valueIndex; i++) {
+                if ((namespaceURI == names[i].namespaceName || namespaceURI.equals(names[i].namespaceName))) {
+                    encodeNonZeroIntegerOnSecondBitFirstBitZero(names[i].index);
+
+                    boolean addToTable = (value.length() < _v.attributeValueSizeConstraint) ? true : false;
+                    encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
+                    return;
+                }
+            }                
+        } 
+        encodeLiteralAttributeQualifiedNameAndValueOnSecondBit(namespaceURI, getPrefixFromQualifiedName(qName), 
+                localName, value, entry);
+    }
 }

@@ -44,8 +44,7 @@ import java.util.Map;
 
 public class StringIntMap extends KeyIntMap {
 
-    StringIntMap _readOnlyMap;
-    boolean _hasReadOnlyMap = false;
+    private StringIntMap _readOnlyMap;
     
     static class Entry extends BaseEntry {
         final String _key;
@@ -59,49 +58,29 @@ public class StringIntMap extends KeyIntMap {
     }
     
     private Entry[] _table;
-    private String[] _array;
     
-    public StringIntMap(int initialCapacity, float loadFactor, boolean supportArray) {
-        super(initialCapacity, loadFactor, supportArray);
+    public StringIntMap(int initialCapacity, float loadFactor) {
+        super(initialCapacity, loadFactor);
 
         _table = new Entry[_capacity];
-        
-        if (_supportArray) {
-            _array = new String[_capacity];
-        }
     }
     
     public StringIntMap(int initialCapacity, boolean supportArray) {
-        this(initialCapacity, DEFAULT_LOAD_FACTOR, supportArray);
-    }
-
-    public StringIntMap(boolean supportArray) {
-        this(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR, supportArray);
+        this(initialCapacity, DEFAULT_LOAD_FACTOR);
     }
 
     public StringIntMap() {
-        this(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR, false);
+        this(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR);
     }
 
-    public void clear() {
+    public final void clear() {
         for (int i = 0; i < _table.length; i++) {
             _table[i] = null;
         }
         _size = 0;
-
-        if (_supportArray) {
-            for (int i = 0; i < _arraySize; i++) {
-                _array[i] = null;
-            }
-            _arraySize = 0;
-        }
     }
 
-    public String[] getKeys() {
-        return _array;
-    }
-    
-    public void setReadOnlyMap(KeyIntMap readOnlyMap, boolean clear) {
+    public final void setReadOnlyMap(KeyIntMap readOnlyMap, boolean clear) {
         if (!(readOnlyMap instanceof StringIntMap)) {
             throw new IllegalArgumentException("Illegal class: "
                 + readOnlyMap);
@@ -110,7 +89,7 @@ public class StringIntMap extends KeyIntMap {
         setReadOnlyMap((StringIntMap)readOnlyMap, clear);
     }
     
-    public void setReadOnlyMap(StringIntMap readOnlyMap, boolean clear) {
+    public final void setReadOnlyMap(StringIntMap readOnlyMap, boolean clear) {
         _readOnlyMap = readOnlyMap;
         if (_readOnlyMap != null) {
             _readOnlyMapSize = _readOnlyMap.size();
@@ -123,7 +102,7 @@ public class StringIntMap extends KeyIntMap {
         }     
     }
     
-    public int obtainIndex(String key) {
+    public final int obtainIndex(String key) {
         final int hash = hashHash(key.hashCode());
         
         if (_readOnlyMap != null) {
@@ -144,19 +123,19 @@ public class StringIntMap extends KeyIntMap {
         return NOT_PRESENT;
     }
 
-    public void add(String key) {
+    public final void add(String key) {
         final int hash = hashHash(key.hashCode());
         final int tableIndex = indexFor(hash, _table.length);
         addEntry(key, hash, _size + _readOnlyMapSize, tableIndex);
     }
 
-    public int get(String key) {
+    public final int get(String key) {
         return get(key, hashHash(key.hashCode()));
     }
     
-    private int get(String key, int hash) {
+    private final int get(String key, int hash) {
         if (_readOnlyMap != null) {
-            int i = _readOnlyMap.get(key, hash);
+            final int i = _readOnlyMap.get(key, hash);
             if (i != -1) {
                 return i;
             }
@@ -173,25 +152,15 @@ public class StringIntMap extends KeyIntMap {
     }
 
 
-    private void addEntry(String key, int hash, int value, int bucketIndex) {
+    private final void addEntry(String key, int hash, int value, int bucketIndex) {
 	Entry e = _table[bucketIndex];
         _table[bucketIndex] = new Entry(key, hash, value, e);
         if (_size++ >= _threshold) {
             resize(2 * _table.length);
         }
-
-        if (_supportArray) {
-            if (_arraySize == _array.length) {
-                String[] newArray = new String[_arraySize * 3 / 2 + 1];
-                System.arraycopy(_array, 0, newArray, 0, _arraySize);
-                _array = newArray;
-            }
-
-            _array[_arraySize++] = key;
-        }
     }
     
-    private void resize(int newCapacity) {
+    private final void resize(int newCapacity) {
         _capacity = newCapacity;
         Entry[] oldTable = _table;
         int oldCapacity = oldTable.length;
@@ -206,7 +175,7 @@ public class StringIntMap extends KeyIntMap {
         _threshold = (int)(_capacity * _loadFactor);        
     }
 
-    private void transfer(Entry[] newTable) {
+    private final void transfer(Entry[] newTable) {
         Entry[] src = _table;
         int newCapacity = newTable.length;
         for (int j = 0; j < src.length; j++) {
@@ -224,8 +193,7 @@ public class StringIntMap extends KeyIntMap {
         }
     }
         
-    boolean eq(String x, String y) {
+    private final boolean eq(String x, String y) {
         return x == y || x.equals(y);
     }
-
 }

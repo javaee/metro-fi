@@ -45,9 +45,9 @@ import java.util.List;
 
 public class LocalNameQualifiedNamesMap extends KeyIntMap {
 
-    LocalNameQualifiedNamesMap _readOnlyMap;
-    boolean _hasReadOnlyMap = false;
-    int _index;
+    private LocalNameQualifiedNamesMap _readOnlyMap;
+   
+    private int _index;
     
     public static class Entry {
         final String _key;
@@ -78,7 +78,7 @@ public class LocalNameQualifiedNamesMap extends KeyIntMap {
     private Entry[] _table;
     
     public LocalNameQualifiedNamesMap(int initialCapacity, float loadFactor) {
-        super(initialCapacity, loadFactor, false);
+        super(initialCapacity, loadFactor);
 
         _table = new Entry[_capacity];        
     }
@@ -87,30 +87,11 @@ public class LocalNameQualifiedNamesMap extends KeyIntMap {
         this(initialCapacity, DEFAULT_LOAD_FACTOR);
     }
 
-    public LocalNameQualifiedNamesMap(boolean supportArray) {
-        this(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR);
-    }
-
     public LocalNameQualifiedNamesMap() {
         this(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR);
     }
-
-    public QualifiedName[] getQualifiedNames() {
-        List entries = new ArrayList();
-        for (int i = 0; i < _table.length; i++) {
-            Entry e = _table[i];
-            while(e != null) {
-                for (int j = 0; j < e._valueIndex; j++) {
-                    entries.add(e._value[j]);
-                }
-                e = e._next;
-            }
-        }
-
-        return (QualifiedName[])entries.toArray(new QualifiedName[0]);
-    }
         
-    public void clear() {
+    public final void clear() {
         for (int i = 0; i < _table.length; i++) {
             _table[i] = null;
         }
@@ -123,7 +104,7 @@ public class LocalNameQualifiedNamesMap extends KeyIntMap {
         }
     }
 
-    public void setReadOnlyMap(KeyIntMap readOnlyMap, boolean clear) {
+    public final void setReadOnlyMap(KeyIntMap readOnlyMap, boolean clear) {
         if (!(readOnlyMap instanceof LocalNameQualifiedNamesMap)) {
             throw new IllegalArgumentException("Illegal class: "
                 + readOnlyMap);
@@ -132,7 +113,7 @@ public class LocalNameQualifiedNamesMap extends KeyIntMap {
         setReadOnlyMap((LocalNameQualifiedNamesMap)readOnlyMap, clear);
     }
     
-    public void setReadOnlyMap(LocalNameQualifiedNamesMap readOnlyMap, boolean clear) {
+    public final void setReadOnlyMap(LocalNameQualifiedNamesMap readOnlyMap, boolean clear) {
         _readOnlyMap = readOnlyMap;
         if (_readOnlyMap != null) {
             _readOnlyMapSize = _readOnlyMap.size();
@@ -146,16 +127,16 @@ public class LocalNameQualifiedNamesMap extends KeyIntMap {
         }     
     }
 
-    public int getNextIndex() {
+    public final int getNextIndex() {
         return _index++;
     }
 
-    public int getIndex() {
+    public final int getIndex() {
         return _index;
         
     }
     
-    public Entry obtainEntry(String key) {
+    public final Entry obtainEntry(String key) {
         final int hash = hashHash(key.hashCode());
         
         if (_readOnlyMap != null) {
@@ -175,9 +156,9 @@ public class LocalNameQualifiedNamesMap extends KeyIntMap {
         return addEntry(key, hash, tableIndex);        
     }
 
-    private Entry getEntry(String key, int hash) {
+    private final Entry getEntry(String key, int hash) {
         if (_readOnlyMap != null) {
-            Entry entry = _readOnlyMap.getEntry(key, hash);
+            final Entry entry = _readOnlyMap.getEntry(key, hash);
             if (entry != null) {
                 return entry;
             }
@@ -194,7 +175,7 @@ public class LocalNameQualifiedNamesMap extends KeyIntMap {
     }
 
 
-    private Entry addEntry(String key, int hash, int bucketIndex) {
+    private final Entry addEntry(String key, int hash, int bucketIndex) {
 	Entry e = _table[bucketIndex];
         _table[bucketIndex] = new Entry(key, hash, e);
         e = _table[bucketIndex];
@@ -205,7 +186,7 @@ public class LocalNameQualifiedNamesMap extends KeyIntMap {
         return e;
     }
     
-    private void resize(int newCapacity) {
+    private final void resize(int newCapacity) {
         _capacity = newCapacity;
         Entry[] oldTable = _table;
         int oldCapacity = oldTable.length;
@@ -220,7 +201,7 @@ public class LocalNameQualifiedNamesMap extends KeyIntMap {
         _threshold = (int)(_capacity * _loadFactor);        
     }
 
-    private void transfer(Entry[] newTable) {
+    private final void transfer(Entry[] newTable) {
         Entry[] src = _table;
         int newCapacity = newTable.length;
         for (int j = 0; j < src.length; j++) {
@@ -238,7 +219,7 @@ public class LocalNameQualifiedNamesMap extends KeyIntMap {
         }
     }
         
-    boolean eq(String x, String y) {
+    private final boolean eq(String x, String y) {
         return x == y || x.equals(y);
     }
 

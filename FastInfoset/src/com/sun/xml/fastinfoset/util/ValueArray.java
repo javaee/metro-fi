@@ -42,11 +42,11 @@ package com.sun.xml.fastinfoset.util;
 public abstract class ValueArray {
     public static final int DEFAULT_CAPACITY = 10;
 
-    public int _size;
+    protected int _size;
     
-    int _readOnlyArraySize;  
+    protected int _readOnlyArraySize;  
     
-    public int size() {
+    public int getSize() {
         return _size;
     }
     

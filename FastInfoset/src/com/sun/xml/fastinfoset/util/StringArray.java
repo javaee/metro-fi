@@ -41,9 +41,9 @@ package com.sun.xml.fastinfoset.util;
 
 public class StringArray extends ValueArray {
     
-    String[] _array;
+    private String[] _array;
     
-    StringArray _readOnlyArray;
+    private StringArray _readOnlyArray;
 
     public StringArray(int initialCapacity) {
         _array = new String[initialCapacity];
@@ -53,14 +53,18 @@ public class StringArray extends ValueArray {
         this(DEFAULT_CAPACITY);
     }
 
-    public void clear() {
+    public final void clear() {
         for (int i = 0; i < _size; i++) {
             _array[i] = null;
         }
         _size = 0;
     }
 
-    public void setReadOnlyArray(ValueArray readOnlyArray, boolean clear) {
+    public final String[] getArray() {
+        return _array;
+    }
+    
+    public final void setReadOnlyArray(ValueArray readOnlyArray, boolean clear) {
         if (!(readOnlyArray instanceof StringArray)) {
             throw new IllegalArgumentException("Illegal class: "
                 + readOnlyArray);
@@ -69,10 +73,10 @@ public class StringArray extends ValueArray {
         setReadOnlyArray((StringArray)readOnlyArray, clear);
     }
 
-    public void setReadOnlyArray(StringArray readOnlyArray, boolean clear) {
+    public final void setReadOnlyArray(StringArray readOnlyArray, boolean clear) {
         if (readOnlyArray != null) {
             _readOnlyArray = readOnlyArray;
-            _readOnlyArraySize = readOnlyArray.size();
+            _readOnlyArraySize = readOnlyArray.getSize();
             
             if (clear) {
                 clear();
@@ -80,21 +84,21 @@ public class StringArray extends ValueArray {
         }
     }
     
-    public String get(int i) {
-        if (_readOnlyArray != null) {
+    public final String get(int i) {
+        if (_readOnlyArray == null) {
+            return _array[i];
+        } else {
             if (i < _readOnlyArraySize) {
                return _readOnlyArray.get(i); 
             } else {
                 return _array[i - _readOnlyArraySize];
             }
-        } else {
-            return _array[i];
         }
    }
  
-    public void add(String s) {
+    public final void add(String s) {
         if (_size == _array.length) {
-            String[] newArray = new String[_size * 3 / 2 + 1];
+            final String[] newArray = new String[_size * 3 / 2 + 1];
             System.arraycopy(_array, 0, newArray, 0, _size);
             _array = newArray;
         }

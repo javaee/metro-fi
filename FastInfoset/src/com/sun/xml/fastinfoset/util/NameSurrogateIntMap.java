@@ -56,28 +56,19 @@ public class NameSurrogateIntMap extends KeyIntMap {
     }
     
     private Entry[] _table;
-    private NameSurrogate[] _array;
     
-    public NameSurrogateIntMap(int initialCapacity, float loadFactor, boolean supportArray) {
-        super(initialCapacity, loadFactor, supportArray);
+    public NameSurrogateIntMap(int initialCapacity, float loadFactor) {
+        super(initialCapacity, loadFactor);
 
         _table = new Entry[_capacity];
-
-        if (_supportArray) {
-            _array = new NameSurrogate[_capacity];
-        }
     }
     
-    public NameSurrogateIntMap(int initialCapacity, boolean supportArray) {
-        this(initialCapacity, DEFAULT_LOAD_FACTOR, supportArray);
-    }
-
-    public NameSurrogateIntMap(boolean supportArray) {
-        this(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR, supportArray);
+    public NameSurrogateIntMap(int initialCapacity) {
+        this(initialCapacity, DEFAULT_LOAD_FACTOR);
     }
 
     public NameSurrogateIntMap() {
-        this(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR, false);
+        this(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR);
     }
 
     public void clear() {
@@ -85,17 +76,6 @@ public class NameSurrogateIntMap extends KeyIntMap {
             _table[i] = null;
         }
         _size = 0;
-        
-        if (_supportArray) {
-            for (int i = 0; i < _arraySize; i++) {
-                _array[i] = null;
-            }
-            _arraySize = 0;
-        }
-    }
-
-    public NameSurrogate[] getKeys() {
-        return _array;
     }
 
     public void setReadOnlyMap(KeyIntMap readOnlyMap, boolean clear) {
@@ -174,16 +154,6 @@ public class NameSurrogateIntMap extends KeyIntMap {
         _table[bucketIndex] = new Entry(key, hash, value, e);
         if (_size++ >= _threshold) {
             resize(2 * _table.length);
-        }
-
-        if (_supportArray) {
-            if (_arraySize == _array.length) {
-                NameSurrogate[] newArray = new NameSurrogate[_arraySize * 3 / 2 + 1];
-                System.arraycopy(_array, 0, newArray, 0, _arraySize);
-                _array = newArray;
-            }
-
-            _array[_arraySize++] = key;
         }
     }
     

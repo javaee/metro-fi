@@ -671,13 +671,13 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
                 }
 
                 // Encode namespace decls associated with this element
-                if (_namespaces.size() > 0) {
-                    _s.write(_b | EncodingConstants.ELEMENT_NAMESPACES_FLAG);
-                    for (int i = 0; i < _namespaces.size(); i++) {
+                if (_namespaces.getSize() > 0) {
+                    write(_b | EncodingConstants.ELEMENT_NAMESPACES_FLAG);
+                    for (int i = 0; i < _namespaces.getSize(); i++) {
                         QualifiedName name = _namespaces.get(i);
                         encodeNamespaceAttribute(name.prefix, name.namespaceName);
                     }
-                    _s.write(EncodingConstants.TERMINATOR);
+                    write(EncodingConstants.TERMINATOR);
 
                     _namespaces.clear();
 
@@ -718,9 +718,9 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
             }
             
             // Encode namespace decls associated with this element
-            if (_namespaces.size() > 0) {
-                _s.write(_b | EncodingConstants.ELEMENT_NAMESPACES_FLAG);
-                for (int i = 0; i < _namespaces.size(); i++) {
+            if (_namespaces.getSize() > 0) {
+                write(_b | EncodingConstants.ELEMENT_NAMESPACES_FLAG);
+                for (int i = 0; i < _namespaces.getSize(); i++) {
                     QualifiedName name = _namespaces.get(i);
                     encodeNamespaceAttribute(name.prefix, name.namespaceName);
                 }

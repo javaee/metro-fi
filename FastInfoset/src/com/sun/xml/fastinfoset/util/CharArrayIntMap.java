@@ -41,8 +41,7 @@ package com.sun.xml.fastinfoset.util;
 
 public class CharArrayIntMap extends KeyIntMap {
 
-    CharArrayIntMap _readOnlyMap;
-    boolean _hasReadOnlyMap = false;
+    private CharArrayIntMap _readOnlyMap;
     
     static class Entry extends BaseEntry {
         final CharArray _key;
@@ -56,49 +55,29 @@ public class CharArrayIntMap extends KeyIntMap {
     }
     
     private Entry[] _table;
-    private CharArray[] _array;
 
-    public CharArrayIntMap(int initialCapacity, float loadFactor, boolean supportArray) {
-        super(initialCapacity, loadFactor, supportArray);
+    public CharArrayIntMap(int initialCapacity, float loadFactor) {
+        super(initialCapacity, loadFactor);
 
-        _table = new Entry[_capacity];
-        
-        if (_supportArray) {
-            _array = new CharArray[_capacity];
-        }
+        _table = new Entry[_capacity];        
     }
     
-    public CharArrayIntMap(int initialCapacity, boolean supportArray) {
-        this(initialCapacity, DEFAULT_LOAD_FACTOR, supportArray);
-    }
-
-    public CharArrayIntMap(boolean supportArray) {
-        this(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR, supportArray);
+    public CharArrayIntMap(int initialCapacity) {
+        this(initialCapacity, DEFAULT_LOAD_FACTOR);
     }
     
     public CharArrayIntMap() {
-        this(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR, false);
+        this(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR);
     }
 
-    public void clear() {
+    public final void clear() {
         for (int i = 0; i < _table.length; i++) {
             _table[i] = null;
         }
         _size = 0;
-
-        if (_supportArray) {
-            for (int i = 0; i < _arraySize; i++) {
-                _array[i] = null;
-            }
-            _arraySize = 0;
-        }
     }
 
-    public CharArray[] getKeys() {
-        return _array;
-    }
-
-    public void setReadOnlyMap(KeyIntMap readOnlyMap, boolean clear) {
+    public final void setReadOnlyMap(KeyIntMap readOnlyMap, boolean clear) {
         if (!(readOnlyMap instanceof CharArrayIntMap)) {
             throw new IllegalArgumentException("Illegal class: "
                 + readOnlyMap);
@@ -107,7 +86,7 @@ public class CharArrayIntMap extends KeyIntMap {
         setReadOnlyMap((CharArrayIntMap)readOnlyMap, clear);
     }
     
-    public void setReadOnlyMap(CharArrayIntMap readOnlyMap, boolean clear) {
+    public final void setReadOnlyMap(CharArrayIntMap readOnlyMap, boolean clear) {
         _readOnlyMap = readOnlyMap;
         if (_readOnlyMap != null) {
             _readOnlyMapSize = _readOnlyMap.size();
@@ -120,11 +99,11 @@ public class CharArrayIntMap extends KeyIntMap {
         }     
     }
     
-    public int obtainIndex(CharArray key) {
+    public final int obtainIndex(CharArray key) {
         final int hash = hashHash(key.hashCode());
         
         if (_readOnlyMap != null) {
-            int index = _readOnlyMap.get(key, hash);
+            final int index = _readOnlyMap.get(key, hash);
             if (index != -1) {
                 return index;
             }
@@ -141,13 +120,13 @@ public class CharArrayIntMap extends KeyIntMap {
         return NOT_PRESENT;
     }
 
-    public int get(CharArray key) {
+    public final int get(CharArray key) {
         return get(key, hashHash(key.hashCode()));
     }
     
-    private int get(CharArray key, int hash) {
+    private final int get(CharArray key, int hash) {
         if (_readOnlyMap != null) {
-            int i = _readOnlyMap.get(key, hash);
+            final int i = _readOnlyMap.get(key, hash);
             if (i != -1) {
                 return i;
             }
@@ -164,25 +143,15 @@ public class CharArrayIntMap extends KeyIntMap {
     }
 
 
-    private void addEntry(CharArray key, int hash, int value, int bucketIndex) {
+    private final void addEntry(CharArray key, int hash, int value, int bucketIndex) {
 	Entry e = _table[bucketIndex];
         _table[bucketIndex] = new Entry(key, hash, value, e);
         if (_size++ >= _threshold) {
             resize(2 * _table.length);
-        }
-        
-        if (_supportArray) {
-            if (_arraySize == _array.length) {
-                CharArray[] newArray = new CharArray[_arraySize * 3 / 2 + 1];
-                System.arraycopy(_array, 0, newArray, 0, _arraySize);
-                _array = newArray;
-            }
-
-           _array[_arraySize++] = key;
-        }
+        }        
     }
     
-    private void resize(int newCapacity) {
+    private final void resize(int newCapacity) {
         _capacity = newCapacity;
         Entry[] oldTable = _table;
         int oldCapacity = oldTable.length;
@@ -197,7 +166,7 @@ public class CharArrayIntMap extends KeyIntMap {
         _threshold = (int)(_capacity * _loadFactor);        
     }
 
-    private void transfer(Entry[] newTable) {
+    private final void transfer(Entry[] newTable) {
         Entry[] src = _table;
         int newCapacity = newTable.length;
         for (int j = 0; j < src.length; j++) {
@@ -215,7 +184,7 @@ public class CharArrayIntMap extends KeyIntMap {
         }
     }
         
-    boolean eq(CharArray x, CharArray y) {
+    private final boolean eq(CharArray x, CharArray y) {
         return x == y || x.equals(y);
     }
 }

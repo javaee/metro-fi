@@ -67,10 +67,6 @@ public abstract class KeyIntMap {
     int _size;
   
     int _capacity;
-
-    int _arraySize;
-    
-    boolean _supportArray;
     
     /**
      * The next size value at which to resize (capacity * load factor).
@@ -92,7 +88,7 @@ public abstract class KeyIntMap {
         }
     }
  
-    public KeyIntMap(int initialCapacity, float loadFactor, boolean supportArray) {
+    public KeyIntMap(int initialCapacity, float loadFactor) {
         if (initialCapacity < 0)
             throw new IllegalArgumentException("Illegal initial capacity: " +
                                                initialCapacity);
@@ -115,12 +111,10 @@ public abstract class KeyIntMap {
             _loadFactor = DEFAULT_LOAD_FACTOR;
             _threshold = (int)(DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);        
         }
-        
-        _supportArray = supportArray;
     }
     
-    public KeyIntMap(int initialCapacity, boolean supportArray) {
-        this(initialCapacity, DEFAULT_LOAD_FACTOR, supportArray);
+    public KeyIntMap(int initialCapacity) {
+        this(initialCapacity, DEFAULT_LOAD_FACTOR);
     }
 
     public KeyIntMap() {
@@ -129,25 +123,16 @@ public abstract class KeyIntMap {
         _threshold = (int)(DEFAULT_INITIAL_CAPACITY * DEFAULT_LOAD_FACTOR);
     }
 
-    public KeyIntMap(boolean supportArray) {
-        this();
-        _supportArray = supportArray;
-    }
-
-    public int size() {
+    public final int size() {
         return _size + _readOnlyMapSize;
     }
 
     public abstract void clear();
-
-    public int getKeysSize() {
-        return _arraySize;
-    }
     
     public abstract void setReadOnlyMap(KeyIntMap readOnlyMap, boolean clear);
 
     
-    static int hashHash(int h) {
+    static final int hashHash(int h) {
         h += ~(h << 9);
         h ^=  (h >>> 14);
         h +=  (h << 4);
@@ -155,7 +140,7 @@ public abstract class KeyIntMap {
         return h;
     }
 
-    static int indexFor(int h, int length) {
+    static final int indexFor(int h, int length) {
         return h & (length-1);
     }
 

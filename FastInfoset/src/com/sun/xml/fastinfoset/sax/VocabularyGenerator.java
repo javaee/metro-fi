@@ -95,16 +95,10 @@ public class VocabularyGenerator extends DefaultHandler implements LexicalHandle
     }
 
     public void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException {
-        String prefix = getPrefixFromQualifiedName(qName);
-        // addToNameTable(namespaceURI, prefix, localName, _serializerVocabulary.elementName, _parserVocabulary.elementName);
-        addToNameTable2(namespaceURI, prefix, localName, _serializerVocabulary.elementName, _parserVocabulary.elementName);
+        addToNameTable(namespaceURI, qName, localName, _serializerVocabulary.elementName, _parserVocabulary.elementName);
         
-        for (int a = 0; a < atts.getLength(); a++) {
-            qName = atts.getQName(a);
-            prefix = getPrefixFromQualifiedName(qName);
-            
-            // addToNameTable(atts.getURI(a), prefix, atts.getLocalName(a), _serializerVocabulary.attributeName, _parserVocabulary.attributeName);
-            addToNameTable2(atts.getURI(a), prefix, atts.getLocalName(a), _serializerVocabulary.attributeName, _parserVocabulary.attributeName);
+        for (int a = 0; a < atts.getLength(); a++) {            
+            addToNameTable(atts.getURI(a), atts.getQName(a), atts.getLocalName(a), _serializerVocabulary.attributeName, _parserVocabulary.attributeName);
         
             String value = atts.getValue(a);
             if (value.length() < _serializerVocabulary.attributeValueSizeConstraint) {
@@ -176,18 +170,19 @@ public class VocabularyGenerator extends DefaultHandler implements LexicalHandle
         }        
     }
 
-    public void addToNameTable2(String namespaceURI, String prefix, String localName, LocalNameQualifiedNamesMap m, QualifiedNameArray a) throws SAXException {        
-        LocalNameQualifiedNamesMap.Entry entry = m.obtainEntry(localName);
+    public void addToNameTable(String namespaceURI, String qName, String localName, LocalNameQualifiedNamesMap m, QualifiedNameArray a) throws SAXException {        
+        LocalNameQualifiedNamesMap.Entry entry = m.obtainEntry(qName);
         if (entry._valueIndex > 0) {
             QualifiedName[] names = entry._value;
             for (int i = 0; i < entry._valueIndex; i++) {
-                if ((prefix == names[i].prefix || prefix.equals(names[i].prefix)) 
-                        && (namespaceURI == names[i].namespaceName || namespaceURI.equals(names[i].namespaceName))) {
+                if ((namespaceURI == names[i].namespaceName || namespaceURI.equals(names[i].namespaceName))) {
                     return;
                 }
             }                
         } 
-
+        
+        String prefix = getPrefixFromQualifiedName(qName);
+        
         int namespaceURIIndex = -1;
         int prefixIndex = -1;
         int localNameIndex = -1;
@@ -210,42 +205,7 @@ public class VocabularyGenerator extends DefaultHandler implements LexicalHandle
         entry.addQualifiedName(name);
         a.add(name);
     }
-    
-    public void addToNameTable(String namespaceURI, String prefix, String localName, NameSurrogateIntMap m, QualifiedNameArray a) throws SAXException {
-        int namespaceURIIndex = -1;
-        int prefixIndex = -1;
-        int localNameIndex = -1;
-        if (namespaceURI != "") {
-            namespaceURIIndex = _serializerVocabulary.namespaceName.get(namespaceURI);
-            if (namespaceURIIndex == KeyIntMap.NOT_PRESENT) {
-                throw new SAXException("namespace URI of local name not indexed");
-            }
-            
-            if (prefix != "") {
-                prefixIndex = _serializerVocabulary.prefix.get(prefix);
-                if (prefixIndex == KeyIntMap.NOT_PRESENT) {
-                    throw new SAXException("prefix of local name not indexed");
-                }
-            }
-        }
         
-        localNameIndex = _serializerVocabulary.localName.obtainIndex(localName);
-        if (localNameIndex == KeyIntMap.NOT_PRESENT) {
-            localNameIndex = _serializerVocabulary.localName.size() - 1;
-            
-            NameSurrogate nameSurrogate = new NameSurrogate(prefixIndex, namespaceURIIndex, localNameIndex);
-            m.add(nameSurrogate);
-            a.add(new QualifiedName(prefix, namespaceURI, localName));
-        } else {
-            NameSurrogate nameSurrogate = new NameSurrogate(prefixIndex, namespaceURIIndex, localNameIndex);
-            
-            int nameSurrogateIndex = m.obtainIndex(nameSurrogate);
-            if (nameSurrogateIndex == KeyIntMap.NOT_PRESENT) {
-                a.add(new QualifiedName(prefix, namespaceURI, localName));
-            }
-        }
-    }
-    
     public static String getPrefixFromQualifiedName(String qName) {
         int i = qName.indexOf(':');
         String prefix = "";

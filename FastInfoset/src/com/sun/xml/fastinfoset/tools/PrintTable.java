@@ -39,7 +39,6 @@
 
 package com.sun.xml.fastinfoset.tools;
 
-import com.sun.xml.fastinfoset.NameSurrogate;
 import com.sun.xml.fastinfoset.QualifiedName;
 import java.io.File;
 
@@ -48,11 +47,11 @@ import javax.xml.parsers.SAXParserFactory;
 
 import com.sun.xml.fastinfoset.sax.VocabularyGenerator;
 import com.sun.xml.fastinfoset.util.CharArray;
+import com.sun.xml.fastinfoset.util.CharArrayArray;
 import com.sun.xml.fastinfoset.util.CharArrayIntMap;
-import com.sun.xml.fastinfoset.util.LocalNameQualifiedNamesMap;
-import com.sun.xml.fastinfoset.util.NameSurrogateIntMap;
-import com.sun.xml.fastinfoset.util.StringIntMap;
-import com.sun.xml.fastinfoset.vocab.SerializerVocabulary;
+import com.sun.xml.fastinfoset.util.QualifiedNameArray;
+import com.sun.xml.fastinfoset.util.StringArray;
+import com.sun.xml.fastinfoset.vocab.ParserVocabulary;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -65,65 +64,46 @@ public class PrintTable {
     public PrintTable() {
     }
     
-    public static void printVocabulary(SerializerVocabulary vocabulary) {
-        printMap("Attribute Name Table", vocabulary.attributeName);
-        printMap("Attribute Value Table", vocabulary.attributeValue);
-        printMap("Character Content Chunk Table", vocabulary.characterContentChunk);
-        printMap("Element Name Table", vocabulary.elementName);
-        printMap("Local Name Table", vocabulary.localName);
-        printMap("Namespace Name Table", vocabulary.namespaceName);
-        printMap("Other NCName Table", vocabulary.otherNCName);
-        printMap("Other String Table", vocabulary.otherString);
-        printMap("Other URI Table", vocabulary.otherURI);
-        printMap("Prefix Table", vocabulary.prefix);
+    public static void printVocabulary(ParserVocabulary vocabulary) {
+        printArray("Attribute Name Table", vocabulary.attributeName);
+        printArray("Attribute Value Table", vocabulary.attributeValue);
+        printArray("Character Content Chunk Table", vocabulary.characterContentChunk);
+        printArray("Element Name Table", vocabulary.elementName);
+        printArray("Local Name Table", vocabulary.localName);
+        printArray("Namespace Name Table", vocabulary.namespaceName);
+        printArray("Other NCName Table", vocabulary.otherNCName);
+        printArray("Other String Table", vocabulary.otherString);
+        printArray("Other URI Table", vocabulary.otherURI);
+        printArray("Prefix Table", vocabulary.prefix);
     }
     
-    public static void printMap(String title, StringIntMap m) {
+    public static void printArray(String title, StringArray a) {
         System.out.println(title);
 
-        String[] keys = m.getKeys();
-        for (int i = 0; i < m.getKeysSize(); i++) {
-            System.out.println("" + (i + 1) + ": " + keys[i]);
+        for (int i = 0; i < a.getSize(); i++) {
+            System.out.println("" + (i + 1) + ": " + a.getArray()[i]);
         }        
     }
 
-    public static void printMap(String title, LocalNameQualifiedNamesMap m) {
+    public static void printArray(String title, CharArrayArray a) {
         System.out.println(title);
 
-        List names = new ArrayList();
-        
-        QualifiedName[] entries = m.getQualifiedNames();
-        for (int i = 0; i < entries.length; i++) {
-            names.add(entries[i]);
-        }
-        
-        Collections.sort(names, new Comparator() {
-                public int compare(Object o1, Object o2) {
-                    QualifiedName n1 = (QualifiedName)o1;
-                    QualifiedName n2 = (QualifiedName)o2;
-                    return n1.index - n2.index;
-                }
-            }
-        );
-        
-        Iterator i = names.iterator();
-        while (i.hasNext()) {
-            QualifiedName name = (QualifiedName)i.next();
+        for (int i = 0; i < a.getSize(); i++) {
+            System.out.println("" + (i + 1) + ": " + a.getArray()[i]);
+        }        
+    }
+
+    public static void printArray(String title, QualifiedNameArray a) {
+        System.out.println(title);
+
+        for (int i = 0; i < a.getSize(); i++) {
+            QualifiedName name = a.getArray()[i];
             System.out.println("" + (name.index + 1) + ": " + 
                     "{" + name.namespaceName + "}" + 
                     name.prefix + ":" + name.localName);
-        }
-    }
-    
-    public static void printMap(String title, CharArrayIntMap m) {
-        System.out.println(title);
-
-        CharArray[] keys = m.getKeys();
-        for (int i = 0; i < m.getKeysSize(); i++) {
-            System.out.println("" + (i + 1) + ": \"" + keys[i] + "\"");
         }        
     }
-
+    
     /**
      * @param args the command line arguments
      */
@@ -134,7 +114,7 @@ public class PrintTable {
 
             SAXParser saxParser = saxParserFactory.newSAXParser();
 
-            SerializerVocabulary referencedVocabulary = new SerializerVocabulary(true);
+            ParserVocabulary referencedVocabulary = new ParserVocabulary();
         
             VocabularyGenerator vocabularyGenerator = new VocabularyGenerator(referencedVocabulary);
             File f = new File(args[0]);

@@ -41,9 +41,9 @@ package com.sun.xml.fastinfoset.util;
 
 public class CharArrayArray extends ValueArray {
     
-    public CharArray[] _array;
+    private CharArray[] _array;
     
-    CharArrayArray _readOnlyArray;
+    private CharArrayArray _readOnlyArray;
     
     public CharArrayArray(int initialCapacity) {
         _array = new CharArray[initialCapacity];
@@ -53,14 +53,18 @@ public class CharArrayArray extends ValueArray {
         this(DEFAULT_CAPACITY);
     }
     
-    public void clear() {
+    public final void clear() {
         for (int i = 0; i < _size; i++) {
             _array[i] = null;
         }
         _size = 0;
     }
 
-    public void setReadOnlyArray(ValueArray readOnlyArray, boolean clear) {
+    public final CharArray[] getArray() {
+        return _array;
+    }
+    
+    public final void setReadOnlyArray(ValueArray readOnlyArray, boolean clear) {
         if (!(readOnlyArray instanceof CharArrayArray)) {
             throw new IllegalArgumentException("Illegal class: "
                 + readOnlyArray);
@@ -69,10 +73,10 @@ public class CharArrayArray extends ValueArray {
         setReadOnlyArray((CharArrayArray)readOnlyArray, clear);
     }
 
-    public void setReadOnlyArray(CharArrayArray readOnlyArray, boolean clear) {
+    public final void setReadOnlyArray(CharArrayArray readOnlyArray, boolean clear) {
         if (readOnlyArray != null) {
             _readOnlyArray = readOnlyArray;
-            _readOnlyArraySize = readOnlyArray.size();
+            _readOnlyArraySize = readOnlyArray.getSize();
                         
             if (clear) {
                 clear();
@@ -80,21 +84,21 @@ public class CharArrayArray extends ValueArray {
         }
     }
     
-    public CharArray get(int i) {
-        if (_readOnlyArray != null) {
+    public final CharArray get(int i) {
+        if (_readOnlyArray == null) {
+            return _array[i];
+        } else {
             if (i < _readOnlyArraySize) {
                return _readOnlyArray.get(i); 
             } else {
                 return _array[i - _readOnlyArraySize];
             }
-        } else {
-            return _array[i];
         }
    }
     
-    public void add(CharArray s) {
+    public final void add(CharArray s) {
         if (_size == _array.length) {
-            CharArray[] newArray = new CharArray[_size * 3 / 2 + 1];
+            final CharArray[] newArray = new CharArray[_size * 3 / 2 + 1];
             System.arraycopy(_array, 0, newArray, 0, _size);
             _array = newArray;
         }
