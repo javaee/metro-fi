@@ -39,11 +39,13 @@
 
 package com.sun.xml.fastinfoset.algorithm;
 
+import com.sun.xml.fastinfoset.EncodingConstants;
 import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
 
 public final class BuiltInEncodingAlgorithmFactory {
 
-    public final static BuiltInEncodingAlgorithm[] table = new BuiltInEncodingAlgorithm[10];
+    public final static BuiltInEncodingAlgorithm[] table = 
+            new BuiltInEncodingAlgorithm[EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END + 1];
     
     public final static IntEncodingAlgorithm intEncodingAlgorithm = new IntEncodingAlgorithm();
     

@@ -40,21 +40,31 @@
 package com.sun.xml.fastinfoset.sax;
 
 import com.sun.xml.fastinfoset.QualifiedName;
-import org.xml.sax.Attributes;
 
-public class AttributesHolder implements Attributes {
-    private static final int DEFAULT_CAPACITY = 10;
+import org.jvnet.fastinfoset.sax.EncodingAlgorithmAttributes;
+
+public class AttributesHolder implements EncodingAlgorithmAttributes {
+    private static final int DEFAULT_CAPACITY = 8;
 
     private int _attributeCount;
+    
     private QualifiedName[] _names;
     private String[] _values;
-
+    
+    private String[] _algorithmURIs;
+    private int[] _algorithmIds;
+    private Object[] _algorithmData;
+    
     public AttributesHolder() {
         _names = new QualifiedName[DEFAULT_CAPACITY];
         _values = new String[DEFAULT_CAPACITY];
+        
+        _algorithmURIs = new String[DEFAULT_CAPACITY];
+        _algorithmIds = new int[DEFAULT_CAPACITY];
+        _algorithmData = new Object[DEFAULT_CAPACITY];
     }
 
-    // -----
+    // org.xml.sax.Attributes
     
     public final int getLength() {
         return _attributeCount;
@@ -149,23 +159,46 @@ public class AttributesHolder implements Attributes {
     public final void clear() {
         for (int i = 0; i < _attributeCount; i++) {
             _values[i] = null;
+            _algorithmData[i] = null;
         }
         _attributeCount = 0;
     }
 
+    // EncodingAlgorithmAttributes
+    
+    public final String getAlgorithmURI(int index) {
+        return _algorithmURIs[index];
+    }
+ 
+    public final int getAlgorithmIndex(int index) {
+        return _algorithmIds[index];
+    }
+    
+    public final Object getAlgorithmData(int index) {
+        return _algorithmData[index];
+    }
+
+    
     // -----
     
     public final void addAttribute(QualifiedName name, String value) {
         if (_attributeCount == _names.length) {
-            QualifiedName[] names = new QualifiedName[_attributeCount * 3 / 2 + 1];
-            String[] values = new String[_attributeCount  * 3 / 2 + 1];
-            System.arraycopy(_names, 0, names, 0, _attributeCount);
-            System.arraycopy(_values, 0, values, 0, _attributeCount);
-            _names = names;
-            _values = values;
+            resize();
         }
         _names[_attributeCount] = name;
         _values[_attributeCount++] = value;
+    }
+
+    public final void addAttributeWithAlgorithmData(QualifiedName name, String URI, int id, Object data) {
+        if (_attributeCount == _names.length) {
+            resize();
+        }
+        _names[_attributeCount] = name;
+        _values[_attributeCount] = null;
+
+        _algorithmURIs[_attributeCount] = URI;
+        _algorithmIds[_attributeCount] = id;
+        _algorithmData[_attributeCount++] = data;
     }
 
     public final QualifiedName getQualifiedName(int index) {
@@ -175,4 +208,30 @@ public class AttributesHolder implements Attributes {
     public final String getPrefix(int index) {
         return _names[index].prefix;
     }
+    
+    private final void resize() {
+        final int newLength = _attributeCount * 3 / 2 + 1;
+
+        QualifiedName[] names = new QualifiedName[newLength];
+        String[] values = new String[newLength];
+
+        String[] algorithmURIs = new String[newLength];
+        int[] algorithmIds = new int[newLength];
+        Object[] algorithmData = new Object[newLength];
+
+        System.arraycopy(_names, 0, names, 0, _attributeCount);
+        System.arraycopy(_values, 0, values, 0, _attributeCount);
+
+        System.arraycopy(_algorithmURIs, 0, algorithmURIs, 0, _attributeCount);
+        System.arraycopy(_algorithmIds, 0, algorithmIds, 0, _attributeCount);
+        System.arraycopy(_algorithmData, 0, algorithmData, 0, _attributeCount);
+
+        _names = names;
+        _values = values;
+
+        _algorithmURIs = algorithmURIs;
+        _algorithmIds = algorithmIds;
+        _algorithmData = algorithmData;
+    }
+    
 }

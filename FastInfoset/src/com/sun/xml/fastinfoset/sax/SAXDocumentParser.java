@@ -667,6 +667,17 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 }
                 case DecoderStateTables.CII_EA:
                 {
+                    if ((_b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0) {
+                        throw new EncodingAlgorithmException("Add to table not supported for Encoding algorithms");
+                    }
+
+                    // Decode encoding algorithm integer
+                    _identifier = (_b & 0x02) << 6;
+                    _b = read();
+                    _identifier |= (_b & 0xFC) >> 2;
+                    
+                    decodeOctetsOfNonIdentifyingStringOnThirdBit(_b);
+            
                     processCIIEncodingAlgorithm();
                     break;
                 }
@@ -1059,14 +1070,17 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 }
                 case DecoderStateTables.NISTRING_EA:
                 {
-                    final boolean addToTable = (b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0;
-                    // Decode encoding algorithm integer
+                    if ((b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0) {
+                        throw new EncodingAlgorithmException("Add to table not supported for Encoding algorithms");
+                    }
+
                     _identifier = (b & 0x0F) << 4;
                     b = read();
                     _identifier |= (b & 0xF0) >> 4;
 
                     decodeOctetsOfNonIdentifyingStringOnFirstBit(b);
-                    throw new IOException("Encoding algorithms not supported for [normalized value] property of AII");
+
+                    processAIIEncodingAlgorithm(name);
                 }
                 case DecoderStateTables.NISTRING_INDEX_SMALL:
                     value = _v.attributeValue.get(b & EncodingConstants.INTEGER_2ND_BIT_SMALL_MASK);
@@ -1173,25 +1187,31 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
     }
 
     protected final void processCIIEncodingAlgorithm() throws FastInfosetException, IOException {
-        if ((_b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0) {
-            throw new EncodingAlgorithmException("Add to table not supported for Encoding algorithms");
-        }
-
-        // Decode encoding algorithm integer
-        _identifier = (_b & 0x02) << 6;
-        final int b2 = read();
-        _identifier |= (b2 & 0xFC) >> 2;
-
-        decodeOctetsOfNonIdentifyingStringOnThirdBit(b2);
-
         if (_identifier <= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
             switch (_algorithmReportingState) {
                 case EA_NONE:
-                    processCIIBuiltInEncodingAlgorithmAsCharacters();
+                {
+                    StringBuffer buffer = new StringBuffer();
+                    processBuiltInEncodingAlgorithmAsCharacters(buffer);
+
+                    try {
+                        _contentHandler.characters(buffer.toString().toCharArray(), 0, buffer.length());
+                    } catch (SAXException e) {
+                        throw new FastInfosetException(e);
+                    }
                     break;
+                }
                 case EA_GENERIC:
-                    processCIIBuiltInEncodingAlgorithmAsObject();
+                {
+                    Object array = processBuiltInEncodingAlgorithmAsObject();
+                    
+                    try {
+                        _algorithmHandler.object(null, _identifier, array);
+                    } catch (SAXException e) {
+                        throw new FastInfosetException(e);
+                    }
                     break;
+                }
                 case EA_PRIMITIVE:
                 case EA_PRIMITIVE_APPLICATION:
                     processCIIBuiltInEncodingAlgorithmAsPrimitive();
@@ -1224,32 +1244,6 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         }
     }
 
-    protected final void processCIIBuiltInEncodingAlgorithmAsCharacters() throws FastInfosetException, IOException {
-        // TODO not very efficient, need to reuse buffers
-        Object array = BuiltInEncodingAlgorithmFactory.table[_identifier].
-                decodeFromBytes(_octetBuffer, _octetBufferStart, _octetBufferLength);
-
-        StringBuffer buffer = new StringBuffer();
-        BuiltInEncodingAlgorithmFactory.table[_identifier].convertToCharacters(array,  buffer);
-
-        try {
-            _contentHandler.characters(buffer.toString().toCharArray(), 0, buffer.length());
-        } catch (SAXException e) {
-            throw new FastInfosetException(e);
-        }
-    }
-
-    protected final void processCIIBuiltInEncodingAlgorithmAsObject() throws FastInfosetException, IOException {
-        Object array = BuiltInEncodingAlgorithmFactory.table[_identifier].
-                decodeFromBytes(_octetBuffer, _octetBufferStart, _octetBufferLength);
-        
-        try {
-            _algorithmHandler.object(null, _identifier, array);
-        } catch (SAXException e) {
-            throw new FastInfosetException(e);
-        }
-    }
-    
     protected final void processCIIBuiltInEncodingAlgorithmAsPrimitive() throws FastInfosetException, IOException {
         try {
             int length;
@@ -1265,7 +1259,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     length = BuiltInEncodingAlgorithmFactory.intEncodingAlgorithm.
                             getLength(_octetBufferLength);
                     if (length > builtInAlgorithmState.intArray.length) {
-                        int[] array = new int[length * 3 / 2 + 1];
+                        final int[] array = new int[length * 3 / 2 + 1];
                         System.arraycopy(builtInAlgorithmState.intArray, 0, 
                                 array, 0, builtInAlgorithmState.intArray.length);
                         builtInAlgorithmState.intArray = array;
@@ -1284,7 +1278,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     length = BuiltInEncodingAlgorithmFactory.floatEncodingAlgorithm.
                             getLength(_octetBufferLength);
                     if (length > builtInAlgorithmState.floatArray.length) {
-                        float[] array = new float[length * 3 / 2 + 1];
+                        final float[] array = new float[length * 3 / 2 + 1];
                         System.arraycopy(builtInAlgorithmState.floatArray, 0, 
                                 array, 0, builtInAlgorithmState.floatArray.length);
                         builtInAlgorithmState.floatArray = array;
@@ -1308,4 +1302,63 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             throw new FastInfosetException(e);
         }
     }
+    
+    
+    protected final void processAIIEncodingAlgorithm(QualifiedName name) throws FastInfosetException, IOException {
+        if (_identifier <= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
+            switch (_algorithmReportingState) {
+                case EA_NONE:
+                {
+                    StringBuffer buffer = new StringBuffer();
+                    processBuiltInEncodingAlgorithmAsCharacters(buffer);
+                    _attributes.addAttribute(name, buffer.toString());
+                    break;
+                }
+                case EA_GENERIC:
+                case EA_PRIMITIVE:
+                case EA_PRIMITIVE_APPLICATION:
+                {
+                    Object data = processBuiltInEncodingAlgorithmAsObject();
+                    _attributes.addAttributeWithAlgorithmData(name, null, _identifier, data);
+                    break;
+                }
+            }
+            // Built-in algorithms
+        } else if (_identifier >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
+            switch (_algorithmReportingState) {
+                case EA_PRIMITIVE:
+                case EA_NONE:
+                    // TODO should have property to ignore
+                    throw new EncodingAlgorithmException(
+                            "Document contains application-defined encoding algorithm data that cannot be reported");
+                case EA_GENERIC:
+                    String URI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
+                    byte[] data = new byte[_octetBufferLength];
+                    System.arraycopy(_octetBuffer, _octetBufferStart, data, 0, _octetBufferLength);
+                    _attributes.addAttributeWithAlgorithmData(name, URI, _identifier, data);
+                    break;
+                case EA_PRIMITIVE_APPLICATION:
+                    throw new UnsupportedOperationException("");
+            }
+        } else {
+            // Reserved built-in algorithms for future use
+            // TODO should use sax property to decide if event will be
+            // reported, allows for support through handler if required.
+            throw new EncodingAlgorithmException("Encoding algorithm identifiers 10 up to and including 31 are reserved for future use");
+        }
+    }
+ 
+    protected final void processBuiltInEncodingAlgorithmAsCharacters(StringBuffer buffer) throws FastInfosetException, IOException {
+        // TODO not very efficient, need to reuse buffers
+        Object array = BuiltInEncodingAlgorithmFactory.table[_identifier].
+                decodeFromBytes(_octetBuffer, _octetBufferStart, _octetBufferLength);
+
+        BuiltInEncodingAlgorithmFactory.table[_identifier].convertToCharacters(array,  buffer);
+    }
+
+    protected final Object processBuiltInEncodingAlgorithmAsObject() throws FastInfosetException, IOException {
+        return BuiltInEncodingAlgorithmFactory.table[_identifier].
+                decodeFromBytes(_octetBuffer, _octetBufferStart, _octetBufferLength);        
+    }
+    
 }
