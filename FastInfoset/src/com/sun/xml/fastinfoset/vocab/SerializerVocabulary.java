@@ -42,7 +42,6 @@ package com.sun.xml.fastinfoset.vocab;
 import com.sun.xml.fastinfoset.util.CharArrayIntMap;
 import com.sun.xml.fastinfoset.util.KeyIntMap;
 import com.sun.xml.fastinfoset.util.LocalNameQualifiedNamesMap;
-import com.sun.xml.fastinfoset.util.NameSurrogateIntMap;
 import com.sun.xml.fastinfoset.util.StringIntMap;
 import java.net.URI;
 
