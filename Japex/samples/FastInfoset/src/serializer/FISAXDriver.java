@@ -69,9 +69,9 @@ public class FISAXDriver extends JapexDriverBase {
     SAXResult _result = null;
     ByteArrayOutputStream _baos;
     
-    /** Creates a new instance of StAXRIDriver */
     public FISAXDriver() {
     }
+    
     public void initializeDriver() {
         try {
             _transformer = TransformerFactory.newInstance().newTransformer();
