@@ -46,6 +46,9 @@ import com.sun.xml.fastinfoset.util.ValueArray;
 import java.net.URI;
 
 public class ParserVocabulary extends Vocabulary {
+    public final StringArray restrictedAlphabet = new StringArray();
+    public final StringArray encodingAlgorithm = new StringArray();
+
     public final StringArray namespaceName = new StringArray();
     public final StringArray prefix = new StringArray();
     public final StringArray localName = new StringArray();
@@ -59,14 +62,16 @@ public class ParserVocabulary extends Vocabulary {
     public final QualifiedNameArray elementName = new QualifiedNameArray();
     public final QualifiedNameArray attributeName = new QualifiedNameArray();
 
-    public final ValueArray[] tables = new ValueArray[10];
+    public final ValueArray[] tables = new ValueArray[12];
     
     protected SerializerVocabulary _readOnlyVocabulary;
     
     /** Creates a new instance of ParserVocabulary */
     public ParserVocabulary() {
-        tables[NAMESPACE_NAME] = namespaceName;
+        tables[RESTRICTED_ALPHABET] = restrictedAlphabet;
+        tables[ENCODING_ALGORITHM] = encodingAlgorithm;
         tables[PREFIX] = prefix;
+        tables[NAMESPACE_NAME] = namespaceName;
         tables[LOCAL_NAME] = localName;
         tables[OTHER_NCNAME] = otherNCName;
         tables[OTHER_URI] = otherURI;

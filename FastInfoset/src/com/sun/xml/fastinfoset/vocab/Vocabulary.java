@@ -42,16 +42,18 @@ package com.sun.xml.fastinfoset.vocab;
 import java.net.URI;
 
 public abstract class Vocabulary {
-    public static final int NAMESPACE_NAME = 0;
-    public static final int PREFIX = 1;
-    public static final int LOCAL_NAME = 2;
-    public static final int OTHER_NCNAME = 3;
-    public static final int OTHER_URI = 4;
-    public static final int ATTRIBUTE_VALUE = 5;
-    public static final int OTHER_STRING = 6;
-    public static final int CHARACTER_CONTENT_CHUNK = 7;
-    public static final int ELEMENT_NAME = 8;
-    public static final int ATTRIBUTE_NAME = 9;
+    public static final int RESTRICTED_ALPHABET = 0;
+    public static final int ENCODING_ALGORITHM = 1;
+    public static final int PREFIX = 2;
+    public static final int NAMESPACE_NAME = 3;
+    public static final int LOCAL_NAME = 4;
+    public static final int OTHER_NCNAME = 5;
+    public static final int OTHER_URI = 6;
+    public static final int ATTRIBUTE_VALUE = 7;
+    public static final int OTHER_STRING = 8;
+    public static final int CHARACTER_CONTENT_CHUNK = 9;
+    public static final int ELEMENT_NAME = 10;
+    public static final int ATTRIBUTE_NAME = 11;
         
     protected boolean _hasInitialReadOnlyVocabulary;
     

@@ -56,19 +56,19 @@ public class DecoderStateTables {
     public final static int CII_UTF8_SMALL_LENGTH           = 6;
     public final static int CII_UTF8_MEDIUM_LENGTH          = 7;
     public final static int CII_UTF8_LARGE_LENGTH           = 8;
-    public final static int CII_EA                          = 9;
-    public final static int CII_RA_SMALL_LENGTH             = 10;
-    public final static int CII_RA_MEDIUM_LENGTH            = 11;
-    public final static int CII_RA_LARGE_LENGTH             = 12;
-    public final static int CII_UTF16_SMALL_LENGTH          = 13;
-    public final static int CII_UTF16_MEDIUM_LENGTH         = 14;
-    public final static int CII_UTF16_LARGE_LENGTH          = 15;
-    public final static int CII_INDEX_SMALL                 = 16;
-    public final static int CII_INDEX_MEDIUM                = 17;
-    public final static int CII_INDEX_LARGE                 = 18;
-    public final static int CII_INDEX_LARGE_LARGE            = 19;    
-    public final static int COMMENT_II                      = 20;
-    public final static int PROCESSING_INSTRUCTION_II       = 21;
+    public final static int CII_UTF16_SMALL_LENGTH          = 9;
+    public final static int CII_UTF16_MEDIUM_LENGTH         = 10;
+    public final static int CII_UTF16_LARGE_LENGTH          = 11;
+    public final static int CII_RA                          = 12;
+    public final static int CII_EA                          = 13;
+    public final static int CII_INDEX_SMALL                 = 14;
+    public final static int CII_INDEX_MEDIUM                = 15;
+    public final static int CII_INDEX_LARGE                 = 16;
+    public final static int CII_INDEX_LARGE_LARGE           = 17;    
+    public final static int COMMENT_II                      = 18;
+    public final static int PROCESSING_INSTRUCTION_II       = 19;
+    public final static int DOCUMENT_TYPE_DECLARATION_II    = 20;
+    public final static int UNEXPANDED_ENTITY_REFERENCE_II  = 21;
     public final static int TERMINATOR_SINGLE               = 22;
     public final static int TERMINATOR_DOUBLE               = 23;
 
@@ -140,8 +140,14 @@ public class DecoderStateTables {
 
         // %01111111  EII attributes literal (prefix, namespace)
         { 0x7F, EII_LITERAL },
-        
-        // %10000000 to %10111111
+                                
+        // %10000000 to %11000011
+        { 0xC3, STATE_ILLEGAL },
+                
+        // %11000100 to %11000111
+        { 0xC7, DOCUMENT_TYPE_DECLARATION_II },
+                
+        // %11001000 to %1110000
         { 0xE0, STATE_ILLEGAL },
         
         // %11100001 processing instruction
@@ -235,7 +241,9 @@ public class DecoderStateTables {
         { 0x7F, EII_LITERAL },
         
         // CII
-        
+
+        // UTF-8 string
+                
         // %10000000 to %10000001  CII UTF-8 no add to table small length
         { 0x81, CII_UTF8_SMALL_LENGTH },
 
@@ -245,6 +253,8 @@ public class DecoderStateTables {
         // %10000011  CII UTF-8 no add to table large length
         { 0x83, CII_UTF8_LARGE_LENGTH },
 
+        // UTF-16 string
+                
         // %10000100 to %10000101  CII UTF-16 no add to table small length
         { 0x85, CII_UTF16_SMALL_LENGTH },
 
@@ -254,17 +264,17 @@ public class DecoderStateTables {
         // %10000111  CII UTF-16 no add to table large length
         { 0x87, CII_UTF16_LARGE_LENGTH },
 
-        // %10001000 to %10001001  CII RA no add to table small length
-        { 0x89, CII_RA_SMALL_LENGTH },
+        // Resitricted alphabet
+                
+        // %10001000 to %10001011  CII RA no add to table
+        { 0x8B, CII_RA },
 
-        // %10001010  CII RA no add to table medium length
-        { 0x8A, CII_RA_MEDIUM_LENGTH },
-
-        // %10001011  CII RA no add to table large length
-        { 0x8B, CII_RA_LARGE_LENGTH },
-
+        // Encoding algorithm
+                
         // %10001100 to %10001111  CII EA no add to table
         { 0x8F, CII_EA },
+
+        // UTF-8 string, add to table
                 
         // %10010000 to %10010001  CII add to table small length
         { 0x91, CII_UTF8_SMALL_LENGTH },
@@ -275,6 +285,8 @@ public class DecoderStateTables {
         // %10010011  CII add to table large length
         { 0x93, CII_UTF8_LARGE_LENGTH },
         
+        // UTF-16 string, add to table
+                
         // %10010100 to %10010101  CII UTF-16 add to table small length
         { 0x95, CII_UTF16_SMALL_LENGTH },
 
@@ -284,22 +296,18 @@ public class DecoderStateTables {
         // %10010111  CII UTF-16 add to table large length
         { 0x97, CII_UTF16_LARGE_LENGTH },
 
-        // %10011000 to %10011001  CII RA add to table small length
-        { 0x99, CII_RA_SMALL_LENGTH },
+        // Restricted alphabet, add to table
 
-        // %10011010  CII RA add to table medium length
-        { 0x9A, CII_RA_MEDIUM_LENGTH},
+        // %10011000 to %10011011  CII RA add to table
+        { 0x9B, CII_RA },
 
-        // %10011011  CII RA add to table large length
-        { 0x9B, CII_RA_LARGE_LENGTH },
-
-        // %10011100 to %10011111  CII EA no add to table
+        // Encoding algorithm, add to table
+                
+        // %10011100 to %10011111  CII EA add to table
         { 0x9F, CII_EA },
-
-            // %101100xx
-            // %101101xx
-            // %101110xx
         
+        // Index
+                
         // %10100000 to %10101111  CII small index
         { 0xAF, CII_INDEX_SMALL },
         
@@ -311,15 +319,15 @@ public class DecoderStateTables {
 
         // %10111000  CII very large index
         { 0xB8, CII_INDEX_LARGE_LARGE },
-        
-        // %10111001 to %10111111  ILLEGAL
-        { 0xBF, STATE_ILLEGAL },
-        
-	// Other IIs
+                
+        // %10111001 to %11000111  ILLEGAL
+        { 0xC7, STATE_ILLEGAL },
 
-	// TODO
-        // %11000000 to %11100000
-        { 0xE0, STATE_UNSUPPORTED },
+        // %11001000 to %11001011
+        { 0xCB, UNEXPANDED_ENTITY_REFERENCE_II },
+                
+        // %11001100 to %11100000  ILLEGAL
+        { 0xE0, STATE_ILLEGAL },
         
         // %11100001 processing instruction
         { 0xE1, PROCESSING_INSTRUCTION_II },
@@ -327,9 +335,8 @@ public class DecoderStateTables {
         // %11100010 comment
         { 0xE2, COMMENT_II},
 
-        // TODO
         // %111000011 to %11101111
-        { 0xEF, STATE_UNSUPPORTED },
+        { 0xEF, STATE_ILLEGAL },
         
         // Terminators
         
@@ -397,22 +404,20 @@ public class DecoderStateTables {
     public final static int NISTRING_UTF8_SMALL_LENGTH     = 0;
     public final static int NISTRING_UTF8_MEDIUM_LENGTH    = 1;
     public final static int NISTRING_UTF8_LARGE_LENGTH     = 2;
-    public final static int NISTRING_EA                    = 3;
-    public final static int NISTRING_RA_SMALL_LENGTH       = 4;
-    public final static int NISTRING_RA_MEDIUM_LENGTH      = 5;
-    public final static int NISTRING_RA_LARGE_LENGTH       = 6;
-    public final static int NISTRING_UTF16_SMALL_LENGTH    = 7;
-    public final static int NISTRING_UTF16_MEDIUM_LENGTH   = 8;
-    public final static int NISTRING_UTF16_LARGE_LENGTH    = 9;
-    public final static int NISTRING_INDEX_SMALL           = 10;
-    public final static int NISTRING_INDEX_MEDIUM          = 11;
-    public final static int NISTRING_INDEX_LARGE           = 12;
-    public final static int NISTRING_EMPTY                 = 13;
+    public final static int NISTRING_UTF16_SMALL_LENGTH    = 3;
+    public final static int NISTRING_UTF16_MEDIUM_LENGTH   = 4;
+    public final static int NISTRING_UTF16_LARGE_LENGTH    = 5;
+    public final static int NISTRING_RA                    = 6;
+    public final static int NISTRING_EA                    = 7;
+    public final static int NISTRING_INDEX_SMALL           = 8;
+    public final static int NISTRING_INDEX_MEDIUM          = 9;
+    public final static int NISTRING_INDEX_LARGE           = 10;
+    public final static int NISTRING_EMPTY                 = 11;
 
     public static int[] NISTRING = new int[256];
 
     private static int[][] NISTRING_RANGES = {
-        // UTF-8
+        // UTF-8 string
         
         // %00000000 to %00000111  UTF-8 no add to table small length
         { 0x07, NISTRING_UTF8_SMALL_LENGTH },
@@ -429,7 +434,7 @@ public class DecoderStateTables {
         // %00001101 to %00001111 ILLEGAL
         { 0x0F, STATE_ILLEGAL },
         
-        // UTF-16
+        // UTF-16 string
 
         // %00010000 to %00010111  UTF-16 no add to table small length
         { 0x17, NISTRING_UTF16_SMALL_LENGTH },
@@ -447,28 +452,16 @@ public class DecoderStateTables {
         { 0x1F, STATE_ILLEGAL },
         
         // Restricted alphabet
-        
-        // %00100000 to %00100111  RA no add to table small length
-        { 0x27, NISTRING_RA_SMALL_LENGTH },
-        
-        // %00101000  RA no add to table medium length
-        { 0x28, NISTRING_RA_MEDIUM_LENGTH },
-
-        // %00101001 to %00101011 ILLEGAL
-        { 0x2B, STATE_ILLEGAL },
-        
-        // %00101100  RA no add to table large length
-        { 0x2C, NISTRING_RA_LARGE_LENGTH },
-        
-        // %00101101 to %00101111 ILLEGAL
-        { 0x2F, STATE_ILLEGAL },
+                
+        // %00100000 to %00101111  RA no add to table small length
+        { 0x2F, NISTRING_RA },
 
         // Encoding algorithm
 
         // %00110000 to %00111111  EA no add to table
         { 0x3F, NISTRING_EA },        
 
-        // UTF-8 add to table
+        // UTF-8 string, add to table
         
         // %01000000 to %01000111  UTF-8 add to table small length
         { 0x47, NISTRING_UTF8_SMALL_LENGTH },
@@ -485,7 +478,7 @@ public class DecoderStateTables {
         // %01001101 to %01001111 ILLEGAL
         { 0x4F, STATE_ILLEGAL },
         
-        // UTF-16 add to table
+        // UTF-16 string, add to table
 
         // %01010000 to %01010111  UTF-16 add to table small length
         { 0x57, NISTRING_UTF16_SMALL_LENGTH },
@@ -502,24 +495,12 @@ public class DecoderStateTables {
         // %01011101 to %01011111 ILLEGAL
         { 0x5F, STATE_ILLEGAL },
         
-        // Restricted alphabet add to table
+        // Restricted alphabet, add to table
         
-        // %01100000 to %01100111  RA add to table small length
-        { 0x67, NISTRING_RA_SMALL_LENGTH },
-        
-        // %01101000  RA add to table medium length
-        { 0x68, NISTRING_RA_MEDIUM_LENGTH },
+        // %01100000 to %01101111  RA no add to table small length
+        { 0x6F, NISTRING_RA },
 
-        // %01101001 to %01101011 ILLEGAL
-        { 0x6B, STATE_ILLEGAL },
-        
-        // %01101100  RA add to table large length
-        { 0x6C, NISTRING_RA_LARGE_LENGTH },
-        
-        // %01101101 to %01101111 ILLEGAL
-        { 0x6F, STATE_ILLEGAL },
-
-        // Encoding algorithm add to table
+        // Encoding algorithm, add to table
 
         // %01110000 to %01111111  EA add to table
         { 0x7F, NISTRING_EA },

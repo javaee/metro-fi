@@ -238,16 +238,20 @@ public class SAXDocumentParser extends Decoder implements XMLReader {
     }
     
     protected final void processDII() throws IOException {
-        decodeDII();
-        
         try {
             _contentHandler.startDocument();
         } catch (SAXException e) {
             throw new IOException("processDII");
         }
 
-        // Decode Comment IIs, PI IIs and one EII
+        _b = read();
+        if (_b > 0) {
+            processDIIOptionalProperties();
+        }
+        
+        // Decode one Document Type II, Comment IIs, PI IIs and one EII
         boolean firstElementHasOccured = false;
+        boolean documentTypeDeclarationOccured = false;
         while(!_terminate || !firstElementHasOccured) {
             _b = read();
             switch(DecoderStateTables.DII[_b]) {
@@ -275,6 +279,51 @@ public class SAXDocumentParser extends Decoder implements XMLReader {
                     processEIIWithNamespaces();
                     firstElementHasOccured = true;
                     break;
+                case DecoderStateTables.DOCUMENT_TYPE_DECLARATION_II:
+                {
+                    if (documentTypeDeclarationOccured) {
+                        throw new IOException("A second occurence of a Document Type Declaration II is present");
+                    }
+                    documentTypeDeclarationOccured = true;
+
+                    String system_identifier = ((_b & EncodingConstants.DOCUMENT_TYPE_SYSTEM_IDENTIFIER_FLAG) > 0) 
+                        ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
+                    String public_identifier = ((_b & EncodingConstants.DOCUMENT_TYPE_PUBLIC_IDENTIFIER_FLAG) > 0) 
+                        ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
+                    
+                    _b = read();
+                    while (_b == EncodingConstants.PROCESSING_INSTRUCTION) {
+                        switch(decodeNonIdentifyingStringOnFirstBit()) {
+                            case NISTRING_STRING:
+                                final String data = new String(_charBuffer, 0, _charBufferLength);
+                                if (_addToTable) {
+                                    _v.otherString.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
+                                }
+                                break;
+                            case NISTRING_ENCODING_ALGORITHM:
+                                throw new IOException("Processing II with encoding algorithm decoding not supported");                        
+                            case NISTRING_INDEX:
+                                break;
+                            case NISTRING_EMPTY_STRING:
+                                break;
+                        }
+                        _b = read();
+                    }
+                    if ((_b & EncodingConstants.TERMINATOR) != EncodingConstants.TERMINATOR) {
+                        throw new IOException("Processing instruction IIs of Document Type Declaraion II not terminated correctly");
+                    }
+                    if (_b == EncodingConstants.DOUBLE_TERMINATOR) {
+                        _terminate = true;
+                    }
+                    
+                    _notations.clear();
+                    _unparsedEntities.clear();
+                    /*
+                     * TODO
+                     * Report All events associated with DTD, PIs, notations etc
+                     */
+                    break;
+                }
                 case DecoderStateTables.COMMENT_II:
                     processCommentII();
                     break;
@@ -316,6 +365,62 @@ public class SAXDocumentParser extends Decoder implements XMLReader {
         } catch (SAXException e) {
             throw new IOException("processDII");
         }        
+    }
+
+    protected final void processDIIOptionalProperties() throws IOException {        
+        if ((_b & EncodingConstants.DOCUMENT_INITIAL_VOCABULARY_FLAG) > 0) {
+            decodeInitialVocabulary();
+        }
+
+        if ((_b & EncodingConstants.DOCUMENT_NOTATIONS_FLAG) > 0) {
+            decodeNotations();
+            /*
+                try {
+                    _dtdHandler.notationDecl(name, public_identifier, system_identifier);
+                } catch (SAXException e) {
+                    throw new IOException("NotationsDeclarationII");
+                }
+            */
+        }
+
+        if ((_b & EncodingConstants.DOCUMENT_UNPARSED_ENTITIES_FLAG) > 0) {
+            decodeUnparsedEntities();
+            /*
+                try {
+                    _dtdHandler.unparsedEntityDecl(name, public_identifier, system_identifier, notation_name);
+                } catch (SAXException e) {
+                    throw new IOException("UnparsedEntitiesII");
+                }
+            */
+        }
+
+        if ((_b & EncodingConstants.DOCUMENT_STANDALONE_FLAG) > 0) {
+            boolean standalone = (read() > 0) ? true : false ;
+            /*
+             * TODO 
+             * how to report the standalone flag?
+             */
+        }
+
+        if ((_b & EncodingConstants.DOCUMENT_VERSION_FLAG) > 0) {
+            switch(decodeNonIdentifyingStringOnFirstBit()) {
+                case NISTRING_STRING:
+                    if (_addToTable) {
+                        _v.otherString.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
+                    }
+                    break;
+                case NISTRING_ENCODING_ALGORITHM:
+                    throw new IOException("Processing II with encoding algorithm decoding not supported");                        
+                case NISTRING_INDEX:
+                    break;
+                case NISTRING_EMPTY_STRING:
+                    break;
+            }
+            /*
+             * TODO 
+             * how to report the standalone flag?
+             */
+        }
     }
     
     protected final void processEII(QualifiedName name, boolean hasAttributes) throws IOException {
@@ -400,6 +505,82 @@ public class SAXDocumentParser extends Decoder implements XMLReader {
                         throw new IOException("processCII");
                     }
                     break;
+                case DecoderStateTables.CII_UTF16_SMALL_LENGTH:
+                    _octetBufferLength = (_b & EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_MASK) 
+                        + 1;
+                    decodeUtf16StringAsCharBuffer();
+                    if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
+                        _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
+                    }
+                    
+                    try {
+                        _contentHandler.characters(_charBuffer, 0, _charBufferLength);
+                    } catch (SAXException e) {
+                        throw new IOException("processCII");
+                    }
+                    break;
+                case DecoderStateTables.CII_UTF16_MEDIUM_LENGTH:
+                    _octetBufferLength = read() + EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_LIMIT;
+                    decodeUtf16StringAsCharBuffer();
+                    if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
+                        _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
+                    }
+                    
+                    try {
+                        _contentHandler.characters(_charBuffer, 0, _charBufferLength);
+                    } catch (SAXException e) {
+                        throw new IOException("processCII");
+                    }
+                    break;
+                case DecoderStateTables.CII_UTF16_LARGE_LENGTH:
+                    _octetBufferLength = (read() << 24) |
+                        (read() << 16) |
+                        (read() << 8) |
+                        read();
+                    _octetBufferLength += EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_MEDIUM_LIMIT;
+                    decodeUtf16StringAsCharBuffer();
+                    if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
+                        _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
+                    }
+                    
+                    try {
+                        _contentHandler.characters(_charBuffer, 0, _charBufferLength);
+                    } catch (SAXException e) {
+                        throw new IOException("processCII");
+                    }
+                    break;
+                case DecoderStateTables.CII_RA:
+                {
+                    // Decode resitricted alphabet integer
+                    _identifier = (_b & 0x02) << 6;
+                    final int b2 = read();
+                    _identifier |= (b2 & 0xFC) >> 2;
+
+                    decodeOctetsOfNonIdentifyingStringOnThirdBit(b2);
+                    // TODO obtain restricted alphabet given _identifier value
+                    decodeRAOctetsAsCharBuffer(null);                    
+                    if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
+                        _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
+                    }
+                    
+                    try {
+                        _contentHandler.characters(_charBuffer, 0, _charBufferLength);
+                    } catch (SAXException e) {
+                        throw new IOException("processCII");
+                    }
+                    break;
+                }
+                case DecoderStateTables.CII_EA:
+                {
+                    final boolean addToTable = (_b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0;
+                    // Decode encoding algorithm integer
+                    _identifier = (_b & 0x02) << 6;
+                    final int b2 = read();
+                    _identifier |= (b2 & 0xFC) >> 2;
+
+                    decodeOctetsOfNonIdentifyingStringOnThirdBit(b2);
+                    throw new IOException("Encoding algorithms for CIIs not yet implemented");
+                }
                 case DecoderStateTables.CII_INDEX_SMALL:
                 {
                     final CharArray ca = _v.characterContentChunk.get(_b & EncodingConstants.INTEGER_4TH_BIT_SMALL_MASK);
@@ -460,6 +641,29 @@ public class SAXDocumentParser extends Decoder implements XMLReader {
                 case DecoderStateTables.PROCESSING_INSTRUCTION_II:
                     processProcessingII();
                     break;
+                case DecoderStateTables.UNEXPANDED_ENTITY_REFERENCE_II:
+                {
+                    String entity_reference_name = decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherNCName);
+                    
+                    String system_identifier = ((_b & EncodingConstants.UNEXPANDED_ENTITY_SYSTEM_IDENTIFIER_FLAG) > 0) 
+                        ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
+                    String public_identifier = ((_b & EncodingConstants.UNEXPANDED_ENTITY_PUBLIC_IDENTIFIER_FLAG) > 0) 
+                        ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
+
+                    try {
+                        /*
+                         * TODO
+                         * Need to verify if the skippedEntity method:
+                         * http://java.sun.com/j2se/1.4.2/docs/api/org/xml/sax/ContentHandler.html#skippedEntity(java.lang.String)
+                         * is the correct method to call. It appears so but a more extensive
+                         * check is necessary.
+                         */
+                        _contentHandler.skippedEntity(entity_reference_name);
+                    } catch (SAXException e) {
+                        throw new IOException("processUnexpandedEntityReferenceII");
+                    }
+                    break;
+                }
                 case DecoderStateTables.TERMINATOR_DOUBLE:                    
                     _doubleTerminate = true; 
                 case DecoderStateTables.TERMINATOR_SINGLE:
@@ -706,13 +910,35 @@ public class SAXDocumentParser extends Decoder implements XMLReader {
                     _attributes.addAttribute(name, value);
                     break;
                 }
-                case DecoderStateTables.NISTRING_EA:
-                    _encodingAlgorithm = (b & 0x0F) << 4;
+                case DecoderStateTables.NISTRING_RA:
+                {
+                    final boolean addToTable = (b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0;
+                    // Decode resitricted alphabet integer
+                    _identifier = (b & 0x0F) << 4;
                     b = read();
-                    _encodingAlgorithm |= (b & 0xF0) >> 4;
+                    _identifier |= (b & 0xF0) >> 4;
+                    
+                    decodeOctetsOfNonIdentifyingStringOnFirstBit(b);
+                    // TODO obtain restricted alphabet given _identifier value
+                    value = decodeRAOctetsAsString(null);
+                    if (addToTable) {
+                        _v.attributeValue.add(value);
+                    }
 
-                    decodeEAOctetString(b);
+                    _attributes.addAttribute(name, value);
+                    break;
+                }
+                case DecoderStateTables.NISTRING_EA:
+                {
+                    final boolean addToTable = (b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0;
+                    // Decode encoding algorithm integer
+                    _identifier = (b & 0x0F) << 4;
+                    b = read();
+                    _identifier |= (b & 0xF0) >> 4;
+
+                    decodeOctetsOfNonIdentifyingStringOnFirstBit(b);
                     throw new IOException("Encoding algorithms not supported for [normalized value] property of AII");
+                }
                 case DecoderStateTables.NISTRING_INDEX_SMALL:
                     value = _v.attributeValue.get(b & EncodingConstants.INTEGER_2ND_BIT_SMALL_MASK);
 

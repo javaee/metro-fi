@@ -49,6 +49,9 @@ public final class EncodingConstants {
             XML_DECL = "<?xml encoding='finf'?>".getBytes("UTF-8");
         } catch (UnsupportedEncodingException e) {
             XML_DECL = new byte[23];
+            // TODO fill out bytes explicitly
+            // then not necessary to call String.getBytes account
+            // for failure
         }
     }
     
@@ -63,8 +66,8 @@ public final class EncodingConstants {
     public static final int INITIAL_VOCABULARY_EXTERNAL_VOCABULARY_FLAG = 0x10; // 00010000
     public static final int INITIAL_VOCABULARY_RESTRICTED_ALPHABETS_FLAG = 0x08; // 00001000
     public static final int INITIAL_VOCABULARY_ENCODING_ALGORITHMS_FLAG = 0x04; // 00000100
-    public static final int INITIAL_VOCABULARY_NAMESPACE_NAMES_FLAG = 0x02; // 00000010
-    public static final int INITIAL_VOCABULARY_PREFIXES_FLAG = 0x01; // 00000001
+    public static final int INITIAL_VOCABULARY_PREFIXES_FLAG = 0x02; // 00000010
+    public static final int INITIAL_VOCABULARY_NAMESPACE_NAMES_FLAG = 0x01; // 00000001
     public static final int INITIAL_VOCABULARY_LOCAL_NAMES_FLAG = 0x80; // 1000000
     public static final int INITIAL_VOCABULARY_OTHER_NCNAMES_FLAG = 0x40; // 01000000
     public static final int INITIAL_VOCABULARY_OTHER_URIS_FLAG = 0x20; // 00100000
@@ -73,6 +76,9 @@ public final class EncodingConstants {
     public static final int INITIAL_VOCABULARY_OTHER_STRINGS_FLAG = 0x04; // 00000100
     public static final int INITIAL_VOCABULARY_ELEMENT_NAME_SURROGATES_FLAG = 0x02; // 0000010
     public static final int INITIAL_VOCABULARY_ATTRIBUTE_NAME_SURROGATES_FLAG = 0x01; // 00000001
+
+    public static final int NAME_SURROGATE_PREFIX_FLAG = 0x02;
+    public static final int NAME_SURROGATE_NAME_FLAG = 0x01;
     
     public static final int NOTATIONS = 0xC0; // 110000
     public static final int NOTATIONS_MASK = 0xFC; // 6 bits
@@ -81,7 +87,7 @@ public final class EncodingConstants {
     
     public static final int UNPARSED_ENTITIES = 0xD0; // 1101000
     public static final int UNPARSED_ENTITIES_MASK = 0xFE; // 7 bits
-    public static final int UNPARSED_PUBLIC_IDENTIFIER_FLAG = 0x01;
+    public static final int UNPARSED_ENTITIES_PUBLIC_IDENTIFIER_FLAG = 0x01;
     
     public static final int PROCESSING_INSTRUCTION = 0xE1; // 11100001
     public static final int PROCESSING_INSTRUCTION_MASK = 0xFF; // 8 bits

@@ -282,6 +282,78 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     _charactersOffset = 0;
                     _charactersLength = _charBufferLength;
                     break;
+                case DecoderStateTables.CII_UTF16_SMALL_LENGTH:
+                    _octetBufferLength = (b & EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_MASK) 
+                        + 1;
+                    decodeUtf16StringAsCharBuffer();
+                    if ((b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
+                        _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
+                    }
+                    
+                    _eventType = CHARACTERS;
+                    _characters = _charBuffer;
+                    _charactersOffset = 0;
+                    _charactersLength = _charBufferLength;
+                    break;
+                case DecoderStateTables.CII_UTF16_MEDIUM_LENGTH:
+                    _octetBufferLength = read() + EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_LIMIT;
+                    decodeUtf16StringAsCharBuffer();
+                    if ((b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
+                        _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
+                    }
+                    
+                    _eventType = CHARACTERS;
+                    _characters = _charBuffer;
+                    _charactersOffset = 0;
+                    _charactersLength = _charBufferLength;
+                    break;
+                case DecoderStateTables.CII_UTF16_LARGE_LENGTH:
+                    _octetBufferLength = (read() << 24) |
+                        (read() << 16) |
+                        (read() << 8) |
+                        read();
+                    _octetBufferLength += EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_MEDIUM_LIMIT;
+                    decodeUtf16StringAsCharBuffer();
+                    if ((b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
+                        _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
+                    }
+                    
+                    _eventType = CHARACTERS;
+                    _characters = _charBuffer;
+                    _charactersOffset = 0;
+                    _charactersLength = _charBufferLength;
+                    break;
+                case DecoderStateTables.CII_RA:
+                {
+                    // Decode resitricted alphabet integer
+                    _identifier = (b & 0x02) << 6;
+                    final int b2 = read();
+                    _identifier |= (b2 & 0xFC) >> 2;
+
+                    decodeOctetsOfNonIdentifyingStringOnThirdBit(b2);
+                    // TODO obtain restricted alphabet given _identifier value
+                    decodeRAOctetsAsCharBuffer(null);                    
+                    if ((b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
+                        _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
+                    }
+                    
+                    _eventType = CHARACTERS;
+                    _characters = _charBuffer;
+                    _charactersOffset = 0;
+                    _charactersLength = _charBufferLength;
+                    break;
+                }
+                case DecoderStateTables.CII_EA:
+                {
+                    final boolean addToTable = (_b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0;
+                    // Decode encoding algorithm integer
+                    _identifier = (_b & 0x02) << 6;
+                    final int b2 = read();
+                    _identifier |= (b2 & 0xFC) >> 2;
+
+                    decodeOctetsOfNonIdentifyingStringOnThirdBit(b2);
+                    throw new IOException("Encoding algorithms for CIIs not yet implemented");
+                }
                 case DecoderStateTables.CII_INDEX_SMALL:
                 {
                     final CharArray ca = _v.characterContentChunk.get(b & EncodingConstants.INTEGER_4TH_BIT_SMALL_MASK);
@@ -338,6 +410,19 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 case DecoderStateTables.PROCESSING_INSTRUCTION_II:
                     processProcessingII();
                     break;
+                case DecoderStateTables.UNEXPANDED_ENTITY_REFERENCE_II:
+                {
+                    /*
+                     * TODO
+                     * How does StAX report such events?
+                     */
+                    String entity_reference_name = decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherNCName);
+                    
+                    String system_identifier = ((_b & EncodingConstants.UNEXPANDED_ENTITY_SYSTEM_IDENTIFIER_FLAG) > 0) 
+                        ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
+                    String public_identifier = ((_b & EncodingConstants.UNEXPANDED_ENTITY_PUBLIC_IDENTIFIER_FLAG) > 0) 
+                        ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
+                }
                 case DecoderStateTables.TERMINATOR_DOUBLE:                    
                     _doubleTerminate = true; 
                 case DecoderStateTables.TERMINATOR_SINGLE:
@@ -866,13 +951,75 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     _attributes.addAttribute(name, value);
                     break;
                 }
-                case DecoderStateTables.NISTRING_EA:
-                    _encodingAlgorithm = (b & 0x0F) << 4;
-                    b = read();
-                    _encodingAlgorithm |= (b & 0xF0) >> 4;
+                case DecoderStateTables.NISTRING_UTF16_SMALL_LENGTH:
+                {
+                    final boolean addToTable = (b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0;
+                    _octetBufferLength = (b & EncodingConstants.OCTET_STRING_LENGTH_5TH_BIT_SMALL_MASK) + 1;
+                    value = decodeUtf16StringAsString();
+                    if (addToTable) {
+                        _v.attributeValue.add(value);
+                    }
+                    
+                    _attributes.addAttribute(name, value);
+                    break;
+                }
+                case DecoderStateTables.NISTRING_UTF16_MEDIUM_LENGTH:
+                {
+                    final boolean addToTable = (b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0;
+                    _octetBufferLength = read() + EncodingConstants.OCTET_STRING_LENGTH_5TH_BIT_SMALL_LIMIT;
+                    value = decodeUtf16StringAsString();
+                    if (addToTable) {
+                        _v.attributeValue.add(value);
+                    }
+                    
+                    _attributes.addAttribute(name, value);
+                    break;
+                }
+                case DecoderStateTables.NISTRING_UTF16_LARGE_LENGTH:
+                {
+                    final boolean addToTable = (b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0;
+                    final int length = (read() << 24) |
+                        (read() << 16) |
+                        (read() << 8) |
+                        read();
+                    _octetBufferLength = length + EncodingConstants.OCTET_STRING_LENGTH_5TH_BIT_MEDIUM_LIMIT;
+                    value = decodeUtf16StringAsString();
+                    if (addToTable) {
+                        _v.attributeValue.add(value);
+                    }
 
-                    decodeEAOctetString(b);
+                    _attributes.addAttribute(name, value);
+                    break;
+                }
+                case DecoderStateTables.NISTRING_RA:
+                {
+                    final boolean addToTable = (b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0;
+                    // Decode resitricted alphabet integer
+                    _identifier = (b & 0x0F) << 4;
+                    b = read();
+                    _identifier |= (b & 0xF0) >> 4;
+                    
+                    decodeOctetsOfNonIdentifyingStringOnFirstBit(b);
+                    // TODO obtain restricted alphabet given _identifier value
+                    value = decodeRAOctetsAsString(null);
+                    if (addToTable) {
+                        _v.attributeValue.add(value);
+                    }
+
+                    _attributes.addAttribute(name, value);
+                    break;
+                }
+                case DecoderStateTables.NISTRING_EA:
+                {
+                    final boolean addToTable = (b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0;
+                    // Decode encoding algorithm integer
+                    _identifier = (b & 0x0F) << 4;
+                    b = read();
+                    _identifier |= (b & 0xF0) >> 4;
+
+                    decodeOctetsOfNonIdentifyingStringOnFirstBit(b);
                     throw new IOException("Encoding algorithms not supported for [normalized value] property of AII");
+                }                
                 case DecoderStateTables.NISTRING_INDEX_SMALL:
                     value = _v.attributeValue.get(b & EncodingConstants.INTEGER_2ND_BIT_SMALL_MASK);
 

@@ -50,6 +50,9 @@ public class SerializerVocabulary extends Vocabulary {
     public final static int ATTRIBUTE_VALUE_SIZE_CONSTRAINT = 7;
     public final static int CHARACTER_CONTENT_CHUNK_SIZE_CONSTRAINT = 7;
     
+    public final StringIntMap restrictedAlphabet;
+    public final StringIntMap encodingAlgorithm;
+
     public final StringIntMap namespaceName;
     public final StringIntMap prefix;
     public final StringIntMap localName;
@@ -63,7 +66,7 @@ public class SerializerVocabulary extends Vocabulary {
     public final LocalNameQualifiedNamesMap elementName;
     public final LocalNameQualifiedNamesMap attributeName;
     
-    public final KeyIntMap[] tables = new KeyIntMap[10];
+    public final KeyIntMap[] tables = new KeyIntMap[12];
 
     public int attributeValueSizeConstraint = ATTRIBUTE_VALUE_SIZE_CONSTRAINT;
     public int characterContentChunkSizeContraint = CHARACTER_CONTENT_CHUNK_SIZE_CONSTRAINT;
@@ -71,8 +74,10 @@ public class SerializerVocabulary extends Vocabulary {
     protected SerializerVocabulary _readOnlyVocabulary;
     
     public SerializerVocabulary(boolean supportArrays) {
-        tables[NAMESPACE_NAME] = namespaceName = new StringIntMap(supportArrays);
+        tables[RESTRICTED_ALPHABET] = restrictedAlphabet = new StringIntMap(supportArrays);
+        tables[ENCODING_ALGORITHM] = encodingAlgorithm = new StringIntMap(supportArrays);
         tables[PREFIX] = prefix = new StringIntMap(supportArrays);
+        tables[NAMESPACE_NAME] = namespaceName = new StringIntMap(supportArrays);
         tables[LOCAL_NAME] = localName = new StringIntMap(supportArrays);
         tables[OTHER_NCNAME] = otherNCName = new StringIntMap(supportArrays);
         tables[OTHER_URI] = otherURI = new StringIntMap(supportArrays);
