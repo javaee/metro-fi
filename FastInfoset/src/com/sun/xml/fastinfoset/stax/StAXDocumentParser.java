@@ -65,6 +65,15 @@ import javax.xml.stream.XMLStreamReader;
 import org.jvnet.fastinfoset.FastInfosetException;
 
 public class StAXDocumentParser extends Decoder implements XMLStreamReader {
+    protected static final int INTERNAL_STATE_START_DOCUMENT = 0;
+    protected static final int INTERNAL_STATE_START_ELEMENT_TERMINATE = 1;
+    protected static final int INTERNAL_STATE_SINGLE_TERMINATE_ELEMENT_WITH_NAMESPACES = 2;
+    protected static final int INTERNAL_STATE_DOUBLE_TERMINATE_ELEMENT = 3;
+    protected static final int INTERNAL_STATE_END_DOCUMENT = 4;
+    protected static final int INTERNAL_STATE_VOID = -1;
+    
+    protected int _internalState;
+    
     /**
      * Current event
      */
@@ -142,6 +151,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         super.reset();
         
         _eventType = START_DOCUMENT;
+        _internalState = INTERNAL_STATE_START_DOCUMENT;
         
         _prefixMap.clear();
         pushNamespaceDecl("", "");
@@ -160,61 +170,66 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     
     public int next() throws XMLStreamException {
         try {
-            // TODO require logic for processing items
-            // between START_DOCUMENT and START_ELEMENT and
-            // the between last END_ELEMENT and END_DOCUMENT
-            
-            // TODO use 'internal state' to avoid unecessary checks
-            switch (_eventType) {
-                case START_DOCUMENT:
-                    decodeHeader();
-                    decodeDII();
-                    break;
-                case START_ELEMENT:
-                    // Check for EII with no attributes or children termination
-                    if (_elementWithAttributesNoChildrenTermination) {
-                        _terminate = false;
-                        _elementWithAttributesNoChildrenTermination = false;
+            if (_internalState != INTERNAL_STATE_VOID) {
+                switch (_internalState) {
+                    case INTERNAL_STATE_START_DOCUMENT:
+                        decodeHeader();
+                        decodeDII();
+                        _internalState = INTERNAL_STATE_VOID;
+                        break;
+                    case INTERNAL_STATE_START_ELEMENT_TERMINATE:
+                        if (_currentNamespaceAIIsEnd > 0) {
+                            for (int i = _currentNamespaceAIIsStart; i < _currentNamespaceAIIsEnd; i++) {
+                                popNamespaceDecl(_namespaceAIIsPrefix[i]);
+                            }
+                            _namespaceAIIsIndex = _currentNamespaceAIIsStart;
+                        }
                         
                         // Pop information off the stack
                         _qualifiedName = _qNameStack[_stackCount];
                         _currentNamespaceAIIsStart = _namespaceAIIsStartStack[_stackCount];
                         _currentNamespaceAIIsEnd = _namespaceAIIsEndStack[_stackCount];
                         _qNameStack[_stackCount--] = null;
-                        
+
+                        _internalState = INTERNAL_STATE_VOID;
                         return _eventType = END_ELEMENT;
-                    }
-                    break;
-                case END_DOCUMENT:
-                    throw new NoSuchElementException("No more events to report (EOF).");
-                case END_ELEMENT:
-                    // Undeclare namespaces
-                    if (_currentNamespaceAIIsEnd > 0) {
+                    case INTERNAL_STATE_SINGLE_TERMINATE_ELEMENT_WITH_NAMESPACES:
+                        // Undeclare namespaces
                         for (int i = _currentNamespaceAIIsStart; i < _currentNamespaceAIIsEnd; i++) {
                             popNamespaceDecl(_namespaceAIIsPrefix[i]);
                         }
                         _namespaceAIIsIndex = _currentNamespaceAIIsStart;
-                    }
-                    
-                    // Check for double EII or DII termination
-                    if (_terminate) {
+                        _internalState = INTERNAL_STATE_VOID;
+                        break;
+                    case INTERNAL_STATE_DOUBLE_TERMINATE_ELEMENT:
                         if (_stackCount == -1) {
+                            _internalState = INTERNAL_STATE_END_DOCUMENT;
                             return _eventType = END_DOCUMENT;
                         }
                         
-                        _terminate = false;
-                        
+                        // Undeclare namespaces
+                        if (_currentNamespaceAIIsEnd > 0) {
+                            for (int i = _currentNamespaceAIIsStart; i < _currentNamespaceAIIsEnd; i++) {
+                                popNamespaceDecl(_namespaceAIIsPrefix[i]);
+                            }
+                            _namespaceAIIsIndex = _currentNamespaceAIIsStart;
+                        }
+                    
                         // Pop information off the stack
                         _qualifiedName = _qNameStack[_stackCount];
                         _currentNamespaceAIIsStart = _namespaceAIIsStartStack[_stackCount];
                         _currentNamespaceAIIsEnd = _namespaceAIIsEndStack[_stackCount];
                         _qNameStack[_stackCount--] = null;
                         
+                        _internalState = (_currentNamespaceAIIsEnd > 0) ? 
+                                INTERNAL_STATE_SINGLE_TERMINATE_ELEMENT_WITH_NAMESPACES :
+                                INTERNAL_STATE_VOID;                        
                         return _eventType = END_ELEMENT;
-                    }
-                    break;
+                    case INTERNAL_STATE_END_DOCUMENT:
+                        throw new NoSuchElementException("No more events to report (EOF).");
+                }
             }
-            
+                        
             // Reset internal state
             _characters = null;
             _currentNamespaceAIIsEnd = 0;
@@ -231,7 +246,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 case DecoderStateTables.EII_INDEX_MEDIUM:
                 {
                     final int i = (((b & EncodingConstants.INTEGER_3RD_BIT_MEDIUM_MASK) << 8) | read())
-                    + EncodingConstants.INTEGER_3RD_BIT_SMALL_LIMIT;
+                            + EncodingConstants.INTEGER_3RD_BIT_SMALL_LIMIT;
                     processEII(_v.elementName.get(i), (b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
                     break;
                 }
@@ -241,11 +256,11 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     if ((b & 0x10) > 0) {
                         // EII large index
                         i = (((b & EncodingConstants.INTEGER_3RD_BIT_LARGE_MASK) << 16) | (read() << 8) | read())
-                        + EncodingConstants.INTEGER_3RD_BIT_MEDIUM_LIMIT;
+                                + EncodingConstants.INTEGER_3RD_BIT_MEDIUM_LIMIT;
                     } else {
                         // EII large large index
                         i = (((read() & EncodingConstants.INTEGER_3RD_BIT_LARGE_LARGE_MASK) << 16) | (read() << 8) | read())
-                        + EncodingConstants.INTEGER_3RD_BIT_LARGE_LIMIT;
+                                + EncodingConstants.INTEGER_3RD_BIT_LARGE_LIMIT;
                     }
                     processEII(_v.elementName.get(i), (b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
                     break;
@@ -268,7 +283,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     break;
                 case DecoderStateTables.CII_UTF8_SMALL_LENGTH:
                     _octetBufferLength = (b & EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_MASK)
-                    + 1;
+                            + 1;
                     decodeUtf8StringAsCharBuffer();
                     if ((b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
                         _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
@@ -447,39 +462,47 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
                     String public_identifier = ((_b & EncodingConstants.UNEXPANDED_ENTITY_PUBLIC_IDENTIFIER_FLAG) > 0)
                     ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
+                    break;
                 }
                 case DecoderStateTables.TERMINATOR_DOUBLE:
-                    _doubleTerminate = true;
+                    if (_stackCount == -1) {
+                        _internalState = INTERNAL_STATE_END_DOCUMENT;
+                        return _eventType = END_DOCUMENT;
+                    }
+
+                    // Pop information off the stack
+                    _qualifiedName = _qNameStack[_stackCount];
+                    _currentNamespaceAIIsStart = _namespaceAIIsStartStack[_stackCount];
+                    _currentNamespaceAIIsEnd = _namespaceAIIsEndStack[_stackCount];
+                    _qNameStack[_stackCount--] = null;
+
+                    _internalState = INTERNAL_STATE_DOUBLE_TERMINATE_ELEMENT;
+                    return _eventType = END_ELEMENT;
                 case DecoderStateTables.TERMINATOR_SINGLE:
-                    _terminate = true;
-                    break;
+                    if (_stackCount == -1) {
+                        _internalState = INTERNAL_STATE_END_DOCUMENT;
+                        return _eventType = END_DOCUMENT;
+                    }
+
+                    // Pop information off the stack
+                    _qualifiedName = _qNameStack[_stackCount];
+                    _currentNamespaceAIIsStart = _namespaceAIIsStartStack[_stackCount];
+                    _currentNamespaceAIIsEnd = _namespaceAIIsEndStack[_stackCount];
+                    _qNameStack[_stackCount--] = null;
+
+                    if (_currentNamespaceAIIsEnd > 0) {
+                        _internalState = INTERNAL_STATE_SINGLE_TERMINATE_ELEMENT_WITH_NAMESPACES;
+                    }
+                    return _eventType = END_ELEMENT;
                 default:
                     throw new FastInfosetException("Illegal state when decoding a child of an EII");
             }
             
-            
-            if (_terminate && _elementWithAttributesNoChildrenTermination == false) {
-                if (_stackCount == -1) {
-                    return _eventType = END_DOCUMENT;
-                }
-                
-                _terminate = _doubleTerminate;
-                _doubleTerminate = false;
-                
-                // Pop information off the stack
-                _qualifiedName = _qNameStack[_stackCount];
-                _currentNamespaceAIIsStart = _namespaceAIIsStartStack[_stackCount];
-                _currentNamespaceAIIsEnd = _namespaceAIIsEndStack[_stackCount];
-                _qNameStack[_stackCount--] = null;
-                
-                return _eventType = END_ELEMENT;
-            } else {
-                return _eventType;
-            }
-            
+            return _eventType;            
         } catch (IOException e) {
             throw new XMLStreamException(e);
         } catch (FastInfosetException e) {
+            e.printStackTrace();
             throw new XMLStreamException(e);
         }
     }
@@ -999,6 +1022,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         int b;
         String value;
         
+        boolean terminate = false;
         do {
             // AII qualified name
             b = read();
@@ -1033,11 +1057,9 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     break;
                 }
                 case DecoderStateTables.AII_TERMINATOR_DOUBLE:
-                    _terminate = _doubleTerminate = _elementWithAttributesNoChildrenTermination = true;
-                    continue;
+                    _internalState = INTERNAL_STATE_START_ELEMENT_TERMINATE;
                 case DecoderStateTables.AII_TERMINATOR_SINGLE:
-                    _terminate = true;
-                    _elementWithAttributesNoChildrenTermination = false;
+                    terminate = true;
                     // AIIs have finished break out of loop
                     continue;
                 default:
@@ -1187,10 +1209,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     throw new FastInfosetException("Illegal state when decoding AII value");
             }
             
-        } while (!_terminate);
-        
-        _terminate = _doubleTerminate;
-        _doubleTerminate = false;
+        } while (!terminate);
     }
     
     protected final void processCommentII() throws FastInfosetException, IOException {
@@ -1238,10 +1257,10 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
             case NISTRING_ENCODING_ALGORITHM:
                 throw new FastInfosetException("Processing II with encoding algorithm decoding not supported");
             case NISTRING_INDEX:
-                _piTarget = _v.otherString.get(_integer).toString();
+                _piData = _v.otherString.get(_integer).toString();
                 break;
             case NISTRING_EMPTY_STRING:
-                _piTarget = "";
+                _piData = "";
                 break;
         }
     }
