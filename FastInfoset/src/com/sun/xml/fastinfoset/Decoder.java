@@ -205,7 +205,7 @@ public abstract class Decoder implements FastInfosetParser {
     
     
     public void reset() {
-        _terminate = _doubleTerminate;
+        _terminate = _doubleTerminate = false;
     }
 
     public void setVocabulary(ParserVocabulary v) {
