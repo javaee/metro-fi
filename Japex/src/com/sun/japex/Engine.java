@@ -214,37 +214,42 @@ public class Engine {
                     }
                 }
                 
-                // Print average for all runs
-                System.out.print("\n     Avgs: ");
-                Iterator tci = di.getAggregateTestCases().iterator();
-                while (tci.hasNext()) {
-                    TestCase tc = (TestCase) tci.next();
-                    System.out.print(tc.getTestName() + ",");                        
-                    System.out.print(tc.getDoubleParam(Constants.RESULT_VALUE) + ",");
+                if (runsPerDriver > 1) {
+                    // Print average for all runs
+                    System.out.print("\n     Avgs: ");
+                    Iterator tci = di.getAggregateTestCases().iterator();
+                    while (tci.hasNext()) {
+                        TestCase tc = (TestCase) tci.next();
+                        System.out.print(tc.getTestName() + ",");                        
+                        System.out.print(tc.getDoubleParam(Constants.RESULT_VALUE) + ",");
+                    }
+                    System.out.print(
+                        "aritmean," +
+                        di.getDoubleParam(Constants.RESULT_ARIT_MEAN) + 
+                        ",geommean," +
+                        di.getDoubleParam(Constants.RESULT_GEOM_MEAN) + 
+                        ",harmmean," +
+                        di.getDoubleParam(Constants.RESULT_HARM_MEAN));   
+
+                    // Print standardDevs for all runs
+                    System.out.print("\n    Stdev: ");
+                    tci = di.getAggregateTestCases().iterator();
+                    while (tci.hasNext()) {
+                        TestCase tc = (TestCase) tci.next();
+                        System.out.print(tc.getTestName() + ",");                        
+                        System.out.print(tc.getDoubleParam(Constants.RESULT_VALUE_STDDEV) + ",");
+                    }
+                    System.out.println(
+                        "aritmean," +
+                        di.getDoubleParam(Constants.RESULT_ARIT_MEAN_STDDEV) + 
+                        ",geommean," +
+                        di.getDoubleParam(Constants.RESULT_GEOM_MEAN_STDDEV) + 
+                        ",harmmean," +
+                        di.getDoubleParam(Constants.RESULT_HARM_MEAN_STDDEV));   
                 }
-                System.out.print(
-                    "aritmean," +
-                    di.getDoubleParam(Constants.RESULT_ARIT_MEAN) + 
-                    ",geommean," +
-                    di.getDoubleParam(Constants.RESULT_GEOM_MEAN) + 
-                    ",harmmean," +
-                    di.getDoubleParam(Constants.RESULT_HARM_MEAN));   
-                
-                // Print standardDevs for all runs
-                System.out.print("\n    Stdev: ");
-                tci = di.getAggregateTestCases().iterator();
-                while (tci.hasNext()) {
-                    TestCase tc = (TestCase) tci.next();
-                    System.out.print(tc.getTestName() + ",");                        
-                    System.out.print(tc.getDoubleParam(Constants.RESULT_VALUE_STDDEV) + ",");
+                else {
+                    System.out.println("");
                 }
-                System.out.println(
-                    "aritmean," +
-                    di.getDoubleParam(Constants.RESULT_ARIT_MEAN_STDDEV) + 
-                    ",geommean," +
-                    di.getDoubleParam(Constants.RESULT_GEOM_MEAN_STDDEV) + 
-                    ",harmmean," +
-                    di.getDoubleParam(Constants.RESULT_HARM_MEAN_STDDEV));   
             }
         }
         catch (Exception e) {
