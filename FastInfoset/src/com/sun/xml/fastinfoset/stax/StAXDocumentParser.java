@@ -1307,7 +1307,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     }
     
     
-    public AttributesHolder getAttributes() {
+    public AttributesHolder getAttributesHolder() {
         return _attributes;
     }
     
