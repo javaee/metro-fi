@@ -41,17 +41,15 @@ package com.sun.xml.fastinfoset.stax;
 
 import com.sun.xml.fastinfoset.Encoder;
 import com.sun.xml.fastinfoset.EncodingConstants;
-import com.sun.xml.fastinfoset.QualifiedName;
-import com.sun.xml.fastinfoset.util.QualifiedNameArray;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.Enumeration;
 import java.util.Iterator;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
 import org.xml.sax.helpers.NamespaceSupport;
 
 public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
@@ -550,6 +548,23 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
                         throw new UnsupportedOperationException();
                     }                    
                 };
+        }
+    }
+
+    public void writeOctets(byte[] b, int start, int len)
+        throws XMLStreamException
+    {
+         try {
+            if (len == 0) {
+                return;
+            }
+
+            encodeTerminationAndCurrentElement(true);
+
+            encodeCIIOctetAlgorithmData(EncodingAlgorithmIndexes.BASE64, b, start, len);
+        }
+        catch (IOException e) {
+            throw new XMLStreamException(e);
         }
     }
     
