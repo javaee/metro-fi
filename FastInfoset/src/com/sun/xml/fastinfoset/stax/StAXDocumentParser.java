@@ -1411,7 +1411,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         _characters = new char[buffer.length()];
         buffer.getChars(0, buffer.length(), _characters, 0);
         _charactersOffset = 0;
-        _charactersLength = _charBufferLength;                    
+        _charactersLength = _characters.length;                    
     }
     
     protected class NamespaceContextImpl implements NamespaceContext {
