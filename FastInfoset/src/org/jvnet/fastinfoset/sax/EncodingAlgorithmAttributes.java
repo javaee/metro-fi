@@ -60,6 +60,9 @@ public interface EncodingAlgorithmAttributes extends Attributes {
      * <p>If the algorithm data corresponds to an application-defined encoding 
      *    algorithm then the URI of the algorithm is returned.</p>
      *
+     * <p>If {@link #getAlgorithmData(int)} returns null then the result of 
+     *    this method is undefined.<p>
+     *
      * @param index The attribute index (zero-based).
      * @return The URI.
      */
@@ -67,6 +70,9 @@ public interface EncodingAlgorithmAttributes extends Attributes {
  
     /**
      * Return the index of the encoding algorithm.
+     *
+     * <p>If {@link #getAlgorithmData(int)} returns null then the result of 
+     *    this method is undefined.<p>
      *
      * @param index The attribute index (zero-based).
      * @return The index
@@ -85,6 +91,9 @@ public interface EncodingAlgorithmAttributes extends Attributes {
      *    is returned if there is no EncodingAlgorithm registered for the 
      *    application-defined encoding algorithm URI. Otherwise, an Object produced 
      *    from the registeredEncodingAlgorithm is returned.</p>
+     *
+     * <p>If there no encoding algorithm data associated an attribute then 
+     *    <code>null</code> is returned.<p>
      *
      * @param index The attribute index (zero-based).
      * @return The data
