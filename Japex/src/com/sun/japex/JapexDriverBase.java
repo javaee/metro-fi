@@ -100,81 +100,15 @@ public class JapexDriverBase implements JapexDriver {
             // Adjust warmup iterations based on number of threads
             warmupIterations = tc.getIntParam(Constants.WARMUP_ITERATIONS);
             
-            // Has user set the number of warmup iterations?
-            if (warmupIterations > 0) {
-                nanos = Util.currentTimeNanos();
-                for (int i = 0; i < warmupIterations; i++) {
-                    warmup(tc);      // Call warmup
-                }
-                nanos = Util.currentTimeNanos() - nanos;
+            nanos = Util.currentTimeNanos();
+            for (int i = 0; i < warmupIterations; i++) {
+                warmup(tc);      // Call warmup
+            }
+            nanos = Util.currentTimeNanos() - nanos;
 
-                // Set actual warmup time
-                tc.setDoubleParam(Constants.ACTUAL_WARMUP_TIME, 
-                                  Util.nanosToMillis(nanos));
-            }
-            else {
-                /*
-                 * This code that attempts to estimate a steady state number 
-                 * of iterations is currently EXPERIMENTAL. It can be turned
-                 * on by explicitly setting the following global params:
-                 *
-                 *    japex.warmupIterations=0
-                 *    japex.minWarmupIterations=100
-                 *    japex.maxWarmupIterations=5000
-                 *    japex.stddevThreshold=15
-                 *
-                 */
-                
-                // Estimate warmup and run iterations
-                boolean inSteadyState = false;
-                warmupIterations = tc.getIntParam(Constants.MIN_WARMUP_ITERATIONS);
-                int maxWarmupIterations = tc.getIntParam(Constants.MAX_WARMUP_ITERATIONS);
-                double stddevThreshold = tc.getDoubleParam(Constants.STDDEV_THRESHOLD);
-                
-                final int sampleSize = 5;
-                
-                do {
-		    double sample[] = new double[sampleSize];
-                    
-                    // Sample of size 10
-                    for (int k = 0; k < sampleSize; k++) {
-                        nanos = Util.currentTimeNanos();
-                        for (int i = 0; i < warmupIterations; i++) {
-                            warmup(tc);      // Call warmup
-                        }
-                        nanos = Util.currentTimeNanos() - nanos;
-                        
-                        sample[k] = Util.nanosToMillis(nanos);                        
-                    }
-                    
-                    if (Util.standardDev(sample) <= stddevThreshold) {
-                        inSteadyState = true;
-                    }
-                    else {
-                        warmupIterations *= 2;   // exponential increase
-                    }
-                } while (!inSteadyState && warmupIterations < maxWarmupIterations);
-                                
-                // Report success or failure in finding steady state
-                if (inSteadyState) {
-                    System.out.print("Steady state = " 
-                        + warmupIterations + " iterations ");
-                }
-                else {
-                    System.out.print(
-                        "Unknown steady state, using = "
-                        + maxWarmupIterations + " iterations ");
-                    warmupIterations = maxWarmupIterations;
-                }
-                
-                // Set actual warmup time - last estimation
-                tc.setDoubleParam(Constants.ACTUAL_WARMUP_TIME, 
-                                  Util.nanosToMillis(nanos));
-                
-                // Set runIterations to estimated warmup iterations
-                tc.setIntParam(Constants.RUN_ITERATIONS, 
-                               warmupIterations);                
-            }
+            // Set actual warmup time
+            tc.setDoubleParam(Constants.ACTUAL_WARMUP_TIME, 
+                              Util.nanosToMillis(nanos));
         }
     }
     
