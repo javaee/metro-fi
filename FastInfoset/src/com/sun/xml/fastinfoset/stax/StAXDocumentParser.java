@@ -47,6 +47,8 @@ import com.sun.xml.fastinfoset.sax.AttributesHolder;
 import com.sun.xml.fastinfoset.util.CharArray;
 import com.sun.xml.fastinfoset.util.CharArrayString;
 import com.sun.xml.fastinfoset.util.QualifiedNameArray;
+import com.sun.xml.fastinfoset.util.XMLChar;
+import com.sun.xml.fastinfoset.util.EventLocation;
 import java.io.IOException;
 import java.util.EmptyStackException;
 import java.util.HashMap;
@@ -109,6 +111,8 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
      * Mapping between prefixes and URIs.
      */
     protected Map _prefixMap = new HashMap();
+
+    protected StAXManager _manager;
     
     public StAXDocumentParser() {
         _eventType = START_DOCUMENT;
@@ -129,7 +133,10 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     public Object getProperty(java.lang.String name)
         throws java.lang.IllegalArgumentException 
     {
-        throw new UnsupportedOperationException("Not implemented");
+        if (_manager != null) {
+            return _manager.getProperty(name);
+        }
+        return null;
     }
     
     public int next() throws XMLStreamException {
@@ -459,20 +466,115 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         }
     }
     
+    /** Test if the current event is of the given type and if the namespace and name match the current namespace and name of the current event.
+     * If the namespaceURI is null it is not checked for equality, if the localName is null it is not checked for equality.
+     * @param type the event type
+     * @param namespaceURI the uri of the event, may be null
+     * @param localName the localName of the event, may be null
+     * @throws XMLStreamException if the required values are not matched.
+     */    
     public void require(int type, String namespaceURI, String localName) 
         throws XMLStreamException
     {
-        throw new UnsupportedOperationException("Not implemented");
+        if( type != _eventType)
+            throw new XMLStreamException("Event type " +getEventTypeString(type)+" specified did not match with current parser event");
+        if( namespaceURI != null && !namespaceURI.equals(getNamespaceURI()) )
+            throw new XMLStreamException("Namespace URI " +namespaceURI+" specified did not match with current namespace URI");
+        if(localName != null && !localName.equals(getLocalName()))
+            throw new XMLStreamException("LocalName " +localName+" specified did not match with current local name");
+        
+        return;
     }
-    
+
+    /** Reads the content of a text-only element. Precondition:
+     * the current event is START_ELEMENT. Postcondition:
+     * The current event is the corresponding END_ELEMENT.
+     * @throws XMLStreamException if the current event is not a START_ELEMENT or if
+     * a non text element is encountered
+     */
     public String getElementText() throws XMLStreamException {
-        throw new UnsupportedOperationException("Not implemented");
+        
+        if(getEventType() != START_ELEMENT) {
+            throw new XMLStreamException(
+            "parser must be on START_ELEMENT to read next text", getLocation());
+        }
+        //current is StartElement, move to the next
+        int eventType = next();
+        return getElementText(true);
+    }
+    /**
+     * @param startElementRead flag if start element has already been read
+     */
+    public String getElementText(boolean startElementRead) throws XMLStreamException {
+        if (!startElementRead) {
+            throw new XMLStreamException(
+            "parser must be on START_ELEMENT to read next text", getLocation());            
+        }
+        int eventType = getEventType();
+        StringBuffer content = new StringBuffer();
+        while(eventType != END_ELEMENT ) {
+            if(eventType == CHARACTERS
+                || eventType == CDATA
+                || eventType == SPACE
+                || eventType == ENTITY_REFERENCE) 
+            {
+                content.append(getText());
+            } else if(eventType == PROCESSING_INSTRUCTION
+                    || eventType == COMMENT) {
+                // skipping
+            } else if(eventType == END_DOCUMENT) {
+                throw new XMLStreamException("unexpected end of document when reading element text content");
+            } else if(eventType == START_ELEMENT) {
+                throw new XMLStreamException(
+                "getElementText() function expects text only elment but START_ELEMENT was encountered.", getLocation());
+            } else {
+                throw new XMLStreamException(
+                "Unexpected event type "+ getEventTypeString(eventType), getLocation());
+            }
+            eventType = next();
+        }
+        return content.toString();        
     }
     
-    public int nextTag() throws XMLStreamException {
-        throw new UnsupportedOperationException("Not implemented");
+    /** Skips any white space (isWhiteSpace() returns true), COMMENT,
+     * or PROCESSING_INSTRUCTION,
+     * until a START_ELEMENT or END_ELEMENT is reached.
+     * If other than white space characters, COMMENT, PROCESSING_INSTRUCTION, START_ELEMENT, END_ELEMENT
+     * are encountered, an exception is thrown. This method should
+     * be used when processing element-only content seperated by white space. 
+     * This method should
+     * be used when processing element-only content because
+     * the parser is not able to recognize ignorable whitespace if
+     * then DTD is missing or not interpreted.
+     * @return the event type of the element read
+     * @throws XMLStreamException if the current event is not white space
+     */
+    public int nextTag() throws XMLStreamException {        
+        int eventType = next();
+        return nextTag(true);
     }
-    
+    /** if the current tag has already read, such as in the case EventReader's 
+     * peek() has been called, the current cursor should not move before the loop
+     */
+    public int nextTag(boolean currentTagRead) throws XMLStreamException {
+        int eventType = getEventType();
+        if (!currentTagRead) {
+            eventType = next();        
+        }
+        while((eventType == CHARACTERS && isWhiteSpace()) // skip whitespace
+            || (eventType == CDATA && isWhiteSpace())
+            || eventType == SPACE
+            || eventType == PROCESSING_INSTRUCTION
+            || eventType == COMMENT) 
+        {
+            eventType = next();
+        }
+        if (eventType != START_ELEMENT && eventType != END_ELEMENT) {
+            throw new XMLStreamException("expected start or end tag", getLocation());
+        }
+        return eventType;
+    }
+        
     public boolean hasNext() throws XMLStreamException {
         return (_eventType != END_DOCUMENT);
     }
@@ -504,8 +606,26 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         return (_eventType == CHARACTERS);
     }
     
+    /**
+     *  Returns true if the cursor points to a character data event that consists of all whitespace
+     *  Application calling this method needs to cache the value and avoid calling this method again
+     *  for the same event.
+     * @return true if the cursor points to all whitespace, false otherwise
+     */
     public boolean isWhiteSpace() {
-        throw new UnsupportedOperationException("Not implemented");
+        if(isCharacters() || (_eventType == CDATA)){
+            char [] ch = this.getTextCharacters();
+            int start = this.getTextStart();
+            int length = this.getTextLength();
+            for (int i=start; i< length;i++){
+                if(!XMLChar.isSpace(ch[i])){
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+        //throw new UnsupportedOperationException("Not implemented");
     }
     
     public String getAttributeValue(String namespaceURI, String localName) {
@@ -673,14 +793,9 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     }
     
     public Location getLocation() {
-        return new Location() {
-            public int getLineNumber() { return -1; }
-            public int getColumnNumber() { return -1; }
-            public int getCharacterOffset() { return -1; }
-            public String getPublicId() { return null; }
-            public String getSystemId() { return null; }
-            public String getLocationURI() { return null; }
-        };
+        //location should be created in next()
+        //returns a nil location for now
+        return EventLocation.getNilLocation();
     }
     
     public QName getName() {
@@ -1179,5 +1294,37 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     public Iterator getPrefixes() {
         return _prefixMap.keySet().iterator();
     }
+
     
+    public void setManager(StAXManager manager) {
+        _manager = manager;
+    }
+    final static String getEventTypeString(int eventType) {
+        switch (eventType){
+            case START_ELEMENT:
+                return "START_ELEMENT";
+            case END_ELEMENT:
+                return "END_ELEMENT";
+            case PROCESSING_INSTRUCTION:
+                return "PROCESSING_INSTRUCTION";
+            case CHARACTERS:
+                return "CHARACTERS";
+            case COMMENT:
+                return "COMMENT";
+            case START_DOCUMENT:
+                return "START_DOCUMENT";
+            case END_DOCUMENT:
+                return "END_DOCUMENT";
+            case ENTITY_REFERENCE:
+                return "ENTITY_REFERENCE";
+            case ATTRIBUTE:
+                return "ATTRIBUTE";
+            case DTD:
+                return "DTD";
+            case CDATA:
+                return "CDATA";
+        }
+        return "UNKNOWN_EVENT_TYPE";
+    }
+           
 }
