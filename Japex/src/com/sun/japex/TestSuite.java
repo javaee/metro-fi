@@ -59,12 +59,12 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.jfree.chart.*;
-import org.jfree.data.DefaultCategoryDataset;
+import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.ui.ApplicationFrame;
 import org.jfree.ui.RefineryUtilities;
 import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.renderer.CategoryItemRenderer;
-import org.jfree.chart.renderer.BarRenderer;
+import org.jfree.chart.renderer.category.CategoryItemRenderer;
+import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.plot.PlotOrientation;
 
 public class TestSuite extends Params {
