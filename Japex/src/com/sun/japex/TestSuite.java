@@ -296,14 +296,17 @@ public class TestSuite extends Params {
     
     public int generateTestCaseCharts(String baseName, String extension) {
         int nOfFiles = 0;
-        final int groupSize = 6;
+        final int maxGroupSize = 5;
+        
+        // Get number of tests from first driver
+        final int nOfTests = 
+            ((DriverInfo) _driverInfo.get(0)).getAggregateTestCases().size();
+            
+        int groupSizesIndex = 0;
+        int[] groupSizes = calculateGroupSizes(nOfTests, maxGroupSize);
         
         try {            
             String resultUnit = getParam(Constants.RESULT_UNIT);
-            
-            // Get number of tests from first driver
-            final int nOfTests = 
-                ((DriverInfo) _driverInfo.get(0)).getAggregateTestCases().size();
             
             // Find first normalizer driver (if any)
             DriverInfo normalizerDriver = null;
@@ -321,7 +324,7 @@ public class TestSuite extends Params {
             // Generate charts 
             DefaultCategoryDataset dataset = new DefaultCategoryDataset();
             
-            int i = 0;
+            int i = 0, thisGroupSize = 0;
             for (; i < nOfTests; i++) {
                 jdi = _driverInfo.iterator();
                 
@@ -345,10 +348,12 @@ public class TestSuite extends Params {
                             di.getName(),
                             tc.getTestName());                    
                     }
-                }                
+                }             
+                
+                thisGroupSize++;
                         
-                // Generate chart for this group
-                if (i > 0 && i % groupSize == 0) {
+                // Generate chart for this group if complete
+                if (thisGroupSize == groupSizes[groupSizesIndex]) {
                     JFreeChart chart = ChartFactory.createBarChart3D(
                         "Results per Test (" + resultUnit + ")", 
                         "", resultUnit, 
@@ -361,31 +366,49 @@ public class TestSuite extends Params {
                         chart, 600, 450);
                     
                     nOfFiles++;
+                    groupSizesIndex++;
+                    thisGroupSize = 0;
                     dataset = new DefaultCategoryDataset();
                 }
-            }
-            
-            // Generate first (if exactly groupSize tests) or last chart
-            if (i == groupSize || i % groupSize != 0) {
-                JFreeChart chart = ChartFactory.createBarChart3D(
-                    "Results per Test (" + resultUnit + ")", 
-                    "", resultUnit, 
-                    dataset,
-                    PlotOrientation.VERTICAL,
-                    true, true, false);
-                chart.setAntiAlias(true);
-
-                ChartUtilities.saveChartAsJPEG(
-                    new File(baseName + Integer.toString(nOfFiles) + extension),
-                    chart, 600, 450);
-                nOfFiles++;
-            }
+            }            
         }
         catch (Exception e) {
             e.printStackTrace();
         }        
         
         return nOfFiles;
+    }
+    
+    /**
+     * Calculate group sizes for tests to avoid a very small final group. 
+     * For example, calculateGroupSizes(21, 5) return { 5,5,5,3,3 } instead
+     * of { 5,5,5,5,1 }.
+     */
+    private static int[] calculateGroupSizes(int nOfTests, int maxGroupSize) {
+        if (nOfTests <= maxGroupSize) {
+            return new int[] { nOfTests };
+        }
+        
+        int[] result = new int[nOfTests / maxGroupSize + 
+                               ((nOfTests % maxGroupSize > 0) ? 1 : 0)];
+        
+        // Var m1 represents the number of groups of size maxGroupSize
+        int m1 = (nOfTests - maxGroupSize) / maxGroupSize;
+        for (int i = 0; i < m1; i++) {
+            result[i] = maxGroupSize;
+        }
+        
+        // Var m2 represents the number of tests not allocated into groups
+        int m2 = nOfTests - m1 * maxGroupSize;
+        if (m2 <= maxGroupSize) {
+            result[result.length - 1] = m2;
+        }
+        else {
+            // Allocate last two groups
+            result[result.length - 2] = (int) Math.ceil(m2 / 2.0);            
+            result[result.length - 1] = m2 - result[result.length - 2];
+        }
+        return result;
     }
 
 }
