@@ -55,7 +55,9 @@ import com.sun.xml.fastinfoset.util.CharArrayString;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
+import org.jvnet.fastinfoset.EncodingAlgorithm;
 import org.jvnet.fastinfoset.EncodingAlgorithmException;
 import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
 import org.jvnet.fastinfoset.FastInfosetException;
@@ -74,8 +76,8 @@ import org.xml.sax.helpers.DefaultHandler;
 public class SAXDocumentParser extends Decoder implements FastInfosetReader {
 
     public static final String STRING_INTERNING_FEATURE_PROPERTY =
-        "com.sun.xml.fast-infoset.property.feature.string-interning";
-                                                                                
+        "com.sun.xml.fastinfoset.feature.property.string-interning";
+
     protected static boolean _stringInterningFeatureProperty = true;
                                                                                 
     static {
@@ -117,6 +119,8 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
     
     protected PrimitiveTypeContentHandler _primitiveHandler;
 
+    protected Map _registeredEncodingAlgorithms = new HashMap();
+    
     protected int _algorithmReportingState = EA_NONE;
     
     protected BuiltInEncodingAlgorithmState builtInAlgorithmState = 
@@ -177,7 +181,13 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         if (name.equals(Properties.LEXICAL_HANDLER_PROPERTY)) {
             return getLexicalHandler();
         } else if (name.equals(Properties.EXTERNAL_VOCABULARIES_PROPERTY)) {
-          return _externalVocabularies;  
+          return _externalVocabularies;
+        } else if (name.equals(Properties.REGISTERED_ENCODING_ALGORITHMS_PROPERTY)) {
+          return getRegisteredEncodingAlgorithms();
+        } else if (name.equals(Properties.ENCODING_ALGORITHM_CONTENT_HANDLER_PROPERTY)) {
+          return getEncodingAlgorithmContentHandler();
+        } else if (name.equals(Properties.PRIMITIVE_TYPE_CONTENT_HANDLER_PROPERTY)) {
+          return getPrimitiveTypeContentHandler();
         } else {
             throw new SAXNotRecognizedException("Property not supported: " +
                 name);
@@ -189,8 +199,13 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         if (name.equals(Properties.LEXICAL_HANDLER_PROPERTY)) {
             setLexicalHandler((LexicalHandler)value);
         } else if (name.equals(Properties.EXTERNAL_VOCABULARIES_PROPERTY)) {
-            // _externalVocabularies = (Map<String, ParserVocabulary>)value;
             _externalVocabularies = (Map)value;
+        } else if (name.equals(Properties.REGISTERED_ENCODING_ALGORITHMS_PROPERTY)) {
+            setRegisteredEncodingAlgorithms((Map)value);
+        } else if (name.equals(Properties.ENCODING_ALGORITHM_CONTENT_HANDLER_PROPERTY)) {
+            setEncodingAlgorithmContentHandler((EncodingAlgorithmContentHandler)value);
+        } else if (name.equals(Properties.PRIMITIVE_TYPE_CONTENT_HANDLER_PROPERTY)) {
+            setPrimitiveTypeContentHandler((PrimitiveTypeContentHandler)value);
         } else {
             throw new SAXNotRecognizedException("Property not supported: " +
                 name);
@@ -261,6 +276,17 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
     public final void parse(InputStream s) throws IOException, FastInfosetException, SAXException {
         setInputStream(s);
         parse();
+    }
+
+    public void setRegisteredEncodingAlgorithms(Map algorithms) {
+        _registeredEncodingAlgorithms = algorithms;
+        if (_registeredEncodingAlgorithms == null) {
+            _registeredEncodingAlgorithms = new HashMap();
+        }
+    }
+    
+    public Map getRegisteredEncodingAlgorithms() {
+        return _registeredEncodingAlgorithms;
     }
     
     public void setLexicalHandler(LexicalHandler handler) {
@@ -1249,15 +1275,31 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     throw new EncodingAlgorithmException(
                             "Document contains application-defined encoding algorithm data that cannot be reported");
                 case EA_GENERIC:
-                    String URI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
-                    try {
-                        _algorithmHandler.octets(URI, _identifier, _octetBuffer, _octetBufferStart, _octetBufferLength);
-                    } catch (SAXException e) {
-                        throw new FastInfosetException(e);
-                    }
-                    break;
                 case EA_PRIMITIVE_APPLICATION:
-                    throw new UnsupportedOperationException("");
+                {
+                    final String URI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
+                    if (URI == null) {
+                        throw new EncodingAlgorithmException("URI not present for encoding algorithm identifier " + _identifier);
+                    }
+                    
+                    final EncodingAlgorithm ea = (EncodingAlgorithm)_registeredEncodingAlgorithms.get(URI);
+                    if (ea != null) {
+                        final Object data = ea.decodeFromBytes(_octetBuffer, _octetBufferStart, _octetBufferLength);
+                        try {
+                            _algorithmHandler.object(URI, _identifier, data);
+                        } catch (SAXException e) {
+                            throw new FastInfosetException(e);
+                        }                        
+                    } else {
+                        try {
+                            _algorithmHandler.octets(URI, _identifier, _octetBuffer, _octetBufferStart, _octetBufferLength);
+                        } catch (SAXException e) {
+                            throw new FastInfosetException(e);
+                        }
+                    }
+                    
+                    break;
+                }
             }
         } else {
             // Reserved built-in algorithms for future use
@@ -1355,15 +1397,26 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     throw new EncodingAlgorithmException(
                             "Document contains application-defined encoding algorithm data that cannot be reported");
                 case EA_GENERIC:
-                {
-                    String URI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
-                    byte[] data = new byte[_octetBufferLength];
-                    System.arraycopy(_octetBuffer, _octetBufferStart, data, 0, _octetBufferLength);
-                    _attributes.addAttributeWithAlgorithmData(name, URI, _identifier, data);
-                    break;
-                }
                 case EA_PRIMITIVE_APPLICATION:
-                    throw new UnsupportedOperationException("");
+                {
+                    final String URI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
+                    if (URI == null) {
+                        throw new EncodingAlgorithmException("URI not present for encoding algorithm identifier " + _identifier);
+                    }
+                    
+                    final EncodingAlgorithm ea = (EncodingAlgorithm)_registeredEncodingAlgorithms.get(URI);
+                    if (ea != null) {
+                        final Object data = ea.decodeFromBytes(_octetBuffer, _octetBufferStart, _octetBufferLength);
+                        _attributes.addAttributeWithAlgorithmData(name, URI, _identifier, data);
+                    } else {
+                        final byte[] data = new byte[_octetBufferLength];
+                        System.arraycopy(_octetBuffer, _octetBufferStart, data, 0, _octetBufferLength);
+                        _attributes.addAttributeWithAlgorithmData(name, URI, _identifier, data);
+                    }
+
+                    break;
+                    
+                }
             }
         } else {
             // Reserved built-in algorithms for future use

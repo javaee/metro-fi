@@ -42,13 +42,15 @@ package com.sun.xml.fastinfoset.sax;
 import com.sun.xml.fastinfoset.Encoder;
 import com.sun.xml.fastinfoset.EncodingConstants;
 import com.sun.xml.fastinfoset.QualifiedName;
-import com.sun.xml.fastinfoset.algorithm.BuiltInEncodingAlgorithmFactory;
 import com.sun.xml.fastinfoset.util.KeyIntMap;
 import org.jvnet.fastinfoset.ReferencedVocabulary;
 import org.jvnet.fastinfoset.Vocabulary;
 import org.jvnet.fastinfoset.sax.FastInfosetWriter;
 import com.sun.xml.fastinfoset.util.LocalNameQualifiedNamesMap;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import org.jvnet.fastinfoset.EncodingAlgorithmException;
 import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
 import org.jvnet.fastinfoset.FastInfosetException;
 import org.jvnet.fastinfoset.sax.EncodingAlgorithmAttributes;
@@ -181,6 +183,8 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
             }
         } catch (IOException e) {
             throw new SAXException("startElement", e);
+        } catch (FastInfosetException e) {
+            throw new SAXException("startElement", e);
         }
     }
 
@@ -281,23 +285,18 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
     
     // EncodingAlgorithmContentHandler
     
-    public final void octets(String URI, int algorithm, byte[] b, int start, int length)  throws SAXException {
+    public final void octets(String URI, int id, byte[] b, int start, int length)  throws SAXException {
         if (length <= 0) {
             return;
-        }
-        
-        if (URI != null) {
-            algorithm = _v.encodingAlgorithm.get(URI) + EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START;
-            if (algorithm == KeyIntMap.NOT_PRESENT) {
-                throw new SAXException("Encoding algorithm URI '" + URI + "' not a member of the encoding algorithm table");
-            }
         }
         
         try {
             encodeTermination();
             
-            encodeCIIOctetAlgorithmData(algorithm, b, start, length);
+            encodeNonIdentifyingStringOnThirdBit(URI, id, b, start, length);
         } catch (IOException e) {
+            throw new SAXException(e);
+        } catch (FastInfosetException e) {
             throw new SAXException(e);
         }
     }
@@ -306,44 +305,7 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
         try {
             encodeTermination();
             
-            if (id <= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
-                switch(id) {
-                    case EncodingAlgorithmIndexes.HEXADECIMAL:
-                        throw new UnsupportedOperationException("HEXADECIMAL");
-                    case EncodingAlgorithmIndexes.BASE64:
-                    {
-                        byte[] d = (byte[])data;
-                        encodeCIIBuiltInAlgorithmData(id, d, 0, d.length);
-                        break;
-                    }
-                    case EncodingAlgorithmIndexes.SHORT:
-                        throw new UnsupportedOperationException("SHORT");
-                    case EncodingAlgorithmIndexes.INT:
-                    {
-                        int[] d = (int[])data;
-                        encodeCIIBuiltInAlgorithmData(id, d, 0, d.length);
-                        break;
-                    }
-                    case EncodingAlgorithmIndexes.LONG:
-                        throw new UnsupportedOperationException("LONG");
-                    case EncodingAlgorithmIndexes.BOOLEAN:
-                        throw new UnsupportedOperationException("BOOLEAN");
-                    case EncodingAlgorithmIndexes.FLOAT:
-                        float[] d = (float[])data;
-                        encodeCIIBuiltInAlgorithmData(id, d, 0, d.length);
-                        break;
-                    case EncodingAlgorithmIndexes.DOUBLE:
-                        throw new UnsupportedOperationException("DOUBLE");
-                    case EncodingAlgorithmIndexes.UUID:
-                        throw new UnsupportedOperationException("UUID");
-                    case EncodingAlgorithmIndexes.CDATA:      
-                        throw new UnsupportedOperationException("CDATA");
-                    default:
-                        throw new IOException("Unsupported built-in encoding algorithm: " + id);
-                }            
-            } else {
-                throw new UnsupportedOperationException("Non Implemented");
-            }
+            encodeNonIdentifyingStringOnThirdBit(URI, id, data);
         } catch (IOException e) {
             throw new SAXException(e);
         } catch (FastInfosetException e) {
@@ -419,6 +381,21 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
     public final void uuids(long[] msb, long[] lsb, int start, int length) throws SAXException {
         throw new SAXException("Non Implemented");
     }
+
+    
+    // FastInfosetWriter
+    
+    public void setRegisteredEncodingAlgorithms(Map algorithms) {
+        _registeredEncodingAlgorithms = algorithms;
+        if (_registeredEncodingAlgorithms == null) {
+            _registeredEncodingAlgorithms = new HashMap();
+        }
+    }
+    
+    public Map getRegisteredEncodingAlgorithms() {
+        return _registeredEncodingAlgorithms;
+    }
+    
     
     
     protected final void encodeElement(String namespaceURI, String qName, String localName) throws IOException {

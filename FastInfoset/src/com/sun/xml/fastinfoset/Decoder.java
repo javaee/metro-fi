@@ -96,6 +96,8 @@ public abstract class Decoder {
     
     protected int _octetBufferLength;
     
+    protected EncodingAlgorithmInputStream _encodingAlgorithmInputStream = new EncodingAlgorithmInputStream();
+            
     protected char[] _charBuffer = new char[512];
     
     protected int _charBufferLength;
@@ -696,6 +698,46 @@ public abstract class Decoder {
         }
     }
 
+    protected class EncodingAlgorithmInputStream extends InputStream {
+
+        public int read() throws IOException {
+            if (_octetBufferStart < _octetBufferOffset) {
+                return (_octetBuffer[_octetBufferStart++] & 0xFF);
+            } else {
+                return -1;
+            }
+        }
+
+        public int read(byte b[]) throws IOException {
+            return read(b, 0, b.length);
+        }
+
+        public int read(byte b[], int off, int len) throws IOException {
+            if (b == null) {
+                throw new NullPointerException();
+            } else if ((off < 0) || (off > b.length) || (len < 0) ||
+                       ((off + len) > b.length) || ((off + len) < 0)) {
+                throw new IndexOutOfBoundsException();
+            } else if (len == 0) {
+                return 0;
+            }
+
+            final int newOctetBufferStart = _octetBufferStart + len;
+            if (newOctetBufferStart < _octetBufferOffset) {
+                System.arraycopy(_octetBuffer, _octetBufferStart, b, off, len);
+                _octetBufferStart = newOctetBufferStart;
+                return len;
+            } else if (_octetBufferStart < _octetBufferOffset) {
+                final int bytesToRead = _octetBufferOffset - _octetBufferStart;
+                System.arraycopy(_octetBuffer, _octetBufferStart, b, off, bytesToRead);
+                _octetBufferStart += bytesToRead;
+                return bytesToRead;
+            } else {
+                return -1;
+            }    
+        }        
+    }
+    
     protected final boolean _isFastInfosetDocument() throws IOException {
         // TODO
         // Check for <?xml declaration with 'finf' encoding

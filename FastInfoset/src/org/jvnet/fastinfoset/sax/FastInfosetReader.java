@@ -41,6 +41,7 @@ package org.jvnet.fastinfoset.sax;
 import org.jvnet.fastinfoset.VocbularyReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import org.jvnet.fastinfoset.FastInfosetException;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -114,6 +115,14 @@ public interface FastInfosetReader extends XMLReader, VocbularyReader {
      */
     public void parse(InputStream s) throws IOException, FastInfosetException, SAXException;
 
+    public void setRegisteredEncodingAlgorithms(Map algorithms);
+    
+    public Map getRegisteredEncodingAlgorithms();
+
+    public LexicalHandler getLexicalHandler();
+   
+    public void setLexicalHandler(LexicalHandler handler);
+
     /**
      * Allow an application to register an encoding algorithm handler.
      *
@@ -128,12 +137,6 @@ public interface FastInfosetReader extends XMLReader, VocbularyReader {
      * @see #getEncodingAlgorithmContentHandler
      */
     public void setEncodingAlgorithmContentHandler(EncodingAlgorithmContentHandler handler);
-
-
-    public LexicalHandler getLexicalHandler();
-   
-    public void setLexicalHandler(LexicalHandler handler);
-                                                                                
 
     /**
      * Return the current encoding algorithm handler.
@@ -168,5 +171,4 @@ public interface FastInfosetReader extends XMLReader, VocbularyReader {
      * @see #setPrimitiveTypeContentHandler
      */
     public PrimitiveTypeContentHandler getPrimitiveTypeContentHandler();
-    
 }

@@ -42,7 +42,13 @@ package com.sun.xml.fastinfoset.sax;
 public class Properties {
     public static final String LEXICAL_HANDLER_PROPERTY =
             "http://xml.org/sax/properties/lexical-handler";
+    public static final String ENCODING_ALGORITHM_CONTENT_HANDLER_PROPERTY =
+            "http://jvnet.org/fastinfoset/sax/properties/encoding-algorithm-content-handler";
+    public static final String PRIMITIVE_TYPE_CONTENT_HANDLER_PROPERTY =
+            "http://jvnet.org/fastinfoset/sax/properties/primitive-type-content-handler";
     public static final String EXTERNAL_VOCABULARIES_PROPERTY =
-            "urn:com:sun:fast-infoset:feature:external-vocabularies";
+            "http://jvnet.org/fastinfoset/sax/properties/external-vocabularies";
+    public static final String REGISTERED_ENCODING_ALGORITHMS_PROPERTY =
+            "http://jvnet.org/fastinfoset/sax/properties/registered-encoding-algorithms";
 }
 
