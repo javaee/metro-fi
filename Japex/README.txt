@@ -19,14 +19,10 @@ Introduction:
 Building:
 
  It is recommended to set the environment variable JAPEX_HOME to point
- to the installation directory. Downloading JFreeChart is a requirement 
- to build the Japex distribution. You can download this library from [2]. 
- Before building the distribution you must copy the binary jars 
- jfreechart-0.9.21.jar and jcommon-0.9.6.jar into ./lib/jfreechart 
- (Japex should work with any version that is backward compatible with 
- 0.9.21).
+ to the installation directory. Japex depends on JFreeChart [2], see
+ ./lib/jfreechart.
  
- After copying the JFreeChart jars, just type
+Type:
 
  >> ant dist
 
