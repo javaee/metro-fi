@@ -1,13 +1,22 @@
 FastInfoset (FI) Samples
 
-The samples project is in its early stage and not complete. More samples may be added in the near further.
+The samples project is in its early stage and not complete. More samples may be added 
+in the near further. Please note that due to the fact that there might be some minor 
+modifications to the specification of the encoding of Fast Infoset, FI files for the 
+samples are not checked in. The ant targets for those samples that have dependencies 
+on FI files, therefore, are set to run XMLToFI target first to generate FI files from 
+XML files before the targeted tasks are run. For more details, you may run the JavaDoc 
+target (ant doc) to generate JavaDocs under dist/javadoc/ and then browse index.html. 
+  
 We welcome feedbacks and suggestions on use cases. Please write to users@fi.dev.java.net.
 
-Listed here are samples that are planned and completed:
+Listed here are samples that have been completed:
 
 
-1. FI SAX parser (to be completed)
-    Demonstrate the use of FI SAX parser to transform a FI document into XML file. 
+1. FI SAX parser 
+    The sample parses data/inv1a.finf as specified in the build.xml and handle SAX events to display corresponding XML content.
+    To run the sample, go to the samples directory and type:
+    ant FISAXParser
 
 2. FI SAX serializer
     Demonstrate the use of FI SAX serializer to transform a XML file into FI document. The sample

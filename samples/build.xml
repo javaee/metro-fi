@@ -85,15 +85,18 @@
         <java dir="." fork="true" classname="samples.stax.EventReader">
             <classpath refid="class.path"/>
             <arg line="${simple-finf-file}"/>
+            <arg line="${simple-xml-file}"/>
         </java>
     </target>
 
     <target name="doc" depends="compile">
+            
             <javadoc source="1.4"
                     sourcepath="src"
                     packagenames="samples.*"
                     destdir="${dist-dir}/javadoc"
                     version="true">
+                    <classpath refid="compile.class.path"/>
             </javadoc>
     </target>
         
