@@ -376,7 +376,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     final int b2 = read();
                     _identifier |= (b2 & 0xFC) >> 2;
                     
-                    decodeOctetsOfNonIdentifyingStringOnThirdBit(b2);
+                    decodeOctetsOnSeventhBitOfNonIdentifyingStringOnThirdBit(b2);
                     // TODO obtain restricted alphabet given _identifier value
                     decodeRAOctetsAsCharBuffer(null);
                     if ((b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
@@ -395,11 +395,11 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     }
                     
                     // Decode encoding algorithm integer
-                    _algorithmId = (_b & 0x02) << 6;
-                    _b = read();
-                    _algorithmId |= (_b & 0xFC) >> 2;
+                    _algorithmId = (b & 0x02) << 6;
+                    final int b2 = read();
+                    _algorithmId |= (b2 & 0xFC) >> 2;
                     
-                    decodeOctetsOfNonIdentifyingStringOnThirdBit(_b);                    
+                    decodeOctetsOnSeventhBitOfNonIdentifyingStringOnThirdBit(b2);                    
                     processCIIEncodingAlgorithm();
                     
                     return _eventType = CHARACTERS;
@@ -1232,7 +1232,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     b = read();
                     _identifier |= (b & 0xF0) >> 4;
                     
-                    decodeOctetsOfNonIdentifyingStringOnFirstBit(b);
+                    decodeOctetsOnFifthBitOfNonIdentifyingStringOnFirstBit(b);
                     // TODO obtain restricted alphabet given _identifier value
                     value = decodeRAOctetsAsString(null);
                     if (addToTable) {
@@ -1253,7 +1253,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     b = read();
                     _identifier |= (b & 0xF0) >> 4;
                     
-                    decodeOctetsOfNonIdentifyingStringOnFirstBit(b);
+                    decodeOctetsOnFifthBitOfNonIdentifyingStringOnFirstBit(b);
                     processAIIEncodingAlgorithm(name);
                     break;
                 }

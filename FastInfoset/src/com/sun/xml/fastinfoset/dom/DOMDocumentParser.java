@@ -378,7 +378,7 @@ public class DOMDocumentParser extends Decoder {
                     final int b2 = read();
                     _identifier |= (b2 & 0xFC) >> 2;
 
-                    decodeOctetsOfNonIdentifyingStringOnThirdBit(b2);
+                    decodeOctetsOnSeventhBitOfNonIdentifyingStringOnThirdBit(b2);
                     // TODO obtain restricted alphabet given _identifier value
                     decodeRAOctetsAsCharBuffer(null);                    
                     if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
@@ -398,7 +398,7 @@ public class DOMDocumentParser extends Decoder {
                     _b = read();
                     _identifier |= (_b & 0xFC) >> 2;
                     
-                    decodeOctetsOfNonIdentifyingStringOnThirdBit(_b);
+                    decodeOctetsOnSeventhBitOfNonIdentifyingStringOnThirdBit(_b);
             
                     throw new UnsupportedOperationException("Encoding algoroithm");
                 }
@@ -710,7 +710,7 @@ public class DOMDocumentParser extends Decoder {
                     b = read();
                     _identifier |= (b & 0xF0) >> 4;
                     
-                    decodeOctetsOfNonIdentifyingStringOnFirstBit(b);
+                    decodeOctetsOnFifthBitOfNonIdentifyingStringOnFirstBit(b);
                     // TODO obtain restricted alphabet given _identifier value
                     value = decodeRAOctetsAsString(null);
                     if (addToTable) {
@@ -729,7 +729,7 @@ public class DOMDocumentParser extends Decoder {
                     b = read();
                     _identifier |= (b & 0xF0) >> 4;
 
-                    decodeOctetsOfNonIdentifyingStringOnFirstBit(b);
+                    decodeOctetsOnFifthBitOfNonIdentifyingStringOnFirstBit(b);
                     throw new UnsupportedOperationException("Encoding algorithm");
                 }
                 case DecoderStateTables.NISTRING_INDEX_SMALL:

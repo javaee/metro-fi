@@ -207,7 +207,6 @@ public abstract class Decoder implements FastInfosetParser {
     
     public void reset() {
         _terminate = _doubleTerminate = false;
-        _b = 0;     // needed for enconding algorithms
     }
 
     public void setVocabulary(ParserVocabulary v) {
@@ -539,7 +538,7 @@ public abstract class Decoder implements FastInfosetParser {
                 final int b2 = read();
                 _identifier |= (b2 & 0xF0) >> 4;
 
-                decodeOctetsOfNonIdentifyingStringOnFirstBit(b2);
+                decodeOctetsOnFifthBitOfNonIdentifyingStringOnFirstBit(b2);
                 // TODO obtain restricted alphabet given _identifier value
                 decodeRAOctetsAsCharBuffer(null);
                 return NISTRING_STRING;
@@ -552,7 +551,7 @@ public abstract class Decoder implements FastInfosetParser {
                 final int b2 = read();
                 _identifier |= (b2 & 0xF0) >> 4;
 
-                decodeOctetsOfNonIdentifyingStringOnFirstBit(b2);
+                decodeOctetsOnFifthBitOfNonIdentifyingStringOnFirstBit(b2);
                 return NISTRING_ENCODING_ALGORITHM;
             }
             case DecoderStateTables.NISTRING_INDEX_SMALL:
@@ -573,7 +572,7 @@ public abstract class Decoder implements FastInfosetParser {
         }
     }
 
-    public final void decodeOctetsOfNonIdentifyingStringOnFirstBit(int b) throws FastInfosetException, IOException {
+    public final void decodeOctetsOnFifthBitOfNonIdentifyingStringOnFirstBit(int b) throws FastInfosetException, IOException {
         // Remove top 4 bits of restricted alphabet or encoding algorithm integer
         b &= 0x0F;
         // Reuse UTF8 length states
@@ -599,18 +598,22 @@ public abstract class Decoder implements FastInfosetParser {
         _octetBufferOffset += _octetBufferLength;
     }
 
-    public final void decodeOctetsOfNonIdentifyingStringOnThirdBit(int b) throws FastInfosetException, IOException {
+    public final void decodeOctetsOnSeventhBitOfNonIdentifyingStringOnThirdBit(int b) throws FastInfosetException, IOException {
         // Remove top 6 bits of restricted alphabet or encoding algorithm integer
         switch (b & 0x03) {
+            // Small length
             case 0:
                 _octetBufferLength = 1;
                 break;
+            // Small length
             case 1:
                 _octetBufferLength = 2;
                 break;
+            // Medium length
             case 2:
                 _octetBufferLength = read() + EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_LIMIT;
                 break;
+            // Large length
             case 3:
                 _octetBufferLength = (read() << 24) |
                     (read() << 16) |
