@@ -49,8 +49,8 @@ import com.sun.japex.*;
 
 public class FastInfosetSizeDriver extends JapexDriverBase {
     
-    String _xmlFile;
-    byte[] _fastInfosetSizeDocumentByteArray;
+    protected String _xmlFile;
+    protected byte[] _fastInfosetByteArray;
     
     public FastInfosetSizeDriver() {
     }
@@ -80,7 +80,7 @@ public class FastInfosetSizeDriver extends JapexDriverBase {
             parser.parse(fis, ds);
             fis.close();
 
-            _fastInfosetSizeDocumentByteArray = baos.toByteArray();
+            _fastInfosetByteArray = baos.toByteArray();
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -95,7 +95,7 @@ public class FastInfosetSizeDriver extends JapexDriverBase {
     
     public void finish(TestCase testCase) {
         testCase.setDoubleParam(Constants.RESULT_VALUE, 
-            _fastInfosetSizeDocumentByteArray.length / 1024.0);
+            _fastInfosetByteArray.length / 1024.0);
     }
     
     public void terminateDriver() {
