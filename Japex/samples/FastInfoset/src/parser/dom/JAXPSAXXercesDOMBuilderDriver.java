@@ -43,24 +43,26 @@ import com.sun.japex.JapexDriverBase;
 import com.sun.japex.TestCase;
 import com.sun.org.apache.xml.internal.utils.DOMBuilder;
 import com.sun.xml.fastinfoset.sax.Features;
-import com.sun.xml.fastinfoset.sax.SAXDocumentParser;
-import com.sun.xml.fastinfoset.sax.SAXDocumentSerializer;
+import com.sun.xml.fastinfoset.sax.Properties;
 import java.io.File;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.parsers.SAXParser;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
 
 
 
-public class FISAXXercesDOMBuilderDriver extends JapexDriverBase {
+public class JAXPSAXXercesDOMBuilderDriver extends JapexDriverBase {
     ByteArrayInputStream _inputStream;
-
-    SAXDocumentParser _fidp;
+    InputSource _inputSource;
+    
+    SAXParser _parser;
+    XMLReader _reader;
     DocumentBuilder _db;
     
     public void initializeDriver() {
@@ -77,22 +79,16 @@ public class FISAXXercesDOMBuilderDriver extends JapexDriverBase {
         try {
 	    SAXParserFactory spf = SAXParserFactory.newInstance();
             spf.setNamespaceAware(true);
-            SAXParser parser = spf.newSAXParser();
-
-	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	    SAXDocumentSerializer ds = new SAXDocumentSerializer();
+            spf.setFeature(Features.NAMESPACE_PREFIXES_FEATURE, true);
+            _parser = spf.newSAXParser();
+            _reader = _parser.getXMLReader();
             
-            ds.setOutputStream(baos);
-
-            // TODO must use URL here
             FileInputStream fis = new FileInputStream(new File(xmlFile));
-            parser.parse(fis, ds);
+            byte[] xmlFileByteArray = com.sun.japex.Util.streamToByteArray(fis);
+            _inputStream = new ByteArrayInputStream(xmlFileByteArray);
             fis.close();
+            _inputSource = new InputSource(_inputStream);
 
-            _inputStream = new ByteArrayInputStream(baos.toByteArray());
-            _fidp = new SAXDocumentParser();
-            _fidp.setFeature(Features.NAMESPACE_PREFIXES_FEATURE, true);
-            
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
             _db = dbf.newDocumentBuilder();
@@ -104,11 +100,10 @@ public class FISAXXercesDOMBuilderDriver extends JapexDriverBase {
     public void warmup(TestCase testCase) {
         try {
             _inputStream.reset();
-            _fidp.setInputStream(_inputStream);
             DOMBuilder db = new DOMBuilder(_db.newDocument());
-            _fidp.setContentHandler(db);
-            _fidp.setLexicalHandler(db);
-            _fidp.parse();
+            _reader.setContentHandler(db);
+            _reader.setProperty(Properties.LEXICAL_HANDLER_PROPERTY, db);
+            _reader.parse(_inputSource);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -118,11 +113,10 @@ public class FISAXXercesDOMBuilderDriver extends JapexDriverBase {
     public void run(TestCase testCase) {
         try {
             _inputStream.reset();
-            _fidp.setInputStream(_inputStream);
             DOMBuilder db = new DOMBuilder(_db.newDocument());
-            _fidp.setContentHandler(db);
-            _fidp.setLexicalHandler(db);
-            _fidp.parse();
+            _reader.setContentHandler(db);
+            _reader.setProperty(Properties.LEXICAL_HANDLER_PROPERTY, db);
+            _reader.parse(_inputSource);
         }
         catch (Exception e) {
             e.printStackTrace();
