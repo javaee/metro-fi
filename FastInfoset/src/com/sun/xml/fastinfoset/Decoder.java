@@ -62,11 +62,11 @@ public abstract class Decoder implements FastInfosetParser {
 
     // String interning system property
     public static final String STRING_INTERNING_SYSTEM_PROPERTY =
-        "com.sun.xml.fastinfoset.property.string-interning";
+        "com.sun.xml.fastinfoset.parser.string-interning";
 
     // Buffer size system property
     public static final String BUFFER_SIZE_SYSTEM_PROPERTY =
-        "com.sun.xml.fastinfoset.property.buffer-size";
+        "com.sun.xml.fastinfoset.parser.buffer-size";
 
     protected static boolean _stringInterningSystemDefault = true;
     
