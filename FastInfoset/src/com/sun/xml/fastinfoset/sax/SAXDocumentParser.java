@@ -868,18 +868,9 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         }
         
         _b = read();
-        if (hasAttributes) {
-            // Re-flag attribute flag
-            // This is so the EII table can be reused.
-            _b |= EncodingConstants.ELEMENT_ATTRIBUTE_FLAG;
-        }
-        
         switch(DecoderStateTables.EII[_b]) {
             case DecoderStateTables.EII_NO_AIIS_INDEX_SMALL:
-                processEII(_v.elementName.get(_b), false);
-                break;
-            case DecoderStateTables.EII_AIIS_INDEX_SMALL:
-                processEII(_v.elementName.get(_b & EncodingConstants.INTEGER_3RD_BIT_SMALL_MASK), true);
+                processEII(_v.elementName.get(_b), hasAttributes);
                 break;
             case DecoderStateTables.EII_INDEX_MEDIUM:
                 processEII(decodeEIIIndexMedium(), hasAttributes);
