@@ -215,7 +215,9 @@ public class DOMDocumentSerializer extends Encoder {
         final String text = t.getNodeValue();
         
         final int length = text.length();
-        if (length < _charBuffer.length) {
+        if (length == 0) {
+            return;
+        } else if (length < _charBuffer.length) {
             text.getChars(0, length, _charBuffer, 0);
             encodeCharactersNoClone(_charBuffer, 0, length);
         } else {
@@ -228,7 +230,9 @@ public class DOMDocumentSerializer extends Encoder {
         final String comment = c.getNodeValue();
         
         final int length = comment.length();
-        if (length < _charBuffer.length) {
+        if (length == 0) {
+            return;
+        } else if (length < _charBuffer.length) {
             comment.getChars(0, length, _charBuffer, 0);
             encodeCommentNoClone(_charBuffer, 0, length);
         } else {
@@ -246,7 +250,7 @@ public class DOMDocumentSerializer extends Encoder {
     protected final void encodeElement(String namespaceURI, String qName, String localName) throws IOException {
         LocalNameQualifiedNamesMap.Entry entry = _v.elementName.obtainEntry(qName);
         if (entry._valueIndex > 0) {
-            QualifiedName[] names = entry._value;
+            final QualifiedName[] names = entry._value;
             for (int i = 0; i < entry._valueIndex; i++) {
                 if ((namespaceURI == names[i].namespaceName || namespaceURI.equals(names[i].namespaceName))) {
                     encodeNonZeroIntegerOnThirdBit(names[i].index);
@@ -262,7 +266,7 @@ public class DOMDocumentSerializer extends Encoder {
     protected final void encodeAttribute(String namespaceURI, String qName, String localName) throws IOException {
         LocalNameQualifiedNamesMap.Entry entry = _v.attributeName.obtainEntry(qName);
         if (entry._valueIndex > 0) {
-            QualifiedName[] names = entry._value;
+            final QualifiedName[] names = entry._value;
             for (int i = 0; i < entry._valueIndex; i++) {
                 if ((namespaceURI == names[i].namespaceName || namespaceURI.equals(names[i].namespaceName))) {
                     encodeNonZeroIntegerOnSecondBitFirstBitZero(names[i].index);
