@@ -91,6 +91,11 @@ public class DriverInfo extends Params {
     private void computeMeans() {
         final int runsPerDriver = _testCases.length;
         
+        // Nothing to compute if only 1 run per driver
+        if (runsPerDriver == 1) {
+            return;
+        }
+        
         // Avoid re-computing the driver's aggregates
         if (_computeMeans) {
             final int nOfTests = _testCases[0].size();
