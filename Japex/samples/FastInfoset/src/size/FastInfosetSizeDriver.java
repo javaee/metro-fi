@@ -1,3 +1,4 @@
+package size;
 /*
  * Japex ver. 0.1 software ("Software")
  * 
@@ -38,30 +39,24 @@
  */
 
 import java.io.*;
+import org.xml.sax.InputSource;
 import javax.xml.parsers.*;
 import java.util.Properties;
 
+import com.sun.xml.fastinfoset.sax.*;
+import com.sun.xml.fastinfoset.vocab.*;
+
 import com.sun.japex.*;
 
-public class PiccoloDriver extends JapexDriverBase {
+public class FastInfosetSizeDriver extends JapexDriverBase {
     
-    String _xmlFile;
-    byte[] _xmlFileByteArray;
-    ByteArrayInputStream _inputStream;
-    SAXParser _parser;
+    protected String _xmlFile;
+    protected byte[] _fastInfosetByteArray;
     
-    public PiccoloDriver() {
+    public FastInfosetSizeDriver() {
     }
 
     public void initializeDriver() {
-        try {
-            SAXParserFactory spf = new com.bluecast.xml.JAXPSAXParserFactory();
-            spf.setNamespaceAware(true);
-            _parser = spf.newSAXParser();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
     }   
     
     public void prepare(TestCase testCase) {
@@ -72,37 +67,36 @@ public class PiccoloDriver extends JapexDriverBase {
         
         // Load file into byte array to factor out IO
         try {
+	    SAXParserFactory spf = SAXParserFactory.newInstance();
+            spf.setNamespaceAware(true);
+            SAXParser parser = spf.newSAXParser();
+
+	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	    SAXDocumentSerializer ds = new SAXDocumentSerializer();
+            
+            ds.setOutputStream(baos);
+
             // TODO must use URL here
             FileInputStream fis = new FileInputStream(new File(_xmlFile));
-            _xmlFileByteArray = com.sun.japex.Util.streamToByteArray(fis);
-            _inputStream = new ByteArrayInputStream(_xmlFileByteArray);
+            parser.parse(fis, ds);
             fis.close();
+
+            _fastInfosetByteArray = baos.toByteArray();
         }
-        catch (IOException e) {
+        catch (Exception e) {
             e.printStackTrace();
         }
     }
     
     public void warmup(TestCase testCase) {
-        try {
-            _inputStream.reset();
-            _parser.parse(_inputStream, 
-                          new org.xml.sax.helpers.DefaultHandler());
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
     }
     
     public void run(TestCase testCase) {
-        try {
-            _inputStream.reset();
-            _parser.parse(_inputStream, 
-                          new org.xml.sax.helpers.DefaultHandler());
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+    }
+    
+    public void finish(TestCase testCase) {
+        testCase.setDoubleParam(Constants.RESULT_VALUE, 
+            _fastInfosetByteArray.length / 1024.0);
     }
     
     public void terminateDriver() {

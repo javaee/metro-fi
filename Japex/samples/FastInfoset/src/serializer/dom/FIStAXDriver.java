@@ -37,7 +37,7 @@
  * nuclear facility.
  */
 
-package serializer;
+package serializer.dom;
 
 import java.io.File;
 import java.io.ByteArrayInputStream;
@@ -57,7 +57,8 @@ import com.sun.xml.fastinfoset.stax.SAX2StAXWriter;
 
 import com.sun.japex.*;
 
-public class SJSXPDriver extends JapexDriverBase {
+
+public class FIStAXDriver extends JapexDriverBase {
     String _xmlFile;
     ByteArrayInputStream _inputStream;
     Transformer _transformer;
@@ -65,7 +66,7 @@ public class SJSXPDriver extends JapexDriverBase {
     SAXResult _result = null;
     ByteArrayOutputStream _baos;
     
-    public SJSXPDriver() {
+    public FIStAXDriver() {
     }
     
     public void initializeDriver() {
@@ -82,7 +83,8 @@ public class SJSXPDriver extends JapexDriverBase {
             throw new RuntimeException("xmlfile not specified");
         }
         
-        Util util = new Util(Util.STAX_SERIALIZER_SJSXP);
+        boolean FISTAXFactory = true;
+        Util util = new Util(Util.STAX_SERIALIZER_FI);
         _source = util.getDOMSource(new File(_xmlFile));
         _baos = new ByteArrayOutputStream();
         _result = util.getSAXResult(_baos);

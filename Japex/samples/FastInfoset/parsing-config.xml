@@ -30,7 +30,7 @@
     <!-- Run each test for 10 seconds -->
     <param name="japex.warmupTime" value="5"/>
     <param name="japex.runTime" value="5"/>
-
+    
     <!-- 1 or more drivers 
       -
       - Driver parameters can override global parameters. The optional
@@ -46,28 +46,28 @@
       -
       -->
     <driver name="FastInfosetDriver" normal="true">
-        <param name="japex.driverClass" value="FastInfosetDriver"/>
+        <param name="japex.driverClass" value="parser.sax.FastInfosetDriver"/>
         <param name="description" value="Fast Infoset SAX Parser"/>
     </driver>
-    <driver name="XercesDriver">
-        <param name="japex.driverClass" value="XercesDriver"/>
-        <param name="description" value="Xerces Parser"/>
+    <driver name="JAXPDriver">
+        <param name="japex.driverClass" value="parser.sax.JAXPDriver"/>
+        <param name="description" value="JAXP SAX Parser"/>
     </driver>
     <driver name="StAXRIDriver">
-        <param name="japex.driverClass" value="StAXRIDriver"/>
+        <param name="japex.driverClass" value="parser.stax.StAXRIDriver"/>
         <param name="description" value="StAX Reference Implementation Parser"/>
     </driver>    
     <driver name="SJSXPDriver">
-        <param name="japex.driverClass" value="SJSXPDriver"/>
+        <param name="japex.driverClass" value="parser.stax.SJSXPDriver"/>
         <param name="description" value="Sun Java Streaming XML Parser"/>
     </driver>    
     <driver name="XPP3Driver">
-        <param name="japex.driverClass" value="XPP3Driver"/>
-        <param name="description" value="XPP3 Parser"/>
+        <param name="japex.driverClass" value="parser.XPP3Driver"/>
+        <param name="description" value="XPP3 Pull Parser"/>
     </driver>
     <driver name="PiccoloDriver">
-        <param name="japex.driverClass" value="PiccoloDriver"/>
-        <param name="description" value="Piccolo Parser"/>
+        <param name="japex.driverClass" value="parser.sax.PiccoloDriver"/>
+        <param name="description" value="Piccolo SAX Parser"/>
     </driver>
     
     <!-- 

@@ -37,25 +37,40 @@
  * nuclear facility.
  */
 
-import java.io.*;
-import org.xml.sax.InputSource;
-import javax.xml.parsers.*;
-import java.util.Properties;
+package serializer.dom;
 
-import com.sun.xml.fastinfoset.sax.*;
-import com.sun.xml.fastinfoset.vocab.*;
+import java.io.File;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
 
 import com.sun.japex.*;
+import com.sun.xml.fastinfoset.dom.DOMDocumentSerializer;
+import org.w3c.dom.Document;
 
-public class FastInfosetSizeDriver extends JapexDriverBase {
-    
-    protected String _xmlFile;
-    protected byte[] _fastInfosetByteArray;
-    
-    public FastInfosetSizeDriver() {
+
+
+public class FIDOMDriver extends JapexDriverBase {
+    String _xmlFile;
+    ByteArrayInputStream _inputStream;
+    Transformer _transformer;
+    DOMSource _source;
+    Document _d;
+    protected DOMDocumentSerializer _serializer;
+    ByteArrayOutputStream _baos;
+
+    public FIDOMDriver() {
     }
-
+    
     public void initializeDriver() {
+        try {
+            _transformer = TransformerFactory.newInstance().newTransformer();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }   
     
     public void prepare(TestCase testCase) {
@@ -64,40 +79,37 @@ public class FastInfosetSizeDriver extends JapexDriverBase {
             throw new RuntimeException("xmlfile not specified");
         }
         
-        // Load file into byte array to factor out IO
+        Util util = new Util();
+        _source = util.getDOMSource(new File(_xmlFile));
+        _d = (Document)_source.getNode();
+        _baos = new ByteArrayOutputStream();
+        _serializer = new DOMDocumentSerializer();
+        _serializer.setOutputStream(_baos);
+    }
+    
+    public void warmup(TestCase testCase) {
         try {
-	    SAXParserFactory spf = SAXParserFactory.newInstance();
-            spf.setNamespaceAware(true);
-            SAXParser parser = spf.newSAXParser();
-
-	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	    SAXDocumentSerializer ds = new SAXDocumentSerializer();
-            
-            ds.setOutputStream(baos);
-
-            // TODO must use URL here
-            FileInputStream fis = new FileInputStream(new File(_xmlFile));
-            parser.parse(fis, ds);
-            fis.close();
-
-            _fastInfosetByteArray = baos.toByteArray();
+            _baos.reset();
+            _serializer.serialize(_d);
         }
         catch (Exception e) {
             e.printStackTrace();
         }
     }
     
-    public void warmup(TestCase testCase) {
-    }
-    
     public void run(TestCase testCase) {
+        try {
+            _baos.reset();
+            _serializer.serialize(_d);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     
     public void finish(TestCase testCase) {
-        testCase.setDoubleParam(Constants.RESULT_VALUE, 
-            _fastInfosetByteArray.length / 1024.0);
     }
     
     public void terminateDriver() {
-    }
+    }    
 }

@@ -1,3 +1,4 @@
+package parser;
 /*
  * Japex ver. 0.1 software ("Software")
  * 
@@ -38,25 +39,34 @@
  */
 
 import java.io.*;
-import java.net.URI;
-import org.xml.sax.InputSource;
-import javax.xml.parsers.*;
 import java.util.Properties;
-
-import com.sun.xml.fastinfoset.sax.*;
-import com.sun.xml.fastinfoset.vocab.*;
 
 import com.sun.japex.*;
 
-public class FastInfosetSizeExtVocDriver extends JapexDriverBase {
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
+
+public class XPP3Driver extends JapexDriverBase {
     
-    protected String _xmlFile;
-    protected byte[] _fastInfosetByteArray;
+    String _xmlFile;
+    byte[] _xmlFileByteArray;
+    ByteArrayInputStream _inputStream;
+    XmlPullParser _parser;
     
-    public FastInfosetSizeExtVocDriver() {
+    public XPP3Driver() {
     }
 
     public void initializeDriver() {
+        try {
+            XmlPullParserFactory factory = XmlPullParserFactory.newInstance(
+               System.getProperty(XmlPullParserFactory.PROPERTY_NAME), null);
+            factory.setNamespaceAware(true);
+            _parser = factory.newPullParser();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }   
     
     public void prepare(TestCase testCase) {
@@ -67,54 +77,36 @@ public class FastInfosetSizeExtVocDriver extends JapexDriverBase {
         
         // Load file into byte array to factor out IO
         try {
-            // Instantiate XML parser
-	    SAXParserFactory spf = SAXParserFactory.newInstance();
-            spf.setNamespaceAware(true);
-            SAXParser parser = spf.newSAXParser();
-
-            // Create stream from XML file
             FileInputStream fis = new FileInputStream(new File(_xmlFile));
-            byte[] xmlFileByteArray = Util.streamToByteArray(fis);
+            _xmlFileByteArray = com.sun.japex.Util.streamToByteArray(fis);
+            _inputStream = new ByteArrayInputStream(_xmlFileByteArray);
             fis.close();
-            
-            // Create external vocabulary object
-            SerializerVocabulary externalVocabulary = new SerializerVocabulary();
-            externalVocabulary.attributeValueSizeConstraint 
-                = externalVocabulary.characterContentChunkSizeContraint = 0;
-
-            // Generate vocabulary from XML instance
-            VocabularyGenerator vocabularyGenerator = new VocabularyGenerator(externalVocabulary);
-            parser.parse(new ByteArrayInputStream(xmlFileByteArray), 
-                         vocabularyGenerator);
-            
-            // Serialize document into FI using external vocabulary
-	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	    SAXDocumentSerializer ds = new SAXDocumentSerializer();
-            
-            SerializerVocabulary initialVocabulary = new SerializerVocabulary();
-            initialVocabulary.setExternalVocabulary(
-                new URI("file:///" + _xmlFile),
-                externalVocabulary, false);
-            ds.setVocabulary(initialVocabulary);            
-            ds.setOutputStream(baos);
-            parser.parse(new ByteArrayInputStream(xmlFileByteArray), ds);
-
-            _fastInfosetByteArray = baos.toByteArray();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void warmup(TestCase testCase) {
+        try {
+            _inputStream.reset();
+            _parser.setInput(_inputStream, null);   // unknown encoding
+            while (_parser.next() != XmlPullParser.END_DOCUMENT);
         }
         catch (Exception e) {
             e.printStackTrace();
         }
     }
     
-    public void warmup(TestCase testCase) {
-    }
-    
     public void run(TestCase testCase) {
-    }
-    
-    public void finish(TestCase testCase) {
-        testCase.setDoubleParam(Constants.RESULT_VALUE, 
-            _fastInfosetByteArray.length / 1024.0);
+        try {
+            _inputStream.reset();
+            _parser.setInput(_inputStream, null);   // unknown encoding
+            while (_parser.next() != XmlPullParser.END_DOCUMENT);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     
     public void terminateDriver() {

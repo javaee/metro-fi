@@ -1,3 +1,4 @@
+package parser.stax;
 /*
  * Japex ver. 0.1 software ("Software")
  * 
@@ -38,36 +39,25 @@
  */
 
 import java.io.*;
-import org.xml.sax.InputSource;
-import javax.xml.parsers.*;
+import javax.xml.stream.*;
 import java.util.Properties;
-
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import com.sun.xml.fastinfoset.stax.StAXInputFactory;
-import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
-import com.sun.xml.fastinfoset.tools.XML_SAX_FI;
 
 import com.sun.japex.*;
 
-public class FastInfosetStAXDriver extends JapexDriverBase {
+public class StAXRIDriver extends JapexDriverBase {
     
     String _xmlFile;
-    InputStream _inputStream;
-
-    XMLInputFactory _factory = null;
-    XMLStreamReader _streamReader = null;
+    byte[] _xmlFileByteArray;
+    ByteArrayInputStream _inputStream;
+    XMLInputFactory _factory;
+    XMLStreamReader _reader;
     
-    public FastInfosetStAXDriver() {
+    public StAXRIDriver() {
     }
 
     public void initializeDriver() {
-        System.setProperty("javax.xml.stream.XMLInputFactory", 
-                       "com.sun.xml.fastinfoset.stax.StAXInputFactory");
         try {
-            _factory = XMLInputFactory.newInstance();
+            _factory = new com.bea.xml.stream.MXParserFactory();
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -80,21 +70,15 @@ public class FastInfosetStAXDriver extends JapexDriverBase {
             throw new RuntimeException("xmlfile not specified");
         }
         
-        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        BufferedOutputStream bufferedStream = new BufferedOutputStream(byteStream);
         // Load file into byte array to factor out IO
-        try {            
-            FileReader xmlfile = new FileReader(_xmlFile);
-            StAXDocumentParser sr = null;
-            XML_SAX_FI convertor = new XML_SAX_FI();
-            convertor.convert(xmlfile, bufferedStream);
-/**
-            ByteArrayInputStream byteInputStream = new ByteArrayInputStream(byteStream.toByteArray());
-            _inputStream = new BufferedInputStream(byteInputStream);     
-*/
-            _inputStream = new ByteArrayInputStream(byteStream.toByteArray());
+        try {
+            // TODO must use URL here
+            FileInputStream fis = new FileInputStream(new File(_xmlFile));
+            _xmlFileByteArray = com.sun.japex.Util.streamToByteArray(fis);
+            _inputStream = new ByteArrayInputStream(_xmlFileByteArray);
+            fis.close();
         }
-        catch (Exception e) {
+        catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -102,9 +86,9 @@ public class FastInfosetStAXDriver extends JapexDriverBase {
     public void warmup(TestCase testCase) {
         try {
             _inputStream.reset();
-            _streamReader = _factory.createXMLStreamReader(_inputStream);
-            while (_streamReader.hasNext()) {
-                _streamReader.next();
+            _reader = _factory.createXMLStreamReader(_inputStream);
+            while (_reader.hasNext()) {
+                _reader.next();
             }
         }
         catch (Exception e) {
@@ -115,20 +99,14 @@ public class FastInfosetStAXDriver extends JapexDriverBase {
     public void run(TestCase testCase) {
         try {
             _inputStream.reset();
-            _streamReader = _factory.createXMLStreamReader(_inputStream);
-            while (_streamReader.hasNext()) {
-                _streamReader.next();
+            _reader = _factory.createXMLStreamReader(_inputStream);
+            while (_reader.hasNext()) {
+                _reader.next();
             }
         }
         catch (Exception e) {
             e.printStackTrace();
         }
-    }
-    
-    protected void parse() {
-    
-    }
-    public void finish(TestCase testCase) {
     }
     
     public void terminateDriver() {

@@ -37,105 +37,100 @@
  * nuclear facility.
  */
 
-package serializer;
+package serializer.dom;
+
 
 import java.io.File;
-import java.io.InputStream;
-import java.io.FileInputStream;
 import java.io.OutputStream;
-import java.io.FileOutputStream;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 
-import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import org.w3c.dom.Document;
 
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import com.sun.xml.fastinfoset.stax.StAXInputFactory;
 import com.sun.xml.fastinfoset.stax.SAX2StAXWriter;
+import com.sun.xml.fastinfoset.sax.SAXDocumentSerializer;
 
-public class Util {
-    DocumentBuilder _docBuilder;
-            
-    public static final int STAX_SERIALIZER_RI = 1;
-    public static final int STAX_SERIALIZER_FI = 2;
-    public static final int STAX_SERIALIZER_SJSXP = 3;
+import com.sun.japex.*;
+
+
+public class FISAXDriver extends JapexDriverBase {
+    String _xmlFile;
+    ByteArrayInputStream _inputStream;
+    Transformer _transformer;
+    DOMSource _source = null;
+    SAXResult _result = null;
+    ByteArrayOutputStream _baos;
     
-    XMLOutputFactory factory = XMLOutputFactory.newInstance();
-    /** Creates a new instance of Util */
-    public Util() {
-        init();
+    public FISAXDriver() {
     }
     
-    public Util(int outputFactory) {
-        if (outputFactory==STAX_SERIALIZER_FI) {
-            System.setProperty("javax.xml.stream.XMLOutputFactory", 
-                       "com.sun.xml.fastinfoset.stax.StAXOutputFactory");        
-        } else if (outputFactory==STAX_SERIALIZER_SJSXP) {
-            System.setProperty("javax.xml.stream.XMLOutputFactory", 
-                       "com.sun.xml.stream.ZephyrWriterFactory");                    
-        }
-        init();
-    }
-    
-    void init() {
+    public void initializeDriver() {
         try {
-            factory = XMLOutputFactory.newInstance(); 
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-            _docBuilder = dbf.newDocumentBuilder();             
+            _transformer = TransformerFactory.newInstance().newTransformer();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }   
+    
+    public void prepare(TestCase testCase) {
+        _xmlFile = testCase.getParam("xmlfile");
+        if (_xmlFile == null) {
+            throw new RuntimeException("xmlfile not specified");
+        }
         
+        Util util = new Util(Util.STAX_SERIALIZER_SJSXP);
+        _source = util.getDOMSource(new File(_xmlFile));
+        _baos = new ByteArrayOutputStream();
+        getSAXResult(_baos);
     }
-
-
-    public DOMSource getDOMSource(File input) {
+    
+    private void getSAXResult(OutputStream output) {
         try {
-            FileInputStream fis = new FileInputStream(input);
-            Document document = _docBuilder.parse(fis);
-            fis.close();
-            return new DOMSource(document);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }    
-
-    public SAXResult getSAXResult(OutputStream output) {
-        SAXResult _result = null;
-        try {
-            XMLStreamWriter serializer = factory.createXMLStreamWriter(output);
-            SAX2StAXWriter saxTostax = new SAX2StAXWriter(serializer);
+            SAXDocumentSerializer serializer = new SAXDocumentSerializer();
+            serializer.setOutputStream(output);
             
             _result = new SAXResult();
-            _result.setHandler(saxTostax);
-            _result.setLexicalHandler(saxTostax);                
+            _result.setHandler(serializer);
+            _result.setLexicalHandler(serializer);                
             
         }
         catch (Exception e) {
             e.printStackTrace();
-        }   
-        return _result;
+        }        
     }
-    public StreamResult getStreamResult(OutputStream output) {
-        StreamResult result = null;
+    
+    public void warmup(TestCase testCase) {
         try {
-            result = new StreamResult(output);            
+            _baos.reset();
+            _transformer.transform(_source, _result);
         }
         catch (Exception e) {
             e.printStackTrace();
         }
-        return result;
+    }
+    
+    public void run(TestCase testCase) {
+        try {
+            _baos.reset();
+            _transformer.transform(_source, _result);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void finish(TestCase testCase) {
+    }
+    
+    public void terminateDriver() {
     }    
 }

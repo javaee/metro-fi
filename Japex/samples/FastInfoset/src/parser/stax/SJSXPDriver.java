@@ -1,3 +1,4 @@
+package parser.stax;
 /*
  * Japex ver. 0.1 software ("Software")
  * 
@@ -38,30 +39,25 @@
  */
 
 import java.io.*;
+import javax.xml.stream.*;
 import java.util.Properties;
 
 import com.sun.japex.*;
 
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
-
-public class XPP3Driver extends JapexDriverBase {
+public class SJSXPDriver extends JapexDriverBase {
     
     String _xmlFile;
     byte[] _xmlFileByteArray;
     ByteArrayInputStream _inputStream;
-    XmlPullParser _parser;
+    XMLInputFactory _factory;
+    XMLStreamReader _reader;
     
-    public XPP3Driver() {
+    public SJSXPDriver() {
     }
 
     public void initializeDriver() {
         try {
-            XmlPullParserFactory factory = XmlPullParserFactory.newInstance(
-               System.getProperty(XmlPullParserFactory.PROPERTY_NAME), null);
-            factory.setNamespaceAware(true);
-            _parser = factory.newPullParser();
+            _factory = new com.sun.xml.stream.ZephyrParserFactory();
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -76,6 +72,7 @@ public class XPP3Driver extends JapexDriverBase {
         
         // Load file into byte array to factor out IO
         try {
+            // TODO must use URL here
             FileInputStream fis = new FileInputStream(new File(_xmlFile));
             _xmlFileByteArray = com.sun.japex.Util.streamToByteArray(fis);
             _inputStream = new ByteArrayInputStream(_xmlFileByteArray);
@@ -89,8 +86,10 @@ public class XPP3Driver extends JapexDriverBase {
     public void warmup(TestCase testCase) {
         try {
             _inputStream.reset();
-            _parser.setInput(_inputStream, null);   // unknown encoding
-            while (_parser.next() != XmlPullParser.END_DOCUMENT);
+            _reader = _factory.createXMLStreamReader(_inputStream);
+            while (_reader.hasNext()) {
+                _reader.next();
+            }
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -100,8 +99,10 @@ public class XPP3Driver extends JapexDriverBase {
     public void run(TestCase testCase) {
         try {
             _inputStream.reset();
-            _parser.setInput(_inputStream, null);   // unknown encoding
-            while (_parser.next() != XmlPullParser.END_DOCUMENT);
+            _reader = _factory.createXMLStreamReader(_inputStream);
+            while (_reader.hasNext()) {
+                _reader.next();
+            }
         }
         catch (Exception e) {
             e.printStackTrace();

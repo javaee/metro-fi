@@ -1,3 +1,4 @@
+package size;
 /*
  * Japex ver. 0.1 software ("Software")
  * 
@@ -44,13 +45,13 @@ import java.util.zip.*;
 
 import com.sun.japex.*;
 
-public class GzipFastInfosetSizeExtVocDriver extends FastInfosetSizeExtVocDriver {
+public class GzipXMLSizeDriver extends XMLSizeDriver {
         
     public void finish(TestCase testCase) {
         try {
             ByteArrayOutputStream gzipBaos = new ByteArrayOutputStream();
             GZIPOutputStream gzipOs = new GZIPOutputStream(gzipBaos);
-            gzipOs.write(_fastInfosetByteArray, 0, _fastInfosetByteArray.length);   
+            gzipOs.write(_xmlFileByteArray, 0, _xmlFileByteArray.length);   
             gzipOs.finish();
             
             testCase.setDoubleParam(Constants.RESULT_VALUE, 

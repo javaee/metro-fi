@@ -37,21 +37,40 @@
  * nuclear facility.
  */
 
-import java.io.*;
-import javax.xml.parsers.*;
-import java.util.Properties;
+package serializer.dom;
+
+import java.io.File;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
 
 import com.sun.japex.*;
+import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
+import org.w3c.dom.Document;
 
-public class XMLSizeDriver extends JapexDriverBase {
-    
-    protected String _xmlFile;
-    protected byte[] _xmlFileByteArray;
-    
-    public XMLSizeDriver() {
+
+
+public class XercesXMLSerializerDriver extends JapexDriverBase {
+    String _xmlFile;
+    ByteArrayInputStream _inputStream;
+    Transformer _transformer;
+    DOMSource _source;
+    Document _d;
+    XMLSerializer _xmlSerializer;
+    ByteArrayOutputStream _baos;
+
+    public XercesXMLSerializerDriver() {
     }
-
+    
     public void initializeDriver() {
+        try {
+            _transformer = TransformerFactory.newInstance().newTransformer();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }   
     
     public void prepare(TestCase testCase) {
@@ -60,27 +79,37 @@ public class XMLSizeDriver extends JapexDriverBase {
             throw new RuntimeException("xmlfile not specified");
         }
         
+        Util util = new Util();
+        _source = util.getDOMSource(new File(_xmlFile));
+        _d = (Document)_source.getNode();
+        _baos = new ByteArrayOutputStream();
+        _xmlSerializer = new XMLSerializer();
+        _xmlSerializer.setOutputByteStream(_baos);
+    }
+    
+    public void warmup(TestCase testCase) {
         try {
-            FileInputStream fis = new FileInputStream(new File(_xmlFile));
-            _xmlFileByteArray = com.sun.japex.Util.streamToByteArray(fis);
-            fis.close();
+            _baos.reset();
+            _xmlSerializer.serialize(_d);
         }
-        catch (IOException e) {
+        catch (Exception e) {
             e.printStackTrace();
         }
     }
     
-    public void warmup(TestCase testCase) {
-    }
-    
     public void run(TestCase testCase) {
+        try {
+            _baos.reset();
+            _xmlSerializer.serialize(_d);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     
     public void finish(TestCase testCase) {
-        testCase.setDoubleParam(Constants.RESULT_VALUE, 
-            _xmlFileByteArray.length / 1024.0);
     }
     
     public void terminateDriver() {
-    }
+    }    
 }

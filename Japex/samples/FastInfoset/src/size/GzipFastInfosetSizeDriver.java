@@ -1,3 +1,4 @@
+package size;
 /*
  * Japex ver. 0.1 software ("Software")
  * 
@@ -38,76 +39,26 @@
  */
 
 import java.io.*;
-import javax.xml.stream.*;
+import javax.xml.parsers.*;
 import java.util.Properties;
+import java.util.zip.*;
 
 import com.sun.japex.*;
 
-public class SJSXPDriver extends JapexDriverBase {
-    
-    String _xmlFile;
-    byte[] _xmlFileByteArray;
-    ByteArrayInputStream _inputStream;
-    XMLInputFactory _factory;
-    XMLStreamReader _reader;
-    
-    public SJSXPDriver() {
-    }
-
-    public void initializeDriver() {
-        try {
-            _factory = new com.sun.xml.stream.ZephyrParserFactory();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-    }   
-    
-    public void prepare(TestCase testCase) {
-        _xmlFile = testCase.getParam("xmlfile");
-        if (_xmlFile == null) {
-            throw new RuntimeException("xmlfile not specified");
-        }
+public class GzipFastInfosetSizeDriver extends FastInfosetSizeDriver {
         
-        // Load file into byte array to factor out IO
+    public void finish(TestCase testCase) {
         try {
-            // TODO must use URL here
-            FileInputStream fis = new FileInputStream(new File(_xmlFile));
-            _xmlFileByteArray = com.sun.japex.Util.streamToByteArray(fis);
-            _inputStream = new ByteArrayInputStream(_xmlFileByteArray);
-            fis.close();
+            ByteArrayOutputStream gzipBaos = new ByteArrayOutputStream();
+            GZIPOutputStream gzipOs = new GZIPOutputStream(gzipBaos);
+            gzipOs.write(_fastInfosetByteArray, 0, _fastInfosetByteArray.length);   
+            gzipOs.finish();
+            
+            testCase.setDoubleParam(Constants.RESULT_VALUE, 
+                gzipBaos.toByteArray().length / 1024.0);
         }
         catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-    }
-    
-    public void warmup(TestCase testCase) {
-        try {
-            _inputStream.reset();
-            _reader = _factory.createXMLStreamReader(_inputStream);
-            while (_reader.hasNext()) {
-                _reader.next();
-            }
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    
-    public void run(TestCase testCase) {
-        try {
-            _inputStream.reset();
-            _reader = _factory.createXMLStreamReader(_inputStream);
-            while (_reader.hasNext()) {
-                _reader.next();
-            }
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    
-    public void terminateDriver() {
     }
 }

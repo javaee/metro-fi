@@ -1,3 +1,4 @@
+package size;
 /*
  * Japex ver. 0.1 software ("Software")
  * 
@@ -40,24 +41,47 @@
 import java.io.*;
 import javax.xml.parsers.*;
 import java.util.Properties;
-import java.util.zip.*;
 
 import com.sun.japex.*;
 
-public class GzipXMLSizeDriver extends XMLSizeDriver {
+public class XMLSizeDriver extends JapexDriverBase {
+    
+    protected String _xmlFile;
+    protected byte[] _xmlFileByteArray;
+    
+    public XMLSizeDriver() {
+    }
+
+    public void initializeDriver() {
+    }   
+    
+    public void prepare(TestCase testCase) {
+        _xmlFile = testCase.getParam("xmlfile");
+        if (_xmlFile == null) {
+            throw new RuntimeException("xmlfile not specified");
+        }
         
-    public void finish(TestCase testCase) {
         try {
-            ByteArrayOutputStream gzipBaos = new ByteArrayOutputStream();
-            GZIPOutputStream gzipOs = new GZIPOutputStream(gzipBaos);
-            gzipOs.write(_xmlFileByteArray, 0, _xmlFileByteArray.length);   
-            gzipOs.finish();
-            
-            testCase.setDoubleParam(Constants.RESULT_VALUE, 
-                gzipBaos.toByteArray().length / 1024.0);
+            FileInputStream fis = new FileInputStream(new File(_xmlFile));
+            _xmlFileByteArray = com.sun.japex.Util.streamToByteArray(fis);
+            fis.close();
         }
         catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
+    }
+    
+    public void warmup(TestCase testCase) {
+    }
+    
+    public void run(TestCase testCase) {
+    }
+    
+    public void finish(TestCase testCase) {
+        testCase.setDoubleParam(Constants.RESULT_VALUE, 
+            _xmlFileByteArray.length / 1024.0);
+    }
+    
+    public void terminateDriver() {
     }
 }

@@ -1,3 +1,4 @@
+package parser.stax;
 /*
  * Japex ver. 0.1 software ("Software")
  * 
@@ -37,41 +38,39 @@
  * nuclear facility.
  */
 
-package serializer;
+import java.io.*;
+import org.xml.sax.InputSource;
+import javax.xml.parsers.*;
+import java.util.Properties;
 
-import java.io.File;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.sax.SAXResult;
-import javax.xml.transform.dom.DOMSource;
-
-import javax.xml.stream.XMLStreamWriter;
-import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import com.sun.xml.fastinfoset.stax.StAXInputFactory;
-import com.sun.xml.fastinfoset.stax.SAX2StAXWriter;
+import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
+import com.sun.xml.fastinfoset.tools.XML_SAX_FI;
 
 import com.sun.japex.*;
 
-public class FIStAXDriver extends JapexDriverBase {
+public class FastInfosetStAXDriver extends JapexDriverBase {
+    
     String _xmlFile;
-    ByteArrayInputStream _inputStream;
-    Transformer _transformer;
-    DOMSource _source = null;
-    SAXResult _result = null;
-    ByteArrayOutputStream _baos;
+    InputStream _inputStream;
+
+    XMLInputFactory _factory = null;
+    XMLStreamReader _streamReader = null;
     
-    public FIStAXDriver() {
+    public FastInfosetStAXDriver() {
     }
-    
+
     public void initializeDriver() {
+        System.setProperty("javax.xml.stream.XMLInputFactory", 
+                       "com.sun.xml.fastinfoset.stax.StAXInputFactory");
         try {
-            _transformer = TransformerFactory.newInstance().newTransformer();
-        } catch (Exception e) {
+            _factory = XMLInputFactory.newInstance();
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
     }   
@@ -82,17 +81,32 @@ public class FIStAXDriver extends JapexDriverBase {
             throw new RuntimeException("xmlfile not specified");
         }
         
-        boolean FISTAXFactory = true;
-        Util util = new Util(Util.STAX_SERIALIZER_FI);
-        _source = util.getDOMSource(new File(_xmlFile));
-        _baos = new ByteArrayOutputStream();
-        _result = util.getSAXResult(_baos);
+        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        BufferedOutputStream bufferedStream = new BufferedOutputStream(byteStream);
+        // Load file into byte array to factor out IO
+        try {            
+            FileReader xmlfile = new FileReader(_xmlFile);
+            StAXDocumentParser sr = null;
+            XML_SAX_FI convertor = new XML_SAX_FI();
+            convertor.convert(xmlfile, bufferedStream);
+/**
+            ByteArrayInputStream byteInputStream = new ByteArrayInputStream(byteStream.toByteArray());
+            _inputStream = new BufferedInputStream(byteInputStream);     
+*/
+            _inputStream = new ByteArrayInputStream(byteStream.toByteArray());
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     
     public void warmup(TestCase testCase) {
         try {
-            _baos.reset();
-            _transformer.transform(_source, _result);
+            _inputStream.reset();
+            _streamReader = _factory.createXMLStreamReader(_inputStream);
+            while (_streamReader.hasNext()) {
+                _streamReader.next();
+            }
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -101,17 +115,23 @@ public class FIStAXDriver extends JapexDriverBase {
     
     public void run(TestCase testCase) {
         try {
-            _baos.reset();
-            _transformer.transform(_source, _result);
+            _inputStream.reset();
+            _streamReader = _factory.createXMLStreamReader(_inputStream);
+            while (_streamReader.hasNext()) {
+                _streamReader.next();
+            }
         }
         catch (Exception e) {
             e.printStackTrace();
         }
     }
     
+    protected void parse() {
+    
+    }
     public void finish(TestCase testCase) {
     }
     
     public void terminateDriver() {
-    }    
+    }
 }

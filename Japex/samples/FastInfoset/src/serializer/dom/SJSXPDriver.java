@@ -37,28 +37,42 @@
  * nuclear facility.
  */
 
-import java.io.*;
-import javax.xml.stream.*;
-import java.util.Properties;
+package serializer.dom;
+
+import java.io.File;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.dom.DOMSource;
+
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import com.sun.xml.fastinfoset.stax.StAXInputFactory;
+import com.sun.xml.fastinfoset.stax.SAX2StAXWriter;
 
 import com.sun.japex.*;
 
-public class StAXRIDriver extends JapexDriverBase {
-    
-    String _xmlFile;
-    byte[] _xmlFileByteArray;
-    ByteArrayInputStream _inputStream;
-    XMLInputFactory _factory;
-    XMLStreamReader _reader;
-    
-    public StAXRIDriver() {
-    }
 
+public class SJSXPDriver extends JapexDriverBase {
+    String _xmlFile;
+    ByteArrayInputStream _inputStream;
+    Transformer _transformer;
+    DOMSource _source = null;
+    SAXResult _result = null;
+    ByteArrayOutputStream _baos;
+    
+    public SJSXPDriver() {
+    }
+    
     public void initializeDriver() {
         try {
-            _factory = new com.bea.xml.stream.MXParserFactory();
-        }
-        catch (Exception e) {
+            _transformer = TransformerFactory.newInstance().newTransformer();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }   
@@ -69,26 +83,16 @@ public class StAXRIDriver extends JapexDriverBase {
             throw new RuntimeException("xmlfile not specified");
         }
         
-        // Load file into byte array to factor out IO
-        try {
-            // TODO must use URL here
-            FileInputStream fis = new FileInputStream(new File(_xmlFile));
-            _xmlFileByteArray = com.sun.japex.Util.streamToByteArray(fis);
-            _inputStream = new ByteArrayInputStream(_xmlFileByteArray);
-            fis.close();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+        Util util = new Util(Util.STAX_SERIALIZER_SJSXP);
+        _source = util.getDOMSource(new File(_xmlFile));
+        _baos = new ByteArrayOutputStream();
+        _result = util.getSAXResult(_baos);
     }
     
     public void warmup(TestCase testCase) {
         try {
-            _inputStream.reset();
-            _reader = _factory.createXMLStreamReader(_inputStream);
-            while (_reader.hasNext()) {
-                _reader.next();
-            }
+            _baos.reset();
+            _transformer.transform(_source, _result);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -97,17 +101,17 @@ public class StAXRIDriver extends JapexDriverBase {
     
     public void run(TestCase testCase) {
         try {
-            _inputStream.reset();
-            _reader = _factory.createXMLStreamReader(_inputStream);
-            while (_reader.hasNext()) {
-                _reader.next();
-            }
+            _baos.reset();
+            _transformer.transform(_source, _result);
         }
         catch (Exception e) {
             e.printStackTrace();
         }
     }
     
-    public void terminateDriver() {
+    public void finish(TestCase testCase) {
     }
+    
+    public void terminateDriver() {
+    }    
 }

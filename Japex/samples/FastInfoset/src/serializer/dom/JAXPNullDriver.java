@@ -37,27 +37,75 @@
  * nuclear facility.
  */
 
-import java.io.*;
-import javax.xml.parsers.*;
-import java.util.Properties;
-import java.util.zip.*;
+package serializer.dom;
+
+import java.io.File;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.dom.DOMSource;
 
 import com.sun.japex.*;
+import org.xml.sax.helpers.DefaultHandler;
 
-public class GzipFastInfosetSizeDriver extends FastInfosetSizeDriver {
-        
-    public void finish(TestCase testCase) {
+
+public class JAXPNullDriver extends JapexDriverBase {
+    String _xmlFile;
+    ByteArrayInputStream _inputStream;
+    Transformer _transformer;
+    DOMSource _source = null;
+    SAXResult _result = null;
+    ByteArrayOutputStream _baos;
+
+    public JAXPNullDriver() {
+    }
+    
+    public void initializeDriver() {
         try {
-            ByteArrayOutputStream gzipBaos = new ByteArrayOutputStream();
-            GZIPOutputStream gzipOs = new GZIPOutputStream(gzipBaos);
-            gzipOs.write(_fastInfosetByteArray, 0, _fastInfosetByteArray.length);   
-            gzipOs.finish();
-            
-            testCase.setDoubleParam(Constants.RESULT_VALUE, 
-                gzipBaos.toByteArray().length / 1024.0);
+            _transformer = TransformerFactory.newInstance().newTransformer();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        catch (IOException e) {
-            throw new RuntimeException(e);
+    }   
+    
+    public void prepare(TestCase testCase) {
+        _xmlFile = testCase.getParam("xmlfile");
+        if (_xmlFile == null) {
+            throw new RuntimeException("xmlfile not specified");
+        }
+        
+        Util util = new Util();
+        _source = util.getDOMSource(new File(_xmlFile));
+        _baos = new ByteArrayOutputStream();
+        _result = new SAXResult(new DefaultHandler());
+    }
+    
+    public void warmup(TestCase testCase) {
+        try {
+            _baos.reset();
+            _transformer.transform(_source, _result);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
         }
     }
+    
+    public void run(TestCase testCase) {
+        try {
+            _baos.reset();
+            _transformer.transform(_source, _result);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void finish(TestCase testCase) {
+    }
+    
+    public void terminateDriver() {
+    }    
 }
