@@ -37,7 +37,7 @@
  */ 
 
 
-package com.sun.xml.fastinfoset.api.sax;
+package com.sun.xml.fastinfoset.api;
 
 import java.io.InputStream;
 import org.xml.sax.InputSource;

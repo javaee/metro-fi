@@ -37,7 +37,7 @@
  */ 
 
 
-package com.sun.xml.fastinfoset.api.sax;
+package com.sun.xml.fastinfoset.api;
 
 import java.io.OutputStream;
 import javax.xml.transform.sax.SAXResult;
