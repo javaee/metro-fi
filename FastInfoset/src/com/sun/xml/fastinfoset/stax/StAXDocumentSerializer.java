@@ -53,7 +53,8 @@ import javax.xml.stream.XMLStreamWriter;
 import org.xml.sax.helpers.NamespaceSupport;
 
 public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
-    
+    protected StAXManager _manager;
+    protected String _encoding;
     /**
      * Local name of current element.
      */
@@ -96,13 +97,17 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
     
     
     public StAXDocumentSerializer() {
+        
     }
-
-    public void setOutputStream(OutputStream outputStream) {
+    public StAXDocumentSerializer(OutputStream outputStream) {
         super.setOutputStream(outputStream);
-        reset();
     }
 
+    public StAXDocumentSerializer(OutputStream outputStream, StAXManager manager) {
+        super.setOutputStream(outputStream);
+        _manager = manager;
+    }
+    
     public void reset() {        
         _attributes.clear();
         _namespaces.clear();
@@ -622,10 +627,25 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
     public Object getProperty(java.lang.String name) 
         throws IllegalArgumentException 
     {
-        throw new UnsupportedOperationException("Not implemented");
+        if (_manager != null) {
+            return _manager.getProperty(name);
+        }
+        return null;
     }
 
+    public void setManager(StAXManager manager) {
+        _manager = manager;
+    }
 
+    public void setOutputStream(OutputStream outputStream) {
+        super.setOutputStream(outputStream);
+        reset();
+    }
+    
+    public void setEncoding(String encoding) {
+        _encoding = encoding;
+    }
+    
     private void encodeTerminationAndCurrentElement(boolean terminateAfter) throws XMLStreamException {
         try {
             encodeTermination();
