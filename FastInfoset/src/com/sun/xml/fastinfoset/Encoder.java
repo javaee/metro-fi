@@ -403,11 +403,12 @@ public abstract class Encoder extends DefaultHandler {
             write(0xFF);
         } else {
             if (addToTable) {
-                CharArray c = new CharArrayString(s);
-                int index = map.obtainIndex(c);
+                final char[] ch = s.toCharArray();
+                final int length = s.length();
+                int index = map.obtainIndex(ch, 0, length, false);
                 if (index == KeyIntMap.NOT_PRESENT) {
                     _b = EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG;
-                    encodeEncodedCharacterStringAsUTF8OnThirdBit(s);
+                    encodeEncodedCharacterStringAsUTF8OnThirdBit(ch, 0, length);
                 } else {
                     encodeNonZeroIntegerOnSecondBitFirstBitOne(index);
                 }
@@ -427,13 +428,9 @@ public abstract class Encoder extends DefaultHandler {
             write(0xFF);
         } else {
             if (addToTable) {
-                CharArray c = new CharArray(array, start, length, clone);
-                int index = map.obtainIndex(c);
+                int index = map.obtainIndex(array, start, length, clone);
                 if (index == KeyIntMap.NOT_PRESENT) {
                     _b = EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG;
-                    if (clone) {
-                        c.cloneArray();
-                    }
                     encodeEncodedCharacterStringAsUTF8OnThirdBit(array, start, length);
                 } else {
                     encodeNonZeroIntegerOnSecondBitFirstBitOne(index);

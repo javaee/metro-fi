@@ -163,7 +163,7 @@ public class VocabularyGenerator extends DefaultHandler implements LexicalHandle
     }
     
     public void addToCharArrayTable(CharArray c) {
-        if (_serializerVocabulary.characterContentChunk.obtainIndex(c) == KeyIntMap.NOT_PRESENT) {
+        if (_serializerVocabulary.characterContentChunk.obtainIndex(c.ch, c.start, c.length, false) == KeyIntMap.NOT_PRESENT) {
             _parserVocabulary.characterContentChunk.add(c);
         }        
     }

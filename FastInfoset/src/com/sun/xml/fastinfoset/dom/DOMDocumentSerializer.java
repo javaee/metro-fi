@@ -53,6 +53,22 @@ public class DOMDocumentSerializer extends Encoder {
     public DOMDocumentSerializer() {
     }
     
+    public final void serialize(Node n) throws IOException {
+        switch (n.getNodeType()) {
+            case Node.DOCUMENT_NODE:
+                serialize((Document)n);
+            case Node.ELEMENT_NODE:
+                serializeElementAsDocument(n);
+                break;
+            case Node.COMMENT_NODE:
+                serializeComment(n);
+                break;
+            case Node.PROCESSING_INSTRUCTION_NODE:
+                serializeProcessingInstruction(n);
+                break;
+        }
+    }
+    
     public final void serialize(Document d) throws IOException {
         encodeHeader(false);
         encodeInitialVocabulary();
@@ -77,9 +93,16 @@ public class DOMDocumentSerializer extends Encoder {
         encodeDocumentTermination();
     }
 
-    public final void serialize(Node d) throws IOException {
+    protected final void serializeElementAsDocument(Node e) throws IOException {
+        encodeHeader(false);
+        encodeInitialVocabulary();
+
+        serializeElement(e);
+        
+        encodeDocumentTermination();
     }
     
+
     protected Node[] _namespaceAttributes = new Node[4];
     protected Node[] _attributes = new Node[32];
     
