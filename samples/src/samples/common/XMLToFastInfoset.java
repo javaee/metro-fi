@@ -37,18 +37,21 @@
  */ 
 
 
-package samples.sax;
+package samples.common;
 
 
 import java.io.File;
+import samples.transform.*;
 
-/** <p>Converts XML files into FI documents.</p>
- *  This utility class uses FISerializer to transform XML files into FI documents.
- *  Since only XML files are packaged in the sample package, thie utility is used 
- *  in every sample to create FI documents from XML files.
+
+/** <p>Converts XML files into FastInfoset documents.</p>
+ *  This utility class uses samples.transform.XMLToFastInfosetStAXSerializer to 
+ *  transform XML files into FastInfoset documents.
+ *  Since only XML files are packaged in the sample package, thie utility is called 
+ *  in samples that require FI documents to create FI documents from XML files.
  */
 
-public class XMLToFI {
+public class XMLToFastInfoset {
     
     /** Create FI documents from XML files
      *
@@ -59,7 +62,7 @@ public class XMLToFI {
             displayUsageAndExit();
         }
         try {
-            FISerializer docSerializer = new FISerializer();
+            XMLToFastInfosetSAXSerializer docSerializer = new XMLToFastInfosetSAXSerializer();
             for (int i=0; i<args.length; i++) {
                 //XML input file, such as ./data/inv100.xml
                 File input = new File(args[i]);
@@ -79,7 +82,7 @@ public class XMLToFI {
     }
 
     private static void displayUsageAndExit() {
-        System.err.println("Usage: XMLToFI XMLfiles+");
+        System.err.println("Usage: XMLToFastInfoset XMLfiles+");
         System.exit(1);        
     }
     

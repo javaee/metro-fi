@@ -49,6 +49,7 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 
 import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
+import samples.common.Util;
 
 /** <p>This is a sample that demonstrates the use of FI StAX Cursor API.</p>
  *  The sample starts by creating an input stream from the input FI document. The input stream is

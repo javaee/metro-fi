@@ -36,9 +36,7 @@
  *
  */ 
 
-
-package samples.sax;
-
+package samples.transform;
 
 import java.io.File;
 import java.io.InputStream;
@@ -47,6 +45,7 @@ import java.io.FileOutputStream;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileNotFoundException;
+import java.io.ByteArrayOutputStream;
 
 import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
@@ -56,30 +55,34 @@ import org.w3c.dom.*;
 import javax.xml.transform.sax.SAXResult;
 
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import com.sun.xml.fastinfoset.sax.SAXDocumentSerializer;
-
-
+import com.sun.xml.fastinfoset.stax.StAXDocumentSerializer;
+import com.sun.xml.fastinfoset.stax.SAX2StAXWriter;
 
 /** <p>Serializes an XML input stream into FI document using 
- *  SAXDocumentSerializer defined in the fastinfoset.sax package.</p>
+ *  StAX document serializer defined in the fastinfoset.stax package.</p>
  *  In the sample, a DOMSource is constructed out of an XML file input (see method getDOMSource)
- *  and a SAXResult instantiated using an instance of SAXDocumentSerializer as the 
- *  handler which takes a FI document as OutputStream (see method getSAXResult). 
- *  The sample then calls transformer's tranform method to convert the XML file into the FI
- *  document.
+ *  and a SAXResult is instantiated using an instance of SAX2StAXWriter as handlers (see method 
+ *  getSAXResult). Utility class 
+ *  SAX2StAXWriter extends DefaultHandler and implements LexicalHandler, which allows it
+ *  to be used to handle SAX events. The source and result are then used by the JAXP transformer
+ *  to transform the XML file to FI document which was passed in as OutputStream for the StAX 
+ *  serializer object. The XML inputstream is first transformed into a ByteArrayOutputStream 
+ *  that may be used for other processing. In this sample, we simply write it out into a file.<br>
+ *
  */
-public class FISerializer {
+
+public class XMLToFastInfosetStAXSerializer {
+    String _xmlFile;
     Transformer _transformer;
     DocumentBuilder _docBuilder;
     DOMSource _source = null;
     SAXResult _result = null;
+    ByteArrayOutputStream _baos;
     
-    /** Creates a new instance of FISerializer */
-    public FISerializer() {
+    /** Creates a new instance of DocumentSerializer */
+    public XMLToFastInfosetStAXSerializer() {
         try {
-            // get a transformer and document builder
             _transformer = TransformerFactory.newInstance().newTransformer();
             _docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         } catch (Exception e) {
@@ -87,7 +90,6 @@ public class FISerializer {
         }
     }
     
- 
      /** Construct a DOMSource with a file.
      *
      *  @param input the XML file input
@@ -111,68 +113,67 @@ public class FISerializer {
      */
     void getSAXResult(File output) {
         try {
-            BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(output));
-            SAXDocumentSerializer serializer = new SAXDocumentSerializer();
-            serializer.setOutputStream(fos);
+            _baos = new ByteArrayOutputStream();
+            XMLStreamWriter serializer = new StAXDocumentSerializer(_baos);
+            SAX2StAXWriter saxTostax = new SAX2StAXWriter(serializer);
             
             _result = new SAXResult();
-            _result.setHandler(serializer);
-            _result.setLexicalHandler(serializer);                
+            _result.setHandler(saxTostax);
+            _result.setLexicalHandler(saxTostax);                
             
         }
         catch (Exception e) {
             e.printStackTrace();
         }        
     }
-    
+
     /** Transform an XML file into a FI document.
      *
      *  @param input an XML file input
      *  @param output the FI document output
      */
     public void write(File input, File output) {
-        // construct a DOMSource from the input file
         getDOMSource(input);
-        // Initialize a SAXResult object
         getSAXResult(output);
-        
         if (_source != null && _result != null) {
             try {
                 System.out.println("Transforming "+input.getName()+ " into " + output.getName());
-                // Transform the XML input file into a FI document
+                //Transform the XML inputstream into ByteArrayOutputStream
                 _transformer.transform(_source, _result);
+
+                //the ByteArrayOutputStream may be used for other processing
+                //in this sample, we simply write it out to a file
+                BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(output));
+                _baos.writeTo(fos);
             } catch (Exception e) {
                 e.printStackTrace();
             }
             System.out.println("\ndone.");
         } else {
-            System.out.println("Source or Result could not be null.");
-        }
-    }
-    
-    /** Starts the sample
-     * @param args XML input file name and FI output document name
-     */
-    public static void main(String[] args) {
-        if (args.length < 1 || args.length > 4) {
-            displayUsageAndExit();
-        }
-        
+                System.out.println("Source or Result could not be null.");
+        }  
         try {
-            //XML input file, such as ./data/inv100.xml
-            File input = new File(args[0]);
-            //FastInfoset output file, such as ./data/inv100_sax.finf. 
-            File ouput = new File(args[1]);
-            FISerializer docSerializer = new FISerializer();
-            docSerializer.write(input, ouput);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+    /** Starts the sample.
+     *
+     *  @param args XML input file name and FI output file name
+     */
+    public static void main(String[] args) {
+        if (args.length < 1 || args.length > 2) {
+            displayUsageAndExit();
+        }
+        File input = new File(args[0]);
+        File ouput = new File(args[1]);
+        XMLToFastInfosetStAXSerializer docSerializer = new XMLToFastInfosetStAXSerializer();
+        docSerializer.write(input, ouput);
+    }
 
     private static void displayUsageAndExit() {
-        System.err.println("Usage: ant FISAXSerialixer or samples.sax.FISerializer XML_input_file FI_output_file");
+        System.err.println("Usage: ant FIStAXSerializer or samples.stax.FISerializer XML_input_file> FI_output_file");
         System.exit(1);        
     }
-    
+        
 }

@@ -36,7 +36,7 @@
  *
  */ 
 
-package samples.stax;
+package samples.common;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;

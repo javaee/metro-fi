@@ -56,6 +56,7 @@ import javax.xml.stream.XMLStreamException;
 
 import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
 import com.sun.xml.fastinfoset.stax.StAXEventReader;
+import samples.common.Util;
 
 
 /** <p>This is a sample that demonstrates the use of FI StAX Event Iterator API.</p>
