@@ -44,6 +44,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.Reader;
+import org.xml.sax.InputSource;
 
 public class XML_SAX_FI extends TransformInputOutput {
     
@@ -51,17 +54,39 @@ public class XML_SAX_FI extends TransformInputOutput {
     }
 
     public void parse(InputStream xml, OutputStream finf) throws Exception {
-        SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
-        saxParserFactory.setNamespaceAware(true);
-        SAXParser saxParser = saxParserFactory.newSAXParser();
-
-        SAXDocumentSerializer documentSerializer = new SAXDocumentSerializer();
-        documentSerializer.setOutputStream(finf);
-
+        SAXParser saxParser = getParser();
+        SAXDocumentSerializer documentSerializer = getSerializer(finf);
+        
         saxParser.setProperty("http://xml.org/sax/properties/lexical-handler", documentSerializer);
         saxParser.parse(xml, documentSerializer);
     }
+        
+    public void convert(Reader reader, OutputStream finf) throws Exception {
+        InputSource is = new InputSource(reader);
+        
+        SAXParser saxParser = getParser();
+        SAXDocumentSerializer documentSerializer = getSerializer(finf);
+        
+        saxParser.setProperty("http://xml.org/sax/properties/lexical-handler", documentSerializer);
+        saxParser.parse(is, documentSerializer);
+    }
     
+    private SAXParser getParser() {
+        SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
+        saxParserFactory.setNamespaceAware(true);
+        try {
+            return saxParserFactory.newSAXParser(); 
+        } catch (Exception e)
+        {
+            return null;
+        }
+    }
+    
+    private SAXDocumentSerializer getSerializer(OutputStream finf) {
+        SAXDocumentSerializer documentSerializer = new SAXDocumentSerializer();
+        documentSerializer.setOutputStream(finf);
+        return documentSerializer;
+    }
     public static void main(String[] args) throws Exception {
         XML_SAX_FI s = new XML_SAX_FI();
         s.parse(args);
