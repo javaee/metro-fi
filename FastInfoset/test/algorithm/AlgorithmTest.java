@@ -467,6 +467,11 @@ public class AlgorithmTest extends TestCase {
         public final void object(String URI, int algorithm, Object data)  throws SAXException {
             assertEquals(APPLICATION_DEFINED_ALGORITHM_ID, algorithm);
             assertEquals(APPLICATION_DEFINED_ALGORITHM_URI, URI);
+            assertEquals(true, data instanceof float[]);
+            float[] b = (float[])data;
+            for (int is = 0; is < ARRAY_SIZE; is++) {
+                assertEquals(_floatArray[is], b[is]);
+            }
         }
         
         public final void octets(String URI, int algorithm, byte[] b, int start, int length)  throws SAXException {
