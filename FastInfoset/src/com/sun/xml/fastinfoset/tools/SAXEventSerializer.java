@@ -43,6 +43,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -55,6 +58,9 @@ public class SAXEventSerializer extends DefaultHandler
     private Writer _writer; 
     private boolean _charactersAreCDATA;
     private StringBuffer _characters;
+    
+    private Stack _namespaceStack = new Stack();    
+    protected List _namespaceAttributes;
     
     public SAXEventSerializer(OutputStream s) throws IOException {
         _writer = new OutputStreamWriter(s);
@@ -86,24 +92,28 @@ public class SAXEventSerializer extends DefaultHandler
         }
     }
 
+    
     public void startPrefixMapping(String prefix, String uri) 
         throws SAXException
     {
-        try {
-            outputCharacters();
-            
-            _writer.write("<startPrefixMapping prefix=\"" +
-                prefix + "\" uri=\"" + uri + "\"/>\n");
-            _writer.flush();
+        if (_namespaceAttributes == null) {
+            _namespaceAttributes = new ArrayList();
         }
-        catch (IOException e) {
-            throw new SAXException(e);
-        }
+        
+        String qName = (prefix == "") ? "xmlns" : "xmlns" + prefix;
+        AttributeValueHolder attribute = new AttributeValueHolder(
+                qName,
+                prefix, 
+                uri, 
+                null,
+                null);
+        _namespaceAttributes.add(attribute);            
     }
     
     public void endPrefixMapping(String prefix) 
         throws SAXException 
     {
+        /*
         try {
             outputCharacters();
 
@@ -114,6 +124,7 @@ public class SAXEventSerializer extends DefaultHandler
         catch (IOException e) {
             throw new SAXException(e);
         }
+         */
     }
 
     public void startElement(String uri, String localName,
@@ -123,6 +134,26 @@ public class SAXEventSerializer extends DefaultHandler
         try {
             outputCharacters();
 
+            if (_namespaceAttributes != null) {
+                
+                AttributeValueHolder[] attrsHolder = new AttributeValueHolder[0];
+                attrsHolder = (AttributeValueHolder[])_namespaceAttributes.toArray(attrsHolder);
+                        
+                // Sort attributes
+                quicksort(attrsHolder, 0, attrsHolder.length - 1);
+
+                for (int i = 0; i < attrsHolder.length; i++) {
+                    _writer.write("<startPrefixMapping prefix=\"" +
+                        attrsHolder[i].localName + "\" uri=\"" + attrsHolder[i].uri + "\"/>\n");
+                    _writer.flush();
+                }
+                        
+                _namespaceStack.push(attrsHolder);
+                _namespaceAttributes = null;
+            } else {
+                _namespaceStack.push(null);
+            }
+            
             AttributeValueHolder[] attrsHolder = 
                 new AttributeValueHolder[attributes.getLength()];
             for (int i = 0; i < attributes.getLength(); i++) {
@@ -190,6 +221,18 @@ public class SAXEventSerializer extends DefaultHandler
                 + "\" localName=\"" + localName + "\" qName=\""
                 + qName + "\"/>\n");   
             _writer.flush();
+
+            // Write out the end prefix here rather than waiting
+            // for the explicit events
+            AttributeValueHolder[] attrsHolder = (AttributeValueHolder[])_namespaceStack.pop();
+            if (attrsHolder != null) {
+                for (int i = 0; i < attrsHolder.length; i++) {
+                    _writer.write("<endPrefixMapping prefix=\"" +
+                        attrsHolder[i].localName  + "\"/>\n");
+                    _writer.flush();
+                }
+            }
+            
         }
         catch (IOException e) {
             throw new SAXException(e);
