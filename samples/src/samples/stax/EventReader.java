@@ -59,9 +59,8 @@ import com.sun.xml.fastinfoset.stax.StAXInputFactory;
 import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
 
 
-/**
- *
- * Demonstrate the use of Event API
+/** <p>FI StAX EventReader</p>
+ *  Demonstrates the use of FI "StAXEventReader" to read a FI document
  */
 public class EventReader{
     protected XMLInputFactory factory = null;
@@ -73,6 +72,11 @@ public class EventReader{
     public EventReader() {
         init();
     }
+     /** Starts the sample. The sample takes a FI document filename that will
+      * be read using StAXEventReader.
+     *
+     *  @param args a FI document.
+     */
     public static void main(String[] args) {
         if (args.length < 1 || args.length > 2) {
             displayUsageAndExit();
@@ -83,17 +87,17 @@ public class EventReader{
                        "com.sun.xml.fastinfoset.stax.StAXEventFactory");
         EventReader eventReader = new EventReader();
         try {
-            eventReader.testFinfInput(args[0]);
-            eventReader.testXMLInput(args[1]);
+            eventReader.readFIDoc(args[0]);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
     
-    public void init() {
-        factory = XMLInputFactory.newInstance();
-    }
-    public void testFinfInput(String filename) throws Exception {
+     /** Reads a FI document using fastinfoset.StAXEventReader and displays all of the events in the document.
+     *
+     *  @param filename FI document name.
+     */
+    public void readFIDoc(String filename) throws Exception {
         input = new File(filename);
         document= new BufferedInputStream(new FileInputStream(input));
 
@@ -108,30 +112,12 @@ public class EventReader{
         }
     }
     
-    /** test creating EventReader with a XML file in a form of a IO Reader
-     *
-     */
-    public void testXMLInput(String filename) throws Exception {
-        input = new File(filename);
-        FileReader document= new FileReader(input);
-
+    private void init() {
         factory = XMLInputFactory.newInstance();
-        XMLEventReader r = factory.createXMLEventReader(document);
-        int count = 0;
-        System.out.println("Reading "+ input.getName() + ": \n");
-        while(r.hasNext()) {
-            count++;
-            XMLEvent e = r.nextEvent();
-            if (e.getEventType()==XMLStreamConstants.CHARACTERS)
-                System.out.println(count + ": " + Util.getEventTypeString(e.getEventType()) + " [" + e.toString()+ "]");
-            else
-                System.out.println(count + ": " + Util.getEventTypeString(e.getEventType()) + " " + e.toString());
-        }
-        
     }
 
     private static void displayUsageAndExit() {
-        System.err.println("Usage: EventReader <finf file> <xml file>");
+        System.err.println("Usage: ant EventReader or samples.stax.EventReader FI_file");
         System.exit(1);        
     }
         

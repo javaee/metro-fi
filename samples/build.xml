@@ -8,6 +8,7 @@
     <property name="simple-finf-file" value="data/inv1a.finf"/>
     
     <property name="lib-dir" value="lib"/>
+    <property name="dist-dir" value="dist"/>
     
     <path id="compile.class.path">
         <pathelement location="../FastInfoset/dist/FastInfoset.jar"/>
@@ -15,17 +16,17 @@
     </path>
     
     <path id="class.path">
-        <pathelement location="dist/classes"/>
+        <pathelement location="${dist-dir}/classes"/>
         <path refid="compile.class.path"/>
     </path>
     
     <target name="clean">
-        <delete dir="dist"/>
+        <delete dir="${dist-dir}"/>
     </target>
     
     <target name="prepare">
-        <mkdir dir="dist"/>
-        <mkdir dir="dist/classes"/>
+        <mkdir dir="${dist-dir}"/>
+        <mkdir dir="${dist-dir}/classes"/>
     </target>
     
     <target name="compile" depends="prepare">
@@ -50,6 +51,21 @@
         </java>
     </target>
 
+    <target name="FISAXParser" depends="XMLToFI">
+        <java dir="." fork="true" classname="samples.sax.FIParser">
+            <classpath refid="class.path"/>
+            <arg line="${simple-finf-file}"/>
+        </java>
+    </target>
+
+    <target name="FISAXSerializer" depends="compile">
+        <java dir="." fork="true" classname="samples.sax.FISerializer">
+            <classpath refid="class.path"/>
+            <arg line="${xml-file}"/>
+            <arg line="${finf-file}"/>
+        </java>
+    </target>
+
     <target name="FIStAXSerializer" depends="compile">
         <java dir="." fork="true" classname="samples.stax.DocumentSerializer">
             <classpath refid="class.path"/>
@@ -69,7 +85,16 @@
         <java dir="." fork="true" classname="samples.stax.EventReader">
             <classpath refid="class.path"/>
             <arg line="${simple-finf-file}"/>
-            <arg line="${simple-xml-file}"/>
         </java>
     </target>
+
+    <target name="doc" depends="compile">
+            <javadoc source="1.4"
+                    sourcepath="src"
+                    packagenames="samples.*"
+                    destdir="${dist-dir}/javadoc"
+                    version="true">
+            </javadoc>
+    </target>
+        
 </project>

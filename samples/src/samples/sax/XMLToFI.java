@@ -42,13 +42,18 @@ package samples.sax;
 
 import java.io.File;
 
-
-/**
- * Convert XML files to FI documents with the same filename and extension ".finf"
- * 
+/** <p>Convert XML files into FI documents</p>
+ *  This utility class uses FISerializer to transform XML files into FI documents.
+ *  Since only XML files are packaged in the sample package, thie utility is used 
+ *  in every sample to create FI documents from XML files.
  */
+
 public class XMLToFI {
     
+    /** Create FI documents from XML files
+     *
+     * @param args XML files
+     */
     public static void main(String[] args) {
         if (args.length < 1) {
             displayUsageAndExit();

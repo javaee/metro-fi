@@ -1,8 +1,40 @@
 /*
- * Util.java
+ * Fast Infoset ver. 0.1 software ("Software")
+ * 
+ * Copyright, 2004-2005 Sun Microsystems, Inc. All Rights Reserved. 
+ * 
+ * Software is licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at:
+ * 
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ *    Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations.
+ * 
+ *    Sun supports and benefits from the global community of open source
+ * developers, and thanks the community for its important contributions and
+ * open standards-based technology, which Sun has adopted into many of its
+ * products.
+ * 
+ *    Please note that portions of Software may be provided with notices and
+ * open source licenses from such communities and third parties that govern the
+ * use of those portions, and any licenses granted hereunder do not alter any
+ * rights and obligations you may have under such open source licenses,
+ * however, the disclaimer of warranty and limitation of liability provisions
+ * in this License will apply to all Software in this distribution.
+ * 
+ *    You acknowledge that the Software is not designed, licensed or intended
+ * for use in the design, construction, operation or maintenance of any nuclear
+ * facility.
  *
- * Created on January 14, 2005, 12:35 PM
- */
+ * Apache License
+ * Version 2.0, January 2004
+ * http://www.apache.org/licenses/
+ *
+ */ 
 
 package samples.stax;
 
@@ -13,9 +45,8 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.namespace.QName;
 
-/**
- *
- * @author hw123265
+/** <p>Sample utitliy</p>
+ *  This is an utility class used for samples in this package.
  */
 public class Util {
     
@@ -23,9 +54,10 @@ public class Util {
     public Util() {
     }
     
-    /**
-     * @param eventType
-     * @return
+    /** Get event type in string format 
+     *
+     * @param eventType event type
+     * @return String
      */    
     public final static String getEventTypeString(int eventType) {
         switch (eventType){
@@ -55,11 +87,20 @@ public class Util {
         return "UNKNOWN_EVENT_TYPE";
     }
     
+    /** Print out event type
+     *
+     * @param eventType event type
+     */    
     public static void printEventType(int eventType) {
         System.out.print("EVENT TYPE("+eventType+"):");
         System.out.println(getEventTypeString(eventType));
     }
     
+    /** Print out element name
+     *
+     * @param xmlr Stream reader
+     * @param eventType event type
+     */    
     public static void printName(XMLStreamReader xmlr,int eventType){
         if(xmlr.hasName()){
             System.out.println("HAS NAME: " + xmlr.getLocalName());
@@ -68,6 +109,10 @@ public class Util {
         }
     }
     
+    /** Print out text
+     *
+     * @param xmlr Stream reader
+     */    
     public static void printText(XMLStreamReader xmlr){
         if(xmlr.hasText()){
             System.out.println("HAS TEXT: " + xmlr.getText());
@@ -76,6 +121,10 @@ public class Util {
         }
     }
     
+    /** Print out processing instructions
+     *
+     * @param xmlr Stream reader
+     */    
     public static void printPIData(XMLStreamReader xmlr){
         if (xmlr.getEventType() == XMLStreamConstants.PROCESSING_INSTRUCTION){
             System.out.println(" PI target = " + xmlr.getPITarget() ) ;
@@ -83,6 +132,10 @@ public class Util {
         }
     }
     
+    /** Print out element attributes
+     *
+     * @param xmlr Stream reader
+     */    
     public static void printAttributes(XMLStreamReader xmlr){
         if(xmlr.getAttributeCount() > 0){
             System.out.println("\nHAS ATTRIBUTES: ");

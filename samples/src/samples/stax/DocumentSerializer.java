@@ -60,9 +60,9 @@ import javax.xml.stream.XMLStreamException;
 import com.sun.xml.fastinfoset.stax.StAXInputFactory;
 import com.sun.xml.fastinfoset.stax.SAX2StAXWriter;
 
-/**
- * Demonstrate using StAXDocumentSerializer to convert a XML file to FI document
- * 
+/** <p>FI StAX document serializer</p>
+ *  Demonstrates the use of StAXDocumentSerializer to transform 
+ *  an XML file into a FastInfoset document
  */
 public class DocumentSerializer {
     XMLOutputFactory factory;
@@ -84,9 +84,11 @@ public class DocumentSerializer {
         }
     }
     
- 
-    public void getDOMSource(File input) {
-        // Load file into byte array to factor out IO
+     /** Construct a DOMSource with a file.
+     *
+     *  @param input the XML file input
+     */
+    void getDOMSource(File input) {
         try {
             FileInputStream fis = new FileInputStream(input);
             Document document = _docBuilder.parse(fis);
@@ -99,7 +101,11 @@ public class DocumentSerializer {
         
     }
     
-    public void getSAXResult(File output) {
+    /** Initialize a SAXResult and set its handers.
+     *
+     *  @param output FI document output
+     */
+    void getSAXResult(File output) {
         try {
             //BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(output));
             _baos = new ByteArrayOutputStream();
@@ -115,6 +121,12 @@ public class DocumentSerializer {
             e.printStackTrace();
         }        
     }
+
+    /** Transform an XML file into a FI document.
+     *
+     *  @param input an XML file input
+     *  @param output the FI document output
+     */
     public void write(File input, File output) {
         getDOMSource(input);
         getSAXResult(output);
@@ -139,6 +151,10 @@ public class DocumentSerializer {
             e.printStackTrace();
         }
     }
+    /** Starts the sample.
+     *
+     *  @param args XML input file name and FI output file name
+     */
     public static void main(String[] args) {
         if (args.length < 1 || args.length > 2) {
             displayUsageAndExit();
@@ -152,7 +168,7 @@ public class DocumentSerializer {
     }
 
     private static void displayUsageAndExit() {
-        System.err.println("Usage: FISerializer <XML input file> <FI output file>");
+        System.err.println("Usage: ant FIStAXSerializer or samples.stax.FISerializer XML_input_file> FI_output_file");
         System.exit(1);        
     }
         

@@ -51,8 +51,8 @@ import javax.xml.stream.XMLStreamException;
 import com.sun.xml.fastinfoset.stax.StAXInputFactory;
 
 import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
-/**
- *  Demo using Cursor API -- stream reader
+/** <p>FI StAX StreamReader</p>
+ *  Demonstrates the use of FI StAX StreamReader "StAXDocumentParser" to read a FI document
  */
 public class StreamReader {
     protected XMLInputFactory factory = null;
@@ -60,8 +60,10 @@ public class StreamReader {
     /** Creates a new instance of Cursor */
     public StreamReader() {
     }
-    /**
-     * @param args the command line arguments
+     /** Starts the sample. The sample takes a FI document that will
+     * be read using StAXDocumentParser in the fastinfoset package.
+     *
+     *  @param args a FI document.
      */
     public static void main(String[] args) {
         if (args.length < 1 || args.length > 1) {
@@ -73,6 +75,10 @@ public class StreamReader {
         streamReader.parse(args[0]);
     }
     
+     /** Reads a FI document using StAXDocumentParser and displays event types and contents.
+     *
+     *  @param filename FI document name.
+     */
     public void parse(String filename) {  
         File input = null;
         InputStream document = null;
@@ -113,7 +119,7 @@ public class StreamReader {
     }   
 
     private static void displayUsageAndExit() {
-        System.err.println("Usage: StreamReader <FI file>");
+        System.err.println("Usage: ant StreamReader or samples.stax.StreamReader FI_file");
         System.exit(1);        
     }
         

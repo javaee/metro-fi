@@ -61,9 +61,10 @@ import javax.xml.stream.XMLStreamException;
 import com.sun.xml.fastinfoset.sax.SAXDocumentSerializer;
 
 
-/**
- *
- * Demonstrate the use of SAXDocumentSerializer to convert xml file to FastInfoset document
+
+/** <p>FI SAX document serializer</p>
+ *  Demonstrates the use of SAXDocumentSerializer to transform 
+ *  an XML file into a FastInfoset document
  */
 public class FISerializer {
     Transformer _transformer;
@@ -71,9 +72,10 @@ public class FISerializer {
     DOMSource _source = null;
     SAXResult _result = null;
     
-    /** Creates a new instance of DocumentSerializer */
+    /** Creates a new instance of FISerializer */
     public FISerializer() {
         try {
+            // get a transformer and document builder
             _transformer = TransformerFactory.newInstance().newTransformer();
             _docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         } catch (Exception e) {
@@ -82,8 +84,11 @@ public class FISerializer {
     }
     
  
-    public void getDOMSource(File input) {
-        // Load file into byte array to factor out IO
+     /** Construct a DOMSource with a file.
+     *
+     *  @param input the XML file input
+     */
+    void getDOMSource(File input) {
         try {
             FileInputStream fis = new FileInputStream(input);
             Document document = _docBuilder.parse(fis);
@@ -96,7 +101,11 @@ public class FISerializer {
         
     }
     
-    public void getSAXResult(File output) {
+    /** Initialize a SAXResult and set its handers.
+     *
+     *  @param output FI document output
+     */
+    void getSAXResult(File output) {
         try {
             BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(output));
             SAXDocumentSerializer serializer = new SAXDocumentSerializer();
@@ -112,12 +121,21 @@ public class FISerializer {
         }        
     }
     
+    /** Transform an XML file into a FI document.
+     *
+     *  @param input an XML file input
+     *  @param output the FI document output
+     */
     public void write(File input, File output) {
+        // construct a DOMSource from the input file
         getDOMSource(input);
+        // Initialize a SAXResult object
         getSAXResult(output);
+        
         if (_source != null && _result != null) {
             try {
                 System.out.println("Transforming "+input.getName()+ " into " + output.getName());
+                // Transform the XML input file into a FI document
                 _transformer.transform(_source, _result);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -128,6 +146,9 @@ public class FISerializer {
         }
     }
     
+    /** Starts the sample
+     * @param args XML input file name and FI output document name
+     */
     public static void main(String[] args) {
         if (args.length < 1 || args.length > 4) {
             displayUsageAndExit();
@@ -146,7 +167,7 @@ public class FISerializer {
     }
 
     private static void displayUsageAndExit() {
-        System.err.println("Usage: FISerializer <XML input file> <FI output file>");
+        System.err.println("Usage: ant FISAXSerialixer or samples.sax.FISerializer XML_input_file FI_output_file");
         System.exit(1);        
     }
     
