@@ -1,4 +1,4 @@
-<project name="FastInfoset" default="compile" basedir=".">
+<project name="Japex-FastInfoset" default="compile" basedir=".">
     <property environment="env"/>
     
     <property name="app.jar" value="test.jar"/>
@@ -36,6 +36,18 @@
     
     <target name="run" depends="compile">
         <java dir="." fork="true" classname="com.sun.japex.Japex">
+            <jvmarg value="-server"/>
+            <jvmarg value="-Xms384M"/>
+            <jvmarg value="-Xmx384M"/>
+            <classpath refid="class.path"/>
+            <arg line="${config}/"/>
+        </java>
+    </target>
+
+    <target name="runIbm" depends="compile">
+        <java dir="." fork="true" classname="com.sun.japex.Japex">
+            <jvmarg value="-Xms384M"/>
+            <jvmarg value="-Xmx384M"/>
             <classpath refid="class.path"/>
             <arg line="${config}/"/>
         </java>
