@@ -38,6 +38,12 @@
 
 package com.sun.xml.fastinfoset.api.sax;
 
+import com.sun.xml.fastinfoset.api.VocbularyReader;
+import java.io.IOException;
+import java.io.InputStream;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+
 /**
  * Interface for reading an Fast Infoset document using callbacks.
  *
@@ -77,12 +83,35 @@ package com.sun.xml.fastinfoset.api.sax;
  * notified through the callback methods of the EncodingAlgorithmContentHandler.<p>
  *
  * @version 0.1
+ * @see com.sun.xml.fastinfoset.api.VocabularyReader
  * @see com.sun.xml.fastinfoset.api.sax.PrimitiveTypeContentHandler
  * @see com.sun.xml.fastinfoset.api.sax.EncodingAlgorithmContentHandler
  * @see org.xml.sax.XMLReader
  * @see org.xml.sax.ContentHandler
  */
-public interface FastInfosetReader {
+public interface FastInfosetReader extends XMLReader, VocbularyReader {    
+    /**
+     * Parse a fast infoset document from an InputStream.
+     *
+     * <p>The application can use this method to instruct the Fast Infoset
+     * reader to begin parsing a fast infoset document from a byte stream.</p>
+     *
+     * <p>Applications may not invoke this method while a parse is in progress 
+     * (they should create a new XMLReader instead for each nested XML document). 
+     * Once a parse is complete, an application may reuse the same 
+     * FastInfosetReader object, possibly with a different byte stream.</p>
+     *
+     * <p>During the parse, the FastInfosetReader will provide information about 
+     * the fast infoset document through the registered event handlers.<p>
+     *
+     * <p> This method is synchronous: it will not return until parsing has ended. 
+     * If a client application wants to terminate parsing early, it should throw 
+     * an exception.<p>
+     *
+     * @param s The byte stream to parse from.
+     */
+    public void parse(InputStream s) throws IOException, SAXException;
+
     /**
      * Allow an application to register an encoding algorithm handler.
      *
@@ -119,7 +148,7 @@ public interface FastInfosetReader {
      * handler immediately.</p>
      *
      * @param handler The primitive type handler.
-     * @see #gettPrimitiveTypeContentHandler
+     * @see #getPrimitiveTypeContentHandler
      */
     public void setPrimitiveTypeContentHandler(PrimitiveTypeContentHandler handler);
 

@@ -80,7 +80,7 @@ public interface EncodingAlgorithmAttributes extends Attributes {
      *
      * @param index The attribute index (zero-based).
      * @return The index
-     * @see com.sun.xml.fastinfoset.EncodingAlgorithmIndexes       
+     * @see com.sun.xml.fastinfoset.api.EncodingAlgorithmIndexes       
      */
     public int getAlgorithmIndex(int index);
     
@@ -103,7 +103,7 @@ public interface EncodingAlgorithmAttributes extends Attributes {
      *
      * @param index The attribute index (zero-based).
      * @return The data
-     * @see com.sun.xml.fastinfoset.EncodingAlgorithmIndexes       
+     * @see com.sun.xml.fastinfoset.api.EncodingAlgorithmIndexes       
      */
     public Object getAlgorithmData(int index);    
 }

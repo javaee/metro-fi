@@ -97,9 +97,9 @@ public interface EncodingAlgorithmContentHandler {
      * @param length the number of byte to read from the array
      * @throws org.xml.sax.SAXException any SAX exception, possibly
      *            wrapping another exception
-     * @see com.sun.xml.fastinfoset.EncodingAlgorithmIndexes
+     * @see com.sun.xml.fastinfoset.api.EncodingAlgorithmIndexes
      */    
-    void octets(String URI, int algorithm, byte[] b, int start, int length)  throws SAXException;    
+    public void octets(String URI, int algorithm, byte[] b, int start, int length)  throws SAXException;    
 
     /**
      * Receive notification of encoding algorithm data as an object.
@@ -113,7 +113,7 @@ public interface EncodingAlgorithmContentHandler {
      * @param o the encoding algorithm object
      * @throws org.xml.sax.SAXException any SAX exception, possibly
      *            wrapping another exception
-     * @see com.sun.xml.fastinfoset.EncodingAlgorithmIndexes
+     * @see com.sun.xml.fastinfoset.api.EncodingAlgorithmIndexes
      */    
-    void object(String URI, int algorithm, Object o)  throws SAXException;    
+    public void object(String URI, int algorithm, Object o)  throws SAXException;    
 }
