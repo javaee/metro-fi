@@ -119,8 +119,6 @@ public abstract class Decoder implements FastInfosetParser {
 
     protected boolean _doubleTerminate;
 
-    protected boolean _elementWithAttributesNoChildrenTermination;
-
     protected boolean _addToTable;
 
     protected int _integer;
@@ -207,7 +205,7 @@ public abstract class Decoder implements FastInfosetParser {
     
     
     public void reset() {
-        _terminate = _doubleTerminate = _elementWithAttributesNoChildrenTermination = false;
+        _terminate = _doubleTerminate;
     }
 
     public void setVocabulary(ParserVocabulary v) {

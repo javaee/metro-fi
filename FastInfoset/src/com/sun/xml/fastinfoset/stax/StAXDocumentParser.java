@@ -80,11 +80,6 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     protected int _eventType;
     
     /**
-     * Flag indicating processing of a DII and children
-     */
-    protected boolean _processingDII;
-    
-    /**
      * Stack of qualified names and namespaces
      */
     protected QualifiedName[] _qNameStack = new QualifiedName[32];
@@ -111,6 +106,8 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
      * List of attributes
      */
     protected AttributesHolder _attributes = new AttributesHolder();
+
+    protected boolean _clearAttributes = false;
     
     /**
      * Characters associated with event.
@@ -135,21 +132,20 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     protected StAXManager _manager;
     
     public StAXDocumentParser() {
-        _eventType = START_DOCUMENT;
+        reset();
     }
     
     public StAXDocumentParser(InputStream s) {
         this();
         setInputStream(s);
     }
+    
     public StAXDocumentParser(InputStream s, StAXManager manager) {
         this(s);
         _manager = manager;
     }
     
-    public void reset() {
-        super.reset();
-        
+    public void reset() {        
         _eventType = START_DOCUMENT;
         _internalState = INTERNAL_STATE_START_DOCUMENT;
         
@@ -167,8 +163,8 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         }
         return null;
     }
-    
-    public int next() throws XMLStreamException {
+        
+    public final int next() throws XMLStreamException {
         try {
             if (_internalState != INTERNAL_STATE_VOID) {
                 switch (_internalState) {
@@ -235,20 +231,20 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
             _currentNamespaceAIIsEnd = 0;
             
             // Process information item
-            int b = read();
+            final int b = read();
             switch(DecoderStateTables.EII[b]) {
                 case DecoderStateTables.EII_NO_AIIS_INDEX_SMALL:
                     processEII(_v.elementName.get(b), false);
-                    break;
+                    return _eventType;
                 case DecoderStateTables.EII_AIIS_INDEX_SMALL:
                     processEII(_v.elementName.get(b & EncodingConstants.INTEGER_3RD_BIT_SMALL_MASK), true);
-                    break;
+                    return _eventType;
                 case DecoderStateTables.EII_INDEX_MEDIUM:
                 {
                     final int i = (((b & EncodingConstants.INTEGER_3RD_BIT_MEDIUM_MASK) << 8) | read())
                             + EncodingConstants.INTEGER_3RD_BIT_SMALL_LIMIT;
                     processEII(_v.elementName.get(i), (b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
-                    break;
+                    return _eventType;
                 }
                 case DecoderStateTables.EII_INDEX_LARGE:
                 {
@@ -263,7 +259,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                                 + EncodingConstants.INTEGER_3RD_BIT_LARGE_LIMIT;
                     }
                     processEII(_v.elementName.get(i), (b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
-                    break;
+                    return _eventType;
                 }
                 case DecoderStateTables.EII_LITERAL:
                 {
@@ -276,11 +272,11 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     final QualifiedName qualifiedName = new QualifiedName(prefix, namespaceName, localName);
                     _v.elementName.add(qualifiedName);
                     processEII(qualifiedName, (b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
-                    break;
+                    return _eventType;
                 }
                 case DecoderStateTables.EII_NAMESPACES:
                     processEIIWithNamespaces((b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
-                    break;
+                    return _eventType;
                 case DecoderStateTables.CII_UTF8_SMALL_LENGTH:
                     _octetBufferLength = (b & EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_MASK)
                             + 1;
@@ -289,11 +285,10 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                         _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
                     }
                     
-                    _eventType = CHARACTERS;
                     _characters = _charBuffer;
                     _charactersOffset = 0;
                     _charactersLength = _charBufferLength;
-                    break;
+                    return _eventType = CHARACTERS;
                 case DecoderStateTables.CII_UTF8_MEDIUM_LENGTH:
                     _octetBufferLength = read() + EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_LIMIT;
                     decodeUtf8StringAsCharBuffer();
@@ -301,11 +296,10 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                         _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
                     }
                     
-                    _eventType = CHARACTERS;
                     _characters = _charBuffer;
                     _charactersOffset = 0;
                     _charactersLength = _charBufferLength;
-                    break;
+                    return _eventType = CHARACTERS;
                 case DecoderStateTables.CII_UTF8_LARGE_LENGTH:
                     _octetBufferLength = (read() << 24) |
                             (read() << 16) |
@@ -317,11 +311,10 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                         _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
                     }
                     
-                    _eventType = CHARACTERS;
                     _characters = _charBuffer;
                     _charactersOffset = 0;
                     _charactersLength = _charBufferLength;
-                    break;
+                    return _eventType = CHARACTERS;
                 case DecoderStateTables.CII_UTF16_SMALL_LENGTH:
                     _octetBufferLength = (b & EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_MASK)
                     + 1;
@@ -330,11 +323,10 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                         _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
                     }
                     
-                    _eventType = CHARACTERS;
                     _characters = _charBuffer;
                     _charactersOffset = 0;
                     _charactersLength = _charBufferLength;
-                    break;
+                    return _eventType = CHARACTERS;
                 case DecoderStateTables.CII_UTF16_MEDIUM_LENGTH:
                     _octetBufferLength = read() + EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_LIMIT;
                     decodeUtf16StringAsCharBuffer();
@@ -342,11 +334,10 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                         _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
                     }
                     
-                    _eventType = CHARACTERS;
                     _characters = _charBuffer;
                     _charactersOffset = 0;
                     _charactersLength = _charBufferLength;
-                    break;
+                    return _eventType = CHARACTERS;
                 case DecoderStateTables.CII_UTF16_LARGE_LENGTH:
                     _octetBufferLength = (read() << 24) |
                             (read() << 16) |
@@ -358,11 +349,10 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                         _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
                     }
                     
-                    _eventType = CHARACTERS;
                     _characters = _charBuffer;
                     _charactersOffset = 0;
                     _charactersLength = _charBufferLength;
-                    break;
+                    return _eventType = CHARACTERS;
                 case DecoderStateTables.CII_RA:
                 {
                     // Decode resitricted alphabet integer
@@ -377,11 +367,10 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                         _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
                     }
                     
-                    _eventType = CHARACTERS;
                     _characters = _charBuffer;
                     _charactersOffset = 0;
                     _charactersLength = _charBufferLength;
-                    break;
+                    return _eventType = CHARACTERS;
                 }
                 case DecoderStateTables.CII_EA:
                 {
@@ -398,11 +387,10 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 {
                     final CharArray ca = _v.characterContentChunk.get(b & EncodingConstants.INTEGER_4TH_BIT_SMALL_MASK);
                     
-                    _eventType = CHARACTERS;
                     _characters = ca.ch;
                     _charactersOffset = ca.start;
                     _charactersLength = ca.length;
-                    break;
+                    return _eventType = CHARACTERS;
                 }
                 case DecoderStateTables.CII_INDEX_MEDIUM:
                 {
@@ -410,11 +398,10 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     + EncodingConstants.INTEGER_4TH_BIT_SMALL_LIMIT;
                     final CharArray ca = _v.characterContentChunk.get(index);
                     
-                    _eventType = CHARACTERS;
                     _characters = ca.ch;
                     _charactersOffset = ca.start;
                     _charactersLength = ca.length;
-                    break;
+                    return _eventType = CHARACTERS;
                 }
                 case DecoderStateTables.CII_INDEX_LARGE:
                 {
@@ -424,11 +411,10 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     index += EncodingConstants.INTEGER_4TH_BIT_MEDIUM_LIMIT;
                     final CharArray ca = _v.characterContentChunk.get(index);
                     
-                    _eventType = CHARACTERS;
                     _characters = ca.ch;
                     _charactersOffset = ca.start;
                     _charactersLength = ca.length;
-                    break;
+                    return _eventType = CHARACTERS;
                 }
                 case DecoderStateTables.CII_INDEX_LARGE_LARGE:
                 {
@@ -438,18 +424,17 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     index += EncodingConstants.INTEGER_4TH_BIT_LARGE_LIMIT;
                     final CharArray ca = _v.characterContentChunk.get(index);
                     
-                    _eventType = CHARACTERS;
                     _characters = ca.ch;
                     _charactersOffset = ca.start;
                     _charactersLength = ca.length;
-                    break;
+                    return _eventType = CHARACTERS;
                 }
                 case DecoderStateTables.COMMENT_II:
                     processCommentII();
-                    break;
+                    return _eventType;
                 case DecoderStateTables.PROCESSING_INSTRUCTION_II:
                     processProcessingII();
-                    break;
+                    return _eventType;
                 case DecoderStateTables.UNEXPANDED_ENTITY_REFERENCE_II:
                 {
                     /*
@@ -462,7 +447,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
                     String public_identifier = ((_b & EncodingConstants.UNEXPANDED_ENTITY_PUBLIC_IDENTIFIER_FLAG) > 0)
                     ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
-                    break;
+                    return _eventType;
                 }
                 case DecoderStateTables.TERMINATOR_DOUBLE:
                     if (_stackCount == -1) {
@@ -497,12 +482,9 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 default:
                     throw new FastInfosetException("Illegal state when decoding a child of an EII");
             }
-            
-            return _eventType;            
         } catch (IOException e) {
             throw new XMLStreamException(e);
         } catch (FastInfosetException e) {
-            e.printStackTrace();
             throw new XMLStreamException(e);
         }
     }
@@ -514,7 +496,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
      * @param localName the localName of the event, may be null
      * @throws XMLStreamException if the required values are not matched.
      */
-    public void require(int type, String namespaceURI, String localName)
+    public final void require(int type, String namespaceURI, String localName)
     throws XMLStreamException {
         if( type != _eventType)
             throw new XMLStreamException("Event type " +getEventTypeString(type)+" specified did not match with current parser event");
@@ -532,7 +514,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
      * @throws XMLStreamException if the current event is not a START_ELEMENT or if
      * a non text element is encountered
      */
-    public String getElementText() throws XMLStreamException {
+    public final String getElementText() throws XMLStreamException {
         
         if(getEventType() != START_ELEMENT) {
             throw new XMLStreamException(
@@ -545,7 +527,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     /**
      * @param startElementRead flag if start element has already been read
      */
-    public String getElementText(boolean startElementRead) throws XMLStreamException {
+    public final String getElementText(boolean startElementRead) throws XMLStreamException {
         if (!startElementRead) {
             throw new XMLStreamException(
                     "parser must be on START_ELEMENT to read next text", getLocation());
@@ -588,14 +570,14 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
      * @return the event type of the element read
      * @throws XMLStreamException if the current event is not white space
      */
-    public int nextTag() throws XMLStreamException {
+    public final int nextTag() throws XMLStreamException {
         int eventType = next();
         return nextTag(true);
     }
     /** if the current tag has already read, such as in the case EventReader's
      * peek() has been called, the current cursor should not move before the loop
      */
-    public int nextTag(boolean currentTagRead) throws XMLStreamException {
+    public final int nextTag(boolean currentTagRead) throws XMLStreamException {
         int eventType = getEventType();
         if (!currentTagRead) {
             eventType = next();
@@ -613,15 +595,14 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         return eventType;
     }
     
-    public boolean hasNext() throws XMLStreamException {
+    public final boolean hasNext() throws XMLStreamException {
         return (_eventType != END_DOCUMENT);
     }
-    
-    public void close() throws XMLStreamException {
-        reset();
+        
+    public final void close() throws XMLStreamException {
     }
     
-    public String getNamespaceURI(String prefix) {
+    public final String getNamespaceURI(String prefix) {
         String namespace = getNamespaceDecl(prefix);
         if (namespace == null) {
             if (prefix == null) {
@@ -632,15 +613,15 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         return namespace;
     }
     
-    public boolean isStartElement() {
+    public final boolean isStartElement() {
         return (_eventType == START_ELEMENT);
     }
     
-    public boolean isEndElement() {
+    public final boolean isEndElement() {
         return (_eventType == END_ELEMENT);
     }
     
-    public boolean isCharacters() {
+    public final boolean isCharacters() {
         return (_eventType == CHARACTERS);
     }
     
@@ -650,7 +631,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
      *  for the same event.
      * @return true if the cursor points to all whitespace, false otherwise
      */
-    public boolean isWhiteSpace() {
+    public final boolean isWhiteSpace() {
         if(isCharacters() || (_eventType == CDATA)){
             char [] ch = this.getTextCharacters();
             int start = this.getTextStart();
@@ -666,7 +647,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         //throw new UnsupportedOperationException("Not implemented");
     }
     
-    public String getAttributeValue(String namespaceURI, String localName) {
+    public final String getAttributeValue(String namespaceURI, String localName) {
         if (_eventType != START_ELEMENT) {
             throw new IllegalStateException("Method getAttributeValue() called in invalid state");
         }
@@ -681,7 +662,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         return null;
     }
     
-    public int getAttributeCount() {
+    public final int getAttributeCount() {
         if (_eventType != START_ELEMENT) {
             throw new IllegalStateException("Method getAttributeValue() called in invalid state");
         }
@@ -689,14 +670,14 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         return _attributes.getLength();
     }
     
-    public javax.xml.namespace.QName getAttributeName(int index) {
+    public final javax.xml.namespace.QName getAttributeName(int index) {
         if (_eventType != START_ELEMENT) {
             throw new IllegalStateException("Method getAttributeValue() called in invalid state");
         }
         return _attributes.getQualifiedName(index).getQName();
     }
     
-    public String getAttributeNamespace(int index) {
+    public final String getAttributeNamespace(int index) {
         if (_eventType != START_ELEMENT) {
             throw new IllegalStateException("Method getAttributeValue() called in invalid state");
         }
@@ -704,39 +685,39 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         return _attributes.getURI(index);
     }
     
-    public String getAttributeLocalName(int index) {
+    public final String getAttributeLocalName(int index) {
         if (_eventType != START_ELEMENT) {
             throw new IllegalStateException("Method getAttributeValue() called in invalid state");
         }
         return _attributes.getLocalName(index);
     }
     
-    public String getAttributePrefix(int index) {
+    public final String getAttributePrefix(int index) {
         if (_eventType != START_ELEMENT) {
             throw new IllegalStateException("Method getAttributeValue() called in invalid state");
         }
         return _attributes.getPrefix(index);
     }
     
-    public String getAttributeType(int index) {
+    public final String getAttributeType(int index) {
         if (_eventType != START_ELEMENT) {
             throw new IllegalStateException("Method getAttributeValue() called in invalid state");
         }
         return _attributes.getType(index);
     }
     
-    public String getAttributeValue(int index) {
+    public final String getAttributeValue(int index) {
         if (_eventType != START_ELEMENT) {
             throw new IllegalStateException("Method getAttributeValue() called in invalid state");
         }
         return _attributes.getValue(index);
     }
     
-    public boolean isAttributeSpecified(int index) {
+    public final boolean isAttributeSpecified(int index) {
         return false;   // non-validating parser
     }
     
-    public int getNamespaceCount() {
+    public final int getNamespaceCount() {
         if (_eventType == START_ELEMENT || _eventType == END_ELEMENT) {
             return (_currentNamespaceAIIsEnd > 0) ? (_currentNamespaceAIIsEnd - _currentNamespaceAIIsStart) : 0;
         } else {
@@ -744,7 +725,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         }
     }
     
-    public String getNamespacePrefix(int index) {
+    public final String getNamespacePrefix(int index) {
         if (_eventType == START_ELEMENT || _eventType == END_ELEMENT) {
             return _namespaceAIIsPrefix[_currentNamespaceAIIsStart + index];
         } else {
@@ -752,7 +733,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         }
     }
     
-    public String getNamespaceURI(int index) {
+    public final String getNamespaceURI(int index) {
         if (_eventType == START_ELEMENT || _eventType == END_ELEMENT) {
             return _namespaceAIIsNamespaceName[_currentNamespaceAIIsStart + index];
         } else {
@@ -760,15 +741,15 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         }
     }
     
-    public NamespaceContext getNamespaceContext() {
+    public final NamespaceContext getNamespaceContext() {
         return _nsContext;
     }
     
-    public int getEventType() {
+    public final int getEventType() {
         return _eventType;
     }
     
-    public String getText() {
+    public final String getText() {
         if (_characters == null) {
             throw new IllegalStateException("Method getText() called in invalid state");
         }
@@ -778,7 +759,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 _charactersLength);
     }
     
-    public char[] getTextCharacters() {
+    public final char[] getTextCharacters() {
         if (_characters == null) {
             throw new IllegalStateException("Method getText() called in invalid state");
         }
@@ -786,7 +767,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         return _characters;
     }
     
-    public int getTextStart() {
+    public final int getTextStart() {
         if (_characters == null) {
             throw new IllegalStateException("Method getTextStart() called in invalid state");
         }
@@ -795,7 +776,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         return 0;
     }
     
-    public int getTextLength() {
+    public final int getTextLength() {
         if (_characters == null) {
             throw new IllegalStateException("Method getTextStart() called in invalid state");
         }
@@ -803,7 +784,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         return _charactersLength;
     }
     
-    public int getTextCharacters(int sourceStart, char[] target,
+    public final int getTextCharacters(int sourceStart, char[] target,
             int targetStart, int length) throws XMLStreamException {
         if (_characters == null) {
             throw new IllegalStateException("Method getText() called in invalid state");
@@ -819,21 +800,21 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         }
     }
     
-    public String getEncoding() {
+    public final String getEncoding() {
         return "UTF-8";     // for now
     }
     
-    public boolean hasText() {
+    public final boolean hasText() {
         return (_characters != null);
     }
     
-    public Location getLocation() {
+    public final Location getLocation() {
         //location should be created in next()
         //returns a nil location for now
         return EventLocation.getNilLocation();
     }
     
-    public QName getName() {
+    public final QName getName() {
         if (_eventType == START_ELEMENT || _eventType == END_ELEMENT) {
             return _qualifiedName.getQName();
         } else {
@@ -841,7 +822,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         }
     }
     
-    public String getLocalName() {
+    public final String getLocalName() {
         if (_eventType == START_ELEMENT || _eventType == END_ELEMENT) {
             return _qualifiedName.localName;
         } else {
@@ -849,11 +830,11 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         }
     }
     
-    public boolean hasName() {
+    public final boolean hasName() {
         return (_eventType == START_ELEMENT || _eventType == END_ELEMENT);
     }
     
-    public String getNamespaceURI() {
+    public final String getNamespaceURI() {
         if (_eventType == START_ELEMENT || _eventType == END_ELEMENT) {
             return _qualifiedName.namespaceName;
         } else {
@@ -861,7 +842,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         }
     }
     
-    public String getPrefix() {
+    public final String getPrefix() {
         if (_eventType == START_ELEMENT || _eventType == END_ELEMENT) {
             return _qualifiedName.prefix;
         } else {
@@ -869,23 +850,23 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         }
     }
     
-    public String getVersion() {
+    public final String getVersion() {
         return null;
     }
     
-    public boolean isStandalone() {
+    public final boolean isStandalone() {
         return false;
     }
     
-    public boolean standaloneSet() {
+    public final boolean standaloneSet() {
         return false;
     }
     
-    public String getCharacterEncodingScheme() {
+    public final String getCharacterEncodingScheme() {
         return null;
     }
     
-    public String getPITarget() {
+    public final String getPITarget() {
         if (_eventType != PROCESSING_INSTRUCTION) {
             throw new IllegalStateException("Method getPITarget() called in invalid state");
         }
@@ -893,7 +874,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         return _piTarget;
     }
     
-    public String getPIData() {
+    public final String getPIData() {
         if (_eventType != PROCESSING_INSTRUCTION) {
             throw new IllegalStateException("Method getPIData() called in invalid state");
         }
@@ -990,8 +971,12 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     protected final void processEII(QualifiedName name, boolean hasAttributes) throws FastInfosetException, IOException {
         _eventType = START_ELEMENT;
         _qualifiedName = name;
+
+        if (_clearAttributes) {
+            _attributes.clear();
+            _clearAttributes = false;
+        }
         
-        _attributes.clear();
         if (hasAttributes) {
             processAIIs();
         }
@@ -1021,6 +1006,8 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         QualifiedName name;
         int b;
         String value;
+        
+        _clearAttributes = true;
         
         boolean terminate = false;
         do {
@@ -1281,7 +1268,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         }
     }
     
-    public String getNamespaceDecl(String prefix) {
+    public final String getNamespaceDecl(String prefix) {
         try {
             Object o = _prefixMap.get(prefix);
             if (o instanceof String) {
@@ -1295,7 +1282,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         return null;
     }
     
-    private void popNamespaceDecl(String prefix) {
+    private final void popNamespaceDecl(String prefix) {
         try {
             Object o = _prefixMap.get(prefix);
             if (o instanceof String) {
@@ -1308,7 +1295,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         }
     }
     
-    private void pushNamespaceDecl(String prefix, String namespace) {
+    private final void pushNamespaceDecl(String prefix, String namespace) {
         try {
             Object o = _prefixMap.get(prefix);
             if (o == null) {
@@ -1326,19 +1313,19 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     }
     
     
-    public AttributesHolder getAttributesHolder() {
+    public final AttributesHolder getAttributesHolder() {
         return _attributes;
     }
     
-    public String getURI(String prefix) {
+    public final String getURI(String prefix) {
         return getNamespaceDecl(prefix);
     }
     
-    public Iterator getPrefixes() {
+    public final Iterator getPrefixes() {
         return _prefixMap.keySet().iterator();
     }
     
-    public void setManager(StAXManager manager) {
+    public final void setManager(StAXManager manager) {
         _manager = manager;
     }
     
