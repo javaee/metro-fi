@@ -41,6 +41,7 @@ package org.jvnet.fastinfoset.sax;
 import org.jvnet.fastinfoset.VocbularyReader;
 import java.io.IOException;
 import java.io.InputStream;
+import org.jvnet.fastinfoset.FastInfosetException;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
@@ -110,7 +111,7 @@ public interface FastInfosetReader extends XMLReader, VocbularyReader {
      *
      * @param s The byte stream to parse from.
      */
-    public void parse(InputStream s) throws IOException, SAXException;
+    public void parse(InputStream s) throws IOException, FastInfosetException, SAXException;
 
     /**
      * Allow an application to register an encoding algorithm handler.

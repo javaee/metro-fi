@@ -46,19 +46,24 @@ import java.io.OutputStream;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import org.jvnet.fastinfoset.EncodingAlgorithmException;
 
 
 
 public class FloatEncodingAlgorithm extends IEEE754FloatingPointEncodingAlgorithm {
-    
-    public final Object decodeFromBytes(byte[] b, int start, int length) {
-        if (length % FLOAT_SIZE != 0) {
-            throw new IllegalArgumentException("'length' is not a multiple of " +
+
+    public final int getLength(int octetLength) throws EncodingAlgorithmException {
+        if (octetLength % FLOAT_SIZE != 0) {
+            throw new EncodingAlgorithmException("'length' is not a multiple of " +
                     FLOAT_SIZE +
                     " bytes correspond to the size of the IEEE 754 floating-point \"single format\"");
         }
         
-        float[] data = new float[length / FLOAT_SIZE];
+        return octetLength / FLOAT_SIZE;
+    }
+    
+    public final Object decodeFromBytes(byte[] b, int start, int length) throws EncodingAlgorithmException {
+        float[] data = new float[getLength(length)];
         decodeFromBytesToFloatArray(data, 0, b, start, length);
         
         return data;

@@ -36,24 +36,20 @@
  *
  */
 
+
 package org.jvnet.fastinfoset;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+public class EncodingAlgorithmException extends FastInfosetException {
+    
+    public EncodingAlgorithmException(String message) {
+        super(message);
+    }
+    
+    public EncodingAlgorithmException(String message, Exception e) {
+        super(message, e);
+    }
 
-public interface EncodingAlgorithm {
-    
-    public Object decodeFromBytes(byte[] b, int start, int length) throws EncodingAlgorithmException;
-    
-    public Object decodeFromInputStream(InputStream s) throws EncodingAlgorithmException, IOException;
-    
-
-    public void encodeToOutputStream(Object data, OutputStream s) throws EncodingAlgorithmException, IOException;
-    
-    
-    public Object convertFromCharacters(char[] ch, int start, int length) throws EncodingAlgorithmException;
-    
-    public void convertToCharacters(Object data, StringBuffer s) throws EncodingAlgorithmException;
-    
+    public EncodingAlgorithmException(Exception e) {
+        super(e);
+    }    
 }

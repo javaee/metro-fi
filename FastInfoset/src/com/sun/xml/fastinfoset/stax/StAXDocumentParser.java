@@ -62,6 +62,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import org.jvnet.fastinfoset.FastInfosetException;
 
 public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     /**
@@ -445,7 +446,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     _terminate = true;
                     break;
                 default:
-                    throw new IOException("Illegal state when decoding a child of an EII");
+                    throw new FastInfosetException("Illegal state when decoding a child of an EII");
             }
             
             
@@ -470,7 +471,8 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new XMLStreamException(e);
+        } catch (FastInfosetException e) {
             throw new XMLStreamException(e);
         }
     }
@@ -878,7 +880,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
 
     // 
     
-    protected final void processEIIWithNamespaces(boolean hasAttributes) throws IOException {        
+    protected final void processEIIWithNamespaces(boolean hasAttributes) throws FastInfosetException, IOException {        
         _namespaces = new QualifiedNameArray(4);
 
         int b = read();
@@ -905,7 +907,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
             b = read();
         }
         if (b != EncodingConstants.TERMINATOR) {
-            throw new IOException("Namespace names of EII not terminated correctly");
+            throw new FastInfosetException("Namespace names of EII not terminated correctly");
         }
 
         b = read();
@@ -958,11 +960,11 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 break;
             }
             default:
-                throw new IOException("Illegal state when decoding EII after the namespace AIIs");
+                throw new FastInfosetException("Illegal state when decoding EII after the namespace AIIs");
         }
     }
     
-    protected final void processEII(QualifiedName name, boolean hasAttributes) throws IOException {
+    protected final void processEII(QualifiedName name, boolean hasAttributes) throws FastInfosetException, IOException {
         _eventType = START_ELEMENT;
         _qualifiedName = name;
 
@@ -981,7 +983,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         _elementStack[_elementStackCount] = new ElementHolder(_qualifiedName, _namespaces);
     }
     
-    protected final void processAIIs() throws IOException {
+    protected final void processAIIs() throws FastInfosetException, IOException {
         QualifiedName name;
         int b;
         String value;
@@ -1028,7 +1030,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     // AIIs have finished break out of loop
                     continue;
                 default:
-                    throw new IOException("Illegal state when decoding AIIs");
+                    throw new FastInfosetException("Illegal state when decoding AIIs");
             }
 
             // [normalized value] of AII
@@ -1142,7 +1144,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     _identifier |= (b & 0xF0) >> 4;
 
                     decodeOctetsOfNonIdentifyingStringOnFirstBit(b);
-                    throw new IOException("Encoding algorithms not supported for [normalized value] property of AII");
+                    throw new FastInfosetException("Encoding algorithms not supported for [normalized value] property of AII");
                 }                
                 case DecoderStateTables.NISTRING_INDEX_SMALL:
                     value = _v.attributeValue.get(b & EncodingConstants.INTEGER_2ND_BIT_SMALL_MASK);
@@ -1171,7 +1173,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     _attributes.addAttribute(name, "");
                     break;
                 default:
-                    throw new IOException("Illegal state when decoding AII value");
+                    throw new FastInfosetException("Illegal state when decoding AII value");
             }
             
         } while (!_terminate);
@@ -1180,7 +1182,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         _doubleTerminate = false;
     }
 
-    protected final void processCommentII() throws IOException {
+    protected final void processCommentII() throws FastInfosetException, IOException {
         _eventType = COMMENT;
 
         switch(decodeNonIdentifyingStringOnFirstBit()) {
@@ -1194,7 +1196,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 _charactersLength = _charBufferLength;
                 break;
             case NISTRING_ENCODING_ALGORITHM:
-                throw new IOException("Comment II with encoding algorithm decoding not supported");                        
+                throw new FastInfosetException("Comment II with encoding algorithm decoding not supported");                        
             case NISTRING_INDEX:
                 final CharArray ca = _v.otherString.get(_integer);
 
@@ -1210,7 +1212,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         }        
     }
 
-    protected final void processProcessingII() throws IOException {
+    protected final void processProcessingII() throws FastInfosetException, IOException {
         _eventType = PROCESSING_INSTRUCTION;
 
         _piTarget = decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherNCName);
@@ -1223,7 +1225,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 }
                 break;
             case NISTRING_ENCODING_ALGORITHM:
-                throw new IOException("Processing II with encoding algorithm decoding not supported");                        
+                throw new FastInfosetException("Processing II with encoding algorithm decoding not supported");                        
             case NISTRING_INDEX:
                 _piTarget = _v.otherString.get(_integer).toString();
                 break;

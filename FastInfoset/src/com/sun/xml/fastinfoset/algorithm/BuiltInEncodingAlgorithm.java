@@ -43,9 +43,12 @@ import java.nio.CharBuffer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jvnet.fastinfoset.EncodingAlgorithm;
+import org.jvnet.fastinfoset.EncodingAlgorithmException;
 
 public abstract class BuiltInEncodingAlgorithm implements EncodingAlgorithm {
     protected final static Pattern SPACE_PATTERN = Pattern.compile("\\s");
+
+    public abstract int getLength(int octetLength) throws EncodingAlgorithmException;
         
     public interface WordListener {
         public void word(int start, int end);

@@ -36,24 +36,21 @@
  *
  */
 
-package org.jvnet.fastinfoset;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+package com.sun.xml.fastinfoset.algorithm;
 
-public interface EncodingAlgorithm {
-    
-    public Object decodeFromBytes(byte[] b, int start, int length) throws EncodingAlgorithmException;
-    
-    public Object decodeFromInputStream(InputStream s) throws EncodingAlgorithmException, IOException;
-    
+import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
 
-    public void encodeToOutputStream(Object data, OutputStream s) throws EncodingAlgorithmException, IOException;
+public final class BuiltInEncodingAlgorithmFactory {
+
+    public final static BuiltInEncodingAlgorithm[] table = new BuiltInEncodingAlgorithm[10];
     
+    public final static IntEncodingAlgorithm intEncodingAlgorithm = new IntEncodingAlgorithm();
     
-    public Object convertFromCharacters(char[] ch, int start, int length) throws EncodingAlgorithmException;
+    public final static FloatEncodingAlgorithm floatEncodingAlgorithm = new FloatEncodingAlgorithm();
     
-    public void convertToCharacters(Object data, StringBuffer s) throws EncodingAlgorithmException;
-    
+    static {
+        table[EncodingAlgorithmIndexes.INT] = intEncodingAlgorithm;
+        table[EncodingAlgorithmIndexes.FLOAT] = floatEncodingAlgorithm;
+    }
 }

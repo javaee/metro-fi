@@ -46,19 +46,24 @@ import java.io.OutputStream;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import org.jvnet.fastinfoset.EncodingAlgorithmException;
 
 
 
 public class IntEncodingAlgorithm extends IntegerEncodingAlgorithm {
-    
-    public final Object decodeFromBytes(byte[] b, int start, int length) {
-        if (length % INT_SIZE != 0) {
-            throw new IllegalArgumentException("'length' is not a multiple of " +
+
+    public final int getLength(int octetLength) throws EncodingAlgorithmException {
+        if (octetLength % INT_SIZE != 0) {
+            throw new EncodingAlgorithmException("'length' is not a multiple of " +
                     INT_SIZE +
                     " bytes correspond to the size of the 'int' primitive type");
         }
         
-        int[] data = new int[length / INT_SIZE];
+        return octetLength / INT_SIZE;
+    }
+    
+    public final Object decodeFromBytes(byte[] b, int start, int length) throws EncodingAlgorithmException {
+        int[] data = new int[getLength(length)];
         decodeFromBytesToIntArray(data, 0, b, start, length);
         
         return data;
@@ -111,7 +116,7 @@ public class IntEncodingAlgorithm extends IntegerEncodingAlgorithm {
         final int size = length / INT_SIZE;
         for (int i = 0; i < size; i++) {
             idata[istart++] = (b[start++] << 24) | (b[start++]<< 16) | (b[start++] << 8) | b[start++];
-        }
+        }        
     }
     
     public final int[] decodeFromInputStreamToIntArray(InputStream s) throws IOException {
@@ -158,7 +163,7 @@ public class IntEncodingAlgorithm extends IntegerEncodingAlgorithm {
             b[start++] = (byte)((bits >>> 24) & 0xFF);
             b[start++] = (byte)((bits >>> 16) & 0xFF);
             b[start++] = (byte)((bits >>>  8) & 0xFF);
-            b[start++] = (byte)((bits >>>  0) & 0xFF);
+            b[start++] = (byte)(bits & 0xFF);
         }
     }
     
