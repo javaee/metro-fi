@@ -45,9 +45,27 @@
       -->
     <driver name="XMLSizeDriver" normal="true">
         <param name="japex.driverClass" value="XMLSizeDriver"/>
+        <param name="description" value="Computes XML size"/>
     </driver>
     <driver name="FastInfosetSizeDriver">
         <param name="japex.driverClass" value="FastInfosetSizeDriver"/>
+        <param name="description" value="Computes FI size"/>
+    </driver>
+    <driver name="FastInfosetSizeExtVocDriver">
+        <param name="japex.driverClass" value="FastInfosetSizeExtVocDriver"/>
+        <param name="description" value="Computes FI size with external vocabulary"/>
+    </driver>
+    <driver name="GzipXMLSizeDriver">
+        <param name="japex.driverClass" value="GzipXMLSizeDriver"/>
+        <param name="description" value="Computes GZIPed XML size"/>
+    </driver>
+    <driver name="GzipFastInfosetSizeDriver">
+        <param name="japex.driverClass" value="GzipFastInfosetSizeDriver"/>
+        <param name="description" value="Computes GZIPed FI size"/>
+    </driver>
+    <driver name="GzipFastInfosetSizeExtVocDriver">
+        <param name="japex.driverClass" value="GzipFastInfosetSizeExtVocDriver"/>
+        <param name="description" value="Computes GZIPed FI size with external vocabulary"/>
     </driver>
     
     <!-- 
