@@ -6,6 +6,8 @@
 
 	<property name="jsr173_api.jar" value="lib/jsr173_api.jar"/>
 
+        <property name="junit.jar" value="lib/junit.jar"/>
+
         <property name="build.dir" value="build" />
         <property name="dist.dir"  value="dist" />
         <property name="package.dir"  value="package" />
@@ -25,7 +27,7 @@
 
 	<target name="clean">
 		<delete quiet="true" dir="${dist.dir}"/>
-		<delete dir="${build.dir}/classes"/>
+		<delete dir="${build.dir}"/>
 	</target>
 
 	<target name="compile" depends="prepare">
@@ -40,6 +42,48 @@
 			basedir="${build.dir}/classes"/>
 	</target>
 
+        
+	<path id="compile-test.class.path">
+		<pathelement path="compile.class.path"/>
+		<pathelement location="${dist.dir}/${app.jar}"/>
+		<pathelement location="${junit.jar}"/>
+	</path>
+        
+	<target name="prepare-test">
+		<mkdir dir="${build.dir}/test/classes"/>
+		<mkdir dir="${build.dir}/test/results"/>
+	</target>
+        
+	<target name="compile-test" depends="prepare-test, dist">
+		<javac source="1.4" srcdir="test" destdir="${build.dir}/test/classes"
+			debug="on" optimize="on" deprecation="on">
+			<classpath refid="compile-test.class.path"/>
+		</javac>
+                <copy todir="${build.dir}/test/classes">
+                    <fileset dir="test">
+                        <include name="X.finf/**"/>
+                    </fileset>
+                </copy>
+	</target>
+
+	<path id="test.class.path">
+		<pathelement path="compile.class.path"/>
+		<pathelement location="${dist.dir}/${app.jar}"/>
+		<pathelement location="${build.dir}/test/classes"/>
+	</path>
+        
+        <target name="test" depends="compile-test">
+            <junit printsummary="yes" fork="yes" dir="test">
+                    <classpath refid="test.class.path"/>
+                    <formatter type="plain"/>
+                <batchtest todir="${build.dir}/test/results">
+                    <fileset dir="test">
+                        <include name="**/*Suite*.java"/>
+                    </fileset>
+                </batchtest>
+            </junit>
+	</target>        
+        
 	<target name="doc" depends="dist">
 		<javadoc source="1.4"
                         sourcepath="src"

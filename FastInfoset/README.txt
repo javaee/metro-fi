@@ -12,3 +12,14 @@ installed.
 
 The source code requires compilation with JDK 1.4.2 or greater.
 
+JUnit
+-----
+
+To compile and run the JUnit tests independently of NetBeans add the junit.jar, 
+version 3.8.1, in the lib directory to your classpath. Compiling and running 
+the tests is performed with:
+
+ant -f build-without-nb.xml test
+
+See http://www.junit.org/ for more details on its usage and how to obtain the 
+source.
