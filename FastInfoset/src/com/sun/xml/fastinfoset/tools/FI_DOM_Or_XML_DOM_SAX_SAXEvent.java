@@ -48,10 +48,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
-import org.jvnet.fastinfoset.FastInfosetSource;
 import org.w3c.dom.Document;
 
 public class FI_DOM_Or_XML_DOM_SAX_SAXEvent extends TransformInputOutput {
