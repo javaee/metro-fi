@@ -45,6 +45,31 @@ import javax.xml.transform.sax.SAXSource;
 import com.sun.xml.fastinfoset.sax.SAXDocumentParser;
 import com.sun.xml.fastinfoset.*;
 
+/**
+ *  A JAXP Source implementation that supports the parsing fast
+ *  infoset document for use by applications that expect a Source.
+ *
+ *  <P>The derivation of FISource from SAXSource is an implementation
+ *  detail.<P>
+ *
+ *  <P>This implementation is designed for interoperation with JAXP and is not
+ *  not designed with performance in mind. It is recommended that for performant
+ *  interoperation alternative parser specific solutions be used.<P>
+ *
+ *  <P>Applications shall obey the following restrictions:
+ *   <UL>
+ *     <LI>The setXMLReader and setInputSource shall not be called.</LI>
+ *     <LI>The XMLReader object obtained by the getXMLReader method shall
+ *        be used only for parsing the InputSource object returned by
+ *        the getInputSource method.</LI>
+ *     <LI>The InputSource object obtained by the getInputSource method shall 
+ *        be used only for being parsed by the XMLReader object returned by 
+ *        the getXMLReader method.</LI>
+ *   </UL>
+ *  </P>
+ *
+ * @version 0.1
+ */
 public class FISource extends SAXSource {
    
     public FISource(InputStream inputStream) {

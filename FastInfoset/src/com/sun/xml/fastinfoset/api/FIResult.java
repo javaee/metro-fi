@@ -43,6 +43,26 @@ import java.io.OutputStream;
 import javax.xml.transform.sax.SAXResult;
 import com.sun.xml.fastinfoset.sax.SAXDocumentSerializer;
 
+/**
+ *  A JAXP Result implementation that supports the serialization to fast
+ *  infoset documents for use by applications that expect a Result.
+ *
+ *  <P>The derivation of FIResult from SAXResult is an implementation
+ *  detail.<P>
+ *  
+ *  <P>This implementation is designed for interoperation with JAXP and is not
+ *  not designed with performance in mind. It is recommended that for performant
+ *  interoperation alternative serializer specific solutions be used.<P>
+ *
+ *  <P>General applications shall not call the following methods:
+ *   <UL>
+ *     <LI>setHandler</LI>
+ *     <LI>setLexicalHandler</LI>
+ *     <LI>setSystemId</LI>
+ *   </UL>
+ *  </P>
+ * @version 0.1
+ */
 public class FIResult extends SAXResult {
    
     public FIResult(OutputStream outputStream) {
