@@ -164,7 +164,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         return null;
     }
         
-    public final int next() throws XMLStreamException {
+    public int next() throws XMLStreamException {
         try {
             if (_internalState != INTERNAL_STATE_VOID) {
                 switch (_internalState) {
@@ -599,7 +599,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         return (_eventType != END_DOCUMENT);
     }
         
-    public final void close() throws XMLStreamException {
+    public void close() throws XMLStreamException {
     }
     
     public final String getNamespaceURI(String prefix) {
