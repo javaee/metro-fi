@@ -10,6 +10,7 @@
     <property name="lib-dir" value="lib"/>
     
     <path id="compile.class.path">
+        <pathelement location="../FastInfoset/dist/FastInfoset.jar"/>
         <fileset dir="${lib-dir}" includes="*.jar"/>
     </path>
     
@@ -36,39 +37,39 @@
     <target name="run" depends="compile">
         <java dir="." fork="true" classname="samples.stax.DocumentSerializer">
             <classpath refid="class.path"/>
-            <arg line="${input}/"/>
-            <arg line="${output}/"/>
+            <arg line="${xml-file}"/>
+            <arg line="${finf-file}"/>
         </java>
     </target>
-    
-    <target name="FISAXSerializer" depends="compile">
-        <java dir="." fork="true" classname="samples.sax.FISerializer">
+        
+    <target name="XMLToFI" depends="compile">
+        <java dir="." fork="true" classname="samples.sax.XMLToFI">
             <classpath refid="class.path"/>
-            <arg line="${xml-file}/"/>
-            <arg line="${finf-file}/"/>
+            <arg line="${xml-file}"/>
+            <arg line="${simple-xml-file}"/>
         </java>
     </target>
 
     <target name="FIStAXSerializer" depends="compile">
         <java dir="." fork="true" classname="samples.stax.DocumentSerializer">
             <classpath refid="class.path"/>
-            <arg line="${xml-file}/"/>
-            <arg line="${finf-file}/"/>
+            <arg line="${xml-file}"/>
+            <arg line="${finf-file}"/>
         </java>
     </target>
 
-    <target name="StreamReader" depends="compile">
+    <target name="StreamReader" depends="XMLToFI">
         <java dir="." fork="true" classname="samples.stax.StreamReader">
             <classpath refid="class.path"/>
-            <arg line="${simple-finf-file}/"/>
+            <arg line="${simple-finf-file}"/>
         </java>
     </target>
 
-    <target name="EventReader" depends="compile">
+    <target name="EventReader" depends="XMLToFI">
         <java dir="." fork="true" classname="samples.stax.EventReader">
             <classpath refid="class.path"/>
-            <arg line="${simple-finf-file}/"/>
-            <arg line="${simple-xml-file}/"/>
+            <arg line="${simple-finf-file}"/>
+            <arg line="${simple-xml-file}"/>
         </java>
     </target>
 </project>
