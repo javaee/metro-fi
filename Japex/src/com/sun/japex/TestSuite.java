@@ -128,6 +128,19 @@ public class TestSuite extends Params {
             }
         }
         
+        // Check runs per driver
+        if (!hasParam(Constants.RUNS_PER_DRIVER)) {
+            setParam(Constants.RUNS_PER_DRIVER, 
+                     Constants.DEFAULT_RUNS_PER_DRIVER);    
+        }
+        else {
+            int runsPerDriver = getIntParam(Constants.RUNS_PER_DRIVER);
+            if (runsPerDriver < 1) {
+                throw new RuntimeException(
+                    "Parameter 'japex.runsPerDriver' must be at least 1");
+            }
+        }
+        
         // Set other global params
         setParam(Constants.VERSION, Constants.VERSION_VALUE);
         setParam(Constants.OS_NAME, System.getProperty("os.name"));
@@ -155,7 +168,9 @@ public class TestSuite extends Params {
                 driverParams.setProperty(Constants.DRIVER_CLASS, dt.getName());
             }            
             _driverInfo.add(
-                new DriverInfo(dt.getName(), dt.isNormal(), driverParams));
+                new DriverInfo(dt.getName(), dt.isNormal(), 
+                               getIntParam(Constants.RUNS_PER_DRIVER),
+                               driverParams));
         }
         
         // Create and populate list of test cases
@@ -174,11 +189,11 @@ public class TestSuite extends Params {
             testCases.add(new TestCase(tc.getName(), localParams));
         }
         
-        // Set list of test cases on each driver (make sure to clone!)
+        // Set list of test cases and number of runs on each driver
         it = _driverInfo.iterator();
         while (it.hasNext()) {
             DriverInfo di = (DriverInfo) it.next();
-            di.setTestCases((List) testCases.clone());
+            di.setTestCases(testCases);
         }
     }
     
@@ -288,7 +303,7 @@ public class TestSuite extends Params {
             
             // Get number of tests from first driver
             final int nOfTests = 
-                ((DriverInfo) _driverInfo.get(0)).getTestCases().size();
+                ((DriverInfo) _driverInfo.get(0)).getAggregateTestCases().size();
             
             // Find first normalizer driver (if any)
             DriverInfo normalizerDriver = null;
@@ -312,12 +327,12 @@ public class TestSuite extends Params {
                 
                 while (jdi.hasNext()) {
                     DriverInfo di = (DriverInfo) jdi.next();
-                    TestCase tc = (TestCase) di.getTestCases().get(i);
+                    TestCase tc = (TestCase) di.getAggregateTestCases().get(i);
             
                     // User normalizer driver if defined
                     if (normalizerDriver != null) {
                         TestCase normalTc = 
-                            (TestCase) normalizerDriver.getTestCases().get(i);
+                            (TestCase) normalizerDriver.getAggregateTestCases().get(i);
                         dataset.addValue(normalizerDriver == di ? 100.0 :
                                 (100.0 * tc.getDoubleParam(Constants.RESULT_VALUE) /
                                  normalTc.getDoubleParam(Constants.RESULT_VALUE)),

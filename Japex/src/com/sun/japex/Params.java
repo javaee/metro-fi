@@ -40,13 +40,10 @@
 package com.sun.japex;
 
 import java.util.*;
-import java.text.DecimalFormat;
 
 import org.apache.tools.ant.taskdefs.Execute;
 
 public class Params {
-    
-    static DecimalFormat _decimalFormat = new DecimalFormat("0.00");
     
     final static int OUT_EXPR = 0;
     final static int IN_EXPR  = 1;
@@ -118,7 +115,7 @@ public class Params {
     
     public synchronized void setDoubleParam(String name, double value) {
         // Cconversion to String is less than ideal in this case.
-        _params.setProperty(name, _decimalFormat.format(value));
+        _params.setProperty(name, Util.formatDouble(value));
     }    
     
     public void serialize(StringBuffer buffer, int indent) {        

@@ -42,6 +42,7 @@ package com.sun.japex;
 import java.io.*;
 import java.util.*;
 import java.lang.reflect.*;
+import java.text.DecimalFormat;
 
 public class Util {
     
@@ -160,14 +161,17 @@ public class Util {
         return nanos / 1000000.0;
     }
     
-    public static double standardDev(double[] sample) {
-        // Compute sample's mean
+    public static double arithmeticMean(double[] sample) {
         double mean = 0.0;
         for (int i = 0; i < sample.length; i++) {
             mean += sample[i];
         }
-        mean /= sample.length;
-        
+        return (mean / sample.length);
+    }
+    
+    public static double standardDev(double[] sample) {
+        double mean = arithmeticMean(sample);
+
         // Compute biased variance
         double variance = 0.0;
         for (int i = 0; i < sample.length; i++) {
@@ -179,4 +183,9 @@ public class Util {
         return Math.sqrt(variance);
     }
     
+    static DecimalFormat _decimalFormat = new DecimalFormat("0.00");
+    
+    public static String formatDouble(double value) {
+        return _decimalFormat.format(value);   
+    }
 }

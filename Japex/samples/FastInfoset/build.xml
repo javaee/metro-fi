@@ -37,8 +37,13 @@
     <target name="run" depends="compile">
         <java dir="." fork="true" classname="com.sun.japex.Japex">
             <jvmarg value="-server"/>
+<!--
             <jvmarg value="-Xms384M"/>
             <jvmarg value="-Xmx384M"/>
+            <jvmarg value="-XX:+PrintCompilation"/>
+            <jvmarg value="-Xmaxjitcodesize128m"/>
+            <jvmarg value="-Dcom.sun.management.jmxremote"/>
+-->
             <classpath refid="class.path"/>
             <arg line="${config}/"/>
         </java>

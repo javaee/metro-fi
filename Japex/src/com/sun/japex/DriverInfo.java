@@ -46,10 +46,15 @@ import java.io.File;
 public class DriverInfo extends Params {
     
     String _name;
-    List _testCases = null;
     JapexClassLoader _classLoader;
     Class _class = null;
     boolean _isNormal = false;
+    boolean _computeMeans = true;
+    
+    TestCaseArrayList[] _testCases;
+    TestCaseArrayList _aggregateTestCases;
+    
+    int _runsPerDriver;
     
     static class JapexClassLoader extends URLClassLoader {
         public JapexClassLoader(URL[] urls) {
@@ -63,19 +68,109 @@ public class DriverInfo extends Params {
         }
     }
        
-    public DriverInfo(String name, boolean isNormal, Properties params) {
+    public DriverInfo(String name, boolean isNormal, int runsPerDriver, 
+        Properties params) 
+    {
         super(params);
         _name = name;
         _isNormal = isNormal;
         _classLoader = newJapexClassLoader();
+        
+        _runsPerDriver = runsPerDriver;
     }
     
-    public void setTestCases(List testCases) {
-        _testCases = testCases;
+    public void setTestCases(TestCaseArrayList testCases) {
+        _testCases = new TestCaseArrayList[_runsPerDriver];
+        for (int i = 0; i < _runsPerDriver; i++) {
+            _testCases[i] = (TestCaseArrayList) testCases.clone();
+        }
+        
+        _aggregateTestCases = (TestCaseArrayList) testCases.clone();
+    }
+        
+    private void computeMeans() {
+        final int runsPerDriver = _testCases.length;
+        
+        // Avoid re-computing the driver's aggregates
+        if (_computeMeans) {
+            final int nOfTests = _testCases[0].size();
+
+            for (int n = 0; n < nOfTests; n++) {
+                double avgRunsResult = 0.0;
+
+                double[] results = new double[runsPerDriver];
+                
+                // Collect all results
+                for (int i = 0; i < runsPerDriver; i++) {            
+                    TestCase tc = (TestCase) _testCases[i].get(n);
+                    results[i] = tc.getDoubleParam(Constants.RESULT_VALUE);
+                }
+                
+                TestCase tc = (TestCase) _aggregateTestCases.get(n);
+                tc.setDoubleParam(Constants.RESULT_VALUE, Util.arithmeticMean(results));
+                tc.setDoubleParam(Constants.RESULT_VALUE_STDDEV, 
+                        runsPerDriver > 1 ? Util.standardDev(results) : 0.0);
+            }
+            
+            // geometric mean = (sum{i,n} x_i) / n
+            double geomMeanresult = 1.0;
+            // arithmetic mean = (prod{i,n} x_i)^(1/n)
+            double aritMeanresult = 0.0;
+            // harmonic mean inverse = sum{i,n} 1/(n * x_i)
+            double harmMeanresultInverse = 0.0;
+            
+            // Re-compute means based on averages for all runs
+            Iterator tci = _aggregateTestCases.iterator();
+            while (tci.hasNext()) {
+                TestCase tc = (TestCase) tci.next();       
+                double result = tc.getDoubleParam(Constants.RESULT_VALUE);
+                
+                // Compute running means 
+                aritMeanresult += result / nOfTests;
+                geomMeanresult *= Math.pow(result, 1.0 / nOfTests);
+                harmMeanresultInverse += 1.0 / (nOfTests * result);
+            }
+            
+            // Set driver-specific params
+            setDoubleParam(Constants.RESULT_ARIT_MEAN, aritMeanresult);
+            setDoubleParam(Constants.RESULT_GEOM_MEAN, geomMeanresult);
+            setDoubleParam(Constants.RESULT_HARM_MEAN, 1.0 / harmMeanresultInverse);      
+            
+            // geometric mean = (sum{i,n} x_i) / n
+            geomMeanresult = 1.0;
+            // arithmetic mean = (prod{i,n} x_i)^(1/n)
+            aritMeanresult = 0.0;
+            // harmonic mean inverse = sum{i,n} 1/(n * x_i)
+            harmMeanresultInverse = 0.0;
+            
+            // Re-compute means based on averages for all runs
+            tci = _aggregateTestCases.iterator();
+            while (tci.hasNext()) {
+                TestCase tc = (TestCase) tci.next();       
+                double result = tc.getDoubleParam(Constants.RESULT_VALUE_STDDEV);
+                
+                // Compute running means 
+                aritMeanresult += result / nOfTests;
+                geomMeanresult *= Math.pow(result, 1.0 / nOfTests);
+                harmMeanresultInverse += 1.0 / (nOfTests * result);
+            }
+            
+            // Set driver-specific params
+            setDoubleParam(Constants.RESULT_ARIT_MEAN_STDDEV, aritMeanresult);
+            setDoubleParam(Constants.RESULT_GEOM_MEAN_STDDEV, geomMeanresult);
+            setDoubleParam(Constants.RESULT_HARM_MEAN_STDDEV, 1.0 / harmMeanresultInverse);      
+            
+            _computeMeans = false;
+        }        
     }
     
-    public List getTestCases() {
-        return _testCases;
+    public List getTestCases(int driverRun) {
+        return _testCases[driverRun];
+    }
+    
+    public List getAggregateTestCases() {
+        computeMeans();  
+        return _aggregateTestCases;
     }
     
     JapexDriverBase getJapexDriver() throws ClassNotFoundException {
@@ -114,7 +209,7 @@ public class DriverInfo extends Params {
         
         super.serialize(report, spaces + 2);
 
-        Iterator tci = _testCases.iterator();
+        Iterator tci = getAggregateTestCases().iterator();
         while (tci.hasNext()) {
             TestCase tc = (TestCase) tci.next();
             tc.serialize(report, spaces + 2);

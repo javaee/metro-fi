@@ -44,6 +44,7 @@ public class Constants {
     // Global input parameters
     public static final String CLASS_PATH        = "japex.classPath";
     public static final String NUMBER_OF_THREADS = "japex.numberOfThreads";
+    public static final String RUNS_PER_DRIVER   = "japex.runsPerDriver";
     
     // Global output parameters
     public static final String VERSION         = "japex.version";
@@ -61,6 +62,9 @@ public class Constants {
     public static final String RESULT_ARIT_MEAN = "japex.resultAritMean";
     public static final String RESULT_GEOM_MEAN = "japex.resultGeomMean";
     public static final String RESULT_HARM_MEAN = "japex.resultHarmMean";
+    public static final String RESULT_ARIT_MEAN_STDDEV = "japex.resultAritMeanStddev";
+    public static final String RESULT_GEOM_MEAN_STDDEV = "japex.resultGeomMeanStddev";
+    public static final String RESULT_HARM_MEAN_STDDEV = "japex.resultHarmMeanStddev";
     
     // Global/Testcase input parameters
     public static final String RUN_ITERATIONS    = "japex.runIterations";
@@ -78,9 +82,11 @@ public class Constants {
     public static final String ACTUAL_WARMUP_TIME   = "japex.actualWarmupTime";
     public static final String ACTUAL_PREPARE_TIME  = "japex.actualPrepareTime";        
     public static final String RESULT_VALUE         = "japex.resultValue";
+    public static final String RESULT_VALUE_STDDEV  = "japex.resultValueStddev";
     
     // Default values
     public static final String DEFAULT_WARMUP_ITERATIONS = "300";
     public static final String DEFAULT_RUN_ITERATIONS    = "300";
     public static final String DEFAULT_NUMBER_OF_THREADS = "1";
+    public static final String DEFAULT_RUNS_PER_DRIVER   = "1";
 }

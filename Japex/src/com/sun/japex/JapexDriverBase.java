@@ -81,14 +81,14 @@ public class JapexDriverBase implements JapexDriver {
         String warmupTime = tc.getParam(Constants.WARMUP_TIME);
         if (warmupTime != null) {
             // Calculate end time
-            long startTime = Util.currentTimeMillis();
+            long startTime = millis = Util.currentTimeMillis();
             long endTime = startTime + Util.parseDuration(warmupTime);
 
-            do {
+            while (endTime > millis) {
                 warmup(tc);      // Call warmup
                 warmupIterations++;
                 millis = Util.currentTimeMillis();
-            } while (endTime >= millis);
+            } 
 
             // Set actual number of millis
             millis -= startTime;
