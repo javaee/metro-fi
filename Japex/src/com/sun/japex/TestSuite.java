@@ -350,8 +350,8 @@ public class TestSuite extends Params {
                 }
             }
             
-            // Generate last chart
-            if (i % groupSize != 0) {
+            // Generate first (if exactly groupSize tests) or last chart
+            if (i == groupSize || i % groupSize != 0) {
                 JFreeChart chart = ChartFactory.createBarChart3D(
                     "Results per Test (" + resultUnit + ")", 
                     "", resultUnit, 
