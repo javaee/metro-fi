@@ -131,6 +131,9 @@ public final class EncodingConstants {
 
     public static final int CHARACTER_CHUNK = 0x80; // 10
     public static final int CHARACTER_CHUNK_ADD_TO_TABLE_FLAG = 0x10; // 00010000
+    public static final int CHARACTER_CHUNK_UTF_8_FLAG = 0x00; // 00000000
+    public static final int CHARACTER_CHUNK_UTF_16_FLAG = 0x04; // 00000100
+    public static final int CHARACTER_CHUNK_RESTRICTED_ALPHABET_FLAG = 0x08; // 00001000
     public static final int CHARACTER_CHUNK_ENCODING_ALGORITHM_FLAG = 0x0C; // 00001100
     
     public static final int UNEXPANDED_ENTITY_REFERENCE = 0xC8; // 110010
@@ -139,6 +142,9 @@ public final class EncodingConstants {
     public static final int UNEXPANDED_ENTITY_PUBLIC_IDENTIFIER_FLAG = 0x01;
     
     public static final int NISTRING_ADD_TO_TABLE_FLAG = 0x40; // 01000000
+    public static final int NISTRING_UTF_8_FLAG = 0x00; // 00000000
+    public static final int NISTRING_UTF_16_FLAG = 0x10; // 00010000
+    public static final int NISTRING_RESTRICTED_ALPHABET_FLAG = 0x20; // 00100000
     public static final int NISTRING_ENCODING_ALGORITHM_FLAG = 0x30; // 00110000
     
     public static final int TERMINATOR = 0xF0;

@@ -43,10 +43,10 @@ import com.sun.xml.fastinfoset.Decoder;
 import com.sun.xml.fastinfoset.DecoderStateTables;
 import com.sun.xml.fastinfoset.EncodingConstants;
 import com.sun.xml.fastinfoset.QualifiedName;
+import com.sun.xml.fastinfoset.algorithm.BuiltInEncodingAlgorithmFactory;
 import com.sun.xml.fastinfoset.sax.AttributesHolder;
 import com.sun.xml.fastinfoset.util.CharArray;
 import com.sun.xml.fastinfoset.util.CharArrayString;
-import com.sun.xml.fastinfoset.util.QualifiedNameArray;
 import com.sun.xml.fastinfoset.util.XMLChar;
 import com.sun.xml.fastinfoset.util.EventLocation;
 import java.io.IOException;
@@ -62,6 +62,8 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import org.jvnet.fastinfoset.EncodingAlgorithm;
+import org.jvnet.fastinfoset.EncodingAlgorithmException;
 import org.jvnet.fastinfoset.FastInfosetException;
 
 public class StAXDocumentParser extends Decoder implements XMLStreamReader {
@@ -71,7 +73,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     protected static final int INTERNAL_STATE_DOUBLE_TERMINATE_ELEMENT = 3;
     protected static final int INTERNAL_STATE_END_DOCUMENT = 4;
     protected static final int INTERNAL_STATE_VOID = -1;
-    
+
     protected int _internalState;
     
     /**
@@ -115,6 +117,12 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     protected char[] _characters;
     protected int _charactersOffset;
     protected int _charactersLength;
+
+    protected String _algorithmURI;
+    protected int _algorithmId;
+    protected byte[] _algorithmData;
+    protected int _algorithmDataOffset;
+    protected int _algorithmDataLength;
     
     /**
      * State for processing instruction
@@ -235,6 +243,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                         
             // Reset internal state
             _characters = null;
+            _algorithmData = null;
             _currentNamespaceAIIsEnd = 0;
             
             // Process information item
@@ -276,7 +285,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     ? decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(_v.namespaceName) : "";
                     final String localName = decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName);
                     
-                    final QualifiedName qualifiedName = new QualifiedName(prefix, namespaceName, localName);
+                    final QualifiedName qualifiedName = new QualifiedName(prefix, namespaceName, localName, "");
                     _v.elementName.add(qualifiedName);
                     processEII(qualifiedName, (b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
                     return _eventType;
@@ -381,14 +390,19 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 }
                 case DecoderStateTables.CII_EA:
                 {
-                    final boolean addToTable = (_b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0;
-                    // Decode encoding algorithm integer
-                    _identifier = (_b & 0x02) << 6;
-                    final int b2 = read();
-                    _identifier |= (b2 & 0xFC) >> 2;
+                    if ((b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0) {
+                        throw new EncodingAlgorithmException("Add to table not supported for Encoding algorithms");
+                    }
                     
-                    decodeOctetsOfNonIdentifyingStringOnThirdBit(b2);
-                    throw new IOException("Encoding algorithms for CIIs not yet implemented");
+                    // Decode encoding algorithm integer
+                    _algorithmId = (_b & 0x02) << 6;
+                    _b = read();
+                    _algorithmId |= (_b & 0xFC) >> 2;
+                    
+                    decodeOctetsOfNonIdentifyingStringOnThirdBit(_b);                    
+                    processCIIEncodingAlgorithm();
+                    
+                    return _eventType = CHARACTERS;
                 }
                 case DecoderStateTables.CII_INDEX_SMALL:
                 {
@@ -769,7 +783,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     
     public final String getText() {
         if (_characters == null) {
-            throw new IllegalStateException("Method getText() called in invalid state");
+            checkTextState();
         }
         
         return new String(_characters,
@@ -779,7 +793,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     
     public final char[] getTextCharacters() {
         if (_characters == null) {
-            throw new IllegalStateException("Method getText() called in invalid state");
+            checkTextState();
         }
         
         return _characters;
@@ -787,16 +801,15 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     
     public final int getTextStart() {
         if (_characters == null) {
-            throw new IllegalStateException("Method getTextStart() called in invalid state");
+            checkTextState();
         }
-        
-        
+                
         return _charactersOffset;
     }
     
     public final int getTextLength() {
         if (_characters == null) {
-            throw new IllegalStateException("Method getTextStart() called in invalid state");
+            checkTextState();
         }
         
         return _charactersLength;
@@ -805,16 +818,27 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     public final int getTextCharacters(int sourceStart, char[] target,
             int targetStart, int length) throws XMLStreamException {
         if (_characters == null) {
-            throw new IllegalStateException("Method getText() called in invalid state");
+            checkTextState();
         }
         
         try {
-            // TODO: other cases?
             System.arraycopy(_characters, sourceStart, target,
                     targetStart, length);
             return length;
         } catch (IndexOutOfBoundsException e) {
             throw new XMLStreamException(e);
+        }
+    }
+    
+    protected final void checkTextState() {
+        if (_algorithmData == null) {
+            throw new IllegalStateException("Invalid state for text");
+        }
+        
+        try {
+            convertEncodingAlgorithmDataToCharacters();
+        } catch (Exception e) {
+            throw new IllegalStateException("Invalid state for text");
         }
     }
     
@@ -900,6 +924,58 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         return _piData;
     }
     
+
+    
+    
+    
+    public final String getTextAlgorithmURI() {
+        return _algorithmURI;
+    }
+ 
+    public final int getTextAlgorithmIndex() {
+        return _algorithmId;
+    }
+    
+    public final byte[] getTextAlgorithmBytes() {
+        if (_algorithmData == null) {
+            throw new IllegalStateException("Method getTextAlgorithmBytes() called in invalid state");
+        }
+        
+        return _algorithmData;
+    }
+    
+    public final int getTextAlgorithmStart() {
+        if (_algorithmData == null) {
+            throw new IllegalStateException("Method getTextAlgorithmStart() called in invalid state");
+        }
+                
+        return _algorithmDataOffset;
+    }
+    
+    public final int getTextAlgorithmLength() {
+        if (_algorithmData == null) {
+            throw new IllegalStateException("Method getTextAlgorithmStart() called in invalid state");
+        }
+        
+        return _algorithmDataLength;
+    }
+    
+    public final int getTextAlgorithmBytes(int sourceStart, byte[] target,
+            int targetStart, int length) throws XMLStreamException {
+        if (_algorithmData == null) {
+            throw new IllegalStateException("Method getTextAlgorithmBytes() called in invalid state");
+        }
+        
+        try {
+            System.arraycopy(_algorithmData, sourceStart, target,
+                    targetStart, length);
+            return length;
+        } catch (IndexOutOfBoundsException e) {
+            throw new XMLStreamException(e);
+        }
+    }
+    
+
     
     //
     
@@ -976,7 +1052,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 ? decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(_v.namespaceName) : "";
                 final String localName = decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName);
                 
-                final QualifiedName qualifiedName = new QualifiedName(prefix, namespaceName, localName);
+                final QualifiedName qualifiedName = new QualifiedName(prefix, namespaceName, localName, "");
                 _v.elementName.add(qualifiedName);
                 processEII(qualifiedName, hasAttributes);
                 break;
@@ -1056,7 +1132,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     ? decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(_v.namespaceName) : "";
                     final String localName = decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName);
                     
-                    name = new QualifiedName(prefix, namespaceName, localName);
+                    name = new QualifiedName(prefix, namespaceName, localName, "");
                     _v.attributeName.add(name);
                     break;
                 }
@@ -1174,14 +1250,18 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 }
                 case DecoderStateTables.NISTRING_EA:
                 {
-                    final boolean addToTable = (b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0;
+                    if ((b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0) {
+                        throw new EncodingAlgorithmException("Add to table not supported for Encoding algorithms");
+                    }
+                    
                     // Decode encoding algorithm integer
                     _identifier = (b & 0x0F) << 4;
                     b = read();
                     _identifier |= (b & 0xF0) >> 4;
                     
                     decodeOctetsOfNonIdentifyingStringOnFirstBit(b);
-                    throw new FastInfosetException("Encoding algorithms not supported for [normalized value] property of AII");
+                    processAIIEncodingAlgorithm(name);
+                    break;
                 }
                 case DecoderStateTables.NISTRING_INDEX_SMALL:
                     value = _v.attributeValue.get(b & EncodingConstants.INTEGER_2ND_BIT_SMALL_MASK);
@@ -1269,7 +1349,65 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         }
     }
     
+    protected final void processCIIEncodingAlgorithm() throws FastInfosetException, IOException {
+        _algorithmData = _octetBuffer;
+        _algorithmDataOffset = _octetBufferStart;
+        _algorithmDataLength = _octetBufferLength;
+            
+        if (_algorithmId >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
+            _algorithmURI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
+            if (_algorithmURI == null) {
+                throw new EncodingAlgorithmException("URI not present for encoding algorithm identifier " + _identifier);
+            }
+        } else if (_algorithmId > EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
+            // Reserved built-in algorithms for future use
+            // TODO should use sax property to decide if event will be
+            // reported, allows for support through handler if required.
+            throw new EncodingAlgorithmException("Encoding algorithm identifiers 10 up to and including 31 are reserved for future use");
+        }
+    }
     
+    protected final void processAIIEncodingAlgorithm(QualifiedName name) throws FastInfosetException, IOException {
+        String URI = null;
+        if (_identifier >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
+            URI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
+            if (URI == null) {
+                throw new EncodingAlgorithmException("URI not present for encoding algorithm identifier " + _identifier);
+            }
+        } else if (_identifier > EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
+            // Reserved built-in algorithms for future use
+            // TODO should use sax property to decide if event will be
+            // reported, allows for support through handler if required.
+            throw new EncodingAlgorithmException("Encoding algorithm identifiers 10 up to and including 31 are reserved for future use");
+        }
+        
+        final byte[] data = new byte[_octetBufferLength];
+        System.arraycopy(_octetBuffer, _octetBufferStart, data, 0, _octetBufferLength);
+        _attributes.addAttributeWithAlgorithmData(name, URI, _identifier, data);
+    }
+
+    protected final void convertEncodingAlgorithmDataToCharacters() throws FastInfosetException, IOException {
+        StringBuffer buffer = new StringBuffer();
+        if (_algorithmId <= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
+            Object array = BuiltInEncodingAlgorithmFactory.table[_identifier].
+                decodeFromBytes(_algorithmData, _algorithmDataOffset, _algorithmDataLength);
+            BuiltInEncodingAlgorithmFactory.table[_algorithmId].convertToCharacters(array,  buffer);
+        } else if (_algorithmId >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
+            final EncodingAlgorithm ea = (EncodingAlgorithm)_registeredEncodingAlgorithms.get(_algorithmURI);
+            if (ea != null) {
+                final Object data = ea.decodeFromBytes(_octetBuffer, _octetBufferStart, _octetBufferLength);
+                ea.convertToCharacters(data, buffer);
+            } else {
+                throw new EncodingAlgorithmException(
+                        "Document contains application-defined encoding algorithm data that cannot be reported");
+            }
+        }
+        
+        _characters = new char[buffer.length()];
+        buffer.getChars(0, buffer.length(), _characters, 0);
+        _charactersOffset = 0;
+        _charactersLength = _charBufferLength;                    
+    }
     
     protected class NamespaceContextImpl implements NamespaceContext {
         public final String getNamespaceURI(String prefix) {

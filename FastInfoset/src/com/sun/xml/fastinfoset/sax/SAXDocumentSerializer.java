@@ -65,7 +65,6 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
     }
 
 
-
     // ContentHandler
 
     public final void startDocument() throws SAXException {

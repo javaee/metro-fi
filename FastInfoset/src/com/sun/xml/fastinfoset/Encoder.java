@@ -60,8 +60,26 @@ import org.jvnet.fastinfoset.Vocabulary;
 import org.xml.sax.helpers.DefaultHandler;
 
 public abstract class Encoder extends DefaultHandler implements FastInfosetSerializer {
-    protected int _characterCount = 0;
+    // Character encoding scheme system property
+    public static final String CHARACTER_ENCODING_SCHEME_SYSTEM_PROPERTY =
+        "com.sun.xml.fastinfoset.serializer.character-encoding-scheme";
 
+    protected static String _characterEncodingSchemeSystemDefault = UTF_8;
+        
+    static {
+        String p = System.getProperty(CHARACTER_ENCODING_SCHEME_SYSTEM_PROPERTY,
+            _characterEncodingSchemeSystemDefault);
+        if (p.equals(UTF_16BE)) {
+            _characterEncodingSchemeSystemDefault = UTF_16BE;
+        }
+    }
+
+    protected boolean _encodingStringsAsUtf8 = true;
+    
+    protected int _nonIdentifyingStringOnThirdBitCES;
+
+    protected int _nonIdentifyingStringOnFirstBitCES;
+    
     protected Map _registeredEncodingAlgorithms = new HashMap();
 
     protected SerializerVocabulary _v;
@@ -85,8 +103,28 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     
     // FastInfosetSerializer
 
+    public Encoder() {
+        setCharacterEncodingScheme(_characterEncodingSchemeSystemDefault);
+    }
+    
     public void reset() {
         _terminate = false;
+    }
+    
+    public void setCharacterEncodingScheme(String characterEncodingScheme) {
+        if (characterEncodingScheme.equals(UTF_16BE)) { 
+            _encodingStringsAsUtf8 = false;
+            _nonIdentifyingStringOnThirdBitCES = EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_UTF_16_FLAG;
+            _nonIdentifyingStringOnFirstBitCES = EncodingConstants.NISTRING_UTF_16_FLAG;
+        } else {
+            _encodingStringsAsUtf8 = true;
+            _nonIdentifyingStringOnThirdBitCES = EncodingConstants.CHARACTER_CHUNK;
+            _nonIdentifyingStringOnFirstBitCES = 0;
+        }
+    }
+        
+    public String getCharacterEncodingScheme() {
+        return (_encodingStringsAsUtf8) ? UTF_8 : UTF_16BE;
     }
     
     public void setRegisteredEncodingAlgorithms(Map algorithms) {
@@ -232,16 +270,12 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     }
 
     protected final void encodeCharacters(char[] ch, int start, int length) throws IOException {
-       _b = EncodingConstants.CHARACTER_CHUNK;
-
-        boolean addToTable = (length < _v.characterContentChunkSizeContraint) ? true : false;
+        final boolean addToTable = (length < _v.characterContentChunkSizeContraint) ? true : false;
         encodeNonIdentifyingStringOnThirdBit(ch, start, length, _v.characterContentChunk, addToTable, true);
     }
 
     protected final void encodeCharactersNoClone(char[] ch, int start, int length) throws IOException {
-       _b = EncodingConstants.CHARACTER_CHUNK;
-
-        boolean addToTable = (length < _v.characterContentChunkSizeContraint) ? true : false;
+        final boolean addToTable = (length < _v.characterContentChunkSizeContraint) ? true : false;
         encodeNonIdentifyingStringOnThirdBit(ch, start, length, _v.characterContentChunk, addToTable, false);
     }
 
@@ -424,14 +458,14 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
             if (addToTable) {
                 int index = map.obtainIndex(s);
                 if (index == KeyIntMap.NOT_PRESENT) {
-                    _b = EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG;
-                    encodeEncodedCharacterStringAsUTF8OnThirdBit(s);
+                    _b = EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG | _nonIdentifyingStringOnFirstBitCES;
+                    encodeNonEmptyCharacterStringOnFifthBit(s);
                 } else {
                     encodeNonZeroIntegerOnSecondBitFirstBitOne(index);
                 }
             } else {
-                _b = 0;
-                encodeEncodedCharacterStringAsUTF8OnThirdBit(s);
+                _b = _nonIdentifyingStringOnFirstBitCES;
+                encodeNonEmptyCharacterStringOnFifthBit(s);
             }
         }
     }
@@ -449,14 +483,14 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                 final int length = s.length();
                 int index = map.obtainIndex(ch, 0, length, false);
                 if (index == KeyIntMap.NOT_PRESENT) {
-                    _b = EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG;
-                    encodeEncodedCharacterStringAsUTF8OnThirdBit(ch, 0, length);
+                    _b = EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG | _nonIdentifyingStringOnFirstBitCES;
+                    encodeNonEmptyCharacterStringOnFifthBit(ch, 0, length);
                 } else {
                     encodeNonZeroIntegerOnSecondBitFirstBitOne(index);
                 }
             } else {
-                _b = 0;
-                encodeEncodedCharacterStringAsUTF8OnThirdBit(s);
+                _b = _nonIdentifyingStringOnFirstBitCES;
+                encodeNonEmptyCharacterStringOnFifthBit(s);
             }
         }
     }
@@ -473,14 +507,14 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
             if (addToTable) {
                 int index = map.obtainIndex(array, start, length, clone);
                 if (index == KeyIntMap.NOT_PRESENT) {
-                    _b = EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG;
-                    encodeEncodedCharacterStringAsUTF8OnThirdBit(array, start, length);
+                    _b = EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG | _nonIdentifyingStringOnFirstBitCES;
+                    encodeNonEmptyCharacterStringOnFifthBit(array, start, length);
                 } else {
                     encodeNonZeroIntegerOnSecondBitFirstBitOne(index);
                 }
             } else {
-                _b = 0;
-                encodeEncodedCharacterStringAsUTF8OnThirdBit(array, start, length);
+                _b = _nonIdentifyingStringOnFirstBitCES;
+                encodeNonEmptyCharacterStringOnFifthBit(array, start, length);
             }
         }
     }
@@ -605,20 +639,6 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     }
 
     /*
-     * C.19
-     */
-    protected final void encodeEncodedCharacterStringAsUTF8OnThirdBit(String s) throws IOException {
-        encodeNonEmptyOctetStringOnFifthBit(s);
-    }
-
-    /*
-     * C.19
-     */
-    protected final void encodeEncodedCharacterStringAsUTF8OnThirdBit(char[] array, int start, int length) throws IOException {
-        encodeNonEmptyOctetStringOnFifthBit(array, start, length);
-    }
-
-    /*
      * C.15
      */
     protected final void encodeNonIdentifyingStringOnThirdBit(char[] array, int start, int length,
@@ -628,14 +648,16 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         if (addToTable) {
             int index = map.obtainIndex(array, start, length, clone);
             if (index == KeyIntMap.NOT_PRESENT) {
-                _b |= EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG;
-                encodeEncodedCharacterStringAsUTF8OnFifthBit(array, start, length);
+                _b = EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG | 
+                        _nonIdentifyingStringOnThirdBitCES;
+                encodeNonEmptyCharacterStringOnSeventhBit(array, start, length);
             } else {
-                _b |= 0x20;
+                _b = EncodingConstants.CHARACTER_CHUNK | 0x20;
                 encodeNonZeroIntegerOnFourthBit(index);
             }
         } else {
-            encodeEncodedCharacterStringAsUTF8OnFifthBit(array, start, length);
+            _b = _nonIdentifyingStringOnThirdBitCES;
+            encodeNonEmptyCharacterStringOnSeventhBit(array, start, length);
         }
     }
 
@@ -767,13 +789,6 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     }
 
     /*
-     * C.20
-     */
-    protected final void encodeEncodedCharacterStringAsUTF8OnFifthBit(char[] array, int start, int length) throws IOException {
-        encodeNonEmptyOctetStringOnSeventhBit(array, start, length);
-    }
-
-    /*
      * C.13
      */
     protected final void encodeIdentifyingNonEmptyStringOnFirstBit(String s, StringIntMap map) throws IOException {
@@ -822,8 +837,8 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     /*
      * C.23
      */
-    protected final void encodeNonEmptyOctetStringOnFifthBit(String s) throws IOException {
-        final int length = encodeUTF8String(s);
+    protected final void encodeNonEmptyCharacterStringOnFifthBit(String s) throws IOException {
+        final int length = (_encodingStringsAsUtf8) ? encodeUTF8String(s) : encodeUtf16String(s);
         encodeNonZeroOctetStringLengthOnFifthBit(length);
         write(_encodingBuffer, length);
     }
@@ -831,8 +846,8 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     /*
      * C.23
      */
-    protected final void encodeNonEmptyOctetStringOnFifthBit(char[] array, int start, int length) throws IOException {
-        length = encodeUTF8String(array, start, length);
+    protected final void encodeNonEmptyCharacterStringOnFifthBit(char[] array, int start, int length) throws IOException {
+        length = (_encodingStringsAsUtf8) ? encodeUTF8String(array, start, length) : encodeUtf16String(array, start, length);
         encodeNonZeroOctetStringLengthOnFifthBit(length);
         write(_encodingBuffer, length);
     }
@@ -862,8 +877,8 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     /*
      * C.24
      */
-    protected final void encodeNonEmptyOctetStringOnSeventhBit(char[] array, int start, int length) throws IOException {
-        length = encodeUTF8String(array, start, length);
+    protected final void encodeNonEmptyCharacterStringOnSeventhBit(char[] array, int start, int length) throws IOException {
+        length = (_encodingStringsAsUtf8) ? encodeUTF8String(array, start, length) : encodeUtf16String(array, start, length);
         encodeNonZeroOctetStringLengthOnSenventhBit(length);
         write(_encodingBuffer, length);
     }
@@ -1087,7 +1102,18 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
             return encodeUTF8String(ch, 0, length);
         }
     }
-
+    
+    protected final int encodeUtf16String(String s) throws IOException {
+        final int length = s.length();
+        if (length < _charBuffer.length) {
+            s.getChars(0, length, _charBuffer, 0);
+            return encodeUtf16String(_charBuffer, 0, length);
+        } else {
+            char[] ch = s.toCharArray();
+            return encodeUtf16String(ch, 0, length);
+        }
+    }
+    
     protected final void mark() throws IOException {
         _markIndex = _octetBufferIndex;
     }
@@ -1243,6 +1269,29 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         return byteLength;
     }
 
+    protected final void ensureEncodingBufferSizeForUtf16String(int length) {
+        final int newLength = 2 * length;
+        if (_encodingBuffer.length < newLength) {
+            _encodingBuffer = new byte[newLength];
+        }
+    }
+
+    protected final int encodeUtf16String(char[] ch, int start, int length) throws IOException {
+        int byteLength = 0;
+
+        // Make sure buffer is large enough
+        ensureEncodingBufferSizeForUtf16String(length);
+
+        final int n = start + length;
+        for (int i = start; i < n; i++) {
+            final int c = (int) ch[i];
+            _encodingBuffer[byteLength++] = (byte)(c >> 8);
+            _encodingBuffer[byteLength++] = (byte)(c & 0xFF);
+        }
+
+        return byteLength;
+    }
+    
     public static String getPrefixFromQualifiedName(String qName) {
         int i = qName.indexOf(':');
         String prefix = "";

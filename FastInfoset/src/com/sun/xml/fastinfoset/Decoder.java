@@ -1045,8 +1045,7 @@ public abstract class Decoder implements FastInfosetParser {
                 _charBuffer[_charBufferLength++] = (char) b1;
             } else {
                 b1 = (b1 < 0) ? (b1 & 0x7F) | 0x80 : b1;
-                final int state = DecoderStateTables.UTF8[b1];
-                switch(state) {
+                switch(DecoderStateTables.UTF8[b1]) {
                     // Check for 0x09, 0x0A and 0x0D
                     case DecoderStateTables.UTF8_ONE_BYTE:
                     {
@@ -1249,7 +1248,17 @@ public abstract class Decoder implements FastInfosetParser {
     }
 
     public final void decodeUtf16StringIntoCharBuffer() throws IOException {
-        throw new IOException("UTF-16 decoding not implemented");
+        _charBufferLength = _octetBufferLength / 2;
+        if (_charBuffer.length < _charBufferLength) {
+            _charBuffer = new char[_charBufferLength];
+        }
+
+        for (int i = 0; i < _charBufferLength; i++) {
+            final char c = (char)((read() << 8) | read());
+            // TODO check c is a valid Char character
+            _charBuffer[i] = c;
+        }
+        
     }
 
     protected final int read() throws IOException {

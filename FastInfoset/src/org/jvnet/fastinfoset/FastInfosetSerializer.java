@@ -46,6 +46,28 @@ import java.util.Map;
  * @author Paul.Sandoz@Sun.Com
  */
 public interface FastInfosetSerializer {
+    public static final String UTF_8 = "UTF-8";
+    
+    public static final String UTF_16BE = "UTF-16BE";
+    
+    /**
+     * Sets the character encoding scheme.
+     *
+     * The character encoding can be either UTF-8 or UTF-16BE for the
+     * the encoding of chunks of CIIs, the [normalized value]
+     * property of attribute information items, comment information
+     * items and processing instruction information items.
+     *
+     * @param characterEncodingScheme The set of registered algorithms.
+     */
+    public void setCharacterEncodingScheme(String characterEncodingScheme);
+    
+    /**
+     * Gets the character encoding scheme.
+     *
+     * @return The character encoding scheme.
+     */
+    public String getCharacterEncodingScheme();
     
     /**
      * Sets the set of registered encoding algorithms.
