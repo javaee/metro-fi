@@ -68,11 +68,13 @@ import com.sun.xml.fastinfoset.stax.SAX2StAXWriter;
  *  SAX2StAXWriter extends DefaultHandler and implements LexicalHandler, which allows it
  *  to be used to handle SAX events. The source and result are then used by the JAXP transformer
  *  to transform the XML file to FI document which was passed in as OutputStream for the StAX 
- *  serializer.<br>
+ *  serializer object. The XML inputstream is first transformed into a ByteArrayOutputStream 
+ *  that may be used for other processing. In this sample, we simply write it out into a file.<br><br>
  *  Fastinfoset StAX package fully implements the StAX API as specified in JSR173. Property 
  *  javax.xml.stream.XMLOutputFactory needs to be specfied as does in the sample to obtain 
  *  the FI OutputFactory imlementation class. Once getting the factory, a FI StAX serializer is
- *  created by calling the factory's createXMLStreamWriter(OutputStream) method.
+ *  created by calling the factory's createXMLStreamWriter(OutputStream) method.<br>
+ *
  */
 
 public class DocumentSerializer {
@@ -118,7 +120,6 @@ public class DocumentSerializer {
      */
     void getSAXResult(File output) {
         try {
-            //BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(output));
             _baos = new ByteArrayOutputStream();
             XMLStreamWriter serializer = factory.createXMLStreamWriter(_baos);
             SAX2StAXWriter saxTostax = new SAX2StAXWriter(serializer);
@@ -141,23 +142,24 @@ public class DocumentSerializer {
     public void write(File input, File output) {
         getDOMSource(input);
         getSAXResult(output);
-        for (int i=1; i<6; i++) {
-            _baos.reset();
-            if (_source != null && _result != null) {
-                try {
-                    System.out.println("Transforming "+input.getName()+ " into " + output.getName());
-                    _transformer.transform(_source, _result);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                System.out.println("\ndone.");
+        if (_source != null && _result != null) {
+            try {
+                System.out.println("Transforming "+input.getName()+ " into " + output.getName());
+                //Transform the XML inputstream into ByteArrayOutputStream
+                _transformer.transform(_source, _result);
+
+                //the ByteArrayOutputStream may be used for other processing
+                //in this sample, we simply write it out to a file
+                BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(output));
+                _baos.writeTo(fos);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            System.out.println("\ndone.");
         } else {
                 System.out.println("Source or Result could not be null.");
-            }  
-        }
+        }  
         try {
-            BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(output));
-            _baos.writeTo(fos);
         } catch (Exception e) {
             e.printStackTrace();
         }
