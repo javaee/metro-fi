@@ -56,6 +56,7 @@ import org.xml.sax.helpers.NamespaceSupport;
 
 public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
     protected StAXManager _manager;
+    
     protected String _encoding;
     /**
      * Local name of current element.
@@ -85,8 +86,9 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
     /**
      * List of attributes qnames and values defined in the current element.
      */
-    protected ArrayList _attributes = new ArrayList();
-
+    protected String[] _attributesArray = new String[4 * 16];
+    protected int _attributesArrayIndex = 0;
+    
     /**
      * Mapping between uris and prefixes.
      */
@@ -97,8 +99,8 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
     /**
      * List of namespaces defined in the current element.
      */
-    protected QualifiedNameArray _namespaces = new QualifiedNameArray(4);
-    
+    protected String[] _namespacesArray = new String[2 * 8];
+    protected int _namespacesArrayIndex = 0;
     
     public StAXDocumentSerializer() {    
     }
@@ -113,8 +115,8 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
     }
     
     public void reset() {        
-        _attributes.clear();
-        _namespaces.clear();
+        _attributesArrayIndex = 0;
+        _namespacesArrayIndex = 0;
         _nsSupport.reset();
                 
         _currentUri = _currentPrefix = null;
@@ -269,8 +271,8 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
             if (prefix == null || prefix.length() == 0) {
                 // Workaround for BUG in SAX NamespaceSupport helper
                 // which incorrectly defines namespace declaration URI
-                if (namespaceURI == "http://www.w3.org/2000/xmlns/" || 
-                        namespaceURI.equals("http://www.w3.org/2000/xmlns/")) {
+                if (namespaceURI == EncodingConstants.XMLNS_NAMESPACE_NAME || 
+                        namespaceURI.equals(EncodingConstants.XMLNS_NAMESPACE_NAME)) {
                     // TODO
                     // Need to check carefully the rule for the writing of
                     // namespaces in StAX. Is it safe to ignore such 
@@ -297,26 +299,42 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         // namespaces in StAX. Is it safe to ignore such 
         // attributes, as declarations will be made using the
         // writeNamespace method
-        if (namespaceURI == "http://www.w3.org/2000/xmlns/" || 
-                namespaceURI.equals("http://www.w3.org/2000/xmlns/")) {
+        if (namespaceURI == EncodingConstants.XMLNS_NAMESPACE_NAME || 
+                namespaceURI.equals(EncodingConstants.XMLNS_NAMESPACE_NAME)) {
             return;
         }
 
-        _attributes.add(new QualifiedName(prefix, namespaceURI, localName, ""));
-        _attributes.add(value);
+        if (_attributesArrayIndex == _attributesArray.length) {
+            final String[] attributesArray = new String[_attributesArrayIndex * 2];
+            System.arraycopy(_attributesArray, 0, attributesArray, 0, _attributesArrayIndex);
+            _attributesArray = attributesArray;
+        }
+        
+        _attributesArray[_attributesArrayIndex++] = namespaceURI;
+        _attributesArray[_attributesArrayIndex++] = prefix;
+        _attributesArray[_attributesArrayIndex++] = localName;
+        _attributesArray[_attributesArrayIndex++] = value;
     }
     
     public void writeNamespace(String prefix, String namespaceURI)
         throws XMLStreamException
     {
-        if (prefix == null || prefix.length() == 0 || prefix.equals("xmlns")) {
+        if (prefix == null || prefix.length() == 0 || prefix.equals(EncodingConstants.XMLNS_NAMESPACE_PREFIX)) {
             writeDefaultNamespace(namespaceURI);
         }
         else {
             if (!_inStartElement) {
                 throw new IllegalStateException("Current state does not allow attribute writing");
-            }           
-            _namespaces.add(new QualifiedName(prefix, namespaceURI));
+            }
+            
+            if (_namespacesArrayIndex == _namespacesArray.length) {
+                final String[] namespacesArray = new String[_namespacesArrayIndex * 2];
+                System.arraycopy(_namespacesArray, 0, namespacesArray, 0, _namespacesArrayIndex);
+                _namespacesArray = namespacesArray;
+            }
+            
+            _namespacesArray[_namespacesArrayIndex++] = prefix;
+            _namespacesArray[_namespacesArrayIndex++] = namespaceURI;
         }
     }
     
@@ -326,7 +344,15 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         if (!_inStartElement) {
             throw new IllegalStateException("Current state does not allow attribute writing");
         }
-        _namespaces.add(new QualifiedName("", namespaceURI));
+        
+        if (_namespacesArrayIndex == _namespacesArray.length) {
+            final String[] namespacesArray = new String[_namespacesArrayIndex * 2];
+            System.arraycopy(_namespacesArray, 0, namespacesArray, 0, _namespacesArrayIndex);
+            _namespacesArray = namespacesArray;
+        }
+
+        _namespacesArray[_namespacesArrayIndex++] = "";
+        _namespacesArray[_namespacesArrayIndex++] = namespaceURI;
     }
     
     public void writeComment(String data) throws XMLStreamException {
@@ -505,20 +531,19 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
             if (_inStartElement) {
 
                 _b = EncodingConstants.ELEMENT;
-                if (_attributes.size() > 0) {
+                if (_attributesArrayIndex > 0) {
                     _b |= EncodingConstants.ELEMENT_ATTRIBUTE_FLAG;
                 }
 
                 // Encode namespace decls associated with this element
-                if (_namespaces.getSize() > 0) {
+                if (_namespacesArrayIndex > 0) {
                     write(_b | EncodingConstants.ELEMENT_NAMESPACES_FLAG);
-                    for (int i = 0; i < _namespaces.getSize(); i++) {
-                        QualifiedName name = _namespaces.get(i);
-                        encodeNamespaceAttribute(name.prefix, name.namespaceName);
+                    for (int i = 0; i < _namespacesArrayIndex;) {
+                        encodeNamespaceAttribute(_namespacesArray[i++], _namespacesArray[i++]);
                     }
+                    _namespacesArrayIndex = 0;
+                    
                     write(EncodingConstants.TERMINATOR);
-
-                    _namespaces.clear();
 
                     _b = 0;
                 }
@@ -526,20 +551,19 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
                 // Encode element and its attributes
                 encodeElementQualifiedNameOnThirdBit(_currentUri, _currentPrefix, _currentLocalName);
 
-                for (int i = 0; i < _attributes.size();) {
-                    final QualifiedName name = (QualifiedName)_attributes.get(i++);
-                    if (encodeAttributeQualifiedNameOnSecondBit(name.namespaceName, name.prefix, name.localName) == false) {
-                        continue;
-                    }
+                for (int i = 0; i < _attributesArrayIndex;) {
+                    encodeAttributeQualifiedNameOnSecondBit(
+                            _attributesArray[i++], _attributesArray[i++], _attributesArray[i++]);
 
-                    final String value = (String)_attributes.get(i++);
+                    final String value = _attributesArray[i];
+                    _attributesArray[i++] = null;
                     final boolean addToTable = (value.length() < _v.attributeValueSizeConstraint) ? true : false;
                     encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
                     
                     _b = EncodingConstants.TERMINATOR;
                     _terminate = true;
                 }
-                _attributes.clear();
+                _attributesArrayIndex = 0;
                 _inStartElement = false;
 
                 if (terminateAfter) {

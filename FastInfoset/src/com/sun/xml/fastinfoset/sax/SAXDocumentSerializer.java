@@ -137,9 +137,7 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
                 if (atts instanceof EncodingAlgorithmAttributes) {
                     EncodingAlgorithmAttributes eAtts = (EncodingAlgorithmAttributes)atts;
                     for (int i = 0; i < eAtts.getLength(); i++) {
-                        if (encodeAttribute(atts.getURI(i), atts.getQName(i), atts.getLocalName(i)) == false) {
-                            continue;
-                        }
+                        encodeAttribute(atts.getURI(i), atts.getQName(i), atts.getLocalName(i));
 
                         value = eAtts.getValue(i);
                         if (value != null) {
@@ -152,9 +150,7 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
                     }
                 } else {
                     for (int i = 0; i < atts.getLength(); i++) {
-                        if (encodeAttribute(atts.getURI(i), atts.getQName(i), atts.getLocalName(i)) == false) {
-                            continue;
-                        }
+                        encodeAttribute(atts.getURI(i), atts.getQName(i), atts.getLocalName(i));
 
                         value = atts.getValue(i);
                         addToTable = (value.length() < _v.attributeValueSizeConstraint) ? true : false;
@@ -397,20 +393,19 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
                 localName, entry);
     }
 
-    protected final boolean encodeAttribute(String namespaceURI, String qName, String localName) throws IOException {
+    protected final void encodeAttribute(String namespaceURI, String qName, String localName) throws IOException {
         LocalNameQualifiedNamesMap.Entry entry = _v.attributeName.obtainEntry(qName);
         if (entry._valueIndex > 0) {
             QualifiedName[] names = entry._value;
             for (int i = 0; i < entry._valueIndex; i++) {
                 if ((namespaceURI == names[i].namespaceName || namespaceURI.equals(names[i].namespaceName))) {
                     encodeNonZeroIntegerOnSecondBitFirstBitZero(names[i].index);
-                    return true;
+                    return;
                 }
             }
         }
 
-        return encodeLiteralAttributeQualifiedNameOnSecondBit(namespaceURI, getPrefixFromQualifiedName(qName),
+        encodeLiteralAttributeQualifiedNameOnSecondBit(namespaceURI, getPrefixFromQualifiedName(qName),
                 localName, entry);
-
     }
 }

@@ -328,7 +328,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     /*
      * C.17
      */
-    protected final boolean encodeAttributeQualifiedNameOnSecondBit(String namespaceURI, String prefix, String localName) throws IOException {
+    protected final void encodeAttributeQualifiedNameOnSecondBit(String namespaceURI, String prefix, String localName) throws IOException {
         LocalNameQualifiedNamesMap.Entry entry = _v.attributeName.obtainEntry(localName);
         if (entry._valueIndex > 0) {
             QualifiedName[] names = entry._value;
@@ -336,45 +336,32 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                 if ((prefix == names[i].prefix || prefix.equals(names[i].prefix))
                         && (namespaceURI == names[i].namespaceName || namespaceURI.equals(names[i].namespaceName))) {
                     encodeNonZeroIntegerOnSecondBitFirstBitZero(names[i].index);
-                    return true;
+                    return;
                 }
             }
         }
 
-        return encodeLiteralAttributeQualifiedNameOnSecondBit(namespaceURI, prefix,
+        encodeLiteralAttributeQualifiedNameOnSecondBit(namespaceURI, prefix,
                 localName, entry);
     }
 
     /*
      * C.17
      */
-    protected final boolean encodeLiteralAttributeQualifiedNameOnSecondBit(String namespaceURI, String prefix, String localName,
+    protected final void encodeLiteralAttributeQualifiedNameOnSecondBit(String namespaceURI, String prefix, String localName,
                 LocalNameQualifiedNamesMap.Entry entry) throws IOException {
         int namespaceURIIndex = KeyIntMap.NOT_PRESENT;
         int prefixIndex = KeyIntMap.NOT_PRESENT;
         if (namespaceURI != "") {
             namespaceURIIndex = _v.namespaceName.get(namespaceURI);
             if (namespaceURIIndex == KeyIntMap.NOT_PRESENT) {
-                if (namespaceURI == "http://www.w3.org/XML/1998/namespace"
-                        || namespaceURI.equals("http://www.w3.org/XML/1998/namespace")) {
-                    _v.namespaceName.add("http://www.w3.org/XML/1998/namespace");
-                } else if (namespaceURI == "http://www.w3.org/2000/xmlns/"
-                        || namespaceURI.equals("http://www.w3.org/2000/xmlns/")) {
-                    // Ignore XMLNS attributes
-                    return false;
-                } else {
-                    throw new IOException("namespace name not declared by namespace AII: " + namespaceURI);
-                }
+                throw new IOException("namespace URI of local name not indexed: " + namespaceURI);
             }
-
+            
             if (prefix != "") {
                 prefixIndex = _v.prefix.get(prefix);
                 if (prefixIndex == KeyIntMap.NOT_PRESENT) {
-                    if (prefix == "xml" || prefix.equals("xml")) {
-                        _v.prefix.add("xml");
-                    } else {
-                        throw new IOException("prefix by namespace AII: " + prefix);
-                    }
+                    throw new IOException("prefix of local name not indexed: " + prefix);
                 }
             }
         }
@@ -410,8 +397,6 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         } else {
             encodeNonEmptyOctetStringOnSecondBit(localName);
         }
-
-        return true;
     }
 
     /*
