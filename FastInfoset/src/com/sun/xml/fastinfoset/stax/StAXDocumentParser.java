@@ -1394,7 +1394,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     protected final void convertEncodingAlgorithmDataToCharacters() throws FastInfosetException, IOException {
         StringBuffer buffer = new StringBuffer();
         if (_algorithmId <= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
-            Object array = BuiltInEncodingAlgorithmFactory.table[_identifier].
+            Object array = BuiltInEncodingAlgorithmFactory.table[_algorithmId].
                 decodeFromBytes(_algorithmData, _algorithmDataOffset, _algorithmDataLength);
             BuiltInEncodingAlgorithmFactory.table[_algorithmId].convertToCharacters(array,  buffer);
         } else if (_algorithmId >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
