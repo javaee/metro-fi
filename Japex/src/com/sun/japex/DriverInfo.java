@@ -49,6 +49,7 @@ public class DriverInfo extends Params {
     List _testCases = null;
     JapexClassLoader _classLoader;
     Class _class = null;
+    boolean _isNormal = false;
     
     static class JapexClassLoader extends URLClassLoader {
         public JapexClassLoader(URL[] urls) {
@@ -62,9 +63,10 @@ public class DriverInfo extends Params {
         }
     }
        
-    public DriverInfo(String name, Properties params) {
+    public DriverInfo(String name, boolean isNormal, Properties params) {
         super(params);
         _name = name;
+        _isNormal = isNormal;
         _classLoader = newJapexClassLoader();
     }
     
@@ -101,6 +103,10 @@ public class DriverInfo extends Params {
     public String getName() {
         return _name;
     }    
+    
+    public boolean isNormal() {
+        return _isNormal;
+    }
     
     public void serialize(StringBuffer report, int spaces) {
         report.append(Util.getSpaces(spaces) 

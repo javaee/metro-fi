@@ -29,6 +29,7 @@
                      maxOccurs="unbounded"/>
             </xsd:sequence>
             <xsd:attribute name="name" type="xsd:string" use="required"/>
+            <xsd:attribute name="normal" type="xsd:boolean" default="false"/>
           </xsd:complexType>
         </xsd:element>       
         

@@ -154,7 +154,8 @@ public class TestSuite extends Params {
             if (driverParams.getProperty(Constants.DRIVER_CLASS) == null) {
                 driverParams.setProperty(Constants.DRIVER_CLASS, dt.getName());
             }            
-            _driverInfo.add(new DriverInfo(dt.getName(), driverParams));
+            _driverInfo.add(
+                new DriverInfo(dt.getName(), dt.isNormal(), driverParams));
         }
         
         // Create and populate list of test cases
@@ -208,26 +209,61 @@ public class TestSuite extends Params {
     public void generateDriverChart(String fileName) {
         try {
             DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-
+            String resultUnit = getParam(Constants.RESULT_UNIT);
+            
+            // Find first normalizer driver (if any) and adjust unit
+            DriverInfo normalizerDriver = null;            
             Iterator jdi = _driverInfo.iterator();
             while (jdi.hasNext()) {
-                DriverInfo di = (DriverInfo) jdi.next();
-                               
-                dataset.addValue(
-                    di.getDoubleParam(Constants.RESULT_ARIT_MEAN), 
-                    di.getName(),
-                    "Arithmetic Mean");
-                dataset.addValue(
-                    di.getDoubleParam(Constants.RESULT_GEOM_MEAN), 
-                    di.getName(),
-                    "Geometric Mean");
-                dataset.addValue(
-                    di.getDoubleParam(Constants.RESULT_HARM_MEAN), 
-                    di.getName(),
-                    "Harmonic Mean");
+                DriverInfo di = (DriverInfo) jdi.next();       
+                if (di.isNormal()) {
+                    normalizerDriver = di; 
+                    resultUnit = "% of " + resultUnit;
+                    break;
+                }
             }
             
-            String resultUnit = getParam(Constants.RESULT_UNIT);
+            // Generate charts
+            jdi = _driverInfo.iterator();
+            while (jdi.hasNext()) {
+                DriverInfo di = (DriverInfo) jdi.next();
+                              
+                if (normalizerDriver != null) {
+                    dataset.addValue(
+                        normalizerDriver == di ? 100.0 :
+                        (100.0 * di.getDoubleParam(Constants.RESULT_ARIT_MEAN) /
+                         normalizerDriver.getDoubleParam(Constants.RESULT_ARIT_MEAN)),
+                        di.getName(),
+                        "Arithmetic Mean");
+                    dataset.addValue(
+                        normalizerDriver == di ? 100.0 :
+                        (100.0 * di.getDoubleParam(Constants.RESULT_GEOM_MEAN) /
+                         normalizerDriver.getDoubleParam(Constants.RESULT_GEOM_MEAN)),
+                        di.getName(),
+                        "Geometric Mean");
+                    dataset.addValue(
+                        normalizerDriver == di ? 100.0 :
+                        (100.0 * di.getDoubleParam(Constants.RESULT_HARM_MEAN) /
+                         normalizerDriver.getDoubleParam(Constants.RESULT_HARM_MEAN)),
+                        di.getName(),
+                        "Harmonic Mean");                    
+                }
+                else {
+                    dataset.addValue(
+                        di.getDoubleParam(Constants.RESULT_ARIT_MEAN), 
+                        di.getName(),
+                        "Arithmetic Mean");
+                    dataset.addValue(
+                        di.getDoubleParam(Constants.RESULT_GEOM_MEAN), 
+                        di.getName(),
+                        "Geometric Mean");
+                    dataset.addValue(
+                        di.getDoubleParam(Constants.RESULT_HARM_MEAN), 
+                        di.getName(),
+                        "Harmonic Mean");
+                }
+            }
+            
             JFreeChart chart = ChartFactory.createBarChart3D(
                 "Result Summary (" + resultUnit + ")", 
                 "", resultUnit, 
@@ -248,26 +284,52 @@ public class TestSuite extends Params {
         final int groupSize = 6;
         
         try {            
+            String resultUnit = getParam(Constants.RESULT_UNIT);
+            
             // Get number of tests from first driver
             final int nOfTests = 
                 ((DriverInfo) _driverInfo.get(0)).getTestCases().size();
             
-            // Get result unit
-            String resultUnit = getParam(Constants.RESULT_UNIT);
+            // Find first normalizer driver (if any)
+            DriverInfo normalizerDriver = null;
             
+            Iterator jdi = _driverInfo.iterator();
+            while (jdi.hasNext()) {
+                DriverInfo di = (DriverInfo) jdi.next();       
+                if (di.isNormal()) {
+                    normalizerDriver = di; 
+                    resultUnit = "% of " + resultUnit;
+                    break;
+                }
+            }
+            
+            // Generate charts 
             DefaultCategoryDataset dataset = new DefaultCategoryDataset();
             
             int i = 0;
             for (; i < nOfTests; i++) {
-                Iterator jdi = _driverInfo.iterator();
+                jdi = _driverInfo.iterator();
+                
                 while (jdi.hasNext()) {
                     DriverInfo di = (DriverInfo) jdi.next();
-                 
                     TestCase tc = (TestCase) di.getTestCases().get(i);
-                    dataset.addValue(
-                        tc.getDoubleParam(Constants.RESULT_VALUE), 
-                        di.getName(),
-                        tc.getTestName());                    
+            
+                    // User normalizer driver if defined
+                    if (normalizerDriver != null) {
+                        TestCase normalTc = 
+                            (TestCase) normalizerDriver.getTestCases().get(i);
+                        dataset.addValue(normalizerDriver == di ? 100.0 :
+                                (100.0 * tc.getDoubleParam(Constants.RESULT_VALUE) /
+                                 normalTc.getDoubleParam(Constants.RESULT_VALUE)),
+                                di.getName(),
+                                tc.getTestName());                                                
+                    }
+                    else {
+                        dataset.addValue(
+                            tc.getDoubleParam(Constants.RESULT_VALUE), 
+                            di.getName(),
+                            tc.getTestName());                    
+                    }
                 }                
                         
                 // Generate chart for this group
