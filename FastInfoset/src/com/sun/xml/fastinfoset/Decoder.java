@@ -327,6 +327,39 @@ public abstract class Decoder {
             break;
         }
     }
+
+    protected final QualifiedName decodeEIIIndexMedium() throws FastInfosetException, IOException {
+        final int i = (((_b & EncodingConstants.INTEGER_3RD_BIT_MEDIUM_MASK) << 8) | read())
+            + EncodingConstants.INTEGER_3RD_BIT_SMALL_LIMIT;
+        return _v.elementName.get(i);
+    }
+
+    protected final QualifiedName decodeEIIIndexLarge() throws FastInfosetException, IOException {
+        int i;
+        if ((_b & 0x10) > 0) {
+            // EII large index
+            i = (((_b & EncodingConstants.INTEGER_3RD_BIT_LARGE_MASK) << 16) | (read() << 8) | read())
+                + EncodingConstants.INTEGER_3RD_BIT_MEDIUM_LIMIT;
+        } else {
+            // EII large large index
+            i = (((read() & EncodingConstants.INTEGER_3RD_BIT_LARGE_LARGE_MASK) << 16) | (read() << 8) | read()) 
+                + EncodingConstants.INTEGER_3RD_BIT_LARGE_LIMIT;
+        }
+        return _v.elementName.get(i);
+    }
+
+    protected final QualifiedName decodeEIILiteral() throws FastInfosetException, IOException {
+        final String prefix = ((_b & EncodingConstants.LITERAL_QNAME_PREFIX_FLAG) > 0) 
+            ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.prefix) : "";
+        final String namespaceName = ((_b & EncodingConstants.LITERAL_QNAME_NAMESPACE_NAME_FLAG) > 0) 
+            ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.namespaceName) : "";
+        final String localName = decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName);
+
+        final QualifiedName qualifiedName = new QualifiedName(prefix, namespaceName, localName);
+        _v.elementName.add(qualifiedName);
+        return qualifiedName;
+    }
+    
     
     public static final int NISTRING_STRING              = 0;
     public static final int NISTRING_INDEX               = 1;

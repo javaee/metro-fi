@@ -43,10 +43,16 @@ public class CharArrayString extends CharArray {
     protected String _s;
     
     public CharArrayString(String s) {
+        this(s, true);
+    }
+
+    public CharArrayString(String s, boolean createArray) {
         _s = s;
-        ch = _s.toCharArray();
-        start = 0;
-        length = ch.length;
+        if (createArray) {
+            ch = _s.toCharArray();
+            start = 0;
+            length = ch.length;
+        }
     }
     
     public String toString() {

@@ -50,27 +50,27 @@ public class QualifiedName {
     private QName qNameObject;
     
     public QualifiedName(String prefix, String namespaceName, String localName, String qName) {
-        this.prefix = (prefix == null) ? "" : prefix;
-        this.namespaceName = (namespaceName == null) ? "" : namespaceName;
+        this.prefix = prefix;
+        this.namespaceName = namespaceName;
         this.localName = localName;
         this.qName = qName;
         this.index = -1;
     }    
 
     public QualifiedName(String prefix, String namespaceName, String localName, String qName, int index) {
-        this.prefix = (prefix == null) ? "" : prefix;
-        this.namespaceName = (namespaceName == null) ? "" : namespaceName;
+        this.prefix = prefix;
+        this.namespaceName = namespaceName;
         this.localName = localName;
         this.qName = qName;
         this.index = index;
     }    
 
     public QualifiedName(String prefix, String namespaceName, String localName) {
-        this.prefix = (prefix == null) ? "" : prefix;
-        this.namespaceName = (namespaceName == null) ? "" : namespaceName;
+        this.prefix = prefix;
+        this.namespaceName = namespaceName;
         this.localName = localName;
 
-        if (this.prefix != "") {
+        if (this.prefix != null && this.prefix != "") {
             StringBuffer b = new StringBuffer(this.prefix);
             b.append(':');
             b.append(this.localName);
@@ -83,11 +83,11 @@ public class QualifiedName {
     }    
 
     public QualifiedName(String prefix, String namespaceName, String localName, int index) {
-        this.prefix = (prefix == null) ? "" : prefix;
-        this.namespaceName = (namespaceName == null) ? "" : namespaceName;
+        this.prefix = prefix;
+        this.namespaceName = namespaceName;
         this.localName = localName;
 
-        if (this.prefix != "") {
+        if (this.prefix != null && this.prefix != "") {
             StringBuffer b = new StringBuffer(this.prefix);
             b.append(':');
             b.append(this.localName);
@@ -101,8 +101,8 @@ public class QualifiedName {
     
     // Qualified Name as a Namespace Name
     public QualifiedName(String prefix, String namespaceName) {
-        this.prefix = (prefix == null) ? "" : prefix;
-        this.namespaceName = (namespaceName == null) ? "" : namespaceName;
+        this.prefix = prefix;
+        this.namespaceName = namespaceName;
         this.localName = "";
         this.qName = "";
         this.index = -1;
