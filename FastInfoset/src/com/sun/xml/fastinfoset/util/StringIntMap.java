@@ -44,9 +44,9 @@ import java.util.Map;
 
 public class StringIntMap extends KeyIntMap {
 
-    private StringIntMap _readOnlyMap;
+    protected StringIntMap _readOnlyMap;
     
-    static class Entry extends BaseEntry {
+    protected static class Entry extends BaseEntry {
         final String _key;
         Entry _next;
         
@@ -57,7 +57,7 @@ public class StringIntMap extends KeyIntMap {
         }
     }
     
-    private Entry[] _table;
+    protected Entry[] _table;
     
     public StringIntMap(int initialCapacity, float loadFactor) {
         super(initialCapacity, loadFactor);
@@ -73,14 +73,14 @@ public class StringIntMap extends KeyIntMap {
         this(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR);
     }
 
-    public final void clear() {
+    public void clear() {
         for (int i = 0; i < _table.length; i++) {
             _table[i] = null;
         }
         _size = 0;
     }
 
-    public final void setReadOnlyMap(KeyIntMap readOnlyMap, boolean clear) {
+    public void setReadOnlyMap(KeyIntMap readOnlyMap, boolean clear) {
         if (!(readOnlyMap instanceof StringIntMap)) {
             throw new IllegalArgumentException("Illegal class: "
                 + readOnlyMap);
@@ -160,7 +160,7 @@ public class StringIntMap extends KeyIntMap {
         }
     }
     
-    private final void resize(int newCapacity) {
+    protected final void resize(int newCapacity) {
         _capacity = newCapacity;
         Entry[] oldTable = _table;
         int oldCapacity = oldTable.length;

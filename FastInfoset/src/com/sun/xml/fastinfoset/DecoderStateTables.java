@@ -563,6 +563,73 @@ public class DecoderStateTables {
     };
 
     
+    public final static int ISTRING_PREFIX_NAMESPACE_LENGTH_3   = 6;
+    public final static int ISTRING_PREFIX_NAMESPACE_LENGTH_5   = 7;
+    public final static int ISTRING_PREFIX_NAMESPACE_LENGTH_29  = 8;
+    public final static int ISTRING_PREFIX_NAMESPACE_LENGTH_36  = 9;
+    public final static int ISTRING_PREFIX_NAMESPACE_INDEX_ZERO = 10;
+    
+    public static final int[] ISTRING_PREFIX_NAMESPACE = new int[256];
+    
+    private static int[][] ISTRING_PREFIX_NAMESPACE_RANGES = {
+        // %00000000 to %00000001 small length
+        { 0x01, ISTRING_SMALL_LENGTH },
+
+        // %00000010 small length
+        { 0x02, ISTRING_PREFIX_NAMESPACE_LENGTH_3 },
+        
+        // %00000011 small length
+        { 0x03, ISTRING_SMALL_LENGTH },
+                
+        // %00000100 small length
+        { 0x04, ISTRING_PREFIX_NAMESPACE_LENGTH_5 },
+
+        // %00011011 small length
+        { 0x1B, ISTRING_SMALL_LENGTH },
+                
+        // %00011100 small length
+        { 0x1C, ISTRING_PREFIX_NAMESPACE_LENGTH_29 },
+
+        // %00100010 small length
+        { 0x22, ISTRING_SMALL_LENGTH },
+                                
+        // %00100011 small length
+        { 0x23, ISTRING_PREFIX_NAMESPACE_LENGTH_36 },
+                
+        // %00000101 to %00111111 small length
+        { 0x3F, ISTRING_SMALL_LENGTH },
+
+                
+                
+                
+        // %01000000 medium length
+        { 0x40, ISTRING_MEDIUM_LENGTH },
+
+        // %01000001 to %01011111 ILLEGAL
+        { 0x5F, STATE_ILLEGAL },
+
+        // %01100000 large length
+        { 0x60, ISTRING_LARGE_LENGTH },
+
+        // %01100001 to %01111111 ILLEGAL
+        { 0x7F, STATE_ILLEGAL },
+
+        // %10000000 index small, 0
+        { 0x80, ISTRING_PREFIX_NAMESPACE_INDEX_ZERO },
+                
+        // %10000000 to %10111111 index small
+        { 0xBF, ISTRING_INDEX_SMALL },
+
+        // %11000000 to %11011111 index medium
+        { 0xDF, ISTRING_INDEX_MEDIUM },
+
+        // %11100000 to %11101111 index large
+        { 0xEF, ISTRING_INDEX_LARGE },
+
+        // %11110000 to %11111111 ILLEGAL
+        { 0xFF, STATE_ILLEGAL },
+    };
+    
     // UTF-8 states
     public final static int UTF8_NCNAME         = 0;
     public final static int UTF8_NCNAME_CHAR    = 1;
@@ -669,6 +736,9 @@ public class DecoderStateTables {
         // Identifying string
         constructTable(ISTRING, ISTRING_RANGES);        
 
+        // Identifying string
+        constructTable(ISTRING_PREFIX_NAMESPACE, ISTRING_PREFIX_NAMESPACE_RANGES);        
+        
         // UTF-8 states
         constructTable(UTF8, UTF8_RANGES);        
     }

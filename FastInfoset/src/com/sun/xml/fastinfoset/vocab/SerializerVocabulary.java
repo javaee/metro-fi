@@ -39,7 +39,9 @@
 
 package com.sun.xml.fastinfoset.vocab;
 
+import com.sun.xml.fastinfoset.EncodingConstants;
 import com.sun.xml.fastinfoset.util.CharArrayIntMap;
+import com.sun.xml.fastinfoset.util.FixedEntryStringIntMap;
 import com.sun.xml.fastinfoset.util.KeyIntMap;
 import com.sun.xml.fastinfoset.util.LocalNameQualifiedNamesMap;
 import com.sun.xml.fastinfoset.util.StringIntMap;
@@ -73,15 +75,15 @@ public class SerializerVocabulary extends Vocabulary {
     protected SerializerVocabulary _readOnlyVocabulary;
     
     public SerializerVocabulary() {
-        tables[RESTRICTED_ALPHABET] = restrictedAlphabet = new StringIntMap();
-        tables[ENCODING_ALGORITHM] = encodingAlgorithm = new StringIntMap();
-        tables[PREFIX] = prefix = new StringIntMap();
-        tables[NAMESPACE_NAME] = namespaceName = new StringIntMap();
+        tables[RESTRICTED_ALPHABET] = restrictedAlphabet = new StringIntMap(4);
+        tables[ENCODING_ALGORITHM] = encodingAlgorithm = new StringIntMap(4);
+        tables[PREFIX] = prefix = new FixedEntryStringIntMap(EncodingConstants.XML_NAMESPACE_PREFIX, 8);
+        tables[NAMESPACE_NAME] = namespaceName = new FixedEntryStringIntMap(EncodingConstants.XML_NAMESPACE_NAME, 8);
         tables[LOCAL_NAME] = localName = new StringIntMap();
-        tables[OTHER_NCNAME] = otherNCName = new StringIntMap();
-        tables[OTHER_URI] = otherURI = new StringIntMap();
+        tables[OTHER_NCNAME] = otherNCName = new StringIntMap(4);
+        tables[OTHER_URI] = otherURI = new StringIntMap(4);
         tables[ATTRIBUTE_VALUE] = attributeValue = new StringIntMap();
-        tables[OTHER_STRING] = otherString = new CharArrayIntMap();
+        tables[OTHER_STRING] = otherString = new CharArrayIntMap(4);
         tables[CHARACTER_CONTENT_CHUNK] = characterContentChunk = new CharArrayIntMap();
         tables[ELEMENT_NAME] = elementName = new LocalNameQualifiedNamesMap();
         tables[ATTRIBUTE_NAME] = attributeName = new LocalNameQualifiedNamesMap();        

@@ -55,14 +55,28 @@ public final class EncodingConstants {
         }
     }
     
+    public static final String XML_NAMESPACE_PREFIX = "xml";
+    public static final int XML_NAMESPACE_PREFIX_LENGTH = XML_NAMESPACE_PREFIX.length();
+    public static final String XML_NAMESPACE_NAME = "http://www.w3.org/XML/1998/namespace";
+    public static final int XML_NAMESPACE_NAME_LENGTH = XML_NAMESPACE_NAME.length();
+    public static final char[] XML_NAMESPACE_NAME_CHARS = XML_NAMESPACE_NAME.toCharArray();
+            
+    public static final String XMLNS_NAMESPACE_PREFIX = "xmlns";    
+    public static final int XMLNS_NAMESPACE_PREFIX_LENGTH = XMLNS_NAMESPACE_PREFIX.length();
+    public static final String XMLNS_NAMESPACE_NAME = "http://www.w3.org/2000/xmlns/";
+    public static final int XMLNS_NAMESPACE_NAME_LENGTH = XMLNS_NAMESPACE_NAME.length();
+    public static final char[] XMLNS_NAMESPACE_NAME_CHARS = XMLNS_NAMESPACE_NAME.toCharArray();
+    
     public static final byte[] HEADER = {(byte)0xE0, 0, 0, 1};
     
-    public static final int DOCUMENT_INITIAL_VOCABULARY_FLAG = 0x10; // 00010000
-    public static final int DOCUMENT_NOTATIONS_FLAG = 0x08; // 00001000
-    public static final int DOCUMENT_UNPARSED_ENTITIES_FLAG = 0x04; // 00000100
+    public static final int DOCUMENT_ADDITIONAL_DATA_FLAG = 0x40; // 01000000
+    public static final int DOCUMENT_INITIAL_VOCABULARY_FLAG = 0x20; // 00100000
+    public static final int DOCUMENT_NOTATIONS_FLAG = 0x10; // 00010000
+    public static final int DOCUMENT_UNPARSED_ENTITIES_FLAG = 0x08; // 00001000
+    public static final int DOCUMENT_CHARACTER_ENCODING_SCHEME = 0x04; // 00000100
     public static final int DOCUMENT_STANDALONE_FLAG = 0x02; // 00000010
     public static final int DOCUMENT_VERSION_FLAG = 0x01; // 00000001
-
+    
     public static final int INITIAL_VOCABULARY_EXTERNAL_VOCABULARY_FLAG = 0x10; // 00010000
     public static final int INITIAL_VOCABULARY_RESTRICTED_ALPHABETS_FLAG = 0x08; // 00001000
     public static final int INITIAL_VOCABULARY_ENCODING_ALGORITHMS_FLAG = 0x04; // 00000100

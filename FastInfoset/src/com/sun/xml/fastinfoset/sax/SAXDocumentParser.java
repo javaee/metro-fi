@@ -483,6 +483,10 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
     }
     
     protected final void processDIIOptionalProperties() throws FastInfosetException, IOException {
+        if ((_b & EncodingConstants.DOCUMENT_ADDITIONAL_DATA_FLAG) > 0) {
+            // decodeAdditionalData();
+        }
+        
         if ((_b & EncodingConstants.DOCUMENT_INITIAL_VOCABULARY_FLAG) > 0) {
             decodeInitialVocabulary();
         }
@@ -507,6 +511,10 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     throw new IOException("UnparsedEntitiesII");
                 }
              */
+        }
+        
+        if ((_b & EncodingConstants.DOCUMENT_CHARACTER_ENCODING_SCHEME) > 0) {
+            // decodeCharacterEncodingScheme();
         }
         
         if ((_b & EncodingConstants.DOCUMENT_STANDALONE_FLAG) > 0) {
@@ -825,11 +833,11 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             
             // Prefix
             _namespaceAIIs[_namespaceAIIsIndex++] = ((b & EncodingConstants.NAMESPACE_ATTRIBUTE_PREFIX_FLAG) > 0)
-            ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.prefix) : "";
+            ? decodeIdentifyingNonEmptyStringOnFirstBitAsPrefix(_v.prefix) : "";
             
             // Namespace name
             _namespaceAIIs[_namespaceAIIsIndex++] = ((b & EncodingConstants.NAMESPACE_ATTRIBUTE_NAME_FLAG) > 0)
-            ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.namespaceName) : "";
+            ? decodeIdentifyingNonEmptyStringOnFirstBitAsNamespaceName(_v.namespaceName) : "";
             
             if (_namespacePrefixesFeature) {
                 final String prefix = _namespaceAIIs[_namespaceAIIsIndex - 2];
@@ -838,16 +846,12 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 // Add the namespace delcaration as an attribute
                 if (prefix != "") {
                     _attributes.addAttribute(new QualifiedName(
-                            "xmlns",
-                            "http://www.w3.org/2000/xmlns/",
+                            EncodingConstants.XMLNS_NAMESPACE_PREFIX,
+                            EncodingConstants.XMLNS_NAMESPACE_NAME,
                             prefix),
                             namespaceName);
                 } else {
-                    _attributes.addAttribute(new QualifiedName(
-                            "",
-                            "http://www.w3.org/2000/xmlns/",
-                            "xmlns",
-                            "xmlns"),
+                    _attributes.addAttribute(DEFAULT_NAMESPACE_DECLARATION,
                             namespaceName);
                 }
             }
@@ -926,9 +930,9 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 case DecoderStateTables.AII_LITERAL:
                 {
                     final String prefix = ((b & EncodingConstants.LITERAL_QNAME_PREFIX_FLAG) > 0)
-                    ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.prefix) : "";
+                    ? decodeIdentifyingNonEmptyStringIndexOnFirstBitAsPrefix(_v.prefix) : "";
                     final String namespaceName = ((b & EncodingConstants.LITERAL_QNAME_NAMESPACE_NAME_FLAG) > 0)
-                    ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.namespaceName) : "";
+                    ? decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(_v.namespaceName) : "";
                     final String localName = decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName);
                     
                     name = new QualifiedName(prefix, namespaceName, localName);

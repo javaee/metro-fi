@@ -253,9 +253,9 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 case DecoderStateTables.EII_LITERAL:
                 {
                     final String prefix = ((b & EncodingConstants.LITERAL_QNAME_PREFIX_FLAG) > 0)
-                    ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.prefix) : "";
+                    ? decodeIdentifyingNonEmptyStringIndexOnFirstBitAsPrefix(_v.prefix) : "";
                     final String namespaceName = ((b & EncodingConstants.LITERAL_QNAME_NAMESPACE_NAME_FLAG) > 0)
-                    ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.namespaceName) : "";
+                    ? decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(_v.namespaceName) : "";
                     final String localName = decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName);
                     
                     final QualifiedName qualifiedName = new QualifiedName(prefix, namespaceName, localName);
@@ -903,11 +903,11 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
             
             // Prefix
             final String prefix = _namespaceAIIsPrefix[_namespaceAIIsIndex] = ((b & EncodingConstants.NAMESPACE_ATTRIBUTE_PREFIX_FLAG) > 0)
-            ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.prefix) : "";
+            ? decodeIdentifyingNonEmptyStringOnFirstBitAsPrefix(_v.prefix) : "";
             
             // Namespace name
             final String namespaceName = _namespaceAIIsNamespaceName[_namespaceAIIsIndex++] = ((b & EncodingConstants.NAMESPACE_ATTRIBUTE_NAME_FLAG) > 0)
-            ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.namespaceName) : "";
+            ? decodeIdentifyingNonEmptyStringOnFirstBitAsNamespaceName(_v.namespaceName) : "";
             
             // Push namespace declarations onto the stack
             pushNamespaceDecl(prefix, namespaceName);
@@ -949,9 +949,9 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
             case DecoderStateTables.EII_LITERAL:
             {
                 final String prefix = ((b & EncodingConstants.LITERAL_QNAME_PREFIX_FLAG) > 0)
-                ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.prefix) : "";
+                ? decodeIdentifyingNonEmptyStringIndexOnFirstBitAsPrefix(_v.prefix) : "";
                 final String namespaceName = ((b & EncodingConstants.LITERAL_QNAME_NAMESPACE_NAME_FLAG) > 0)
-                ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.namespaceName) : "";
+                ? decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(_v.namespaceName) : "";
                 final String localName = decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName);
                 
                 final QualifiedName qualifiedName = new QualifiedName(prefix, namespaceName, localName);
@@ -1023,9 +1023,9 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 case DecoderStateTables.AII_LITERAL:
                 {
                     final String prefix = ((b & EncodingConstants.LITERAL_QNAME_PREFIX_FLAG) > 0)
-                    ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.prefix) : "";
+                    ? decodeIdentifyingNonEmptyStringIndexOnFirstBitAsPrefix(_v.prefix) : "";
                     final String namespaceName = ((b & EncodingConstants.LITERAL_QNAME_NAMESPACE_NAME_FLAG) > 0)
-                    ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.namespaceName) : "";
+                    ? decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(_v.namespaceName) : "";
                     final String localName = decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName);
                     
                     name = new QualifiedName(prefix, namespaceName, localName);

@@ -204,6 +204,10 @@ public class DOMDocumentParser extends Decoder {
     }
 
     protected final void processDIIOptionalProperties() throws FastInfosetException, IOException {        
+        if ((_b & EncodingConstants.DOCUMENT_ADDITIONAL_DATA_FLAG) > 0) {
+            // decodeAdditionalData();
+        }
+        
         if ((_b & EncodingConstants.DOCUMENT_INITIAL_VOCABULARY_FLAG) > 0) {
             decodeInitialVocabulary();
         }
@@ -218,6 +222,10 @@ public class DOMDocumentParser extends Decoder {
             // TODO Report unparsed entities
         }
 
+        if ((_b & EncodingConstants.DOCUMENT_CHARACTER_ENCODING_SCHEME) > 0) {
+            // decodeCharacterEncodingScheme();
+        }
+        
         if ((_b & EncodingConstants.DOCUMENT_STANDALONE_FLAG) > 0) {
             boolean standalone = (read() > 0) ? true : false ;
             /*
@@ -478,11 +486,11 @@ public class DOMDocumentParser extends Decoder {
 
             // Prefix
             final String prefix = ((b & EncodingConstants.NAMESPACE_ATTRIBUTE_PREFIX_FLAG) > 0) 
-                ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.prefix) : null;
+                ? decodeIdentifyingNonEmptyStringOnFirstBitAsPrefix(_v.prefix) : null;
 
             // Namespace name
             final String namespaceName = ((b & EncodingConstants.NAMESPACE_ATTRIBUTE_NAME_FLAG) > 0) 
-                ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.namespaceName) : null;
+                ? decodeIdentifyingNonEmptyStringOnFirstBitAsNamespaceName(_v.namespaceName) : null;
             
             if (_namespaceAttributesIndex == _namespaceAttributes.length) {
                 final Attr[] a = new Attr[_namespaceAttributesIndex * 3 / 2 + 1];
@@ -541,9 +549,9 @@ public class DOMDocumentParser extends Decoder {
 
     protected final QualifiedName processEIILiteral() throws FastInfosetException, IOException {
         final String prefix = ((_b & EncodingConstants.LITERAL_QNAME_PREFIX_FLAG) > 0) 
-            ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.prefix) : null;
+            ? decodeIdentifyingNonEmptyStringIndexOnFirstBitAsPrefix(_v.prefix) : null;
         final String namespaceName = ((_b & EncodingConstants.LITERAL_QNAME_NAMESPACE_NAME_FLAG) > 0) 
-            ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.namespaceName) : null;
+            ? decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(_v.namespaceName) : null;
         final String localName = decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName);
 
         final QualifiedName qualifiedName = new QualifiedName(prefix, namespaceName, localName);
@@ -580,9 +588,9 @@ public class DOMDocumentParser extends Decoder {
                 case DecoderStateTables.AII_LITERAL:
                 {
                     final String prefix = ((b & EncodingConstants.LITERAL_QNAME_PREFIX_FLAG) > 0) 
-                        ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.prefix) : null;
+                        ? decodeIdentifyingNonEmptyStringIndexOnFirstBitAsPrefix(_v.prefix) : null;
                     final String namespaceName = ((b & EncodingConstants.LITERAL_QNAME_NAMESPACE_NAME_FLAG) > 0) 
-                        ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.namespaceName) : null;
+                        ? decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(_v.namespaceName) : null;
                     final String localName = decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName);
 
                     name = new QualifiedName(prefix, namespaceName, localName);

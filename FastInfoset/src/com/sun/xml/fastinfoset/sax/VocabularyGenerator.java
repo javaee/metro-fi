@@ -199,6 +199,9 @@ public class VocabularyGenerator extends DefaultHandler implements LexicalHandle
         }
         
         localNameIndex = _serializerVocabulary.localName.obtainIndex(localName);
+        if (localNameIndex == KeyIntMap.NOT_PRESENT) {
+            _parserVocabulary.localName.add(localName);
+        }
         QualifiedName name = new QualifiedName(prefix, namespaceURI, localName, m.getNextIndex());
         entry.addQualifiedName(name);
         a.add(name);
