@@ -46,22 +46,17 @@ import java.io.BufferedInputStream;
 import java.io.FileNotFoundException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import com.sun.xml.fastinfoset.stax.StAXInputFactory;
 
 import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
 
 /** <p>This is a sample that demonstrates the use of FI StAX Cursor API.</p>
- *  The sample starts by setting the javax.xml.stream.XMLInputFactory to the implementation 
- *  classe in the fastinfoset.stax package, which enables the XMLInputFactory to locate 
- *  the correct factory class and obtain an instance of it. The sample then calls 
- *  the factory's createXMLStreamReader method with an InputStream to get a StreamReader. 
- *  The rest of the code in the sample simply uses the StreamReader to loop through
+ *  The sample starts by creating an input stream from the input FI document. The input stream is
+ *  then used to instantiating a new instance of FI StAX stream reader "StAXDocumentParser". The 
+ *  rest of the code simply uses the StreamReader to loop through
  *  the document and displays event types, names and etc.
  */
 public class StreamReader {
-    protected XMLInputFactory factory = null;
     
     /** Creates a new instance of Cursor */
     public StreamReader() {
@@ -75,8 +70,6 @@ public class StreamReader {
         if (args.length < 1 || args.length > 1) {
             displayUsageAndExit();
         }
-        System.setProperty("javax.xml.stream.XMLInputFactory", 
-                       "com.sun.xml.fastinfoset.stax.StAXInputFactory");
         StreamReader streamReader = new StreamReader();
         streamReader.parse(args[0]);
     }
@@ -93,8 +86,7 @@ public class StreamReader {
             input = new File(filename);
             document= new BufferedInputStream(new FileInputStream(filename));
             
-            factory = XMLInputFactory.newInstance();
-            streamReader = factory.createXMLStreamReader(document);
+            streamReader = new StAXDocumentParser(document);
                         
         } catch (Exception e) {
             e.printStackTrace();

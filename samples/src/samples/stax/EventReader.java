@@ -52,31 +52,25 @@ import javax.xml.stream.events.* ;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import com.sun.xml.fastinfoset.stax.StAXInputFactory;
 
 import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
+import com.sun.xml.fastinfoset.stax.StAXEventReader;
 
 
 /** <p>This is a sample that demonstrates the use of FI StAX Event Iterator API.</p>
- *  The sample starts by setting the javax.xml.stream.XMLInputFactory and javax.xml.stream.XMLEventFactory 
- *  properties to the implementation classes in the fastinfoset.stax package.
- *  These two properties must be set in order to return the right factories. The  XMLInputFactory
- *  is used to create FI XMLEventReader as demonstrated in the sample where createXMLEventReader is 
- *  called with an InputStream. The XMLEventFactory is used internally in the XMLEventReader to
- *  allocate XMLEvent. The sample simply uses the EventReader to iterate through the input FI 
- *  document and displays event types.
+ *  The sample starts by creating an input stream from the input FI document. The input stream is used
+ *  to instantiate a stream reader as does in the StreamReader sample. An event reader (StAXEventReader)
+ *  is created using the stream reader isntance. With the event reader, the program iterates through all
+ *  of the events in the input FI document and displays event types and content.
  */
 public class EventReader{
-    protected XMLInputFactory factory = null;
     private File input;
     InputStream document = null;
     XMLStreamReader streamReader = null;
     
     /** Creates a new instance of EventReader */
     public EventReader() {
-        init();
     }
      /** Starts the sample. The sample takes a FI document filename that will
       * be read using StAXEventReader.
@@ -87,10 +81,6 @@ public class EventReader{
         if (args.length < 1 || args.length > 2) {
             displayUsageAndExit();
         }
-        System.setProperty("javax.xml.stream.XMLInputFactory", 
-                       "com.sun.xml.fastinfoset.stax.StAXInputFactory");
-        System.setProperty("javax.xml.stream.XMLEventFactory", 
-                       "com.sun.xml.fastinfoset.stax.StAXEventFactory");
         EventReader eventReader = new EventReader();
         try {
             eventReader.readFIDoc(args[0]);
@@ -107,8 +97,8 @@ public class EventReader{
         input = new File(filename);
         document= new BufferedInputStream(new FileInputStream(input));
 
-        factory = XMLInputFactory.newInstance();
-        XMLEventReader r = factory.createXMLEventReader(document);
+        XMLStreamReader streamReader = new StAXDocumentParser(document);
+        XMLEventReader r = new StAXEventReader(streamReader);
         int count = 0;
         System.out.println("Reading "+ input.getName() + ": \n");
         while(r.hasNext()) {
@@ -118,10 +108,6 @@ public class EventReader{
         }
     }
     
-    private void init() {
-        factory = XMLInputFactory.newInstance();
-    }
-
     private static void displayUsageAndExit() {
         System.err.println("Usage: ant EventReader or samples.stax.EventReader FI_file");
         System.exit(1);        

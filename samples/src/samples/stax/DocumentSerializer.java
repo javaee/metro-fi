@@ -55,9 +55,8 @@ import org.w3c.dom.*;
 import javax.xml.transform.sax.SAXResult;
 
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import com.sun.xml.fastinfoset.stax.StAXInputFactory;
+import com.sun.xml.fastinfoset.stax.StAXDocumentSerializer;
 import com.sun.xml.fastinfoset.stax.SAX2StAXWriter;
 
 /** <p>Serializes an XML input stream into FI document using 
@@ -69,16 +68,11 @@ import com.sun.xml.fastinfoset.stax.SAX2StAXWriter;
  *  to be used to handle SAX events. The source and result are then used by the JAXP transformer
  *  to transform the XML file to FI document which was passed in as OutputStream for the StAX 
  *  serializer object. The XML inputstream is first transformed into a ByteArrayOutputStream 
- *  that may be used for other processing. In this sample, we simply write it out into a file.<br><br>
- *  Fastinfoset StAX package fully implements the StAX API as specified in JSR173. Property 
- *  javax.xml.stream.XMLOutputFactory needs to be specfied as does in the sample to obtain 
- *  the FI OutputFactory imlementation class. Once getting the factory, a FI StAX serializer is
- *  created by calling the factory's createXMLStreamWriter(OutputStream) method.<br>
+ *  that may be used for other processing. In this sample, we simply write it out into a file.<br>
  *
  */
 
 public class DocumentSerializer {
-    XMLOutputFactory factory;
     String _xmlFile;
     Transformer _transformer;
     DocumentBuilder _docBuilder;
@@ -91,7 +85,6 @@ public class DocumentSerializer {
         try {
             _transformer = TransformerFactory.newInstance().newTransformer();
             _docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            factory = XMLOutputFactory.newInstance();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -121,7 +114,7 @@ public class DocumentSerializer {
     void getSAXResult(File output) {
         try {
             _baos = new ByteArrayOutputStream();
-            XMLStreamWriter serializer = factory.createXMLStreamWriter(_baos);
+            XMLStreamWriter serializer = new StAXDocumentSerializer(_baos);
             SAX2StAXWriter saxTostax = new SAX2StAXWriter(serializer);
             
             _result = new SAXResult();
@@ -172,8 +165,6 @@ public class DocumentSerializer {
         if (args.length < 1 || args.length > 2) {
             displayUsageAndExit();
         }
-        System.setProperty("javax.xml.stream.XMLOutputFactory", 
-                       "com.sun.xml.fastinfoset.stax.StAXOutputFactory");
         File input = new File(args[0]);
         File ouput = new File(args[1]);
         DocumentSerializer docSerializer = new DocumentSerializer();
