@@ -91,11 +91,6 @@ public class DriverInfo extends Params {
     private void computeMeans() {
         final int runsPerDriver = _testCases.length;
         
-        // Nothing to compute if only 1 run per driver
-        if (runsPerDriver == 1) {
-            return;
-        }
-        
         // Avoid re-computing the driver's aggregates
         if (_computeMeans) {
             final int nOfTests = _testCases[0].size();
@@ -113,8 +108,10 @@ public class DriverInfo extends Params {
                 
                 TestCase tc = (TestCase) _aggregateTestCases.get(n);
                 tc.setDoubleParam(Constants.RESULT_VALUE, Util.arithmeticMean(results));
-                tc.setDoubleParam(Constants.RESULT_VALUE_STDDEV, 
-                        runsPerDriver > 1 ? Util.standardDev(results) : 0.0);
+                if (runsPerDriver > 1) {
+                    tc.setDoubleParam(Constants.RESULT_VALUE_STDDEV, 
+                            runsPerDriver > 1 ? Util.standardDev(results) : 0.0);
+                }
             }
             
             // geometric mean = (sum{i,n} x_i) / n
@@ -141,6 +138,14 @@ public class DriverInfo extends Params {
             setDoubleParam(Constants.RESULT_GEOM_MEAN, geomMeanresult);
             setDoubleParam(Constants.RESULT_HARM_MEAN, 1.0 / harmMeanresultInverse);      
             
+            // Avoid re-computing these means
+            _computeMeans = false;
+            
+            // If number of runs is just 1, we're done
+            if (runsPerDriver == 1) {
+                return;
+            }
+            
             // geometric mean = (sum{i,n} x_i) / n
             geomMeanresult = 1.0;
             // arithmetic mean = (prod{i,n} x_i)^(1/n)
@@ -163,9 +168,7 @@ public class DriverInfo extends Params {
             // Set driver-specific params
             setDoubleParam(Constants.RESULT_ARIT_MEAN_STDDEV, aritMeanresult);
             setDoubleParam(Constants.RESULT_GEOM_MEAN_STDDEV, geomMeanresult);
-            setDoubleParam(Constants.RESULT_HARM_MEAN_STDDEV, 1.0 / harmMeanresultInverse);      
-            
-            _computeMeans = false;
+            setDoubleParam(Constants.RESULT_HARM_MEAN_STDDEV, 1.0 / harmMeanresultInverse);            
         }        
     }
     
