@@ -1,0 +1,2 @@
+#!/bin/sh
+java -cp ${FI_HOME}/dist/FastInfoset.jar com.sun.xml.fastinfoset.tools.FI_SAX_Or_XML_SAX_DOM_SAX_SAXEvent $1

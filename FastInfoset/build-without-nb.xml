@@ -1,0 +1,33 @@
+<project name="FastInfoset" default="dist" basedir=".">
+
+	<property name="app.jar" value="FastInfoset.jar"/>
+
+	<property name="jsr173_api.jar" value="lib/jsr173_api.jar"/>
+
+	<path id="compile.class.path">
+		<pathelement location="${jsr173_api.jar}"/>
+	</path>
+
+	<target name="prepare">
+		<mkdir dir="build/classes"/>
+		<mkdir dir="dist"/>
+	</target>
+
+	<target name="clean">
+		<delete file="dist/${app.jar}"/>
+		<delete dir="build/classes"/>
+	</target>
+
+	<target name="compile" depends="prepare">
+		<javac srcdir="src" destdir="build/classes"
+			debug="on" optimize="on" deprecation="on">
+			<classpath refid="compile.class.path"/>
+		</javac>
+	</target>
+
+	<target name="dist" depends="compile">
+		<jar jarfile="dist/${app.jar}"
+			basedir="build/classes/"/>
+	</target>
+
+</project>
