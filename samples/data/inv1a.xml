@@ -1,0 +1,20 @@
+<ns1:invoice xmlns:ns1="http://www.sun.com/schema/spidermarkexpress/sm-inv">
+  <Header>
+    <IssueDateTime>2003-03-13T13:13:32-08:00</IssueDateTime>
+    <Identifier schemeAgencyName="ISO" schemeName="Invoice">15570720</Identifier>
+    <POIdentifier schemeName="Generic" schemeAgencyName="ISO">691</POIdentifier>
+    <BuyerParty>
+      <PartyID schemeName="SpiderMarkExpress" schemeAgencyName="SUNW">1</PartyID>
+      <Name>IDES Retail INC US</Name>
+      <Address>
+        <Street>Hill St.</Street>
+        <HouseID schemeName="HouseID" schemeAgencyName="house">5555</HouseID>
+        <RoomID schemeName="RoomID" schemeAgencyName="room">Suite 3</RoomID>
+        <CityName>Boston</CityName>
+        <PostalZoneID schemeName="Zipcode" schemeAgencyName="USPS">01234</PostalZoneID>
+        <StateName>MA</StateName>
+        <CountryIdentificationCode listAgencyId="ISO" listId="3166">US</CountryIdentificationCode>
+      </Address>
+    </BuyerParty>
+  </Header>
+</ns1:invoice>

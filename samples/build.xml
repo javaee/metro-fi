@@ -1,0 +1,74 @@
+<project name="FISamples" default="compile" basedir=".">
+    <property environment="env"/>
+    
+    <property name="app.jar" value="samples.jar"/>
+    <property name="xml-file" value="data/inv1.xml"/>
+    <property name="finf-file" value="data/inv1.finf"/>
+    <property name="simple-xml-file" value="data/inv1a.xml"/>
+    <property name="simple-finf-file" value="data/inv1a.finf"/>
+    
+    <property name="lib-dir" value="lib"/>
+    
+    <path id="compile.class.path">
+        <fileset dir="${lib-dir}" includes="*.jar"/>
+    </path>
+    
+    <path id="class.path">
+        <pathelement location="dist/classes"/>
+        <path refid="compile.class.path"/>
+    </path>
+    
+    <target name="clean">
+        <delete dir="dist"/>
+    </target>
+    
+    <target name="prepare">
+        <mkdir dir="dist"/>
+        <mkdir dir="dist/classes"/>
+    </target>
+    
+    <target name="compile" depends="prepare">
+        <javac srcdir="src" destdir="dist/classes" debug="on" optimize="on" deprecation="on">
+            <classpath refid="compile.class.path"/>
+        </javac>
+    </target>
+    
+    <target name="run" depends="compile">
+        <java dir="." fork="true" classname="samples.stax.DocumentSerializer">
+            <classpath refid="class.path"/>
+            <arg line="${input}/"/>
+            <arg line="${output}/"/>
+        </java>
+    </target>
+    
+    <target name="FISAXSerializer" depends="compile">
+        <java dir="." fork="true" classname="samples.sax.FISerializer">
+            <classpath refid="class.path"/>
+            <arg line="${xml-file}/"/>
+            <arg line="${finf-file}/"/>
+        </java>
+    </target>
+
+    <target name="FIStAXSerializer" depends="compile">
+        <java dir="." fork="true" classname="samples.stax.DocumentSerializer">
+            <classpath refid="class.path"/>
+            <arg line="${xml-file}/"/>
+            <arg line="${finf-file}/"/>
+        </java>
+    </target>
+
+    <target name="StreamReader" depends="compile">
+        <java dir="." fork="true" classname="samples.stax.StreamReader">
+            <classpath refid="class.path"/>
+            <arg line="${simple-finf-file}/"/>
+        </java>
+    </target>
+
+    <target name="EventReader" depends="compile">
+        <java dir="." fork="true" classname="samples.stax.EventReader">
+            <classpath refid="class.path"/>
+            <arg line="${simple-finf-file}/"/>
+            <arg line="${simple-xml-file}/"/>
+        </java>
+    </target>
+</project>
