@@ -62,9 +62,13 @@ import com.sun.xml.fastinfoset.sax.SAXDocumentSerializer;
 
 
 
-/** <p>FI SAX document serializer</p>
- *  Demonstrates the use of SAXDocumentSerializer to transform 
- *  an XML file into a FastInfoset document
+/** <p>Serializes an XML input stream into FI document using 
+ *  SAXDocumentSerializer defined in the fastinfoset.sax package.</p>
+ *  In the sample, a DOMSource is constructed out of an XML file input (see method getDOMSource)
+ *  and a SAXResult instantiated using an instance of SAXDocumentSerializer as the 
+ *  handler which takes a FI document as OutputStream (see method getSAXResult). 
+ *  The sample then calls transformer's tranform method to convert the XML file into the FI
+ *  document.
  */
 public class FISerializer {
     Transformer _transformer;

@@ -42,7 +42,7 @@ package samples.sax;
 
 import java.io.File;
 
-/** <p>Convert XML files into FI documents</p>
+/** <p>Converts XML files into FI documents.</p>
  *  This utility class uses FISerializer to transform XML files into FI documents.
  *  Since only XML files are packaged in the sample package, thie utility is used 
  *  in every sample to create FI documents from XML files.

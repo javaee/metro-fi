@@ -59,8 +59,14 @@ import com.sun.xml.fastinfoset.stax.StAXInputFactory;
 import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
 
 
-/** <p>FI StAX EventReader</p>
- *  Demonstrates the use of FI "StAXEventReader" to read a FI document
+/** <p>This is a sample that demonstrates the use of FI StAX Event Iterator API.</p>
+ *  The sample starts by setting the javax.xml.stream.XMLInputFactory and javax.xml.stream.XMLEventFactory 
+ *  properties to the implementation classes in the fastinfoset.stax package.
+ *  These two properties must be set in order to return the right factories. The  XMLInputFactory
+ *  is used to create FI XMLEventReader as demonstrated in the sample where createXMLEventReader is 
+ *  called with an InputStream. The XMLEventFactory is used internally in the XMLEventReader to
+ *  allocate XMLEvent. The sample simply uses the EventReader to iterate through the input FI 
+ *  document and displays event types.
  */
 public class EventReader{
     protected XMLInputFactory factory = null;

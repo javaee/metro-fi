@@ -45,7 +45,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.namespace.QName;
 
-/** <p>Sample utitliy</p>
+/** <p>Sample utitliy.</p>
  *  This is an utility class used for samples in this package.
  */
 public class Util {

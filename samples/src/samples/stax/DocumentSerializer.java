@@ -60,10 +60,21 @@ import javax.xml.stream.XMLStreamException;
 import com.sun.xml.fastinfoset.stax.StAXInputFactory;
 import com.sun.xml.fastinfoset.stax.SAX2StAXWriter;
 
-/** <p>FI StAX document serializer</p>
- *  Demonstrates the use of StAXDocumentSerializer to transform 
- *  an XML file into a FastInfoset document
+/** <p>Serializes an XML input stream into FI document using 
+ *  StAX document serializer defined in the fastinfoset.stax package.</p>
+ *  In the sample, a DOMSource is constructed out of an XML file input (see method getDOMSource)
+ *  and a SAXResult is instantiated using an instance of SAX2StAXWriter as handlers (see method 
+ *  getSAXResult). Utility class 
+ *  SAX2StAXWriter extends DefaultHandler and implements LexicalHandler, which allows it
+ *  to be used to handle SAX events. The source and result are then used by the JAXP transformer
+ *  to transform the XML file to FI document which was passed in as OutputStream for the StAX 
+ *  serializer.<br>
+ *  Fastinfoset StAX package fully implements the StAX API as specified in JSR173. Property 
+ *  javax.xml.stream.XMLOutputFactory needs to be specfied as does in the sample to obtain 
+ *  the FI OutputFactory imlementation class. Once getting the factory, a FI StAX serializer is
+ *  created by calling the factory's createXMLStreamWriter(OutputStream) method.
  */
+
 public class DocumentSerializer {
     XMLOutputFactory factory;
     String _xmlFile;

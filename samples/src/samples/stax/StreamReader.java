@@ -51,8 +51,14 @@ import javax.xml.stream.XMLStreamException;
 import com.sun.xml.fastinfoset.stax.StAXInputFactory;
 
 import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
-/** <p>FI StAX StreamReader</p>
- *  Demonstrates the use of FI StAX StreamReader "StAXDocumentParser" to read a FI document
+
+/** <p>This is a sample that demonstrates the use of FI StAX Cursor API.</p>
+ *  The sample starts by setting the javax.xml.stream.XMLInputFactory to the implementation 
+ *  classe in the fastinfoset.stax package, which enables the XMLInputFactory to locate 
+ *  the correct factory class and obtain an instance of it. The sample then calls 
+ *  the factory's createXMLStreamReader method with an InputStream to get a StreamReader. 
+ *  The rest of the code in the sample simply uses the StreamReader to loop through
+ *  the document and displays event types, names and etc.
  */
 public class StreamReader {
     protected XMLInputFactory factory = null;
