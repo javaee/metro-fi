@@ -43,6 +43,7 @@ import com.sun.xml.fastinfoset.sax.SAXDocumentSerializer;
 import com.sun.xml.fastinfoset.sax.VocabularyGenerator;
 import com.sun.xml.fastinfoset.vocab.SerializerVocabulary;
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
@@ -102,11 +103,16 @@ public class EncodingTest extends TestCase {
                 externalVocabulary, false);
 
         _finfDocument = parse();
+        FileOutputStream foas = new FileOutputStream("new-UBL-example-refvocab.finf");
+        foas.write(_finfDocument);
+        
         compare(obtainBytesFromStream(_finfRefVocabDocumentURL.openStream()));
     }
 
     public void testEncodeWithoutVocabulary() throws Exception {
         _finfDocument = parse();
+        FileOutputStream foas = new FileOutputStream("new-UBL-example.finf");
+        foas.write(_finfDocument);
         
         compare(obtainBytesFromStream(_finfDocumentURL.openStream()));
     }
@@ -131,7 +137,9 @@ public class EncodingTest extends TestCase {
         boolean passed = true;
         for (int i = 0; i < _finfDocument.length; i++) {
             if (_finfDocument[i] != specFiDocument[i]) {
-                System.err.println(Integer.toHexString(i) + ": " + Integer.toHexString(_finfDocument[i]) + " " + Integer.toHexString(specFiDocument[i]));
+                System.err.println(Integer.toHexString(i) + ": " + 
+                        Integer.toHexString(_finfDocument[i] & 0xFF) + " " + 
+                        Integer.toHexString(specFiDocument[i] & 0xFF));
                 passed = false;
             }
         }

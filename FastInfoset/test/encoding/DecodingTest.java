@@ -147,7 +147,9 @@ public class DecodingTest extends TestCase {
         boolean passed = true;
         for (int i = 0; i < fiDocument.length; i++) {
             if (fiDocument[i] != specFiDocument[i]) {
-                System.err.println(Integer.toHexString(i) + ": " + Integer.toHexString(fiDocument[i]) + " " + Integer.toHexString(specFiDocument[i]));
+                System.err.println(Integer.toHexString(i) + ": " + 
+                        Integer.toHexString(fiDocument[i] & 0xFF) + " " + 
+                        Integer.toHexString(specFiDocument[i] & 0xFF));
                 passed = false;
             }
         }
