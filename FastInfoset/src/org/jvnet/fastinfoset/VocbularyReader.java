@@ -36,23 +36,26 @@
  *
  */
 
-package com.sun.xml.fastinfoset.api;
+package org.jvnet.fastinfoset;
 
-public interface VocabularyWriter {
+import java.util.Map;
 
-    // Before writing
-    
-    public void setExternalVocabulary(ReferencedVocabulary referencedVocabulary);
-    
-    public void setIntitialVocabulary(Vocabulary initialVocabulary);
-    
-    public void setDynamicVocabulary(Vocabulary dynamicVocabulary);
+public interface VocbularyReader {
 
+    // Before reading 
     
-    // After writing
+    public void setExternalVocabularies(Map referencedVocabualries);
+    
+    public void setDynamicVocabulary(Vocabulary v);
+    
+    
+    // After reading 
+    
+    public ReferencedVocabulary getExternalVocabulary();
+    
+    public Vocabulary getIntitialVocabulary();
 
     public Vocabulary getDynamicVocabulary();
 
     public Vocabulary getFinalVocabulary();
-    
 }

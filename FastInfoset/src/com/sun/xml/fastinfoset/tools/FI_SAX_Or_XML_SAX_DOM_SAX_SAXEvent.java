@@ -40,7 +40,7 @@
 package com.sun.xml.fastinfoset.tools;
 
 import com.sun.xml.fastinfoset.Decoder;
-import com.sun.xml.fastinfoset.api.FISource;
+import org.jvnet.fastinfoset.FastInfosetSource;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -70,7 +70,7 @@ public class FI_SAX_Or_XML_SAX_DOM_SAX_SAXEvent extends TransformInputOutput {
         DOMResult dr = new DOMResult();
         
         if (isFastInfosetDocument) {
-            t.transform(new FISource(document), dr);
+            t.transform(new FastInfosetSource(document), dr);
         } else {
             t.transform(new StreamSource(document), dr);
         }

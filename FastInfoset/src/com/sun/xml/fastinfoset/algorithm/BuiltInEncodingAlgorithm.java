@@ -42,6 +42,7 @@ package com.sun.xml.fastinfoset.algorithm;
 import java.nio.CharBuffer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.jvnet.fastinfoset.EncodingAlgorithm;
 
 public abstract class BuiltInEncodingAlgorithm implements EncodingAlgorithm {
     protected final static Pattern SPACE_PATTERN = Pattern.compile("\\s");

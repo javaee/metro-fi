@@ -36,7 +36,7 @@
  *
  */ 
 
-package com.sun.xml.fastinfoset.api;
+package org.jvnet.fastinfoset;
 
 import java.util.List;
 import javax.xml.namespace.QName;

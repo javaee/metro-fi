@@ -36,9 +36,9 @@
  *
  */
 
-package com.sun.xml.fastinfoset.api.sax;
+package org.jvnet.fastinfoset.sax;
 
-import com.sun.xml.fastinfoset.api.VocbularyReader;
+import org.jvnet.fastinfoset.VocbularyReader;
 import java.io.IOException;
 import java.io.InputStream;
 import org.xml.sax.SAXException;

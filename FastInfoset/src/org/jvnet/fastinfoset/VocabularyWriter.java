@@ -36,18 +36,23 @@
  *
  */
 
+package org.jvnet.fastinfoset;
 
-package com.sun.xml.fastinfoset.api;
+public interface VocabularyWriter {
 
-public abstract class VocabularyFactory {
+    // Before writing
     
-    protected VocabularyFactory() {
-    }
+    public void setExternalVocabulary(ReferencedVocabulary referencedVocabulary);
     
-    public static VocabularyFactory newInstance() {
-        // return implementation based on system property
-        return null;
-    }
+    public void setIntitialVocabulary(Vocabulary initialVocabulary);
     
-    public abstract Vocabulary newVocabulary();    
+    public void setDynamicVocabulary(Vocabulary dynamicVocabulary);
+
+    
+    // After writing
+
+    public Vocabulary getDynamicVocabulary();
+
+    public Vocabulary getFinalVocabulary();
+    
 }

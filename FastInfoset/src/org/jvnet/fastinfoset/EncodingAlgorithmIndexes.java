@@ -36,23 +36,28 @@
  *
  */ 
 
+package org.jvnet.fastinfoset;
 
-package com.sun.xml.fastinfoset.api;
-
-public class ReferencedVocabulary {
-    private final String URI;
-    private final Vocabulary vocabulary;
-    
-    public ReferencedVocabulary(String URI, Vocabulary vocabulary) {
-        this.URI = URI;
-        this.vocabulary = vocabulary; 
-    }
-
-    public String getURI() {
-        return URI;
-    }
-
-    public Vocabulary getVocabulary() {
-        return vocabulary;
-    }
+/** 
+ * The indexes of built-in encoding algorithms.
+ *
+ * <p>The indexes of the built-in encoding algorithms are specified
+ * in ITU-T Rec. X.891 | ISO/IEC 24824-1 (Fast Infoset), clause
+ * 10.<p>
+ *
+ * @version 0.1
+ * @see com.sun.xml.fastinfoset.api.sax.EncodingAlgorithmContentHandler
+ * @see com.sun.xml.fastinfoset.api.sax.EncodingAlgorithmAttributes
+ */
+public final class EncodingAlgorithmIndexes {
+    public static final int HEXADECIMAL = 1;
+    public static final int BASE64      = 2;
+    public static final int SHORT       = 3;
+    public static final int INT         = 4;
+    public static final int LONG        = 5;
+    public static final int BOOLEAN     = 6;
+    public static final int FLOAT       = 7;
+    public static final int DOUBLE      = 8;
+    public static final int UUID        = 9;
+    public static final int CDATA       = 10;
 }

@@ -34,28 +34,25 @@
  * Version 2.0, January 2004
  * http://www.apache.org/licenses/
  *
- */
+ */ 
 
-package com.sun.xml.fastinfoset.api;
 
-import java.util.Map;
+package org.jvnet.fastinfoset;
 
-public interface VocbularyReader {
+public class ReferencedVocabulary {
+    private final String URI;
+    private final Vocabulary vocabulary;
+    
+    public ReferencedVocabulary(String URI, Vocabulary vocabulary) {
+        this.URI = URI;
+        this.vocabulary = vocabulary; 
+    }
 
-    // Before reading 
-    
-    public void setExternalVocabularies(Map referencedVocabualries);
-    
-    public void setDynamicVocabulary(Vocabulary v);
-    
-    
-    // After reading 
-    
-    public ReferencedVocabulary getExternalVocabulary();
-    
-    public Vocabulary getIntitialVocabulary();
+    public String getURI() {
+        return URI;
+    }
 
-    public Vocabulary getDynamicVocabulary();
-
-    public Vocabulary getFinalVocabulary();
+    public Vocabulary getVocabulary() {
+        return vocabulary;
+    }
 }

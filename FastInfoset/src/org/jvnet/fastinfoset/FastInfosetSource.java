@@ -37,61 +37,61 @@
  */ 
 
 
-package com.sun.xml.fastinfoset.api;
+package org.jvnet.fastinfoset;
 
-import java.io.OutputStream;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.ext.LexicalHandler;
-import javax.xml.transform.sax.SAXResult;
-import com.sun.xml.fastinfoset.sax.SAXDocumentSerializer;
+import java.io.InputStream;
+import org.xml.sax.InputSource;
+import javax.xml.transform.sax.SAXSource;
+import com.sun.xml.fastinfoset.sax.SAXDocumentParser;
+import com.sun.xml.fastinfoset.*;
+import org.xml.sax.XMLReader;
 
 /**
- *  A JAXP Result implementation that supports the serialization to fast
- *  infoset documents for use by applications that expect a Result.
+ *  A JAXP Source implementation that supports the parsing fast
+ *  infoset document for use by applications that expect a Source.
  *
- *  <P>The derivation of FIResult from SAXResult is an implementation
+ *  <P>The derivation of FISource from SAXSource is an implementation
  *  detail.<P>
- *  
+ *
  *  <P>This implementation is designed for interoperation with JAXP and is not
  *  not designed with performance in mind. It is recommended that for performant
- *  interoperation alternative serializer specific solutions be used.<P>
+ *  interoperation alternative parser specific solutions be used.<P>
  *
- *  <P>General applications shall not call the following methods:
+ *  <P>Applications shall obey the following restrictions:
  *   <UL>
- *     <LI>setHandler</LI>
- *     <LI>setLexicalHandler</LI>
- *     <LI>setSystemId</LI>
+ *     <LI>The setXMLReader and setInputSource shall not be called.</LI>
+ *     <LI>The XMLReader object obtained by the getXMLReader method shall
+ *        be used only for parsing the InputSource object returned by
+ *        the getInputSource method.</LI>
+ *     <LI>The InputSource object obtained by the getInputSource method shall 
+ *        be used only for being parsed by the XMLReader object returned by 
+ *        the getXMLReader method.</LI>
  *   </UL>
  *  </P>
+ *
  * @version 0.1
  */
-public class FIResult extends SAXResult {
+public class FastInfosetSource extends SAXSource {
    
-    OutputStream _outputStream;
-    
-    public FIResult(OutputStream outputStream) {
-        _outputStream = outputStream;
+    public FastInfosetSource(InputStream inputStream) {
+        super(new InputSource(inputStream));
     }
 
-    public ContentHandler getHandler() {
-        ContentHandler handler = super.getHandler();
-        if (handler == null) {
-            handler = new SAXDocumentSerializer();
-            setHandler(handler);
+    public XMLReader getXMLReader() {
+        XMLReader reader = super.getXMLReader();
+        if (reader == null) {
+            reader = new SAXDocumentParser();
+            setXMLReader(reader);
         }
-        ((SAXDocumentSerializer) handler).setOutputStream(_outputStream);
-        return handler;        
+        ((SAXDocumentParser) reader).setInputStream(getInputStream());
+        return reader;
     }
     
-    public LexicalHandler getLexicalHandler() {
-        return (LexicalHandler) getHandler();
+    public InputStream getInputStream() {
+        return getInputSource().getByteStream();
     }
     
-    public OutputStream getOutputStream() {
-        return _outputStream;
-    }    
-    
-    public void setOutputStream(OutputStream outputStream) {
-        _outputStream = outputStream;
-    }    
+    public void setInputStream(InputStream inputStream) {
+        setInputSource(new InputSource(inputStream));
+    }
 }

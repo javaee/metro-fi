@@ -1,6 +1,6 @@
-package com.sun.xml.fastinfoset.api.sax;
+package org.jvnet.fastinfoset.sax;
 
-import com.sun.xml.fastinfoset.api.VocabularyWriter;
+import org.jvnet.fastinfoset.VocabularyWriter;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.ext.LexicalHandler;
 

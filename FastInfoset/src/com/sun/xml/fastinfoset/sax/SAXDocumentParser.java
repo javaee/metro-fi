@@ -43,11 +43,11 @@ import com.sun.xml.fastinfoset.Decoder;
 import com.sun.xml.fastinfoset.DecoderStateTables;
 import com.sun.xml.fastinfoset.EncodingConstants;
 import com.sun.xml.fastinfoset.QualifiedName;
-import com.sun.xml.fastinfoset.api.ReferencedVocabulary;
-import com.sun.xml.fastinfoset.api.Vocabulary;
-import com.sun.xml.fastinfoset.api.sax.EncodingAlgorithmContentHandler;
-import com.sun.xml.fastinfoset.api.sax.FastInfosetReader;
-import com.sun.xml.fastinfoset.api.sax.PrimitiveTypeContentHandler;
+import org.jvnet.fastinfoset.ReferencedVocabulary;
+import org.jvnet.fastinfoset.Vocabulary;
+import org.jvnet.fastinfoset.sax.EncodingAlgorithmContentHandler;
+import org.jvnet.fastinfoset.sax.FastInfosetReader;
+import org.jvnet.fastinfoset.sax.PrimitiveTypeContentHandler;
 import com.sun.xml.fastinfoset.util.CharArray;
 import com.sun.xml.fastinfoset.util.CharArrayString;
 import java.io.IOException;
@@ -625,13 +625,27 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 }
                 case DecoderStateTables.CII_EA:
                 {
-                    final boolean addToTable = (_b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0;
+                    if ((_b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0) {
+                        throw new IOException("Add to table not supported for Encoding algorithms");
+                    }
+
                     // Decode encoding algorithm integer
                     _identifier = (_b & 0x02) << 6;
                     final int b2 = read();
                     _identifier |= (b2 & 0xFC) >> 2;
 
                     decodeOctetsOfNonIdentifyingStringOnThirdBit(b2);
+                    
+                    if (_identifier <= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
+                        // Built-in algorithms
+                    } else if (_identifier >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
+                        // Application-defined algorithms
+                    } else {
+                        // Reserved built-in algorithms for future use
+                        // TODO should use sax property to decide if event will be
+                        // reported, allows for support through handler if required.
+                        throw new IOException("Encoding algorithm identifiers 10 up to and including 31 are reserved for future use");
+                    }
                     throw new IOException("Encoding algorithms for CIIs not yet implemented");
                 }
                 case DecoderStateTables.CII_INDEX_SMALL:

@@ -36,7 +36,7 @@
  *
  */ 
 
-package com.sun.xml.fastinfoset.api.sax;
+package org.jvnet.fastinfoset.sax;
 
 import org.xml.sax.SAXException;
 

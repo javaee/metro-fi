@@ -128,6 +128,11 @@ public final class EncodingConstants {
     public static final int TERMINATOR = 0xF0;
     public static final int DOUBLE_TERMINATOR = 0xFF;
 
+    
+    public static final int ENCODING_ALGORITHM_BUILTIN_END = 9;
+    public static final int ENCODING_ALGORITHM_APPLICATION_START = 31;
+    
+    
     // Octet string length contants
     
     public static final int OCTET_STRING_LENGTH_SMALL_LIMIT = 0;

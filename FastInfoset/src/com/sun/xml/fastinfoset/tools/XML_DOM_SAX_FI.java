@@ -39,7 +39,7 @@
 
 package com.sun.xml.fastinfoset.tools;
 
-import com.sun.xml.fastinfoset.api.FIResult;
+import org.jvnet.fastinfoset.FastInfosetResult;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -64,7 +64,7 @@ public class XML_DOM_SAX_FI extends TransformInputOutput {
         
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer t = tf.newTransformer();
-        t.transform(new DOMSource(d), new FIResult(finf));
+        t.transform(new DOMSource(d), new FastInfosetResult(finf));
     }
     
     public static void main(String[] args) throws Exception {
