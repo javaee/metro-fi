@@ -57,7 +57,6 @@ import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class VocabularyGenerator extends DefaultHandler implements LexicalHandler {
-    int _length = 0;
     
     protected SerializerVocabulary _serializerVocabulary;
     protected ParserVocabulary _parserVocabulary;
@@ -85,7 +84,6 @@ public class VocabularyGenerator extends DefaultHandler implements LexicalHandle
     }
 
     public void endDocument() throws SAXException {
-        System.out.println(_length);
     }
     
     public void startPrefixMapping(String prefix, String uri) throws SAXException {
@@ -109,7 +107,6 @@ public class VocabularyGenerator extends DefaultHandler implements LexicalHandle
             addToNameTable2(atts.getURI(a), prefix, atts.getLocalName(a), _serializerVocabulary.attributeName, _parserVocabulary.attributeName);
         
             String value = atts.getValue(a);
-            _length += value.length();
             if (value.length() < _serializerVocabulary.attributeValueSizeConstraint) {
                 addToTable(value, _serializerVocabulary.attributeValue, _parserVocabulary.attributeValue);
             }
@@ -120,8 +117,6 @@ public class VocabularyGenerator extends DefaultHandler implements LexicalHandle
     }
         
     public void characters(char[] ch, int start, int length) throws SAXException {
-        _length += length;
-    
         if (length < _serializerVocabulary.characterContentChunkSizeContraint) {
             addToCharArrayTable(new CharArray(ch, start, length, true));
         }
