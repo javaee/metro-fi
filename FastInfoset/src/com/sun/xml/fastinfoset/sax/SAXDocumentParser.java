@@ -67,6 +67,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
+import org.xml.sax.SAXParseException;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -327,9 +328,30 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
 
     
     public final void parse() throws FastInfosetException, IOException {
-        reset();
-        decodeHeader();                                                                                
-        processDII();
+        try {
+            reset();
+            decodeHeader();                                                                                
+            processDII();
+        } catch (RuntimeException e) {
+            try {
+                _errorHandler.fatalError(new SAXParseException(e.getClass().getName(), null, e));
+            } catch (Exception ee) {
+            }
+            // Wrap runtime exception
+            throw new FastInfosetException(e);            
+        } catch (FastInfosetException e) {
+            try {
+                _errorHandler.fatalError(new SAXParseException(e.getClass().getName(), null, e));
+            } catch (Exception ee) {
+            }
+            throw e;
+        } catch (IOException e) {
+            try {
+                _errorHandler.fatalError(new SAXParseException(e.getClass().getName(), null, e));
+            } catch (Exception ee) {
+            }
+            throw e;
+        }
     }
     
     protected final void processDII() throws FastInfosetException, IOException {
