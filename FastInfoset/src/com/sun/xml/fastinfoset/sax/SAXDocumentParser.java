@@ -1081,6 +1081,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     decodeOctetsOfNonIdentifyingStringOnFirstBit(b);
 
                     processAIIEncodingAlgorithm(name);
+                    break;
                 }
                 case DecoderStateTables.NISTRING_INDEX_SMALL:
                     value = _v.attributeValue.get(b & EncodingConstants.INTEGER_2ND_BIT_SMALL_MASK);
@@ -1257,7 +1258,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     throw new UnsupportedOperationException("SHORT");
                 case EncodingAlgorithmIndexes.INT:
                     length = BuiltInEncodingAlgorithmFactory.intEncodingAlgorithm.
-                            getLength(_octetBufferLength);
+                            getPrimtiveLengthFromOctetLength(_octetBufferLength);
                     if (length > builtInAlgorithmState.intArray.length) {
                         final int[] array = new int[length * 3 / 2 + 1];
                         System.arraycopy(builtInAlgorithmState.intArray, 0, 
@@ -1268,7 +1269,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     BuiltInEncodingAlgorithmFactory.intEncodingAlgorithm.
                             decodeFromBytesToIntArray(builtInAlgorithmState.intArray, 0, 
                                 _octetBuffer, _octetBufferStart, _octetBufferLength);
-                    _primitiveHandler.ints(null, 0, length);
+                    _primitiveHandler.ints(builtInAlgorithmState.intArray, 0, length);
                     break;
                 case EncodingAlgorithmIndexes.LONG:
                     throw new UnsupportedOperationException("LONG");
@@ -1276,7 +1277,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     throw new UnsupportedOperationException("BOOLEAN");
                 case EncodingAlgorithmIndexes.FLOAT:
                     length = BuiltInEncodingAlgorithmFactory.floatEncodingAlgorithm.
-                            getLength(_octetBufferLength);
+                            getPrimtiveLengthFromOctetLength(_octetBufferLength);
                     if (length > builtInAlgorithmState.floatArray.length) {
                         final float[] array = new float[length * 3 / 2 + 1];
                         System.arraycopy(builtInAlgorithmState.floatArray, 0, 
@@ -1287,7 +1288,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     BuiltInEncodingAlgorithmFactory.floatEncodingAlgorithm.
                             decodeFromBytesToFloatArray(builtInAlgorithmState.floatArray, 0, 
                                 _octetBuffer, _octetBufferStart, _octetBufferLength);
-                    _primitiveHandler.floats(null, 0, length);
+                    _primitiveHandler.floats(builtInAlgorithmState.floatArray, 0, length);
                     break;
                 case EncodingAlgorithmIndexes.DOUBLE:
                     throw new UnsupportedOperationException("DOUBLE");
@@ -1332,11 +1333,13 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     throw new EncodingAlgorithmException(
                             "Document contains application-defined encoding algorithm data that cannot be reported");
                 case EA_GENERIC:
+                {
                     String URI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
                     byte[] data = new byte[_octetBufferLength];
                     System.arraycopy(_octetBuffer, _octetBufferStart, data, 0, _octetBufferLength);
                     _attributes.addAttributeWithAlgorithmData(name, URI, _identifier, data);
                     break;
+                }
                 case EA_PRIMITIVE_APPLICATION:
                     throw new UnsupportedOperationException("");
             }

@@ -117,6 +117,7 @@ public final class EncodingConstants {
 
     public static final int CHARACTER_CHUNK = 0x80; // 10
     public static final int CHARACTER_CHUNK_ADD_TO_TABLE_FLAG = 0x10; // 00010000
+    public static final int CHARACTER_CHUNK_ENCODING_ALGORITHM_FLAG = 0x0C; // 00001100
     
     public static final int UNEXPANDED_ENTITY_REFERENCE = 0xC8; // 110010
     public static final int UNEXPANDED_ENTITY_REFERENCE_MASK = 0xFC; // 6 bits
@@ -124,13 +125,15 @@ public final class EncodingConstants {
     public static final int UNEXPANDED_ENTITY_PUBLIC_IDENTIFIER_FLAG = 0x01;
     
     public static final int NISTRING_ADD_TO_TABLE_FLAG = 0x40; // 01000000
+    public static final int NISTRING_ENCODING_ALGORITHM_FLAG = 0x30; // 00110000
     
     public static final int TERMINATOR = 0xF0;
     public static final int DOUBLE_TERMINATOR = 0xFF;
 
     
     public static final int ENCODING_ALGORITHM_BUILTIN_END = 9;
-    public static final int ENCODING_ALGORITHM_APPLICATION_START = 31;
+    public static final int ENCODING_ALGORITHM_APPLICATION_START = 32;
+    public static final int ENCODING_ALGORITHM_APPLICATION_MAX = 255;
     
     
     // Octet string length contants

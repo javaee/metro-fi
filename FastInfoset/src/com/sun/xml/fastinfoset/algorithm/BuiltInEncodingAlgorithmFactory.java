@@ -47,11 +47,14 @@ public final class BuiltInEncodingAlgorithmFactory {
     public final static BuiltInEncodingAlgorithm[] table = 
             new BuiltInEncodingAlgorithm[EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END + 1];
     
+    public final static BASE64EncodingAlgorithm base64EncodingAlgorithm = new BASE64EncodingAlgorithm();
+    
     public final static IntEncodingAlgorithm intEncodingAlgorithm = new IntEncodingAlgorithm();
     
     public final static FloatEncodingAlgorithm floatEncodingAlgorithm = new FloatEncodingAlgorithm();
     
     static {
+        table[EncodingAlgorithmIndexes.BASE64] = base64EncodingAlgorithm;
         table[EncodingAlgorithmIndexes.INT] = intEncodingAlgorithm;
         table[EncodingAlgorithmIndexes.FLOAT] = floatEncodingAlgorithm;
     }

@@ -20,7 +20,8 @@
  * products.
  *
  *    Please note that portions of Software may be provided with notices and
- * open source licenses from such communities and third parties that govern the
+ * open source licenses from su
+ ch communities and third parties that govern the
  * use of those portions, and any licenses granted hereunder do not alter any
  * rights and obligations you may have under such open source licenses,
  * however, the disclaimer of warranty and limitation of liability provisions
@@ -52,7 +53,7 @@ import org.jvnet.fastinfoset.EncodingAlgorithmException;
 
 public class FloatEncodingAlgorithm extends IEEE754FloatingPointEncodingAlgorithm {
 
-    public final int getLength(int octetLength) throws EncodingAlgorithmException {
+    public final int getPrimtiveLengthFromOctetLength(int octetLength) throws EncodingAlgorithmException {
         if (octetLength % FLOAT_SIZE != 0) {
             throw new EncodingAlgorithmException("'length' is not a multiple of " +
                     FLOAT_SIZE +
@@ -62,8 +63,12 @@ public class FloatEncodingAlgorithm extends IEEE754FloatingPointEncodingAlgorith
         return octetLength / FLOAT_SIZE;
     }
     
+    public int getOctetLengthFromPrimitiveLength(int primitiveLength) {
+        return primitiveLength * FLOAT_SIZE;
+    }
+   
     public final Object decodeFromBytes(byte[] b, int start, int length) throws EncodingAlgorithmException {
-        float[] data = new float[getLength(length)];
+        float[] data = new float[getPrimtiveLengthFromOctetLength(length)];
         decodeFromBytesToFloatArray(data, 0, b, start, length);
         
         return data;
@@ -114,7 +119,10 @@ public class FloatEncodingAlgorithm extends IEEE754FloatingPointEncodingAlgorith
     public final void decodeFromBytesToFloatArray(float[] data, int fstart, byte[] b, int start, int length) {
         final int size = length / FLOAT_SIZE;
         for (int i = 0; i < size; i++) {
-            final int bits = (b[start++] << 24) | (b[start++]<< 16) | (b[start++] << 8) | b[start++];
+            final int bits = ((b[start++] & 0xFF) << 24) | 
+                    ((b[start++] & 0xFF) << 16) | 
+                    ((b[start++] & 0xFF) << 8) | 
+                    (b[start++] & 0xFF);
             data[fstart++] = Float.intBitsToFloat(bits);
         }
     }
@@ -139,7 +147,10 @@ public class FloatEncodingAlgorithm extends IEEE754FloatingPointEncodingAlgorith
                 }
             }
             
-            int bits = (b[0] << 24) | (b[1]<< 16) | (b[2] << 8) | b[3];
+            final int bits = ((b[0] & 0xFF) << 24) | 
+                    ((b[1] & 0xFF) << 16) | 
+                    ((b[2] & 0xFF) << 8) | 
+                    (b[3] & 0xFF);
             floatList.add(new Float(Float.intBitsToFloat(bits)));
         }
         
@@ -150,21 +161,25 @@ public class FloatEncodingAlgorithm extends IEEE754FloatingPointEncodingAlgorith
     public final void encodeToOutputStreamFromFloatArray(float[] fdata, OutputStream s) throws IOException {
         for (int i = 0; i < fdata.length; i++) {
             final int bits = Float.floatToIntBits(fdata[i]);
-            s.write((bits >>> 24) & 0xFF);
+            s.write(bits >>> 24);
             s.write((bits >>> 16) & 0xFF);
             s.write((bits >>> 8) & 0xFF);
             s.write(bits & 0xFF);
         }
     }
     
-    public final void encodeToBytes(float[] fdata, int fstart, int flength, byte[] b, int start) {
+    public final void encodeToBytes(Object array, int astart, int alength, byte[] b, int start) {
+        encodeToBytesFromFloatArray((float[])array, astart, alength, b, start);
+    }
+    
+    public final void encodeToBytesFromFloatArray(float[] fdata, int fstart, int flength, byte[] b, int start) {
         final int fend = fstart + flength;
         for (int i = fstart; i < fend; i++) {
             final int bits = Float.floatToIntBits(fdata[i]);
-            b[start++] = (byte)((bits >>> 24) & 0xFF);
+            b[start++] = (byte)(bits >>> 24);
             b[start++] = (byte)((bits >>> 16) & 0xFF);
             b[start++] = (byte)((bits >>>  8) & 0xFF);
-            b[start++] = (byte)((bits >>>  0) & 0xFF);
+            b[start++] = (byte)(bits & 0xFF);
         }
     }
     

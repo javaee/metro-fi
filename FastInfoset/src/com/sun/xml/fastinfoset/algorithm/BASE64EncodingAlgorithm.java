@@ -39,34 +39,56 @@
 
 package com.sun.xml.fastinfoset.algorithm;
 
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.CharBuffer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.jvnet.fastinfoset.EncodingAlgorithm;
+import java.util.ArrayList;
+import java.util.List;
 import org.jvnet.fastinfoset.EncodingAlgorithmException;
 
-public abstract class BuiltInEncodingAlgorithm implements EncodingAlgorithm {
-    protected final static Pattern SPACE_PATTERN = Pattern.compile("\\s");
+public class BASE64EncodingAlgorithm extends BuiltInEncodingAlgorithm {
 
-    public abstract int getPrimtiveLengthFromOctetLength(int octetLength) throws EncodingAlgorithmException;
-
-    public abstract int getOctetLengthFromPrimitiveLength(int primitiveLength);
-
-    public abstract void encodeToBytes(Object array, int astart, int alength, byte[] b, int start);
-        
-    public interface WordListener {
-        public void word(int start, int end);
+    public final Object decodeFromBytes(byte[] b, int start, int length) throws EncodingAlgorithmException {
+        final byte[] data = new byte[length];
+        System.arraycopy(b, start, data, 0, length);
+        return data;
     }
     
-    public void matchWhiteSpaceDelimnatedWords(CharBuffer cb, WordListener wl) {
-        Matcher m = SPACE_PATTERN.matcher(cb);
-        int i = 0;
-        while(m.find()) {
-            int s = m.start();
-            if (s != i) {
-                wl.word(i, s);
-            }
-            i = m.end();
-        }
+    public final Object decodeFromInputStream(InputStream s) throws IOException {
+        throw new UnsupportedOperationException("Not implemented");
     }
+    
+    
+    public void encodeToOutputStream(Object data, OutputStream s) throws IOException {
+        if (!(data instanceof byte[])) {
+            throw new IllegalArgumentException("'data' not an instance of byte[]");
+        }
+        
+        s.write((byte[])data);
+    }
+    
+    
+    public final Object convertFromCharacters(char[] ch, int start, int length) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+    
+    public final void convertToCharacters(Object data, StringBuffer s) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+    
+    
+        
+    public final int getPrimtiveLengthFromOctetLength(int octetLength) throws EncodingAlgorithmException {
+        return octetLength;
+    }
+
+    public int getOctetLengthFromPrimitiveLength(int primitiveLength) {
+        return primitiveLength;
+    }
+    
+    public final void encodeToBytes(Object array, int astart, int alength, byte[] b, int start) {
+        System.arraycopy((byte[])array, astart, b, start, alength);
+    }    
 }

@@ -42,12 +42,16 @@ package com.sun.xml.fastinfoset.sax;
 import com.sun.xml.fastinfoset.Encoder;
 import com.sun.xml.fastinfoset.EncodingConstants;
 import com.sun.xml.fastinfoset.QualifiedName;
+import com.sun.xml.fastinfoset.algorithm.BuiltInEncodingAlgorithmFactory;
+import com.sun.xml.fastinfoset.util.KeyIntMap;
 import org.jvnet.fastinfoset.ReferencedVocabulary;
 import org.jvnet.fastinfoset.Vocabulary;
 import org.jvnet.fastinfoset.sax.FastInfosetWriter;
 import com.sun.xml.fastinfoset.util.LocalNameQualifiedNamesMap;
 import java.io.IOException;
-import java.io.OutputStream;
+import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
+import org.jvnet.fastinfoset.FastInfosetException;
+import org.jvnet.fastinfoset.sax.EncodingAlgorithmAttributes;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -147,8 +151,30 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
             encodeElement(namespaceURI, qName, localName);
             
             if (attributeCount > 0) {
-                for (int i = 0; i < atts.getLength(); i++) {
-                    encodeAttribute(atts.getURI(i), atts.getQName(i), atts.getLocalName(i), atts.getValue(i));
+                boolean addToTable;
+                String value;
+                if (atts instanceof EncodingAlgorithmAttributes) {
+                    EncodingAlgorithmAttributes eAtts = (EncodingAlgorithmAttributes)atts;
+                    for (int i = 0; i < eAtts.getLength(); i++) {
+                        encodeAttribute(atts.getURI(i), atts.getQName(i), atts.getLocalName(i));
+                        
+                        value = eAtts.getValue(i);
+                        if (value != null) {
+                            addToTable = (value.length() < _v.attributeValueSizeConstraint) ? true : false;
+                            encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
+                        } else {
+                            encodeNonIdentifyingStringOnFirstBit(eAtts.getAlgorithmURI(i), 
+                                    eAtts.getAlgorithmIndex(i), eAtts.getAlgorithmData(i));
+                        }
+                    }
+                } else {
+                    for (int i = 0; i < atts.getLength(); i++) {
+                        encodeAttribute(atts.getURI(i), atts.getQName(i), atts.getLocalName(i));
+
+                        value = atts.getValue(i);
+                        addToTable = (value.length() < _v.attributeValueSizeConstraint) ? true : false;
+                        encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
+                    }
                 }
                 _b = EncodingConstants.TERMINATOR;
                 _terminate = true;
@@ -181,10 +207,11 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
     }
         
     public final void characters(char[] ch, int start, int length) throws SAXException {
+        if (length <= 0) {
+            return;
+        }
+        
         try {
-            if (length == 0) {
-                return;
-            }
             encodeTermination();
             
             encodeCharacters(ch, start, length);
@@ -220,6 +247,10 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
     // LexicalHandler
     
     public final void comment(char[] ch, int start, int length) throws SAXException {
+        if (length <= 0) {
+            return;
+        }
+        
         try {
             encodeTermination();
             
@@ -251,36 +282,97 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
     // EncodingAlgorithmContentHandler
     
     public final void octets(String URI, int algorithm, byte[] b, int start, int length)  throws SAXException {
+        if (length <= 0) {
+            return;
+        }
+        
+        if (URI != null) {
+            algorithm = _v.encodingAlgorithm.get(URI) + EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START;
+            if (algorithm == KeyIntMap.NOT_PRESENT) {
+                throw new SAXException("Encoding algorithm URI '" + URI + "' not a member of the encoding algorithm table");
+            }
+        }
+        
+        try {
+            encodeTermination();
+            
+            encodeCIIOctetAlgorithmData(algorithm, b, start, length);
+        } catch (IOException e) {
+            throw new SAXException(e);
+        }
     }
 
     public final void object(String URI, int algorithm, Object o)  throws SAXException {
+        throw new UnsupportedOperationException("Non Implemented");
     }
     
     
     // PrimitiveTypeContentHandler
     
-    public final void booleans(boolean [] b, int start, int length) throws SAXException {
+    public final void booleans(boolean[] b, int start, int length) throws SAXException {
+        throw new SAXException("Non Implemented");
     }
 
     public final void bytes(byte[] b, int start, int length) throws SAXException {
+        if (length <= 0) {
+            return;
+        }
+        
+        try {
+            encodeTermination();
+            
+            encodeCIIOctetAlgorithmData(EncodingAlgorithmIndexes.BASE64, b, start, length);
+        } catch (IOException e) {
+            throw new SAXException(e);
+        }
     }
     
     public final void shorts(short[] s, int start, int length) throws SAXException {
+        throw new SAXException("Non Implemented");
     }
     
-    public final void ints(int [] i, int start, int length) throws SAXException {
+    public final void ints(int[] i, int start, int length) throws SAXException {
+        if (length <= 0) {
+            return;
+        }
+        
+        try {
+            encodeTermination();
+            
+            encodeCIIBuiltInAlgorithmData(EncodingAlgorithmIndexes.INT, i, start, length);
+        } catch (IOException e) {
+            throw new SAXException(e);
+        } catch (FastInfosetException e) {
+            throw new SAXException(e);
+        }
     }
     
-    public final void longs(long [] l, int start, int length) throws SAXException {
+    public final void longs(long[] l, int start, int length) throws SAXException {
+        throw new SAXException("Non Implemented");
     }
     
-    public final void floats(float [] f, int start, int length) throws SAXException {
+    public final void floats(float[] f, int start, int length) throws SAXException {
+        if (length <= 0) {
+            return;
+        }
+        
+        try {
+            encodeTermination();
+            
+            encodeCIIBuiltInAlgorithmData(EncodingAlgorithmIndexes.FLOAT, f, start, length);
+        } catch (IOException e) {
+            throw new SAXException(e);
+        } catch (FastInfosetException e) {
+            throw new SAXException(e);
+        }
     }
     
-    public final void doubles(double [] d, int start, int length) throws SAXException {
+    public final void doubles(double[] d, int start, int length) throws SAXException {
+        throw new SAXException("Non Implemented");
     }
 
     public final void uuids(long[] msb, long[] lsb, int start, int length) throws SAXException {
+        throw new SAXException("Non Implemented");
     }
     
     
@@ -300,21 +392,20 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
                 localName, entry);
     }
 
-    protected final void encodeAttribute(String namespaceURI, String qName, String localName, String value) throws IOException {
+    protected final void encodeAttribute(String namespaceURI, String qName, String localName) throws IOException {
         LocalNameQualifiedNamesMap.Entry entry = _v.attributeName.obtainEntry(qName);
         if (entry._valueIndex > 0) {
             QualifiedName[] names = entry._value;
             for (int i = 0; i < entry._valueIndex; i++) {
                 if ((namespaceURI == names[i].namespaceName || namespaceURI.equals(names[i].namespaceName))) {
                     encodeNonZeroIntegerOnSecondBitFirstBitZero(names[i].index);
-
-                    boolean addToTable = (value.length() < _v.attributeValueSizeConstraint) ? true : false;
-                    encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
                     return;
                 }
             }                
         } 
-        encodeLiteralAttributeQualifiedNameAndValueOnSecondBit(namespaceURI, getPrefixFromQualifiedName(qName), 
-                localName, value, entry);
+        
+        encodeLiteralAttributeQualifiedNameOnSecondBit(namespaceURI, getPrefixFromQualifiedName(qName), 
+                localName, entry);
+        
     }
 }

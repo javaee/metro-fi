@@ -66,6 +66,8 @@ public abstract class Decoder {
     
     protected ParserVocabulary _v;
 
+    protected boolean _vIsInternal;
+
     protected List _notations;
 
     protected List _unparsedEntities;
@@ -98,22 +100,27 @@ public abstract class Decoder {
     
     protected int _charBufferLength;
 
-    /** Creates a new instance of Decoder */
     public Decoder() {
-        // TODO move the initial vocabulary outside of the parser
         _v = new ParserVocabulary();
+        _vIsInternal = true;
     }
 
     public void reset() {
         _terminate = _doubleTerminate = _elementWithAttributesNoChildrenTermination = false;
     }
 
+    public void setVocabulary(ParserVocabulary v) {
+        _v = v;
+        _vIsInternal = false;
+    }
     
     public void setInputStream(InputStream s) {
         _s = s;
         _octetBufferOffset = 0;
         _octetBufferEnd = 0;
-        _v.clear();
+        if (_vIsInternal == true) {
+            _v.clear();
+        }
     }
         
     public final void decodeDII() throws FastInfosetException, IOException {        

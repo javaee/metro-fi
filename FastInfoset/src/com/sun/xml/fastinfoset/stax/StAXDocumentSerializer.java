@@ -690,7 +690,11 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
                 for (int i = 0; i < _attributes.size();) {
                     QualifiedName name = (QualifiedName)_attributes.get(i++);
                     String value = (String)_attributes.get(i++);
-                    encodeAttributeQualifiedNameAndValueOnSecondBit(name.namespaceName, name.prefix, name.localName, value);
+                    encodeAttributeQualifiedNameOnSecondBit(name.namespaceName, name.prefix, name.localName);
+
+                    final boolean addToTable = (value.length() < _v.attributeValueSizeConstraint) ? true : false;
+                    encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
+                    
                     _b = EncodingConstants.TERMINATOR;
                     _terminate = true;
                 }
@@ -735,7 +739,11 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
             for (int i = 0; i < _attributes.size();) {
                 QualifiedName name = (QualifiedName)_attributes.get(i++);
                 String value = (String)_attributes.get(i++);
-                encodeAttributeQualifiedNameAndValueOnSecondBit(name.namespaceName, name.prefix, name.localName, value);
+                encodeAttributeQualifiedNameOnSecondBit(name.namespaceName, name.prefix, name.localName);
+
+                final boolean addToTable = (value.length() < _v.attributeValueSizeConstraint) ? true : false;
+                encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
+
                 _b = EncodingConstants.TERMINATOR;
                 _terminate = true;
             }

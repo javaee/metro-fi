@@ -174,7 +174,11 @@ public class DOMDocumentSerializer extends Encoder {
                 _attributes[i] = null;
                 namespaceURI = a.getNamespaceURI();
                 namespaceURI = (namespaceURI == null) ? "" : namespaceURI;
-                encodeAttribute(namespaceURI, a.getNodeName(), a.getLocalName(), a.getNodeValue());        
+                encodeAttribute(namespaceURI, a.getNodeName(), a.getLocalName());
+                
+                final String value = a.getNodeValue();
+                final boolean addToTable = (value.length() < _v.attributeValueSizeConstraint) ? true : false;
+                encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
             }
             
             _b = EncodingConstants.TERMINATOR;
@@ -261,21 +265,18 @@ public class DOMDocumentSerializer extends Encoder {
                 localName, entry);
     }
 
-    protected final void encodeAttribute(String namespaceURI, String qName, String localName, String value) throws IOException {
+    protected final void encodeAttribute(String namespaceURI, String qName, String localName) throws IOException {
         LocalNameQualifiedNamesMap.Entry entry = _v.attributeName.obtainEntry(qName);
         if (entry._valueIndex > 0) {
             QualifiedName[] names = entry._value;
             for (int i = 0; i < entry._valueIndex; i++) {
                 if ((namespaceURI == names[i].namespaceName || namespaceURI.equals(names[i].namespaceName))) {
                     encodeNonZeroIntegerOnSecondBitFirstBitZero(names[i].index);
-
-                    boolean addToTable = (value.length() < _v.attributeValueSizeConstraint) ? true : false;
-                    encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
                     return;
                 }
             }                
         } 
-        encodeLiteralAttributeQualifiedNameAndValueOnSecondBit(namespaceURI, getPrefixFromQualifiedName(qName), 
-                localName, value, entry);
+        encodeLiteralAttributeQualifiedNameOnSecondBit(namespaceURI, getPrefixFromQualifiedName(qName), 
+                localName, entry);
     }    
 }

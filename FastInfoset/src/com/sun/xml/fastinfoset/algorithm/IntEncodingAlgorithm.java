@@ -52,7 +52,7 @@ import org.jvnet.fastinfoset.EncodingAlgorithmException;
 
 public class IntEncodingAlgorithm extends IntegerEncodingAlgorithm {
 
-    public final int getLength(int octetLength) throws EncodingAlgorithmException {
+    public final int getPrimtiveLengthFromOctetLength(int octetLength) throws EncodingAlgorithmException {
         if (octetLength % INT_SIZE != 0) {
             throw new EncodingAlgorithmException("'length' is not a multiple of " +
                     INT_SIZE +
@@ -61,9 +61,13 @@ public class IntEncodingAlgorithm extends IntegerEncodingAlgorithm {
         
         return octetLength / INT_SIZE;
     }
+
+    public int getOctetLengthFromPrimitiveLength(int primitiveLength) {
+        return primitiveLength * INT_SIZE;
+    }
     
     public final Object decodeFromBytes(byte[] b, int start, int length) throws EncodingAlgorithmException {
-        int[] data = new int[getLength(length)];
+        int[] data = new int[getPrimtiveLengthFromOctetLength(length)];
         decodeFromBytesToIntArray(data, 0, b, start, length);
         
         return data;
@@ -115,7 +119,10 @@ public class IntEncodingAlgorithm extends IntegerEncodingAlgorithm {
     public final void decodeFromBytesToIntArray(int[] idata, int istart, byte[] b, int start, int length) {
         final int size = length / INT_SIZE;
         for (int i = 0; i < size; i++) {
-            idata[istart++] = (b[start++] << 24) | (b[start++]<< 16) | (b[start++] << 8) | b[start++];
+            idata[istart++] = ((b[start++] & 0xFF) << 24) | 
+                    ((b[start++] & 0xFF) << 16) | 
+                    ((b[start++] & 0xFF) << 8) | 
+                    (b[start++] & 0xFF);
         }        
     }
     
@@ -139,7 +146,11 @@ public class IntEncodingAlgorithm extends IntegerEncodingAlgorithm {
                 }
             }
             
-            integerList.add(new Integer((b[0] << 24) | (b[1]<< 16) | (b[2] << 8) | b[3]));
+            final int i = ((b[0] & 0xFF) << 24) | 
+                    ((b[1] & 0xFF) << 16) | 
+                    ((b[2] & 0xFF) << 8) | 
+                    (b[3] & 0xFF);
+            integerList.add(new Integer(i));
         }
         
         return generateArrayFromList(integerList);
@@ -149,18 +160,22 @@ public class IntEncodingAlgorithm extends IntegerEncodingAlgorithm {
     public final void encodeToOutputStreamFromIntArray(int[] idata, OutputStream s) throws IOException {
         for (int i = 0; i < idata.length; i++) {
             final int bits = idata[i];
-            s.write((bits >>> 24) & 0xFF);
+            s.write(bits >>> 24);
             s.write((bits >>> 16) & 0xFF);
             s.write((bits >>> 8) & 0xFF);
             s.write(bits & 0xFF);
         }
     }
     
+    public final void encodeToBytes(Object array, int astart, int alength, byte[] b, int start) {
+        encodeToBytesFromIntArray((int[])array, astart, alength, b, start);
+    }
+    
     public final void encodeToBytesFromIntArray(int[] idata, int istart, int ilength, byte[] b, int start) {
         final int iend = istart + ilength;
         for (int i = istart; i < iend; i++) {
             final int bits = idata[i];
-            b[start++] = (byte)((bits >>> 24) & 0xFF);
+            b[start++] = (byte)(bits >>> 24);
             b[start++] = (byte)((bits >>> 16) & 0xFF);
             b[start++] = (byte)((bits >>>  8) & 0xFF);
             b[start++] = (byte)(bits & 0xFF);
