@@ -174,7 +174,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
     public Object getProperty(String name)
             throws SAXNotRecognizedException, SAXNotSupportedException {
         if (name.equals(Properties.LEXICAL_HANDLER_PROPERTY)) {
-            return _lexicalHandler;
+            return getLexicalHandler();
         } else if (name.equals(Properties.EXTERNAL_VOCABULARIES_PROPERTY)) {
           return _externalVocabularies;  
         } else {
@@ -186,7 +186,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
     public void setProperty(String name, Object value)
             throws SAXNotRecognizedException, SAXNotSupportedException {
         if (name.equals(Properties.LEXICAL_HANDLER_PROPERTY)) {
-            _lexicalHandler = (LexicalHandler)value;
+            setLexicalHandler((LexicalHandler)value);
         } else if (name.equals(Properties.EXTERNAL_VOCABULARIES_PROPERTY)) {
             // _externalVocabularies = (Map<String, ParserVocabulary>)value;
             _externalVocabularies = (Map)value;
@@ -260,6 +260,14 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
     public final void parse(InputStream s) throws IOException, FastInfosetException, SAXException {
         setInputStream(s);
         parse();
+    }
+    
+    public void setLexicalHandler(LexicalHandler handler) {
+        _lexicalHandler = handler;
+    }
+                                                                                
+    public LexicalHandler getLexicalHandler() {
+        return _lexicalHandler;
     }
     
     public void setEncodingAlgorithmContentHandler(EncodingAlgorithmContentHandler handler) {

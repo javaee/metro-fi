@@ -44,6 +44,7 @@ import java.io.InputStream;
 import org.jvnet.fastinfoset.FastInfosetException;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
+import org.xml.sax.ext.LexicalHandler;
 
 /**
  * Interface for reading an Fast Infoset document using callbacks.
@@ -128,6 +129,11 @@ public interface FastInfosetReader extends XMLReader, VocbularyReader {
      */
     public void setEncodingAlgorithmContentHandler(EncodingAlgorithmContentHandler handler);
 
+
+    public LexicalHandler getLexicalHandler();
+   
+    public void setLexicalHandler(LexicalHandler handler);
+                                                                                
 
     /**
      * Return the current encoding algorithm handler.
