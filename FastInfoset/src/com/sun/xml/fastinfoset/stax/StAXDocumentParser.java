@@ -114,6 +114,8 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
      */
     protected Map _prefixMap = new HashMap();
 
+    protected NamespaceContextImpl _nsContext = new NamespaceContextImpl();
+    
     protected StAXManager _manager;
     
     public StAXDocumentParser() {
@@ -735,7 +737,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     }
     
     public NamespaceContext getNamespaceContext() {
-        throw new UnsupportedOperationException("Not implemented");
+        return _nsContext;
     }
     
     public int getEventType() {
@@ -1243,29 +1245,11 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         }
   
         public final String getPrefix(String namespaceURI) {
-            return null;
-            // return _nsSupport.getPrefix(namespaceURI);
+            throw new UnsupportedOperationException("getPrefix");
         }
 
         public final Iterator getPrefixes(String namespaceURI) {
-            return null;
-            /*
-            final Enumeration e = _nsSupport.getPrefixes(namespaceURI);
-            
-            return new Iterator() {
-                    public boolean hasNext() {
-                        return e.hasMoreElements();
-                    }
-
-                    public Object next() {
-                        return e.nextElement();
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }                    
-                };
-             */
+            throw new UnsupportedOperationException("getPrefixes");
         }
     }
     
