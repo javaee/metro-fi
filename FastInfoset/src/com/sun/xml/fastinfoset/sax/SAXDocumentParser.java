@@ -1,31 +1,31 @@
 /*
  * Fast Infoset ver. 0.1 software ("Software")
- * 
- * Copyright, 2004-2005 Sun Microsystems, Inc. All Rights Reserved. 
- * 
+ *
+ * Copyright, 2004-2005 Sun Microsystems, Inc. All Rights Reserved.
+ *
  * Software is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License. You may
  * obtain a copy of the License at:
- * 
+ *
  *        http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  *    Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations.
- * 
+ *
  *    Sun supports and benefits from the global community of open source
  * developers, and thanks the community for its important contributions and
  * open standards-based technology, which Sun has adopted into many of its
  * products.
- * 
+ *
  *    Please note that portions of Software may be provided with notices and
  * open source licenses from such communities and third parties that govern the
  * use of those portions, and any licenses granted hereunder do not alter any
  * rights and obligations you may have under such open source licenses,
  * however, the disclaimer of warranty and limitation of liability provisions
  * in this License will apply to all Software in this distribution.
- * 
+ *
  *    You acknowledge that the Software is not designed, licensed or intended
  * for use in the design, construction, operation or maintenance of any nuclear
  * facility.
@@ -34,7 +34,7 @@
  * Version 2.0, January 2004
  * http://www.apache.org/licenses/
  *
- */ 
+ */
 
 
 package com.sun.xml.fastinfoset.sax;
@@ -78,17 +78,29 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
     public static final String STRING_INTERNING_FEATURE_PROPERTY =
         "com.sun.xml.fastinfoset.feature.property.string-interning";
 
+    // Size of the initial octet buffer array.
+    public static final String INTEGER_DECODE_OCTET_BUFFER_SIZE_PROPERTY =
+        "http://jvnet.org/fastinfoset/decode/octet-buffer-size";
+
     protected static boolean _stringInterningFeatureProperty = true;
-                                                                                
+    protected static int _decodeOctetBufferSizeFeatureProperty = 1024;
+
     static {
         String p = System.getProperty(STRING_INTERNING_FEATURE_PROPERTY,
             "true");
         _stringInterningFeatureProperty = Boolean.valueOf(p).booleanValue();
+
+        p = System.getProperty(INTEGER_DECODE_OCTET_BUFFER_SIZE_PROPERTY,
+            "1024");
+        _decodeOctetBufferSizeFeatureProperty = Integer.valueOf(p).intValue();
     }
-    
-    protected boolean _stringInterningFeature = _stringInterningFeatureProperty;                                                                                
+
+    protected boolean _stringInterningFeature = _stringInterningFeatureProperty;
 
     protected boolean _namespacePrefixesFeature = false;
+
+    /** Used to only alloc the octetBuffer one extra time at maximum */
+    private boolean allocOctetBuffer = true;
 
     /**
      * Reference to entity resolver.
@@ -116,35 +128,36 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
     protected LexicalHandler _lexicalHandler;
 
     protected EncodingAlgorithmContentHandler _algorithmHandler;
-    
+
     protected PrimitiveTypeContentHandler _primitiveHandler;
 
     protected Map _registeredEncodingAlgorithms = new HashMap();
-        
-    protected BuiltInEncodingAlgorithmState builtInAlgorithmState = 
+
+    protected BuiltInEncodingAlgorithmState builtInAlgorithmState =
             new BuiltInEncodingAlgorithmState();
-    
+
     protected AttributesHolder _attributes = new AttributesHolder();
-    
+
     protected String[] _namespaceAIIs = new String[16];
-    
+
     protected int _namespaceAIIsIndex;
 
     protected boolean _clearAttributes = false;
-    
+
     /** Creates a new instance of DocumetParser2 */
     public SAXDocumentParser() {
         DefaultHandler handler = new DefaultHandler();
-                                                                                
+
         _entityResolver = handler;
         _dtdHandler = handler;
         _contentHandler = handler;
         _errorHandler = handler;
         _lexicalHandler = null;
+
     }
 
     // XMLReader interface
-    
+
     public boolean getFeature(String name)
             throws SAXNotRecognizedException, SAXNotSupportedException {
         if (name.equals(Features.NAMESPACES_FEATURE)) {
@@ -158,7 +171,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 "Feature not supported: " + name);
         }
     }
-                                                                                
+
     public void setFeature(String name, boolean value)
             throws SAXNotRecognizedException, SAXNotSupportedException {
         if (name.equals(Features.NAMESPACES_FEATURE)
@@ -173,7 +186,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 "Feature not supported: " + name);
         }
     }
-                                                                                
+
     public Object getProperty(String name)
             throws SAXNotRecognizedException, SAXNotSupportedException {
         if (name.equals(Properties.LEXICAL_HANDLER_PROPERTY)) {
@@ -191,7 +204,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 name);
         }
     }
-                                                                                
+
     public void setProperty(String name, Object value)
             throws SAXNotRecognizedException, SAXNotSupportedException {
         if (name.equals(Properties.LEXICAL_HANDLER_PROPERTY)) {
@@ -204,43 +217,58 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             setEncodingAlgorithmContentHandler((EncodingAlgorithmContentHandler)value);
         } else if (name.equals(Properties.PRIMITIVE_TYPE_CONTENT_HANDLER_PROPERTY)) {
             setPrimitiveTypeContentHandler((PrimitiveTypeContentHandler)value);
+        } else if (name.equals(INTEGER_DECODE_OCTET_BUFFER_SIZE_PROPERTY)) {
+            setDecodeOctetBufferSize(((Integer)value).intValue());
         } else {
             throw new SAXNotRecognizedException("Property not supported: " +
                 name);
         }
     }
-                                                                                
+
+    /**
+     * Set the initial size of the decode octet buffer.  Requests for sizes
+     * smaller then the current size will be ignored.
+     *
+     * @param size The buffer size
+     */
+    public void setDecodeOctetBufferSize(int size) {
+        _decodeOctetBufferSizeFeatureProperty = size;
+
+        if (_decodeOctetBufferSizeFeatureProperty > _octetBuffer.length)
+            allocOctetBuffer = true;
+    }
+
     public void setEntityResolver(EntityResolver resolver) {
         _entityResolver = resolver;
     }
-                                                                                
+
     public EntityResolver getEntityResolver() {
         return _entityResolver;
     }
-                                                                                
+
     public void setDTDHandler(DTDHandler handler) {
         _dtdHandler = handler;
     }
-                                                                                
+
     public DTDHandler getDTDHandler() {
         return _dtdHandler;
     }
     public void setContentHandler(ContentHandler handler) {
         _contentHandler = handler;
     }
-                                                                                
+
     public ContentHandler getContentHandler() {
         return _contentHandler;
     }
-                                                                                                                                                                
+
     public void setErrorHandler(ErrorHandler handler) {
         _errorHandler = handler;
     }
-                                                                                
+
     public ErrorHandler getErrorHandler() {
         return _errorHandler;
     }
-                                                                                
+
     public void parse(InputSource input) throws IOException, SAXException {
         try {
             InputStream s = input.getByteStream();
@@ -255,22 +283,24 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 parse(s);
             }
         } catch (FastInfosetException e) {
+            e.printStackTrace();
             throw new SAXException(e);
         }
     }
-    
+
     public void parse(String systemId) throws IOException, SAXException {
         try {
             systemId = SystemIdResolver.getAbsoluteURI(systemId);
             parse(new URL(systemId).openStream());
         } catch (FastInfosetException e) {
+            e.printStackTrace();
             throw new SAXException(e);
         }
     }
 
 
     // FastInfosetReader
-    
+
     public final void parse(InputStream s) throws IOException, FastInfosetException, SAXException {
         setInputStream(s);
         parse();
@@ -282,21 +312,21 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             _registeredEncodingAlgorithms = new HashMap();
         }
     }
-    
+
     public Map getRegisteredEncodingAlgorithms() {
         return _registeredEncodingAlgorithms;
     }
-    
+
     public void setLexicalHandler(LexicalHandler handler) {
         _lexicalHandler = handler;
     }
-                                                                                
+
     public LexicalHandler getLexicalHandler() {
         return _lexicalHandler;
     }
-    
+
     public void setEncodingAlgorithmContentHandler(EncodingAlgorithmContentHandler handler) {
-        _algorithmHandler = handler;        
+        _algorithmHandler = handler;
     }
 
     public EncodingAlgorithmContentHandler getEncodingAlgorithmContentHandler() {
@@ -311,13 +341,13 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         return _primitiveHandler;
     }
 
-    
+
     // VocabularyReader
-    
+
     public void setExternalVocabularies(Map referencedVocabualries) {
         throw new UnsupportedOperationException();
     }
-    
+
     public void setDynamicVocabulary(Vocabulary v) {
         throw new UnsupportedOperationException();
     }
@@ -334,15 +364,22 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         throw new UnsupportedOperationException();
     }
 
-    public Vocabulary getFinalVocabulary() { 
+    public Vocabulary getFinalVocabulary() {
         throw new UnsupportedOperationException();
     }
 
-    
+
     public final void parse() throws FastInfosetException, IOException {
+        if (allocOctetBuffer) {
+            if (_octetBuffer.length != _decodeOctetBufferSizeFeatureProperty)
+                _octetBuffer = new byte[_decodeOctetBufferSizeFeatureProperty];
+
+            allocOctetBuffer = false;
+        }
+
         try {
             reset();
-            decodeHeader();                                                                                
+            decodeHeader();
             processDII();
         } catch (RuntimeException e) {
             try {
@@ -350,7 +387,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             } catch (Exception ee) {
             }
             // Wrap runtime exception
-            throw new FastInfosetException(e);            
+            throw new FastInfosetException(e);
         } catch (FastInfosetException e) {
             try {
                 _errorHandler.fatalError(new SAXParseException(e.getClass().getName(), null, e));
@@ -365,7 +402,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             throw e;
         }
     }
-    
+
     protected final void processDII() throws FastInfosetException, IOException {
         try {
             _contentHandler.startDocument();
@@ -377,7 +414,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         if (_b > 0) {
             processDIIOptionalProperties();
         }
-        
+
         // Decode one Document Type II, Comment IIs, PI IIs and one EII
         boolean firstElementHasOccured = false;
         boolean documentTypeDeclarationOccured = false;
@@ -415,11 +452,11 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     }
                     documentTypeDeclarationOccured = true;
 
-                    String system_identifier = ((_b & EncodingConstants.DOCUMENT_TYPE_SYSTEM_IDENTIFIER_FLAG) > 0) 
+                    String system_identifier = ((_b & EncodingConstants.DOCUMENT_TYPE_SYSTEM_IDENTIFIER_FLAG) > 0)
                         ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
-                    String public_identifier = ((_b & EncodingConstants.DOCUMENT_TYPE_PUBLIC_IDENTIFIER_FLAG) > 0) 
+                    String public_identifier = ((_b & EncodingConstants.DOCUMENT_TYPE_PUBLIC_IDENTIFIER_FLAG) > 0)
                         ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
-                    
+
                     _b = read();
                     while (_b == EncodingConstants.PROCESSING_INSTRUCTION) {
                         switch(decodeNonIdentifyingStringOnFirstBit()) {
@@ -430,7 +467,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                                 }
                                 break;
                             case NISTRING_ENCODING_ALGORITHM:
-                                throw new FastInfosetException("Processing II with encoding algorithm decoding not supported");                        
+                                throw new FastInfosetException("Processing II with encoding algorithm decoding not supported");
                             case NISTRING_INDEX:
                                 break;
                             case NISTRING_EMPTY_STRING:
@@ -444,7 +481,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     if (_b == EncodingConstants.DOUBLE_TERMINATOR) {
                         _terminate = true;
                     }
-                    
+
                     _notations.clear();
                     _unparsedEntities.clear();
                     /*
@@ -459,8 +496,8 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 case DecoderStateTables.PROCESSING_INSTRUCTION_II:
                     processProcessingII();
                     break;
-                case DecoderStateTables.TERMINATOR_DOUBLE:                    
-                    _doubleTerminate = true; 
+                case DecoderStateTables.TERMINATOR_DOUBLE:
+                    _doubleTerminate = true;
                 case DecoderStateTables.TERMINATOR_SINGLE:
                     _terminate = true;
                     break;
@@ -479,8 +516,8 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 case DecoderStateTables.PROCESSING_INSTRUCTION_II:
                     processProcessingII();
                     break;
-                case DecoderStateTables.TERMINATOR_DOUBLE:                    
-                    _doubleTerminate = true; 
+                case DecoderStateTables.TERMINATOR_DOUBLE:
+                    _doubleTerminate = true;
                 case DecoderStateTables.TERMINATOR_SINGLE:
                     _terminate = true;
                     break;
@@ -493,10 +530,10 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             _contentHandler.endDocument();
         } catch (SAXException e) {
             throw new FastInfosetException("processDII", e);
-        }        
+        }
     }
 
-    protected final void processDIIOptionalProperties() throws FastInfosetException, IOException {        
+    protected final void processDIIOptionalProperties() throws FastInfosetException, IOException {
         if ((_b & EncodingConstants.DOCUMENT_INITIAL_VOCABULARY_FLAG) > 0) {
             decodeInitialVocabulary();
         }
@@ -526,7 +563,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         if ((_b & EncodingConstants.DOCUMENT_STANDALONE_FLAG) > 0) {
             boolean standalone = (read() > 0) ? true : false ;
             /*
-             * TODO 
+             * TODO
              * how to report the standalone flag?
              */
         }
@@ -539,24 +576,24 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     }
                     break;
                 case NISTRING_ENCODING_ALGORITHM:
-                    throw new FastInfosetException("Processing II with encoding algorithm decoding not supported");                        
+                    throw new FastInfosetException("Processing II with encoding algorithm decoding not supported");
                 case NISTRING_INDEX:
                     break;
                 case NISTRING_EMPTY_STRING:
                     break;
             }
             /*
-             * TODO 
+             * TODO
              * how to report the standalone flag?
              */
         }
     }
-    
+
     protected final void processEII(QualifiedName name, boolean hasAttributes) throws FastInfosetException, IOException {
         if (hasAttributes) {
             processAIIs();
         }
-        
+
         try {
             _contentHandler.startElement(name.namespaceName, name.localName, name.qName, _attributes);
         } catch (SAXException e) {
@@ -568,7 +605,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             _attributes.clear();
             _clearAttributes = false;
         }
-        
+
         while(!_terminate) {
             _b = read();
             switch(DecoderStateTables.EII[_b]) {
@@ -591,13 +628,13 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     processEIIWithNamespaces();
                     break;
                 case DecoderStateTables.CII_UTF8_SMALL_LENGTH:
-                    _octetBufferLength = (_b & EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_MASK) 
+                    _octetBufferLength = (_b & EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_MASK)
                         + 1;
                     decodeUtf8StringAsCharBuffer();
                     if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
                         _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
                     }
-                    
+
                     try {
                         _contentHandler.characters(_charBuffer, 0, _charBufferLength);
                     } catch (SAXException e) {
@@ -610,7 +647,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
                         _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
                     }
-                    
+
                     try {
                         _contentHandler.characters(_charBuffer, 0, _charBufferLength);
                     } catch (SAXException e) {
@@ -627,7 +664,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
                         _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
                     }
-                    
+
                     try {
                         _contentHandler.characters(_charBuffer, 0, _charBufferLength);
                     } catch (SAXException e) {
@@ -635,13 +672,13 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     }
                     break;
                 case DecoderStateTables.CII_UTF16_SMALL_LENGTH:
-                    _octetBufferLength = (_b & EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_MASK) 
+                    _octetBufferLength = (_b & EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_MASK)
                         + 1;
                     decodeUtf16StringAsCharBuffer();
                     if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
                         _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
                     }
-                    
+
                     try {
                         _contentHandler.characters(_charBuffer, 0, _charBufferLength);
                     } catch (SAXException e) {
@@ -654,7 +691,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
                         _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
                     }
-                    
+
                     try {
                         _contentHandler.characters(_charBuffer, 0, _charBufferLength);
                     } catch (SAXException e) {
@@ -671,7 +708,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
                         _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
                     }
-                    
+
                     try {
                         _contentHandler.characters(_charBuffer, 0, _charBufferLength);
                     } catch (SAXException e) {
@@ -687,11 +724,11 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
 
                     decodeOctetsOfNonIdentifyingStringOnThirdBit(b2);
                     // TODO obtain restricted alphabet given _identifier value
-                    decodeRAOctetsAsCharBuffer(null);                    
+                    decodeRAOctetsAsCharBuffer(null);
                     if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
                         _v.characterContentChunk.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
                     }
-                    
+
                     try {
                         _contentHandler.characters(_charBuffer, 0, _charBufferLength);
                     } catch (SAXException e) {
@@ -709,16 +746,16 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     _identifier = (_b & 0x02) << 6;
                     _b = read();
                     _identifier |= (_b & 0xFC) >> 2;
-                    
+
                     decodeOctetsOfNonIdentifyingStringOnThirdBit(_b);
-            
+
                     processCIIEncodingAlgorithm();
                     break;
                 }
                 case DecoderStateTables.CII_INDEX_SMALL:
                 {
                     final CharArray ca = _v.characterContentChunk.get(_b & EncodingConstants.INTEGER_4TH_BIT_SMALL_MASK);
-                    
+
                     try {
                         _contentHandler.characters(ca.ch, ca.start, ca.length);
                     } catch (SAXException e) {
@@ -731,7 +768,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     final int index = (((_b & EncodingConstants.INTEGER_4TH_BIT_MEDIUM_MASK) << 8) | read())
                         + EncodingConstants.INTEGER_4TH_BIT_SMALL_LIMIT;
                     final CharArray ca = _v.characterContentChunk.get(index);
-                    
+
                     try {
                         _contentHandler.characters(ca.ch, ca.start, ca.length);
                     } catch (SAXException e) {
@@ -746,7 +783,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                         read();
                     index += EncodingConstants.INTEGER_4TH_BIT_MEDIUM_LIMIT;
                     final CharArray ca = _v.characterContentChunk.get(index);
-                    
+
                     try {
                         _contentHandler.characters(ca.ch, ca.start, ca.length);
                     } catch (SAXException e) {
@@ -756,19 +793,19 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 }
                 case DecoderStateTables.CII_INDEX_LARGE_LARGE:
                 {
-                    int index = (read() << 16) | 
+                    int index = (read() << 16) |
                         (read() << 8) |
                         read();
                     index += EncodingConstants.INTEGER_4TH_BIT_LARGE_LIMIT;
                     final CharArray ca = _v.characterContentChunk.get(index);
-                    
+
                     try {
                         _contentHandler.characters(ca.ch, ca.start, ca.length);
                     } catch (SAXException e) {
                         throw new FastInfosetException("processCII", e);
                     }
                     break;
-                }                       
+                }
                 case DecoderStateTables.COMMENT_II:
                     processCommentII();
                     break;
@@ -778,10 +815,10 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 case DecoderStateTables.UNEXPANDED_ENTITY_REFERENCE_II:
                 {
                     String entity_reference_name = decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherNCName);
-                    
-                    String system_identifier = ((_b & EncodingConstants.UNEXPANDED_ENTITY_SYSTEM_IDENTIFIER_FLAG) > 0) 
+
+                    String system_identifier = ((_b & EncodingConstants.UNEXPANDED_ENTITY_SYSTEM_IDENTIFIER_FLAG) > 0)
                         ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
-                    String public_identifier = ((_b & EncodingConstants.UNEXPANDED_ENTITY_PUBLIC_IDENTIFIER_FLAG) > 0) 
+                    String public_identifier = ((_b & EncodingConstants.UNEXPANDED_ENTITY_PUBLIC_IDENTIFIER_FLAG) > 0)
                         ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
 
                     try {
@@ -798,8 +835,8 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     }
                     break;
                 }
-                case DecoderStateTables.TERMINATOR_DOUBLE:                    
-                    _doubleTerminate = true; 
+                case DecoderStateTables.TERMINATOR_DOUBLE:
+                    _doubleTerminate = true;
                 case DecoderStateTables.TERMINATOR_SINGLE:
                     _terminate = true;
                     break;
@@ -810,7 +847,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
 
         _terminate = _doubleTerminate;
         _doubleTerminate = false;
-        
+
         try {
             _contentHandler.endElement(name.namespaceName, name.localName, name.qName);
         } catch (SAXException e) {
@@ -822,7 +859,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         final boolean hasAttributes = (_b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0;
 
         _clearAttributes = (_namespacePrefixesFeature ) ? true : false;
-                
+
         int start = _namespaceAIIsIndex;
         int b = read();
         while ((b & EncodingConstants.NAMESPACE_ATTRIBUTE_MASK) == EncodingConstants.NAMESPACE_ATTRIBUTE) {
@@ -838,34 +875,34 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             }
 
             // Prefix
-            _namespaceAIIs[_namespaceAIIsIndex++] = ((b & EncodingConstants.NAMESPACE_ATTRIBUTE_PREFIX_FLAG) > 0) 
+            _namespaceAIIs[_namespaceAIIsIndex++] = ((b & EncodingConstants.NAMESPACE_ATTRIBUTE_PREFIX_FLAG) > 0)
                 ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.prefix) : "";
 
             // Namespace name
-            _namespaceAIIs[_namespaceAIIsIndex++] = ((b & EncodingConstants.NAMESPACE_ATTRIBUTE_NAME_FLAG) > 0) 
+            _namespaceAIIs[_namespaceAIIsIndex++] = ((b & EncodingConstants.NAMESPACE_ATTRIBUTE_NAME_FLAG) > 0)
                 ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.namespaceName) : "";
-            
+
             if (_namespacePrefixesFeature) {
                 final String prefix = _namespaceAIIs[_namespaceAIIsIndex - 2];
                 final String namespaceName = _namespaceAIIs[_namespaceAIIsIndex - 1];
-                
+
                 // Add the namespace delcaration as an attribute
                 if (prefix != "") {
                     _attributes.addAttribute(new QualifiedName(
-                                "xmlns", 
-                                "http://www.w3.org/2000/xmlns/", 
-                                prefix), 
+                                "xmlns",
+                                "http://www.w3.org/2000/xmlns/",
+                                prefix),
                             namespaceName);
                 } else {
                     _attributes.addAttribute(new QualifiedName(
-                                "", 
-                                "http://www.w3.org/2000/xmlns/", 
+                                "",
+                                "http://www.w3.org/2000/xmlns/",
                                 "xmlns",
-                                "xmlns"), 
+                                "xmlns"),
                             namespaceName);
                 }
             }
-            
+
             b = read();
         }
         if (b != EncodingConstants.TERMINATOR) {
@@ -917,12 +954,12 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             throw new IOException("processStartNamespaceAII");
         }
     }
-        
+
     protected final void processAIIs() throws FastInfosetException, IOException {
         QualifiedName name;
         int b;
         String value;
-        
+
         _clearAttributes = true;
 
         do {
@@ -934,23 +971,23 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     break;
                 case DecoderStateTables.AII_INDEX_MEDIUM:
                 {
-                    final int i = (((b & EncodingConstants.INTEGER_2ND_BIT_MEDIUM_MASK) << 8) | read()) 
-                        + EncodingConstants.INTEGER_2ND_BIT_SMALL_LIMIT;            
+                    final int i = (((b & EncodingConstants.INTEGER_2ND_BIT_MEDIUM_MASK) << 8) | read())
+                        + EncodingConstants.INTEGER_2ND_BIT_SMALL_LIMIT;
                     name = _v.attributeName.get(i);
                     break;
                 }
                 case DecoderStateTables.AII_INDEX_LARGE:
                 {
-                    final int i = (((b & EncodingConstants.INTEGER_2ND_BIT_LARGE_MASK) << 16) | (read() << 8) | read()) 
+                    final int i = (((b & EncodingConstants.INTEGER_2ND_BIT_LARGE_MASK) << 16) | (read() << 8) | read())
                         + EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT;
                     name = _v.attributeName.get(i);
                     break;
                 }
                 case DecoderStateTables.AII_LITERAL:
                 {
-                    final String prefix = ((b & EncodingConstants.LITERAL_QNAME_PREFIX_FLAG) > 0) 
+                    final String prefix = ((b & EncodingConstants.LITERAL_QNAME_PREFIX_FLAG) > 0)
                         ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.prefix) : "";
-                    final String namespaceName = ((b & EncodingConstants.LITERAL_QNAME_NAMESPACE_NAME_FLAG) > 0) 
+                    final String namespaceName = ((b & EncodingConstants.LITERAL_QNAME_NAMESPACE_NAME_FLAG) > 0)
                         ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.namespaceName) : "";
                     final String localName = decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName);
 
@@ -958,7 +995,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     _v.attributeName.add(name);
                     break;
                 }
-                case DecoderStateTables.AII_TERMINATOR_DOUBLE:                    
+                case DecoderStateTables.AII_TERMINATOR_DOUBLE:
                     _doubleTerminate = true;
                 case DecoderStateTables.AII_TERMINATOR_SINGLE:
                     _terminate = true;
@@ -969,7 +1006,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             }
 
             // [normalized value] of AII
-            
+
             b = read();
             switch(DecoderStateTables.NISTRING[b]) {
                 case DecoderStateTables.NISTRING_UTF8_SMALL_LENGTH:
@@ -980,7 +1017,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     if (addToTable) {
                         _v.attributeValue.add(value);
                     }
-                    
+
                     _attributes.addAttribute(name, value);
                     break;
                 }
@@ -992,7 +1029,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     if (addToTable) {
                         _v.attributeValue.add(value);
                     }
-                    
+
                     _attributes.addAttribute(name, value);
                     break;
                 }
@@ -1020,7 +1057,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     if (addToTable) {
                         _v.attributeValue.add(value);
                     }
-                    
+
                     _attributes.addAttribute(name, value);
                     break;
                 }
@@ -1032,7 +1069,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     if (addToTable) {
                         _v.attributeValue.add(value);
                     }
-                    
+
                     _attributes.addAttribute(name, value);
                     break;
                 }
@@ -1059,7 +1096,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     _identifier = (b & 0x0F) << 4;
                     b = read();
                     _identifier |= (b & 0xF0) >> 4;
-                    
+
                     decodeOctetsOfNonIdentifyingStringOnFirstBit(b);
                     // TODO obtain restricted alphabet given _identifier value
                     value = decodeRAOctetsAsString(null);
@@ -1092,7 +1129,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     break;
                 case DecoderStateTables.NISTRING_INDEX_MEDIUM:
                 {
-                    final int index = (((b & EncodingConstants.INTEGER_2ND_BIT_MEDIUM_MASK) << 8) | read()) 
+                    final int index = (((b & EncodingConstants.INTEGER_2ND_BIT_MEDIUM_MASK) << 8) | read())
                         + EncodingConstants.INTEGER_2ND_BIT_SMALL_LIMIT;
                     value = _v.attributeValue.get(index);
 
@@ -1101,7 +1138,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 }
                 case DecoderStateTables.NISTRING_INDEX_LARGE:
                 {
-                    final int index = (((b & EncodingConstants.INTEGER_2ND_BIT_LARGE_MASK) << 16) | (read() << 8) | read()) 
+                    final int index = (((b & EncodingConstants.INTEGER_2ND_BIT_LARGE_MASK) << 16) | (read() << 8) | read())
                         + EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT;
                     value = _v.attributeValue.get(index);
 
@@ -1114,9 +1151,9 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 default:
                     throw new IOException("Illegal state when decoding AII value");
             }
-            
+
         } while (!_terminate);
-        
+
         _terminate = _doubleTerminate;
         _doubleTerminate = false;
     }
@@ -1127,7 +1164,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 if (_addToTable) {
                     _v.otherString.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
                 }
-                
+
                 try {
                     _lexicalHandler.comment(_charBuffer, 0, _charBufferLength);
                 } catch (SAXException e) {
@@ -1135,7 +1172,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 }
                 break;
             case NISTRING_ENCODING_ALGORITHM:
-                throw new IOException("Comment II with encoding algorithm decoding not supported");                        
+                throw new IOException("Comment II with encoding algorithm decoding not supported");
             case NISTRING_INDEX:
                 final CharArray ca = _v.otherString.get(_integer);
 
@@ -1152,7 +1189,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     throw new FastInfosetException("processCommentII", e);
                 }
                 break;
-        }        
+        }
     }
 
     protected final void processProcessingII() throws FastInfosetException, IOException {
@@ -1171,7 +1208,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 }
                 break;
             case NISTRING_ENCODING_ALGORITHM:
-                throw new IOException("Processing II with encoding algorithm decoding not supported");                        
+                throw new IOException("Processing II with encoding algorithm decoding not supported");
             case NISTRING_INDEX:
                 try {
                     _contentHandler.processingInstruction(target, _v.otherString.get(_integer).toString());
@@ -1224,7 +1261,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     _algorithmHandler.object(URI, _identifier, data);
                 } catch (SAXException e) {
                     throw new FastInfosetException(e);
-                }                        
+                }
             } else {
                 try {
                     _algorithmHandler.octets(URI, _identifier, _octetBuffer, _octetBufferStart, _octetBufferLength);
@@ -1254,19 +1291,32 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     _primitiveHandler.bytes(_octetBuffer, _octetBufferStart, _octetBufferLength);
                     break;
                 case EncodingAlgorithmIndexes.SHORT:
-                    throw new UnsupportedOperationException("SHORT");
+                    length = BuiltInEncodingAlgorithmFactory.shortEncodingAlgorithm.
+                            getPrimtiveLengthFromOctetLength(_octetBufferLength);
+                    if (length > builtInAlgorithmState.shortArray.length) {
+                        final short[] array = new short[length * 3 / 2 + 1];
+                        System.arraycopy(builtInAlgorithmState.shortArray, 0,
+                                array, 0, builtInAlgorithmState.shortArray.length);
+                        builtInAlgorithmState.shortArray = array;
+                    }
+
+                    BuiltInEncodingAlgorithmFactory.shortEncodingAlgorithm.
+                            decodeFromBytesToShortArray(builtInAlgorithmState.shortArray, 0,
+                                _octetBuffer, _octetBufferStart, _octetBufferLength);
+                    _primitiveHandler.shorts(builtInAlgorithmState.shortArray, 0, length);
+                    break;
                 case EncodingAlgorithmIndexes.INT:
                     length = BuiltInEncodingAlgorithmFactory.intEncodingAlgorithm.
                             getPrimtiveLengthFromOctetLength(_octetBufferLength);
                     if (length > builtInAlgorithmState.intArray.length) {
                         final int[] array = new int[length * 3 / 2 + 1];
-                        System.arraycopy(builtInAlgorithmState.intArray, 0, 
+                        System.arraycopy(builtInAlgorithmState.intArray, 0,
                                 array, 0, builtInAlgorithmState.intArray.length);
                         builtInAlgorithmState.intArray = array;
                     }
-                    
+
                     BuiltInEncodingAlgorithmFactory.intEncodingAlgorithm.
-                            decodeFromBytesToIntArray(builtInAlgorithmState.intArray, 0, 
+                            decodeFromBytesToIntArray(builtInAlgorithmState.intArray, 0,
                                 _octetBuffer, _octetBufferStart, _octetBufferLength);
                     _primitiveHandler.ints(builtInAlgorithmState.intArray, 0, length);
                     break;
@@ -1279,13 +1329,13 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                             getPrimtiveLengthFromOctetLength(_octetBufferLength);
                     if (length > builtInAlgorithmState.floatArray.length) {
                         final float[] array = new float[length * 3 / 2 + 1];
-                        System.arraycopy(builtInAlgorithmState.floatArray, 0, 
+                        System.arraycopy(builtInAlgorithmState.floatArray, 0,
                                 array, 0, builtInAlgorithmState.floatArray.length);
                         builtInAlgorithmState.floatArray = array;
                     }
-                    
+
                     BuiltInEncodingAlgorithmFactory.floatEncodingAlgorithm.
-                            decodeFromBytesToFloatArray(builtInAlgorithmState.floatArray, 0, 
+                            decodeFromBytesToFloatArray(builtInAlgorithmState.floatArray, 0,
                                 _octetBuffer, _octetBufferStart, _octetBufferLength);
                     _primitiveHandler.floats(builtInAlgorithmState.floatArray, 0, length);
                     break;
@@ -1293,7 +1343,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     throw new UnsupportedOperationException("DOUBLE");
                 case EncodingAlgorithmIndexes.UUID:
                     throw new UnsupportedOperationException("UUID");
-                case EncodingAlgorithmIndexes.CDATA:      
+                case EncodingAlgorithmIndexes.CDATA:
                     throw new UnsupportedOperationException("CDATA");
                 default:
                     throw new FastInfosetException("Unsupported built-in encoding algorithm: " + _identifier);
@@ -1302,8 +1352,8 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             throw new FastInfosetException(e);
         }
     }
-    
-    
+
+
     protected final void processAIIEncodingAlgorithm(QualifiedName name) throws FastInfosetException, IOException {
         if (_identifier <= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
             if (_primitiveHandler != null || _algorithmHandler != null) {
@@ -1313,7 +1363,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 StringBuffer buffer = new StringBuffer();
                 processBuiltInEncodingAlgorithmAsCharacters(buffer);
                 _attributes.addAttribute(name, buffer.toString());
-            }            
+            }
         } else if (_identifier >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START && _algorithmHandler != null) {
             final String URI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
             if (URI == null) {
@@ -1340,7 +1390,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             throw new EncodingAlgorithmException("Encoding algorithm identifiers 10 up to and including 31 are reserved for future use");
         }
     }
- 
+
     protected final void processBuiltInEncodingAlgorithmAsCharacters(StringBuffer buffer) throws FastInfosetException, IOException {
         // TODO not very efficient, need to reuse buffers
         Object array = BuiltInEncodingAlgorithmFactory.table[_identifier].
@@ -1351,7 +1401,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
 
     protected final Object processBuiltInEncodingAlgorithmAsObject() throws FastInfosetException, IOException {
         return BuiltInEncodingAlgorithmFactory.table[_identifier].
-                decodeFromBytes(_octetBuffer, _octetBufferStart, _octetBufferLength);        
+                decodeFromBytes(_octetBuffer, _octetBufferStart, _octetBufferLength);
     }
-    
+
 }

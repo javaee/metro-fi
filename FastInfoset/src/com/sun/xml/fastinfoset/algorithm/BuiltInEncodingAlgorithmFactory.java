@@ -44,18 +44,21 @@ import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
 
 public final class BuiltInEncodingAlgorithmFactory {
 
-    public final static BuiltInEncodingAlgorithm[] table = 
+    public final static BuiltInEncodingAlgorithm[] table =
             new BuiltInEncodingAlgorithm[EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END + 1];
-    
+
     public final static BASE64EncodingAlgorithm base64EncodingAlgorithm = new BASE64EncodingAlgorithm();
-    
+
     public final static IntEncodingAlgorithm intEncodingAlgorithm = new IntEncodingAlgorithm();
-    
+
+    public final static ShortEncodingAlgorithm shortEncodingAlgorithm = new ShortEncodingAlgorithm();
+
     public final static FloatEncodingAlgorithm floatEncodingAlgorithm = new FloatEncodingAlgorithm();
-    
+
     static {
         table[EncodingAlgorithmIndexes.BASE64] = base64EncodingAlgorithm;
         table[EncodingAlgorithmIndexes.INT] = intEncodingAlgorithm;
+        table[EncodingAlgorithmIndexes.SHORT] = shortEncodingAlgorithm;
         table[EncodingAlgorithmIndexes.FLOAT] = floatEncodingAlgorithm;
     }
 }

@@ -1,31 +1,31 @@
 /*
  * Fast Infoset ver. 0.1 software ("Software")
- * 
- * Copyright, 2004-2005 Sun Microsystems, Inc. All Rights Reserved. 
- * 
+ *
+ * Copyright, 2004-2005 Sun Microsystems, Inc. All Rights Reserved.
+ *
  * Software is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License. You may
  * obtain a copy of the License at:
- * 
+ *
  *        http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  *    Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations.
- * 
+ *
  *    Sun supports and benefits from the global community of open source
  * developers, and thanks the community for its important contributions and
  * open standards-based technology, which Sun has adopted into many of its
  * products.
- * 
+ *
  *    Please note that portions of Software may be provided with notices and
  * open source licenses from such communities and third parties that govern the
  * use of those portions, and any licenses granted hereunder do not alter any
  * rights and obligations you may have under such open source licenses,
  * however, the disclaimer of warranty and limitation of liability provisions
  * in this License will apply to all Software in this distribution.
- * 
+ *
  *    You acknowledge that the Software is not designed, licensed or intended
  * for use in the design, construction, operation or maintenance of any nuclear
  * facility.
@@ -34,7 +34,7 @@
  * Version 2.0, January 2004
  * http://www.apache.org/licenses/
  *
- */ 
+ */
 
 
 package com.sun.xml.fastinfoset;
@@ -58,15 +58,15 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public abstract class Encoder extends DefaultHandler {
     protected int _characterCount = 0;
-        
+
     protected Map _registeredEncodingAlgorithms = new HashMap();
-    
+
     protected SerializerVocabulary _v;
-    
+
     protected boolean _vIsInternal;
-    
+
     protected boolean _terminate = false;
-    
+
     protected int _b;
 
     protected OutputStream _s;
@@ -79,14 +79,14 @@ public abstract class Encoder extends DefaultHandler {
         _v = vocabulary;
         _vIsInternal = false;
     }
-    
+
     protected final void encodeHeader(boolean encodeXmlDecl) throws IOException {
         if (encodeXmlDecl) {
             _s.write(EncodingConstants.XML_DECL);
         }
         _s.write(EncodingConstants.HEADER);
     }
-    
+
     protected final void encodeInitialVocabulary() throws IOException {
         if (_v == null) {
             _v = new SerializerVocabulary();
@@ -94,7 +94,7 @@ public abstract class Encoder extends DefaultHandler {
         } else if (_vIsInternal) {
             _v.clear();
         }
-        
+
         if (_v.hasInitialVocabulary()) {
             _b = EncodingConstants.DOCUMENT_INITIAL_VOCABULARY_FLAG;
             write(_b);
@@ -107,24 +107,24 @@ public abstract class Encoder extends DefaultHandler {
                 write(_b);
                 write(0);
             }
-            
+
             if (initialVocabulary.hasExternalVocabulary()) {
                 encodeNonEmptyOctetStringOnSecondBit(_v.getExternalVocabularyURI().toString());
-            }            
+            }
 
             // TODO check for contents of vocabulary to encode values
         } else if (_v.hasExternalVocabulary()) {
             _b = EncodingConstants.DOCUMENT_INITIAL_VOCABULARY_FLAG;
             write(_b);
-            
+
             _b = EncodingConstants.INITIAL_VOCABULARY_EXTERNAL_VOCABULARY_FLAG;
             write(_b);
             write(0);
-            
-            encodeNonEmptyOctetStringOnSecondBit(_v.getExternalVocabularyURI().toString());           
+
+            encodeNonEmptyOctetStringOnSecondBit(_v.getExternalVocabularyURI().toString());
         } else {
             write(0);
-        }        
+        }
     }
 
     protected final void encodeDocumentTermination() throws IOException {
@@ -133,7 +133,7 @@ public abstract class Encoder extends DefaultHandler {
         _flush();
         _s.flush();
     }
-    
+
     protected final void encodeElementTermination() throws IOException {
         _terminate = true;
         switch (_b) {
@@ -144,7 +144,7 @@ public abstract class Encoder extends DefaultHandler {
                 write(EncodingConstants.DOUBLE_TERMINATOR);
             default:
                 _b = EncodingConstants.TERMINATOR;
-        }        
+        }
     }
 
     protected final void encodeTermination() throws IOException {
@@ -155,19 +155,19 @@ public abstract class Encoder extends DefaultHandler {
     }
 
     protected final void encodeNamespaceAttribute(String prefix, String uri) throws IOException {
-        _b = EncodingConstants.NAMESPACE_ATTRIBUTE;   
+        _b = EncodingConstants.NAMESPACE_ATTRIBUTE;
         if (prefix != "") {
             _b |= EncodingConstants.NAMESPACE_ATTRIBUTE_PREFIX_FLAG;
-        }        
-        if (uri != "") {
-            _b |= EncodingConstants.NAMESPACE_ATTRIBUTE_NAME_FLAG;                
         }
-        
+        if (uri != "") {
+            _b |= EncodingConstants.NAMESPACE_ATTRIBUTE_NAME_FLAG;
+        }
+
         // NOTE a prefix with out a namespace name is an undeclaration
         // of the namespace bound to the prefix
         // TODO needs to investigate how the startPrefixMapping works in
         // relation to undeclaration
-        
+
         write(_b);
 
         if (prefix != "") {
@@ -184,14 +184,14 @@ public abstract class Encoder extends DefaultHandler {
         boolean addToTable = (length < _v.characterContentChunkSizeContraint) ? true : false;
         encodeNonIdentifyingStringOnThirdBit(ch, start, length, _v.characterContentChunk, addToTable, true);
     }
- 
+
     protected final void encodeCharactersNoClone(char[] ch, int start, int length) throws IOException {
        _b = EncodingConstants.CHARACTER_CHUNK;
 
         boolean addToTable = (length < _v.characterContentChunkSizeContraint) ? true : false;
         encodeNonIdentifyingStringOnThirdBit(ch, start, length, _v.characterContentChunk, addToTable, false);
     }
-    
+
     protected final void encodeProcessingInstruction(String target, String data) throws IOException {
         write(EncodingConstants.PROCESSING_INSTRUCTION);
 
@@ -200,9 +200,9 @@ public abstract class Encoder extends DefaultHandler {
 
         // Data
         boolean addToTable = (data.length() < _v.characterContentChunkSizeContraint) ? true : false;
-        encodeNonIdentifyingStringOnFirstBit(data, _v.otherString, addToTable);        
+        encodeNonIdentifyingStringOnFirstBit(data, _v.otherString, addToTable);
     }
-    
+
     protected final void encodeComment(char[] ch, int start, int length) throws IOException {
         write(EncodingConstants.COMMENT);
 
@@ -216,7 +216,7 @@ public abstract class Encoder extends DefaultHandler {
         boolean addToTable = (length < _v.characterContentChunkSizeContraint) ? true : false;
         encodeNonIdentifyingStringOnFirstBit(ch, start, length, _v.otherString, addToTable, false);
     }
-    
+
     /*
      * C.18
      */
@@ -225,26 +225,26 @@ public abstract class Encoder extends DefaultHandler {
         if (entry._valueIndex > 0) {
             QualifiedName[] names = entry._value;
             for (int i = 0; i < entry._valueIndex; i++) {
-                if ((prefix == names[i].prefix || prefix.equals(names[i].prefix)) 
+                if ((prefix == names[i].prefix || prefix.equals(names[i].prefix))
                         && (namespaceURI == names[i].namespaceName || namespaceURI.equals(names[i].namespaceName))) {
                     encodeNonZeroIntegerOnThirdBit(names[i].index);
                     return;
                 }
-            }                
-        } 
+            }
+        }
 
-        encodeLiteralElementQualifiedNameOnThirdBit(namespaceURI, prefix, 
+        encodeLiteralElementQualifiedNameOnThirdBit(namespaceURI, prefix,
                 localName, entry);
     }
-    
+
     /*
      * C.18
      */
-    protected final void encodeLiteralElementQualifiedNameOnThirdBit(String namespaceURI, String prefix, String localName, 
+    protected final void encodeLiteralElementQualifiedNameOnThirdBit(String namespaceURI, String prefix, String localName,
             LocalNameQualifiedNamesMap.Entry entry) throws IOException {
         QualifiedName name = new QualifiedName(prefix, namespaceURI, localName, "", _v.elementName.getNextIndex());
         entry.addQualifiedName(name);
-        
+
         int namespaceURIIndex = KeyIntMap.NOT_PRESENT;
         int prefixIndex = KeyIntMap.NOT_PRESENT;
         if (namespaceURI != "") {
@@ -267,7 +267,7 @@ public abstract class Encoder extends DefaultHandler {
         if (namespaceURIIndex >= 0) {
             _b |= EncodingConstants.LITERAL_QNAME_NAMESPACE_NAME_FLAG;
             if (prefixIndex >= 0) {
-                _b |= EncodingConstants.LITERAL_QNAME_PREFIX_FLAG;                
+                _b |= EncodingConstants.LITERAL_QNAME_PREFIX_FLAG;
             }
         }
         write(_b);
@@ -278,14 +278,14 @@ public abstract class Encoder extends DefaultHandler {
             }
             encodeNonZeroIntegerOnSecondBitFirstBitOne(namespaceURIIndex);
         }
-        
+
         if (localNameIndex >= 0) {
             encodeNonZeroIntegerOnSecondBitFirstBitOne(localNameIndex);
         } else {
             encodeNonEmptyOctetStringOnSecondBit(localName);
         }
     }
-    
+
     /*
      * C.17
      */
@@ -294,18 +294,18 @@ public abstract class Encoder extends DefaultHandler {
         if (entry._valueIndex > 0) {
             QualifiedName[] names = entry._value;
             for (int i = 0; i < entry._valueIndex; i++) {
-                if ((prefix == names[i].prefix || prefix.equals(names[i].prefix)) 
+                if ((prefix == names[i].prefix || prefix.equals(names[i].prefix))
                         && (namespaceURI == names[i].namespaceName || namespaceURI.equals(names[i].namespaceName))) {
                     encodeNonZeroIntegerOnSecondBitFirstBitZero(names[i].index);
                     return true;
                 }
-            }                
-        } 
+            }
+        }
 
-        return encodeLiteralAttributeQualifiedNameOnSecondBit(namespaceURI, prefix, 
+        return encodeLiteralAttributeQualifiedNameOnSecondBit(namespaceURI, prefix,
                 localName, entry);
     }
-    
+
     /*
      * C.17
      */
@@ -316,7 +316,7 @@ public abstract class Encoder extends DefaultHandler {
         if (namespaceURI != "") {
             namespaceURIIndex = _v.namespaceName.get(namespaceURI);
             if (namespaceURIIndex == KeyIntMap.NOT_PRESENT) {
-                if (namespaceURI == "http://www.w3.org/XML/1998/namespace" 
+                if (namespaceURI == "http://www.w3.org/XML/1998/namespace"
                         || namespaceURI.equals("http://www.w3.org/XML/1998/namespace")) {
                     _v.namespaceName.add("http://www.w3.org/XML/1998/namespace");
                 } else if (namespaceURI == "http://www.w3.org/2000/xmlns/"
@@ -325,9 +325,9 @@ public abstract class Encoder extends DefaultHandler {
                     return false;
                 } else {
                     throw new IOException("namespace name not declared by namespace AII: " + namespaceURI);
-                }                    
+                }
             }
-            
+
             if (prefix != "") {
                 prefixIndex = _v.prefix.get(prefix);
                 if (prefixIndex == KeyIntMap.NOT_PRESENT) {
@@ -335,21 +335,21 @@ public abstract class Encoder extends DefaultHandler {
                         _v.prefix.add("xml");
                     } else {
                         throw new IOException("prefix by namespace AII: " + prefix);
-                    }                    
+                    }
                 }
             }
         }
-        
+
         int localNameIndex = _v.localName.obtainIndex(localName);
 
         QualifiedName name = new QualifiedName(prefix, namespaceURI, localName, "", _v.attributeName.getNextIndex());
-        entry.addQualifiedName(name);       
+        entry.addQualifiedName(name);
 
         _b = EncodingConstants.ATTRIBUTE_LITERAL_QNAME_FLAG;
         if (namespaceURI != "") {
             _b |= EncodingConstants.LITERAL_QNAME_NAMESPACE_NAME_FLAG;
             if (prefix != "") {
-                _b |= EncodingConstants.LITERAL_QNAME_PREFIX_FLAG;                
+                _b |= EncodingConstants.LITERAL_QNAME_PREFIX_FLAG;
             }
         }
 
@@ -365,16 +365,16 @@ public abstract class Encoder extends DefaultHandler {
             encodeNonEmptyOctetStringOnSecondBit("xml");
             encodeNonEmptyOctetStringOnSecondBit("http://www.w3.org/XML/1998/namespace");
         }
-        
+
         if (localNameIndex >= 0) {
             encodeNonZeroIntegerOnSecondBitFirstBitOne(localNameIndex);
         } else {
             encodeNonEmptyOctetStringOnSecondBit(localName);
         }
-        
+
         return true;
     }
-    
+
     /*
      * C.14
      */
@@ -382,7 +382,7 @@ public abstract class Encoder extends DefaultHandler {
         if (s == null || s.length() == 0) {
             // C.26 an index (first bit '1') with seven '1' bits for an empty string
             write(0xFF);
-        } else {  
+        } else {
             if (addToTable) {
                 int index = map.obtainIndex(s);
                 if (index == KeyIntMap.NOT_PRESENT) {
@@ -394,14 +394,14 @@ public abstract class Encoder extends DefaultHandler {
             } else {
                 _b = 0;
                 encodeEncodedCharacterStringAsUTF8OnThirdBit(s);
-            }            
+            }
         }
     }
 
     /*
      * C.14
      */
-    protected final void encodeNonIdentifyingStringOnFirstBit(String s, CharArrayIntMap map, boolean addToTable) throws IOException {        
+    protected final void encodeNonIdentifyingStringOnFirstBit(String s, CharArrayIntMap map, boolean addToTable) throws IOException {
         if (s == null || s.length() == 0) {
             // C.26 an index (first bit '1') with seven '1' bits for an empty string
             write(0xFF);
@@ -419,15 +419,15 @@ public abstract class Encoder extends DefaultHandler {
             } else {
                 _b = 0;
                 encodeEncodedCharacterStringAsUTF8OnThirdBit(s);
-            }         
-        }   
+            }
+        }
     }
 
     /*
      * C.14
      */
-    protected final void encodeNonIdentifyingStringOnFirstBit(char[] array, int start, int length, CharArrayIntMap map, 
-            boolean addToTable, boolean clone) throws IOException {        
+    protected final void encodeNonIdentifyingStringOnFirstBit(char[] array, int start, int length, CharArrayIntMap map,
+            boolean addToTable, boolean clone) throws IOException {
         if (length == 0) {
             // C.26 an index (first bit '1') with seven '1' bits for an empty string
             write(0xFF);
@@ -443,21 +443,21 @@ public abstract class Encoder extends DefaultHandler {
             } else {
                 _b = 0;
                 encodeEncodedCharacterStringAsUTF8OnThirdBit(array, start, length);
-            }         
-        }   
+            }
+        }
     }
 
     /*
      * C.14
      */
-    protected final void encodeNonIdentifyingStringOnFirstBit(String URI, int id, Object data) throws FastInfosetException, IOException { 
+    protected final void encodeNonIdentifyingStringOnFirstBit(String URI, int id, Object data) throws FastInfosetException, IOException {
         if (URI != null) {
             id = _v.encodingAlgorithm.get(URI);
             if (id == KeyIntMap.NOT_PRESENT) {
                 throw new EncodingAlgorithmException("Encoding algorithm URI '" + URI + "' not a member of the encoding algorithm table");
             }
             id += EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START;
-            
+
             EncodingAlgorithm ea = (EncodingAlgorithm)_registeredEncodingAlgorithms.get(URI);
             if (ea != null) {
                 encodeAIIObjectAlgorithmData(URI, id, data, ea);
@@ -481,7 +481,9 @@ public abstract class Encoder extends DefaultHandler {
                     break;
                 }
                 case EncodingAlgorithmIndexes.SHORT:
-                    throw new UnsupportedOperationException("SHORT");
+                    short[] sd = (short[])data;
+                    encodeAIIBuiltInAlgorithmData(id, sd, 0, sd.length);
+                    break;
                 case EncodingAlgorithmIndexes.INT:
                 {
                     int[] d = (int[])data;
@@ -500,11 +502,11 @@ public abstract class Encoder extends DefaultHandler {
                     throw new UnsupportedOperationException("DOUBLE");
                 case EncodingAlgorithmIndexes.UUID:
                     throw new UnsupportedOperationException("UUID");
-                case EncodingAlgorithmIndexes.CDATA:      
+                case EncodingAlgorithmIndexes.CDATA:
                     throw new UnsupportedOperationException("CDATA");
                 default:
                     throw new EncodingAlgorithmException("Unsupported built-in encoding algorithm: " + id);
-            }            
+            }
         } else if (id >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
             if (data instanceof byte[]) {
                 byte[] d = (byte[])data;
@@ -516,26 +518,26 @@ public abstract class Encoder extends DefaultHandler {
             throw new EncodingAlgorithmException("Encoding algorithm identifiers 10 up to and including 31 are reserved for future use");
         }
     }
-    
+
     protected final void encodeAIIOctetAlgorithmData(int id, byte[] d, int start, int length) throws IOException {
         // Encode identification and top four bits of encoding algorithm id
-        write (EncodingConstants.NISTRING_ENCODING_ALGORITHM_FLAG | 
+        write (EncodingConstants.NISTRING_ENCODING_ALGORITHM_FLAG |
                 ((id & 0xF0) >> 4));
-        
+
         // Encode bottom 4 bits of enoding algorithm id
         _b = (id & 0x0F) << 4;
-        
+
         // Encode the length
         encodeNonZeroOctetStringLengthOnFifthBit(length);
-        
+
         write(d, start, length);
     }
 
     protected final void encodeAIIObjectAlgorithmData(String URI, int id, Object data, EncodingAlgorithm ea) throws FastInfosetException, IOException {
         // Encode identification and top four bits of encoding algorithm id
-        write (EncodingConstants.NISTRING_ENCODING_ALGORITHM_FLAG | 
+        write (EncodingConstants.NISTRING_ENCODING_ALGORITHM_FLAG |
                 ((id & 0xF0) >> 4));
-        
+
         // Encode bottom 4 bits of enoding algorithm id
         _b = (id & 0x0F) << 4;
 
@@ -544,12 +546,12 @@ public abstract class Encoder extends DefaultHandler {
         encodeNonZeroOctetStringLengthOnFifthBit(_encodingBufferIndex);
         write(_encodingBuffer, _encodingBufferIndex);
     }
-    
+
     protected final void encodeAIIBuiltInAlgorithmData(int id, Object o, int start, int length) throws IOException {
         // Encode identification and top four bits of encoding algorithm id
-        write (EncodingConstants.NISTRING_ENCODING_ALGORITHM_FLAG | 
+        write (EncodingConstants.NISTRING_ENCODING_ALGORITHM_FLAG |
                 ((id & 0xF0) >> 4));
-        
+
         // Encode bottom 4 bits of enoding algorithm id
         _b = (id & 0x0F) << 4;
 
@@ -561,9 +563,9 @@ public abstract class Encoder extends DefaultHandler {
         ensureSize(octetLength);
         BuiltInEncodingAlgorithmFactory.table[id].
                 encodeToBytes(o, start, length, _octetBuffer, _octetBufferIndex);
-        _octetBufferIndex += octetLength;                    
+        _octetBufferIndex += octetLength;
     }
-    
+
     /*
      * C.19
      */
@@ -584,7 +586,7 @@ public abstract class Encoder extends DefaultHandler {
     protected final void encodeNonIdentifyingStringOnThirdBit(char[] array, int start, int length,
             CharArrayIntMap map, boolean addToTable, boolean clone) throws IOException {
         // length cannot be zero since sequence of CIIs has to be > 0
-        
+
         if (addToTable) {
             int index = map.obtainIndex(array, start, length, clone);
             if (index == KeyIntMap.NOT_PRESENT) {
@@ -599,7 +601,7 @@ public abstract class Encoder extends DefaultHandler {
         }
     }
 
-    protected final void encodeNonIdentifyingStringOnThirdBit(String URI, int id, Object data) throws FastInfosetException, IOException { 
+    protected final void encodeNonIdentifyingStringOnThirdBit(String URI, int id, Object data) throws FastInfosetException, IOException {
         if (URI != null) {
             id = _v.encodingAlgorithm.get(URI);
             if (id == KeyIntMap.NOT_PRESENT) {
@@ -629,7 +631,9 @@ public abstract class Encoder extends DefaultHandler {
                     break;
                 }
                 case EncodingAlgorithmIndexes.SHORT:
-                    throw new UnsupportedOperationException("SHORT");
+                    short[] sd = (short[])data;
+                    encodeCIIBuiltInAlgorithmData(id, sd, 0, sd.length);
+                    break;
                 case EncodingAlgorithmIndexes.INT:
                 {
                     int[] d = (int[])data;
@@ -648,11 +652,11 @@ public abstract class Encoder extends DefaultHandler {
                     throw new UnsupportedOperationException("DOUBLE");
                 case EncodingAlgorithmIndexes.UUID:
                     throw new UnsupportedOperationException("UUID");
-                case EncodingAlgorithmIndexes.CDATA:      
+                case EncodingAlgorithmIndexes.CDATA:
                     throw new UnsupportedOperationException("CDATA");
                 default:
                     throw new EncodingAlgorithmException("Unsupported built-in encoding algorithm: " + id);
-            }            
+            }
         } else if (id >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
             if (data instanceof byte[]) {
                 byte[] d = (byte[])data;
@@ -665,7 +669,7 @@ public abstract class Encoder extends DefaultHandler {
         }
     }
 
-    protected final void encodeNonIdentifyingStringOnThirdBit(String URI, int id, byte[] b, int start, int length) throws FastInfosetException, IOException { 
+    protected final void encodeNonIdentifyingStringOnThirdBit(String URI, int id, byte[] b, int start, int length) throws FastInfosetException, IOException {
         if (URI != null) {
             id = _v.encodingAlgorithm.get(URI);
             if (id == KeyIntMap.NOT_PRESENT) {
@@ -676,26 +680,26 @@ public abstract class Encoder extends DefaultHandler {
 
         encodeCIIOctetAlgorithmData(id, b, start, length);
     }
-    
+
     protected final void encodeCIIOctetAlgorithmData(int id, byte[] d, int start, int length) throws IOException {
         // Encode identification and top two bits of encoding algorithm id
-        write (EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_ENCODING_ALGORITHM_FLAG | 
+        write (EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_ENCODING_ALGORITHM_FLAG |
                 ((id & 0xC0) >> 6));
-        
+
         // Encode bottom 6 bits of enoding algorithm id
         _b = (id & 0x3F) << 2;
-        
+
         // Encode the length
         encodeNonZeroOctetStringLengthOnSenventhBit(length);
 
         write(d, start, length);
     }
-    
+
     protected final void encodeCIIObjectAlgorithmData(String URI, int id, Object data, EncodingAlgorithm ea) throws FastInfosetException, IOException {
         // Encode identification and top two bits of encoding algorithm id
-        write (EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_ENCODING_ALGORITHM_FLAG | 
+        write (EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_ENCODING_ALGORITHM_FLAG |
                 ((id & 0xC0) >> 6));
-        
+
         // Encode bottom 6 bits of enoding algorithm id
         _b = (id & 0x3F) << 2;
 
@@ -707,9 +711,9 @@ public abstract class Encoder extends DefaultHandler {
 
     protected final void encodeCIIBuiltInAlgorithmData(int id, Object o, int start, int length) throws FastInfosetException, IOException {
         // Encode identification and top two bits of encoding algorithm id
-        write (EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_ENCODING_ALGORITHM_FLAG | 
+        write (EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_ENCODING_ALGORITHM_FLAG |
                 ((id & 0xC0) >> 6));
-        
+
         // Encode bottom 6 bits of enoding algorithm id
         _b = (id & 0x3F) << 2;
 
@@ -721,22 +725,22 @@ public abstract class Encoder extends DefaultHandler {
         ensureSize(octetLength);
         BuiltInEncodingAlgorithmFactory.table[id].
                 encodeToBytes(o, start, length, _octetBuffer, _octetBufferIndex);
-        _octetBufferIndex += octetLength;                    
+        _octetBufferIndex += octetLength;
     }
-    
+
     /*
      * C.20
      */
     protected final void encodeEncodedCharacterStringAsUTF8OnFifthBit(char[] array, int start, int length) throws IOException {
         encodeNonEmptyOctetStringOnSeventhBit(array, start, length);
     }
-    
+
     /*
      * C.13
      */
     protected final void encodeIdentifyingNonEmptyStringOnFirstBit(String s, StringIntMap map) throws IOException {
         int index = map.obtainIndex(s);
-        if (index == KeyIntMap.NOT_PRESENT) {           
+        if (index == KeyIntMap.NOT_PRESENT) {
             // _b = 0;
             encodeNonEmptyOctetStringOnSecondBit(s);
         } else {
@@ -744,7 +748,7 @@ public abstract class Encoder extends DefaultHandler {
             encodeNonZeroIntegerOnSecondBitFirstBitOne(index);
         }
     }
-    
+
     /*
      * C.22
      */
@@ -753,7 +757,7 @@ public abstract class Encoder extends DefaultHandler {
         encodeNonZeroOctetStringLengthOnSecondBit(length);
         write(_encodingBuffer, length);
     }
-    
+
     /*
      * C.22
      */
@@ -773,14 +777,14 @@ public abstract class Encoder extends DefaultHandler {
             write((length >> 16) & 0xFF);
             write((length >> 8) & 0xFF);
             write(length & 0xFF);
-        }        
+        }
     }
 
-    
+
     /*
      * C.23
-     */    
-    protected final void encodeNonEmptyOctetStringOnFifthBit(String s) throws IOException {    
+     */
+    protected final void encodeNonEmptyOctetStringOnFifthBit(String s) throws IOException {
         final int length = encodeUTF8String(s);
         encodeNonZeroOctetStringLengthOnFifthBit(length);
         write(_encodingBuffer, length);
@@ -788,16 +792,16 @@ public abstract class Encoder extends DefaultHandler {
 
     /*
      * C.23
-     */    
-    protected final void encodeNonEmptyOctetStringOnFifthBit(char[] array, int start, int length) throws IOException {    
+     */
+    protected final void encodeNonEmptyOctetStringOnFifthBit(char[] array, int start, int length) throws IOException {
         length = encodeUTF8String(array, start, length);
         encodeNonZeroOctetStringLengthOnFifthBit(length);
         write(_encodingBuffer, length);
     }
-    
+
     /*
      * C.23
-     */    
+     */
     protected final void encodeNonZeroOctetStringLengthOnFifthBit(int length) throws IOException {
         if (length < EncodingConstants.OCTET_STRING_LENGTH_5TH_BIT_SMALL_LIMIT) {
             // [1, 8]
@@ -814,9 +818,9 @@ public abstract class Encoder extends DefaultHandler {
             write((length >> 16) & 0xFF);
             write((length >> 8) & 0xFF);
             write(length & 0xFF);
-        }        
+        }
     }
-    
+
     /*
      * C.24
      */
@@ -829,7 +833,7 @@ public abstract class Encoder extends DefaultHandler {
     /*
      * C.24
      */
-    protected final void encodeNonZeroOctetStringLengthOnSenventhBit(int length) throws IOException {    
+    protected final void encodeNonZeroOctetStringLengthOnSenventhBit(int length) throws IOException {
         if (length < EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_LIMIT) {
             // [1, 2]
             write(_b | (length - 1));
@@ -845,16 +849,16 @@ public abstract class Encoder extends DefaultHandler {
             write((length >> 16) & 0xFF);
             write((length >> 8) & 0xFF);
             write(length & 0xFF);
-        }                
+        }
     }
-    
+
     /*
      * C.25 (with first bit set to 1)
      *
      * i is a member of the interval [0, 1048575]
      *
      * In the specification the interval is [1, 1048576]
-     * 
+     *
      * The first bit of the first octet is set. As specified in C.13
      */
     protected final void encodeNonZeroIntegerOnSecondBitFirstBitOne(int i) throws IOException {
@@ -885,7 +889,7 @@ public abstract class Encoder extends DefaultHandler {
      * i is a member of the interval [0, 1048575]
      *
      * In the specification the interval is [1, 1048576]
-     * 
+     *
      * The first bit of the first octet is set. As specified in C.13
      */
     protected final void encodeNonZeroIntegerOnSecondBitFirstBitZero(int i) throws IOException {
@@ -914,7 +918,7 @@ public abstract class Encoder extends DefaultHandler {
      * i is a member of the interval [0, 1048575]
      *
      * In the specification the interval is [1, 1048576]
-     * 
+     *
      */
     protected final void encodeNonZeroIntegerOnThirdBit(int i) throws IOException {
         if (i < EncodingConstants.INTEGER_3RD_BIT_SMALL_LIMIT) {
@@ -932,7 +936,7 @@ public abstract class Encoder extends DefaultHandler {
             _b |= EncodingConstants.INTEGER_3RD_BIT_LARGE_FLAG | (i >> 16); // 00101 000
             write(_b);
             write((i >> 8) & 0xFF);
-            write(i & 0xFF);            
+            write(i & 0xFF);
         } else {
             // [526369, 1048576] ( [526368, 1048575] ) 20 bits
             i -= EncodingConstants.INTEGER_3RD_BIT_LARGE_LIMIT;
@@ -967,7 +971,7 @@ public abstract class Encoder extends DefaultHandler {
             _b |= EncodingConstants.INTEGER_4TH_BIT_LARGE_FLAG | (i >> 16); // 000 101 00
             write(_b);
             write((i >> 8) & 0xFF);
-            write(i & 0xFF);            
+            write(i & 0xFF);
         } else {
             // [263185, 1048576] ( [263184, 1048575] ) 20 bits
             i -= EncodingConstants.INTEGER_4TH_BIT_LARGE_LIMIT;
@@ -978,7 +982,7 @@ public abstract class Encoder extends DefaultHandler {
             write(i & 0xFF);
         }
     }
-    
+
     protected final void encodeNonEmptyUTF8StringAsOctetString(int b, String s, int[] constants) throws IOException {
         final char[] ch = s.toCharArray();
         encodeNonEmptyUTF8StringAsOctetString(b, ch, 0, ch.length, constants);
@@ -1005,8 +1009,8 @@ public abstract class Encoder extends DefaultHandler {
             write(length & 0xFF);
         }
     }
-    
-    protected final void encodeNonZeroInteger(int b, int i, int[] constants) throws IOException {        
+
+    protected final void encodeNonZeroInteger(int b, int i, int[] constants) throws IOException {
         if (i < constants[EncodingConstants.INTEGER_SMALL_LIMIT]) {
             write(b | i);
         } else if (i < constants[EncodingConstants.INTEGER_MEDIUM_LIMIT]) {
@@ -1017,7 +1021,7 @@ public abstract class Encoder extends DefaultHandler {
             i -= constants[EncodingConstants.INTEGER_MEDIUM_LIMIT];
             write(b | constants[EncodingConstants.INTEGER_LARGE_FLAG] | (i >> 16));
             write((i >> 8) & 0xFF);
-            write(i & 0xFF);                        
+            write(i & 0xFF);
         } else if (i < EncodingConstants.INTEGER_MAXIMUM_SIZE) {
             i -= constants[EncodingConstants.INTEGER_LARGE_LIMIT];
             write(b | constants[EncodingConstants.INTEGER_LARGE_LARGE_FLAG]);
@@ -1029,14 +1033,14 @@ public abstract class Encoder extends DefaultHandler {
         }
     }
 
-    
 
-    
- 
 
-    
+
+
+
+
     protected char[] _charBuffer = new char[512];
-    
+
     protected final int encodeUTF8String(String s) throws IOException {
         final int length = s.length();
         if (length < _charBuffer.length) {
@@ -1048,7 +1052,7 @@ public abstract class Encoder extends DefaultHandler {
         }
     }
 
-    
+
     protected byte[] _octetBuffer = new byte[1024];
     protected int _octetBufferIndex;
     protected int _markIndex = -1;
@@ -1060,7 +1064,7 @@ public abstract class Encoder extends DefaultHandler {
     protected final void resetMark() throws IOException {
         _markIndex = -1;
     }
-    
+
     protected final void write(int i) throws IOException {
         if (_octetBufferIndex < _octetBuffer.length) {
             _octetBuffer[_octetBufferIndex++] = (byte)i;
@@ -1094,12 +1098,12 @@ public abstract class Encoder extends DefaultHandler {
                 System.arraycopy(b, start, _octetBuffer, _octetBufferIndex, length);
                 _octetBufferIndex += length;
             }
-        } 
+        }
     }
 
     protected final void writeToBuffer(byte[] b, int length) {
         ensureSize(length);
-        
+
         System.arraycopy(b, 0, _octetBuffer, _octetBufferIndex, length);
         _octetBufferIndex += length;
     }
@@ -1107,9 +1111,9 @@ public abstract class Encoder extends DefaultHandler {
     protected final void ensureSize(int length) {
         if ((_octetBufferIndex + length) > _octetBuffer.length) {
             resize((_octetBufferIndex + length) * 3 / 2 + 1);
-        }        
+        }
     }
-        
+
     protected final void resize(int length) {
         byte[] b = new byte[length];
         System.arraycopy(_octetBuffer, 0, b, 0, _octetBufferIndex);
@@ -1122,9 +1126,9 @@ public abstract class Encoder extends DefaultHandler {
             _octetBufferIndex = 0;
         }
     }
-    
+
     protected class EncodingBufferOutputStream extends OutputStream {
-        
+
         public void write(int b) throws IOException {
             if (_encodingBufferIndex < _encodingBuffer.length) {
                 _encodingBuffer[_encodingBufferIndex++] = (byte)b;
@@ -1132,7 +1136,7 @@ public abstract class Encoder extends DefaultHandler {
                 byte newbuf[] = new byte[Math.max(_encodingBuffer.length << 1, _encodingBufferIndex)];
                 System.arraycopy(_encodingBuffer, 0, newbuf, 0, _encodingBufferIndex);
                 _encodingBuffer = newbuf;
-                
+
                 _encodingBuffer[_encodingBufferIndex++] = (byte)b;
             }
         }
@@ -1157,31 +1161,31 @@ public abstract class Encoder extends DefaultHandler {
         public int getLength() {
             return _encodingBufferIndex;
         }
-        
+
         public void reset() {
             _encodingBufferIndex = 0;
         }
     }
-    
+
     protected EncodingBufferOutputStream _encodingBufferOutputStream = new EncodingBufferOutputStream();
-    
+
     protected byte[] _encodingBuffer = new byte[512];
 
     protected int _encodingBufferIndex;
-    
+
     protected final void ensureEncodingBufferSizeForUtf8String(int length) {
         final int newLength = 3 * length;
         if (_encodingBuffer.length < newLength) {
             _encodingBuffer = new byte[newLength];
         }
     }
-    
-    protected final int encodeUTF8String(char[] ch, int start, int length) throws IOException {        
+
+    protected final int encodeUTF8String(char[] ch, int start, int length) throws IOException {
         int byteLength = 0;
-                                                                                
+
         // Make sure buffer is large enough
         ensureEncodingBufferSizeForUtf8String(length);
-                                                                                
+
         final int n = start + length;
         for (int i = start; i < n; i++) {
             final int c = (int) ch[i];
@@ -1204,10 +1208,10 @@ public abstract class Encoder extends DefaultHandler {
             }
             // TODO High and low surrogates
         }
-                           
+
         return byteLength;
     }
-    
+
     public static String getPrefixFromQualifiedName(String qName) {
         int i = qName.indexOf(':');
         String prefix = "";

@@ -1,31 +1,31 @@
 /*
  * Fast Infoset ver. 0.1 software ("Software")
- * 
- * Copyright, 2004-2005 Sun Microsystems, Inc. All Rights Reserved. 
- * 
+ *
+ * Copyright, 2004-2005 Sun Microsystems, Inc. All Rights Reserved.
+ *
  * Software is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License. You may
  * obtain a copy of the License at:
- * 
+ *
  *        http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  *    Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations.
- * 
+ *
  *    Sun supports and benefits from the global community of open source
  * developers, and thanks the community for its important contributions and
  * open standards-based technology, which Sun has adopted into many of its
  * products.
- * 
+ *
  *    Please note that portions of Software may be provided with notices and
  * open source licenses from such communities and third parties that govern the
  * use of those portions, and any licenses granted hereunder do not alter any
  * rights and obligations you may have under such open source licenses,
  * however, the disclaimer of warranty and limitation of liability provisions
  * in this License will apply to all Software in this distribution.
- * 
+ *
  *    You acknowledge that the Software is not designed, licensed or intended
  * for use in the design, construction, operation or maintenance of any nuclear
  * facility.
@@ -34,7 +34,7 @@
  * Version 2.0, January 2004
  * http://www.apache.org/licenses/
  *
- */ 
+ */
 
 
 package com.sun.xml.fastinfoset;
@@ -56,9 +56,9 @@ import org.jvnet.fastinfoset.FastInfosetException;
 
 public abstract class Decoder {
     protected InputStream _s;
-    
+
     protected Map _externalVocabularies;
-    
+
     protected ParserVocabulary _v;
 
     protected boolean _vIsInternal;
@@ -66,21 +66,21 @@ public abstract class Decoder {
     protected List _notations;
 
     protected List _unparsedEntities;
-    
+
     protected int _b;
-    
+
     protected boolean _terminate;
-    
+
     protected boolean _doubleTerminate;
 
     protected boolean _elementWithAttributesNoChildrenTermination;
 
     protected boolean _addToTable;
-    
+
     protected int _integer;
-    
+
     protected int _identifier;
-    
+
     protected byte[] _octetBuffer = new byte[1024];
 
     protected int _octetBufferStart;
@@ -88,13 +88,13 @@ public abstract class Decoder {
     protected int _octetBufferOffset;
 
     protected int _octetBufferEnd;
-    
+
     protected int _octetBufferLength;
-    
+
     protected EncodingAlgorithmInputStream _encodingAlgorithmInputStream = new EncodingAlgorithmInputStream();
-            
+
     protected char[] _charBuffer = new char[512];
-    
+
     protected int _charBufferLength;
 
     public Decoder() {
@@ -110,7 +110,7 @@ public abstract class Decoder {
         _v = v;
         _vIsInternal = false;
     }
-    
+
     public void setInputStream(InputStream s) {
         _s = s;
         _octetBufferOffset = 0;
@@ -119,77 +119,77 @@ public abstract class Decoder {
             _v.clear();
         }
     }
-        
-    public final void decodeDII() throws FastInfosetException, IOException {        
+
+    public final void decodeDII() throws FastInfosetException, IOException {
         final int b = read();
         if (b == EncodingConstants.DOCUMENT_INITIAL_VOCABULARY_FLAG) {
             decodeInitialVocabulary();
         } else if (b != 0) {
             throw new IOException("Optional values (other than initial vocabulary) of DII not supported");
-        }        
+        }
     }
-    
+
     public final void decodeInitialVocabulary() throws FastInfosetException, IOException {
         // First 5 optionals of 13 bit optional field
         int b = read();
         // Next 8 optionals of 13 bit optional field
         int b2 = read();
-        
+
         // Optimize for the most common case
         if (b == EncodingConstants.INITIAL_VOCABULARY_EXTERNAL_VOCABULARY_FLAG && b2 == 0) {
             decodeExternalVocabularyURI();
             return;
         }
-        
-        if ((b & EncodingConstants.INITIAL_VOCABULARY_EXTERNAL_VOCABULARY_FLAG) > 0) {            
+
+        if ((b & EncodingConstants.INITIAL_VOCABULARY_EXTERNAL_VOCABULARY_FLAG) > 0) {
             decodeExternalVocabularyURI();
         }
-        
-        if ((b & EncodingConstants.INITIAL_VOCABULARY_RESTRICTED_ALPHABETS_FLAG) > 0) {            
+
+        if ((b & EncodingConstants.INITIAL_VOCABULARY_RESTRICTED_ALPHABETS_FLAG) > 0) {
             decodeTableItems(_v.restrictedAlphabet);
         }
-        
+
         if ((b & EncodingConstants.INITIAL_VOCABULARY_ENCODING_ALGORITHMS_FLAG) > 0) {
             decodeTableItems(_v.encodingAlgorithm);
         }
-        
+
         if ((b & EncodingConstants.INITIAL_VOCABULARY_PREFIXES_FLAG) > 0) {
             decodeTableItems(_v.prefix);
         }
-        
+
         if ((b & EncodingConstants.INITIAL_VOCABULARY_NAMESPACE_NAMES_FLAG) > 0) {
             decodeTableItems(_v.namespaceName);
         }
-        
+
         if ((b2 & EncodingConstants.INITIAL_VOCABULARY_LOCAL_NAMES_FLAG) > 0) {
             decodeTableItems(_v.localName);
         }
-        
+
         if ((b2 & EncodingConstants.INITIAL_VOCABULARY_OTHER_NCNAMES_FLAG) > 0) {
             decodeTableItems(_v.otherNCName);
         }
-        
+
         if ((b2 & EncodingConstants.INITIAL_VOCABULARY_OTHER_URIS_FLAG) > 0) {
             decodeTableItems(_v.otherURI);
         }
-        
+
         if ((b2 & EncodingConstants.INITIAL_VOCABULARY_ATTRIBUTE_VALUES_FLAG) > 0) {
             decodeTableItems(_v.attributeValue);
         }
-        
+
         if ((b2 & EncodingConstants.INITIAL_VOCABULARY_CONTENT_CHARACTER_CHUNKS_FLAG) > 0) {
             decodeTableItems(_v.characterContentChunk);
         }
-        
+
         if ((b2 & EncodingConstants.INITIAL_VOCABULARY_OTHER_STRINGS_FLAG) > 0) {
             decodeTableItems(_v.otherString);
         }
-        
+
         if ((b2 & EncodingConstants.INITIAL_VOCABULARY_ELEMENT_NAME_SURROGATES_FLAG) > 0) {
             decodeTableItems(_v.elementName);
         }
-        
-        if ((b2 & EncodingConstants.INITIAL_VOCABULARY_ATTRIBUTE_NAME_SURROGATES_FLAG) > 0) {            
+
+        if ((b2 & EncodingConstants.INITIAL_VOCABULARY_ATTRIBUTE_NAME_SURROGATES_FLAG) > 0) {
             decodeTableItems(_v.attributeName);
         }
     }
@@ -198,9 +198,9 @@ public abstract class Decoder {
         if (_externalVocabularies == null) {
             throw new IOException("No external vocabularies registered");
         }
-        
+
         String externalVocabularyURI = decodeNonEmptyOctetStringOnSecondBitAsUtf8String();
-        ParserVocabulary externalVocabulary = 
+        ParserVocabulary externalVocabulary =
             (ParserVocabulary) _externalVocabularies.get(externalVocabularyURI);
         if (externalVocabulary == null) {
             throw new FastInfosetException("External vocabulary referenced by \"" + externalVocabularyURI + "\" is not registered");
@@ -212,7 +212,7 @@ public abstract class Decoder {
             throw new FastInfosetException("URISyntaxException", e);
         }
     }
-    
+
     public final void decodeTableItems(StringArray array) throws FastInfosetException, IOException {
         for (int i = 0; i < decodeIntegerTableItems(); i++) {
             array.add(decodeNonEmptyOctetStringOnSecondBitAsUtf8String());
@@ -230,26 +230,26 @@ public abstract class Decoder {
             }
         }
     }
-    
+
     public final void decodeTableItems(QualifiedNameArray array) throws FastInfosetException, IOException {
         for (int i = 0; i < decodeIntegerTableItems(); i++) {
             final int b = read();
 
-            final String prefix = ((b & EncodingConstants.NAME_SURROGATE_PREFIX_FLAG) > 0) 
+            final String prefix = ((b & EncodingConstants.NAME_SURROGATE_PREFIX_FLAG) > 0)
                         ? _v.prefix.get(decodeIntegerIndexOnSecondBit()) : "";
-            final String namespaceName = ((b & EncodingConstants.NAME_SURROGATE_NAME_FLAG) > 0) 
+            final String namespaceName = ((b & EncodingConstants.NAME_SURROGATE_NAME_FLAG) > 0)
                         ? _v.namespaceName.get(decodeIntegerIndexOnSecondBit()) : "";
             if (namespaceName == "" && prefix != "") {
                 throw new FastInfosetException("Name surrogate prefix is present when namespace name is absent");
             }
 
             final String localName = _v.localName.get(decodeIntegerIndexOnSecondBit());
-            
+
             QualifiedName qualifiedName = new QualifiedName(prefix, namespaceName, localName);
             array.add(qualifiedName);
         }
     }
-    
+
     public final int decodeIntegerTableItems() throws IOException {
         final int b = read();
         if (b < 128) {
@@ -258,60 +258,60 @@ public abstract class Decoder {
             return ((b & 0x0F) << 16) | (read() << 8) | read();
         }
     }
-    
+
     public final void decodeNotations() throws FastInfosetException, IOException {
         if (_notations == null) {
             _notations = new ArrayList();
         } else {
             _notations.clear();
         }
-        
+
         int b = read();
         while ((b & EncodingConstants.NOTATIONS_MASK) == EncodingConstants.NOTATIONS) {
             String name = decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherNCName);
 
-            String system_identifier = ((_b & EncodingConstants.NOTATIONS_SYSTEM_IDENTIFIER_FLAG) > 0) 
+            String system_identifier = ((_b & EncodingConstants.NOTATIONS_SYSTEM_IDENTIFIER_FLAG) > 0)
                 ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
-            String public_identifier = ((_b & EncodingConstants.NOTATIONS_PUBLIC_IDENTIFIER_FLAG) > 0) 
+            String public_identifier = ((_b & EncodingConstants.NOTATIONS_PUBLIC_IDENTIFIER_FLAG) > 0)
                 ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
 
             Notation notation = new Notation(name, system_identifier, public_identifier);
             _notations.add(notation);
-            
+
             b = read();
         }
         if (b != EncodingConstants.TERMINATOR) {
             throw new FastInfosetException("Notation IIs not terminated correctly");
         }
     }
-    
+
     public final void decodeUnparsedEntities() throws FastInfosetException, IOException {
         if (_unparsedEntities == null) {
             _unparsedEntities = new ArrayList();
         } else {
             _unparsedEntities.clear();
         }
-        
+
         int b = read();
         while ((b & EncodingConstants.UNPARSED_ENTITIES_MASK) == EncodingConstants.UNPARSED_ENTITIES) {
             String name = decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherNCName);
             String system_identifier = decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI);
 
-            String public_identifier = ((_b & EncodingConstants.UNPARSED_ENTITIES_PUBLIC_IDENTIFIER_FLAG) > 0) 
+            String public_identifier = ((_b & EncodingConstants.UNPARSED_ENTITIES_PUBLIC_IDENTIFIER_FLAG) > 0)
                 ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
 
             String notation_name = decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherNCName);
 
             UnparsedEntity unparsedEntity = new UnparsedEntity(name, system_identifier, public_identifier, notation_name);
             _unparsedEntities.add(unparsedEntity);
-            
+
             b = read();
         }
         if (b != EncodingConstants.TERMINATOR) {
             throw new FastInfosetException("Unparsed entities not terminated correctly");
         }
     }
-    
+
     public final void decodeVersion() throws FastInfosetException, IOException {
         switch(decodeNonIdentifyingStringOnFirstBit()) {
         case NISTRING_STRING:
@@ -320,7 +320,7 @@ public abstract class Decoder {
             }
             break;
         case NISTRING_ENCODING_ALGORITHM:
-            throw new IOException("Processing II with encoding algorithm decoding not supported");                        
+            throw new IOException("Processing II with encoding algorithm decoding not supported");
         case NISTRING_INDEX:
             break;
         case NISTRING_EMPTY_STRING:
@@ -342,16 +342,16 @@ public abstract class Decoder {
                 + EncodingConstants.INTEGER_3RD_BIT_MEDIUM_LIMIT;
         } else {
             // EII large large index
-            i = (((read() & EncodingConstants.INTEGER_3RD_BIT_LARGE_LARGE_MASK) << 16) | (read() << 8) | read()) 
+            i = (((read() & EncodingConstants.INTEGER_3RD_BIT_LARGE_LARGE_MASK) << 16) | (read() << 8) | read())
                 + EncodingConstants.INTEGER_3RD_BIT_LARGE_LIMIT;
         }
         return _v.elementName.get(i);
     }
 
     protected final QualifiedName decodeEIILiteral() throws FastInfosetException, IOException {
-        final String prefix = ((_b & EncodingConstants.LITERAL_QNAME_PREFIX_FLAG) > 0) 
+        final String prefix = ((_b & EncodingConstants.LITERAL_QNAME_PREFIX_FLAG) > 0)
             ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.prefix) : "";
-        final String namespaceName = ((_b & EncodingConstants.LITERAL_QNAME_NAMESPACE_NAME_FLAG) > 0) 
+        final String namespaceName = ((_b & EncodingConstants.LITERAL_QNAME_NAMESPACE_NAME_FLAG) > 0)
             ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.namespaceName) : "";
         final String localName = decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName);
 
@@ -359,18 +359,18 @@ public abstract class Decoder {
         _v.elementName.add(qualifiedName);
         return qualifiedName;
     }
-    
-    
+
+
     public static final int NISTRING_STRING              = 0;
     public static final int NISTRING_INDEX               = 1;
     public static final int NISTRING_ENCODING_ALGORITHM  = 2;
     public static final int NISTRING_EMPTY_STRING        = 3;
-        
+
     /*
      * C.14
      * decodeNonIdentifyingStringOnFirstBit
      */
-    public final int decodeNonIdentifyingStringOnFirstBit() throws FastInfosetException, IOException {        
+    public final int decodeNonIdentifyingStringOnFirstBit() throws FastInfosetException, IOException {
         final int b = read();
         switch(DecoderStateTables.NISTRING[b]) {
             case DecoderStateTables.NISTRING_UTF8_SMALL_LENGTH:
@@ -422,11 +422,11 @@ public abstract class Decoder {
                 _identifier = (b & 0x0F) << 4;
                 final int b2 = read();
                 _identifier |= (b2 & 0xF0) >> 4;
-    
+
                 decodeOctetsOfNonIdentifyingStringOnFirstBit(b2);
                 // TODO obtain restricted alphabet given _identifier value
                 decodeRAOctetsAsCharBuffer(null);
-                return NISTRING_STRING;                
+                return NISTRING_STRING;
             }
             case DecoderStateTables.NISTRING_EA:
             {
@@ -435,7 +435,7 @@ public abstract class Decoder {
                 _identifier = (b & 0x0F) << 4;
                 final int b2 = read();
                 _identifier |= (b2 & 0xF0) >> 4;
-    
+
                 decodeOctetsOfNonIdentifyingStringOnFirstBit(b2);
                 return NISTRING_ENCODING_ALGORITHM;
             }
@@ -443,11 +443,11 @@ public abstract class Decoder {
                 _integer = b & EncodingConstants.INTEGER_2ND_BIT_SMALL_MASK;
                 return NISTRING_INDEX;
             case DecoderStateTables.NISTRING_INDEX_MEDIUM:
-                _integer = (((b & EncodingConstants.INTEGER_2ND_BIT_MEDIUM_MASK) << 8) | read()) 
+                _integer = (((b & EncodingConstants.INTEGER_2ND_BIT_MEDIUM_MASK) << 8) | read())
                     + EncodingConstants.INTEGER_2ND_BIT_SMALL_LIMIT;
                 return NISTRING_INDEX;
             case DecoderStateTables.NISTRING_INDEX_LARGE:
-                _integer = (((b & EncodingConstants.INTEGER_2ND_BIT_LARGE_MASK) << 16) | (read() << 8) | read()) 
+                _integer = (((b & EncodingConstants.INTEGER_2ND_BIT_LARGE_MASK) << 16) | (read() << 8) | read())
                     + EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT;
                 return NISTRING_INDEX;
             case DecoderStateTables.NISTRING_EMPTY:
@@ -455,10 +455,10 @@ public abstract class Decoder {
             default:
                 throw new FastInfosetException("Illegal state when decoding non identifying string");
         }
-    }    
-    
+    }
+
     public final void decodeOctetsOfNonIdentifyingStringOnFirstBit(int b) throws FastInfosetException, IOException {
-        // Remove lower bits of restricted alphabet or encoding algorithm integer 
+        // Remove lower bits of restricted alphabet or encoding algorithm integer
         b &= 0x0F;
         // Reuse UTF8 length states
         switch(DecoderStateTables.NISTRING[b]) {
@@ -484,7 +484,7 @@ public abstract class Decoder {
     }
 
     public final void decodeOctetsOfNonIdentifyingStringOnThirdBit(int b) throws FastInfosetException, IOException {
-        // Remove lower bits of restricted alphabet or encoding algorithm integer 
+        // Remove lower bits of restricted alphabet or encoding algorithm integer
         b &= 0x02;
         // Reuse UTF8 length states, necessary to mask with CII identifier bits
         switch(DecoderStateTables.EII[b | 0x80]) {
@@ -508,7 +508,7 @@ public abstract class Decoder {
         _octetBufferStart = _octetBufferOffset;
         _octetBufferOffset += _octetBufferLength;
     }
-    
+
     /*
      * C.13
      */
@@ -544,13 +544,13 @@ public abstract class Decoder {
                 return table.get(b & EncodingConstants.INTEGER_2ND_BIT_SMALL_MASK);
             case DecoderStateTables.ISTRING_INDEX_MEDIUM:
             {
-                final int index = (((b & EncodingConstants.INTEGER_2ND_BIT_MEDIUM_MASK) << 8) | read()) 
+                final int index = (((b & EncodingConstants.INTEGER_2ND_BIT_MEDIUM_MASK) << 8) | read())
                     + EncodingConstants.INTEGER_2ND_BIT_SMALL_LIMIT;
                 return table.get(index);
             }
             case DecoderStateTables.ISTRING_INDEX_LARGE:
             {
-                final int index = (((b & EncodingConstants.INTEGER_2ND_BIT_LARGE_MASK) << 16) | (read() << 8) | read()) 
+                final int index = (((b & EncodingConstants.INTEGER_2ND_BIT_LARGE_MASK) << 16) | (read() << 8) | read())
                     + EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT;
                 return table.get(index);
             }
@@ -558,7 +558,7 @@ public abstract class Decoder {
                 throw new FastInfosetException("Illegal state when decoding identifying string on first bit");
         }
     }
-    
+
     /*
      * C.22
      */
@@ -602,14 +602,14 @@ public abstract class Decoder {
      */
     public final int decodeIntegerIndexOnSecondBit() throws FastInfosetException, IOException {
         final int b = read();
-        switch(DecoderStateTables.ISTRING[b]) {                
+        switch(DecoderStateTables.ISTRING[b]) {
             case DecoderStateTables.ISTRING_INDEX_SMALL:
                 return b & EncodingConstants.INTEGER_2ND_BIT_SMALL_MASK;
             case DecoderStateTables.ISTRING_INDEX_MEDIUM:
-                return (((b & EncodingConstants.INTEGER_2ND_BIT_MEDIUM_MASK) << 8) | read()) 
+                return (((b & EncodingConstants.INTEGER_2ND_BIT_MEDIUM_MASK) << 8) | read())
                     + EncodingConstants.INTEGER_2ND_BIT_SMALL_LIMIT;
             case DecoderStateTables.ISTRING_INDEX_LARGE:
-                return (((b & EncodingConstants.INTEGER_2ND_BIT_LARGE_MASK) << 16) | (read() << 8) | read()) 
+                return (((b & EncodingConstants.INTEGER_2ND_BIT_LARGE_MASK) << 16) | (read() << 8) | read())
                     + EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT;
             case DecoderStateTables.ISTRING_SMALL_LENGTH:
             case DecoderStateTables.ISTRING_MEDIUM_LENGTH:
@@ -618,47 +618,48 @@ public abstract class Decoder {
                 throw new FastInfosetException("Illegal state when decoding index on second bit");
         }
     }
-    
+
     public final void decodeHeader() throws FastInfosetException, IOException {
         if (!_isFastInfosetDocument()) {
             throw new FastInfosetException("Input stream is not a fast infoset document");
         }
     }
-    
+
     public final void decodeRAOctetsAsCharBuffer(char[] restrictedAlphabet) throws IOException {
         throw new UnsupportedOperationException("Restricted alphabet decoding not implemented");
     }
 
     public final String decodeRAOctetsAsString(char[] restrictedAlphabet) throws IOException {
-        decodeRAOctetsAsCharBuffer(null);        
+        decodeRAOctetsAsCharBuffer(null);
         return new String(_charBuffer, 0, _charBufferLength);
     }
-    
-    public final void decodeUtf8StringAsCharBuffer() throws IOException {    
+
+    public final void decodeUtf8StringAsCharBuffer() throws IOException {
         ensureOctetBufferSize();
         decodeUtf8StringIntoCharBuffer();
     }
 
     public final String decodeUtf8StringAsString() throws IOException {
-        decodeUtf8StringAsCharBuffer();        
+        decodeUtf8StringAsCharBuffer();
         return new String(_charBuffer, 0, _charBufferLength);
     }
 
-    public final void decodeUtf16StringAsCharBuffer() throws IOException {    
+    public final void decodeUtf16StringAsCharBuffer() throws IOException {
         ensureOctetBufferSize();
         decodeUtf16StringIntoCharBuffer();
     }
 
     public final String decodeUtf16StringAsString() throws IOException {
-        decodeUtf16StringAsCharBuffer();        
+        decodeUtf16StringAsCharBuffer();
         return new String(_charBuffer, 0, _charBufferLength);
     }
-    
+
     public final void ensureOctetBufferSize() throws IOException {
         if (_octetBufferEnd < (_octetBufferOffset + _octetBufferLength)) {
             final int bytesRemaining = _octetBufferEnd - _octetBufferOffset;
 
             if (_octetBuffer.length < _octetBufferLength) {
+System.out.println("Realloc octet buffer: " +  _octetBufferLength);
                 byte[] newOctetBuffer = new byte[_octetBufferLength];
                 System.arraycopy(_octetBuffer, _octetBufferOffset, newOctetBuffer, 0, bytesRemaining);
                 _octetBuffer = newOctetBuffer;
@@ -666,22 +667,22 @@ public abstract class Decoder {
                 System.arraycopy(_octetBuffer, _octetBufferOffset, _octetBuffer, 0, bytesRemaining);
             }
             _octetBufferOffset = 0;
-            
-            final int bytesRead = _s.read(_octetBuffer, bytesRemaining, _octetBuffer.length - bytesRemaining);            
+
+            final int bytesRead = _s.read(_octetBuffer, bytesRemaining, _octetBuffer.length - bytesRemaining);
             if (bytesRead < 0) {
                 throw new EOFException("Unexpeceted EOF");
             }
-                        
+
             if (bytesRead < _octetBufferLength - bytesRemaining) {
                 // TODO keep reading until require bytes have been obtained
                 throw new IOException("Full bytes not read");
             }
-            
+
             _octetBufferEnd = bytesRemaining + bytesRead;
         }
     }
-    
-    public final void decodeUtf8StringIntoCharBuffer() throws IOException {        
+
+    public final void decodeUtf8StringIntoCharBuffer() throws IOException {
         _charBufferLength = 0;
         if (_charBuffer.length < _octetBufferLength) {
             _charBuffer = new char[_octetBufferLength];
@@ -708,7 +709,7 @@ public abstract class Decoder {
                         }
 
                         _charBuffer[_charBufferLength++] = (char) (
-                            ((b1 & 0x1F) << 6) 
+                            ((b1 & 0x1F) << 6)
                             | (b2 & 0x3F));
                         break;
                     }
@@ -721,7 +722,7 @@ public abstract class Decoder {
                     default:
                         decodeUtf8StringIllegalState();
                 }
-            }            
+            }
         }
     }
 
@@ -730,14 +731,14 @@ public abstract class Decoder {
      * to detemine valid NCName characters for characters not in
      * the Basic Latin range
      */
-    public final void decodeUtf8NCNameIntoCharBuffer() throws IOException {        
+    public final void decodeUtf8NCNameIntoCharBuffer() throws IOException {
         _charBufferLength = 0;
         if (_charBuffer.length < _octetBufferLength) {
             _charBuffer = new char[_octetBufferLength];
         }
 
         final int end = _octetBufferLength + _octetBufferOffset;
-        
+
         int b1 = _octetBuffer[_octetBufferOffset++] & 0xFF;
         int state = DecoderStateTables.UTF8[b1];
         if (state == DecoderStateTables.UTF8_NCNAME) {
@@ -756,7 +757,7 @@ public abstract class Decoder {
                     }
 
                     _charBuffer[_charBufferLength++] = (char) (
-                        ((b1 & 0x1F) << 6) 
+                        ((b1 & 0x1F) << 6)
                         | (b2 & 0x3F));
                     break;
                 }
@@ -771,7 +772,7 @@ public abstract class Decoder {
                     decodeUtf8NCNameIllegalState();
             }
         }
-                
+
         while (end != _octetBufferOffset) {
             b1 = _octetBuffer[_octetBufferOffset++] & 0xFF;
             state = DecoderStateTables.UTF8[b1];
@@ -791,7 +792,7 @@ public abstract class Decoder {
                         }
 
                         _charBuffer[_charBufferLength++] = (char) (
-                            ((b1 & 0x1F) << 6) 
+                            ((b1 & 0x1F) << 6)
                             | (b2 & 0x3F));
                         break;
                     }
@@ -804,7 +805,7 @@ public abstract class Decoder {
                     default:
                         decodeUtf8NCNameIllegalState();
                 }
-            }            
+            }
         }
     }
 
@@ -818,7 +819,7 @@ public abstract class Decoder {
             || (b1 == 0xED && b2 >= 0xA0)
             || ((b1 & 0x0F) == 0 && (b2 & 0x20) == 0)) {
             decodeUtf8StringIllegalState();
-        }        
+        }
 
         // Decode byte 3
         if (end == _octetBufferOffset) {
@@ -834,7 +835,7 @@ public abstract class Decoder {
             | (b2 & 0x3F) << 6
             | (b3 & 0x3F));
     }
-    
+
     public final void decodeUtf8FourByteChar(int end, int b1) throws IOException {
         // Decode byte 2
         if (end == _octetBufferOffset) {
@@ -863,18 +864,18 @@ public abstract class Decoder {
         if ((b4 & 0xC0) != 0x80) {
             decodeUtf8StringIllegalState();
         }
-        
+
         final int uuuuu = ((b1 << 2) & 0x001C) | ((b2 >> 4) & 0x0003);
         if (uuuuu > 0x10) {
             decodeUtf8StringIllegalState();
         }
         final int wwww = uuuuu - 1;
-        
+
         final int hs = 0xD800 |
              ((wwww << 6) & 0x03C0) | ((b2 << 2) & 0x003C) |
              ((b3 >> 4) & 0x0003);
         final int ls = 0xDC00 | ((b3 << 6) & 0x03C0) | (b4 & 0x003F);
-        
+
         _charBuffer[_charBufferLength++] = (char)hs;
         _charBuffer[_charBufferLength++] = (char)ls;
     }
@@ -890,7 +891,7 @@ public abstract class Decoder {
     public final void decodeUtf8NCNameIllegalState() throws IOException {
         throw new IOException("Illegal state for UTF-8 encoded NCName");
     }
-    
+
     public final void decodeUtf16StringIntoCharBuffer() throws IOException {
         throw new IOException("UTF-16 decoding not implemented");
     }
@@ -903,7 +904,7 @@ public abstract class Decoder {
             if (_octetBufferEnd < 0) {
                 throw new EOFException("Unexpeceted EOF");
             }
-            
+
             _octetBufferOffset = 1;
             return _octetBuffer[0] & 0xFF;
         }
@@ -945,30 +946,30 @@ public abstract class Decoder {
                 return bytesToRead;
             } else {
                 return -1;
-            }    
-        }        
+            }
+        }
     }
-    
+
     protected final boolean _isFastInfosetDocument() throws IOException {
         // TODO
         // Check for <?xml declaration with 'finf' encoding
-        
+
         if (read() != (EncodingConstants.HEADER[0] & 0xFF) ||
                 read() != (EncodingConstants.HEADER[1] & 0xFF) ||
                 read() != (EncodingConstants.HEADER[2] & 0xFF) ||
                 read() != (EncodingConstants.HEADER[3] & 0xFF)) {
             return false;
         }
-        
-        // TODO 
+
+        // TODO
         return true;
     }
 
-    
+
     static public boolean isFastInfosetDocument(InputStream s) throws IOException {
         // TODO
         // Check for <?xml declaration with 'finf' encoding
-        
+
         final byte[] header = new byte[4];
         s.read(header);
         if (header[0] != EncodingConstants.HEADER[0] ||
@@ -977,13 +978,13 @@ public abstract class Decoder {
                 header[3] != EncodingConstants.HEADER[3]) {
             return false;
         }
-        
-        // TODO 
+
+        // TODO
         return true;
     }
 
 
-/*                                             
+/*
     protected final static int CHAR_POOL_CHAR_ARRAY_SIZE = 256;
 
     protected char[][] _charPool = new char[4][];
@@ -1005,22 +1006,22 @@ public abstract class Decoder {
     public Decoder() {
         // TODO move the initial vocabulary outside of the parser
         _v = new ParserVocabulary();
-                                                                                                                      
+
         for (int i = 0; i < _charPool.length; i++) {
             _charPool[i] = new char[CHAR_POOL_CHAR_ARRAY_SIZE];
         }
-                                                                                                                      
+
     }
 
     public void reset() {
         _terminate = _doubleTerminate = _elementWithAttributesNoChildrenTermination = false;
         _octetBufferOffset = 0;
         _octetBufferEnd = 0;
-                                                                                                                      
+
         _charPoolIndex = 0;
         _charPoolCharArrayOffset = 0;
         _charPoolCharArray = _charPool[0];
-                                                                                                                      
+
         _charArrayPoolIndex = 0;
     }
 
@@ -1055,13 +1056,13 @@ public abstract class Decoder {
         } else {
             ca.set(ch, start, offset, false);
         }
-                                                                                                                         
+
         return ca;
     }
 
     public final void decodeUtf8StringIntoCharPool() throws IOException {
         ensureOctetBufferSize();
-                                                                                                                      
+
         if (_charPoolCharArrayOffset + _octetBufferLength >= CHAR_POOL_CHAR_ARRAY_SIZE) {
             if (++_charPoolIndex == _charPool.length) {
                 char[][] charPool = new char[_charPoolIndex * 3 / 2][];
@@ -1074,7 +1075,7 @@ public abstract class Decoder {
             _charPoolCharArrayOffset = 0;
             _charPoolCharArray = _charPool[_charPoolIndex];
         }
-                                                                                                                      
+
         _charPoolCharArrayStart = _charPoolCharArrayOffset;
         _charPoolCharArrayOffset = decodeUtf8StringIntoCharPool(_charPoolCharArray, _charPoolCharArrayOffset);
         _charPoolCharArrayLength = _charPoolCharArrayOffset - _charPoolCharArrayStart;
@@ -1084,7 +1085,7 @@ public abstract class Decoder {
         final int end = _octetBufferLength + _octetBufferOffset;
         while (end != _octetBufferOffset) {
             final int c = _octetBuffer[_octetBufferOffset++] & 0xFF;
-                                                                                                                      
+
             if ((c & 0x80) == 0) {         // up to 7 bits
                 charBuffer[charOffset++] = (char) c;
             }
