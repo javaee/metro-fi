@@ -24,7 +24,7 @@
 	</target>
 
 	<target name="clean">
-		<delete dir="${dist.dir}"/>
+		<delete quiet="true" dir="${dist.dir}"/>
 		<delete dir="${build.dir}/classes"/>
 	</target>
 
