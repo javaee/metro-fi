@@ -149,9 +149,9 @@ public class ShortEncodingAlgorithm extends IntegerEncodingAlgorithm {
                 }
             }
 
-            final int i = ((b[2] & 0xFF) << 8) |
-                    (b[3] & 0xFF);
-            shortList.add(new Integer(i));
+            final int i = ((b[0] & 0xFF) << 8) |
+                    (b[1] & 0xFF);
+            shortList.add(new Short((short)i));
         }
 
         return generateArrayFromList(shortList);
