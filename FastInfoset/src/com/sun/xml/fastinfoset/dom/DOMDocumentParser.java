@@ -43,10 +43,12 @@ import com.sun.xml.fastinfoset.Decoder;
 import com.sun.xml.fastinfoset.DecoderStateTables;
 import com.sun.xml.fastinfoset.EncodingConstants;
 import com.sun.xml.fastinfoset.QualifiedName;
+import com.sun.xml.fastinfoset.algorithm.BuiltInEncodingAlgorithmFactory;
 import com.sun.xml.fastinfoset.util.CharArray;
 import com.sun.xml.fastinfoset.util.CharArrayString;
 import java.io.IOException;
 import java.io.InputStream;
+import org.jvnet.fastinfoset.EncodingAlgorithm;
 import org.jvnet.fastinfoset.EncodingAlgorithmException;
 import org.jvnet.fastinfoset.FastInfosetException;
 import org.w3c.dom.Attr;
@@ -399,8 +401,9 @@ public class DOMDocumentParser extends Decoder {
                     _identifier |= (_b & 0xFC) >> 2;
                     
                     decodeOctetsOnSeventhBitOfNonIdentifyingStringOnThirdBit(_b);
-            
-                    throw new UnsupportedOperationException("Encoding algoroithm");
+                    final String s = convertEncodingAlgorithmDataToCharacters();
+                    _currentNode.appendChild(_document.createTextNode(s));
+                    break;
                 }
                 case DecoderStateTables.CII_INDEX_SMALL:
                 {
@@ -730,7 +733,10 @@ public class DOMDocumentParser extends Decoder {
                     _identifier |= (b & 0xF0) >> 4;
 
                     decodeOctetsOnFifthBitOfNonIdentifyingStringOnFirstBit(b);
-                    throw new UnsupportedOperationException("Encoding algorithm");
+                    value = convertEncodingAlgorithmDataToCharacters();
+                    a.setValue(value);                
+                    _currentElement.setAttributeNode(a);
+                    break;
                 }
                 case DecoderStateTables.NISTRING_INDEX_SMALL:
                     value = _v.attributeValue.get(b & EncodingConstants.INTEGER_2ND_BIT_SMALL_MASK);
@@ -834,6 +840,26 @@ public class DOMDocumentParser extends Decoder {
     
     protected Attr createAttribute(String namespaceName, String qName, String localName) {
         return _document.createAttributeNS(namespaceName, qName);
+    }
+
+    protected String convertEncodingAlgorithmDataToCharacters() throws FastInfosetException, IOException {
+        StringBuffer buffer = new StringBuffer();
+        if (_identifier <= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
+            Object array = BuiltInEncodingAlgorithmFactory.table[_identifier].
+                decodeFromBytes(_octetBuffer, _octetBufferStart, _octetBufferLength);
+            BuiltInEncodingAlgorithmFactory.table[_identifier].convertToCharacters(array,  buffer);
+        } else if (_identifier >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
+            final String URI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
+            final EncodingAlgorithm ea = (EncodingAlgorithm)_registeredEncodingAlgorithms.get(URI);
+            if (ea != null) {
+                final Object data = ea.decodeFromBytes(_octetBuffer, _octetBufferStart, _octetBufferLength);
+                ea.convertToCharacters(data, buffer);
+            } else {
+                throw new EncodingAlgorithmException(
+                        "Document contains application-defined encoding algorithm data that cannot be reported");
+            }
+        }
+        return buffer.toString();
     }
     
 }
