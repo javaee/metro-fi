@@ -1237,6 +1237,37 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     
     
     
+    protected class NamespaceContextImpl implements NamespaceContext {
+        public final String getNamespaceURI(String prefix) {
+            return getNamespaceDecl(prefix).namespaceName;
+        }
+  
+        public final String getPrefix(String namespaceURI) {
+            return null;
+            // return _nsSupport.getPrefix(namespaceURI);
+        }
+
+        public final Iterator getPrefixes(String namespaceURI) {
+            return null;
+            /*
+            final Enumeration e = _nsSupport.getPrefixes(namespaceURI);
+            
+            return new Iterator() {
+                    public boolean hasNext() {
+                        return e.hasMoreElements();
+                    }
+
+                    public Object next() {
+                        return e.nextElement();
+                    }
+
+                    public void remove() {
+                        throw new UnsupportedOperationException();
+                    }                    
+                };
+             */
+        }
+    }
     
     public QualifiedName getNamespaceDecl(String prefix) {
         try {
@@ -1306,10 +1337,10 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         return _prefixMap.keySet().iterator();
     }
 
-    
     public void setManager(StAXManager manager) {
         _manager = manager;
     }
+    
     final static String getEventTypeString(int eventType) {
         switch (eventType){
             case START_ELEMENT:
