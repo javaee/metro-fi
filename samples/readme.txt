@@ -1,6 +1,6 @@
 FastInfoset (FI) Samples
 
-The samples project is in its early stage and not complete. More samples may be added in the near further.
+The samples project is in its early stage and not complete. More samples may be added in the near future.
 We welcome feedbacks and suggestions on use cases. Please write to users@fi.dev.java.net.
 
 Listed here are samples that are planned and completed:
