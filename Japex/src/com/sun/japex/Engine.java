@@ -76,9 +76,6 @@ public class Engine {
                     drivers[i].initializeDriver();
                 }
                 
-                // Lower priority of engine thread 
-                Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-                                
                 // Get list of tests
                 List tcList = di.getTestCases();
                 int nOfTests = tcList.size();
@@ -93,35 +90,50 @@ public class Engine {
                 // Iterate through list of test cases
                 Iterator tci = tcList.iterator();
                 while (tci.hasNext()) {
+                    long runTime = 0L;
                     TestCase tc = (TestCase) tci.next();               
                     
                     System.out.print(tc.getTestName() + ",");
-                    
-                    // Create one thread for each driver instance
-                    Thread threads[] = new Thread[nOfThreads];
-                    for (int i = 0; i < nOfThreads; i++) {
-                        threads[i] = new Thread(drivers[i]);
-                        threads[i].setPriority(Thread.MAX_PRIORITY);
+
+                    // If nOfThreads == 1, re-use this thread
+                    if (nOfThreads == 1) {
+                        drivers[0].setTestCase(tc);     // tc is shared!
+                        drivers[0].prepareAndWarmup();
+                        
+                        // Start timer 
+                        runTime = Util.currentTimeMillis();
+                        
+                        drivers[0].run();
                     }
-                
-                    // Initialize driver instance with test case object
-                    // and do prepare and warmup phases
-                    for (int i = 0; i < nOfThreads; i++) {
-                        drivers[i].setTestCase(tc);     // tc is shared!
-                        drivers[i].prepareAndWarmup();
-                    }
-                    
-                    // Start timer 
-                    long runTime = Util.currentTimeMillis();
-                    
-                    // Fork all threads
-                    for (int i = 0; i < nOfThreads; i++) {
-                        threads[i].start();
-                    }
-                    
-                    // Wait for all threads to finish
-                    for (int i = 0; i < nOfThreads; i++) {
-                        threads[i].join();
+                    else {  // nOfThreads > 1
+                        Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+                                
+                        // Create one thread for each driver instance
+                        Thread threads[] = new Thread[nOfThreads];
+                        for (int i = 0; i < nOfThreads; i++) {
+                            threads[i] = new Thread(drivers[i]);
+                            threads[i].setPriority(Thread.MAX_PRIORITY);
+                        }
+
+                        // Initialize driver instance with test case object
+                        // and do prepare and warmup phases
+                        for (int i = 0; i < nOfThreads; i++) {
+                            drivers[i].setTestCase(tc);     // tc is shared!
+                            drivers[i].prepareAndWarmup();
+                        }
+
+                        // Start timer 
+                        runTime = Util.currentTimeMillis();
+
+                        // Fork all threads
+                        for (int i = 0; i < nOfThreads; i++) {
+                            threads[i].start();
+                        }
+
+                        // Wait for all threads to finish
+                        for (int i = 0; i < nOfThreads; i++) {
+                            threads[i].join();
+                        }
                     }
 
                     // Stop timer
