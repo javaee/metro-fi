@@ -26,8 +26,8 @@
     <param name="japex.resultUnit" value="KBytes"/>
     
     <!-- Size calculated in prepare phase -->
-    <param name="japex.warmupIterations" value="0"/>
-    <param name="japex.runIterations" value="0"/>
+    <param name="japex.warmupIterations" value="1"/>
+    <param name="japex.runIterations" value="1"/>
     
     <!-- 1 or more drivers 
       -
@@ -43,7 +43,7 @@
       - japex.resultHarmMean: results harmonic mean
       -
       -->
-    <driver name="XMLSizeDriver">
+    <driver name="XMLSizeDriver" normal="true">
         <param name="japex.driverClass" value="XMLSizeDriver"/>
     </driver>
     <driver name="FastInfosetSizeDriver">
