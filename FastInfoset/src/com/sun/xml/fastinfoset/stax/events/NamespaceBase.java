@@ -71,7 +71,7 @@ public class NamespaceBase extends AttributeBase implements Namespace{
     public NamespaceBase(String prefix, String namespaceURI){
         super(XMLNS_ATTRIBUTE, prefix, namespaceURI);
         setEventType(NAMESPACE);
-        if (!Util.isEmptyString(prefix)) {
+        if (Util.isEmptyString(prefix)) {
             defaultDeclaration=true;
         }
     }

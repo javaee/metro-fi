@@ -53,6 +53,9 @@ import javax.xml.namespace.QName;
  * This class provides the same functionality as StAXEventAllocatorBase, but without
  * using EventFactory and creating a new object for each call.
  *
+ * It seems to be good idea using static components. Unfortunately, EventReader's peek
+ * and next methods require that multiple instances being created.
+ *
  */
 public class StAXEventAllocator implements XMLEventAllocator {
     StartElementEvent startElement = new StartElementEvent();
@@ -138,7 +141,9 @@ public class StAXEventAllocator implements XMLEventAllocator {
             }
             case XMLEvent.CHARACTERS:
             {
-                characters.setData(reader.getText()); 
+                characters.setData(reader.getText());
+                event = characters;
+                /**
                 if (reader.isWhiteSpace()) {
                     space.setData(reader.getText());
                     space.setSpace(true);
@@ -148,6 +153,7 @@ public class StAXEventAllocator implements XMLEventAllocator {
                     characters.setData(reader.getText()); 
                     event = characters;
                 }
+                 */
                 break;
             }
             case XMLEvent.COMMENT:
