@@ -478,8 +478,8 @@ public abstract class Decoder {
             default:
                 throw new FastInfosetException("Illegal state when decoding octets");
         }
-        _octetBufferStart = _octetBufferOffset;
         ensureOctetBufferSize();
+        _octetBufferStart = _octetBufferOffset;
         _octetBufferOffset += _octetBufferLength;
     }
 
@@ -504,8 +504,8 @@ public abstract class Decoder {
             default:
                 throw new FastInfosetException("Illegal state when decoding octets");
         }
-        _octetBufferStart = _octetBufferOffset;
         ensureOctetBufferSize();
+        _octetBufferStart = _octetBufferOffset;
         _octetBufferOffset += _octetBufferLength;
     }
     
@@ -681,35 +681,218 @@ public abstract class Decoder {
         }
     }
     
-    public final void decodeUtf8StringIntoCharBuffer() {        
+    public final void decodeUtf8StringIntoCharBuffer() throws IOException {        
+        _charBufferLength = 0;
+        if (_charBuffer.length < _octetBufferLength) {
+            _charBuffer = new char[_octetBufferLength];
+        }
+
+        int b1;
+        final int end = _octetBufferLength + _octetBufferOffset;
+        while (end != _octetBufferOffset) {
+            b1 = _octetBuffer[_octetBufferOffset++] & 0xFF;
+            if (b1 < 0x80) {
+                _charBuffer[_charBufferLength++] = (char) b1;
+            } else {
+                final int state = DecoderStateTables.UTF8[b1];
+                switch(state) {
+                    case DecoderStateTables.UTF8_TWO_BYTES:
+                    {
+                        // Decode byte 2
+                        if (end == _octetBufferOffset) {
+                            decodeUtf8StringLengthTooSmall();
+                        }
+                        final int b2 = _octetBuffer[_octetBufferOffset++] & 0xFF;
+                        if ((b2 & 0xC0) != 0x80) {
+                            decodeUtf8StringIllegalState();
+                        }
+
+                        _charBuffer[_charBufferLength++] = (char) (
+                            ((b1 & 0x1F) << 6) 
+                            | (b2 & 0x3F));
+                        break;
+                    }
+                    case DecoderStateTables.UTF8_THREE_BYTES:
+                        decodeUtf8ThreeByteChar(end, b1);
+                        break;
+                    case DecoderStateTables.UTF8_FOUR_BYTES:
+                        decodeUtf8FourByteChar(end, b1);
+                        break;
+                    default:
+                        decodeUtf8StringIllegalState();
+                }
+            }            
+        }
+    }
+
+    /*
+     * TODO, use the Xerces org.apache.Xerces.util.XMLChar class
+     * to detemine valid NCName characters for characters not in
+     * the Basic Latin range
+     */
+    public final void decodeUtf8NCNameIntoCharBuffer() throws IOException {        
         _charBufferLength = 0;
         if (_charBuffer.length < _octetBufferLength) {
             _charBuffer = new char[_octetBufferLength];
         }
 
         final int end = _octetBufferLength + _octetBufferOffset;
-        while (end != _octetBufferOffset) {
-            int c = _octetBuffer[_octetBufferOffset++] & 0xFF;
+        
+        int b1 = _octetBuffer[_octetBufferOffset++] & 0xFF;
+        int state = DecoderStateTables.UTF8[b1];
+        if (state == DecoderStateTables.UTF8_NCNAME) {
+            _charBuffer[_charBufferLength++] = (char) b1;
+        } else {
+            switch(state) {
+                case DecoderStateTables.UTF8_TWO_BYTES:
+                {
+                    // Decode byte 2
+                    if (end == _octetBufferOffset) {
+                        decodeUtf8StringLengthTooSmall();
+                    }
+                    final int b2 = _octetBuffer[_octetBufferOffset++] & 0xFF;
+                    if ((b2 & 0xC0) != 0x80) {
+                        decodeUtf8StringIllegalState();
+                    }
 
-            if ((c & 0x80) == 0) {         // up to 7 bits
-                _charBuffer[_charBufferLength++] = (char) c;
+                    _charBuffer[_charBufferLength++] = (char) (
+                        ((b1 & 0x1F) << 6) 
+                        | (b2 & 0x3F));
+                    break;
+                }
+                case DecoderStateTables.UTF8_THREE_BYTES:
+                    decodeUtf8ThreeByteChar(end, b1);
+                    break;
+                case DecoderStateTables.UTF8_FOUR_BYTES:
+                    decodeUtf8FourByteChar(end, b1);
+                    break;
+                case DecoderStateTables.UTF8_NCNAME_CHAR:
+                default:
+                    decodeUtf8NCNameIllegalState();
             }
-            else if ((c & 0x20) == 0) {    // up to 11 bits
-                _charBuffer[_charBufferLength++] = (char) (
-                    ((c & 0x1F) << 6) 
-                    | (_octetBuffer[_octetBufferOffset++] & 0x3F));
-            }
-            else {                         // up to 16 bits
-                _charBuffer[_charBufferLength++] = (char) (
-                    (c & 0x0F) << 12
-                    | (_octetBuffer[_octetBufferOffset++] & 0x3F) << 6
-                    | (_octetBuffer[_octetBufferOffset++] & 0x3F));
-            }
+        }
+                
+        while (end != _octetBufferOffset) {
+            b1 = _octetBuffer[_octetBufferOffset++] & 0xFF;
+            state = DecoderStateTables.UTF8[b1];
+            if (state < DecoderStateTables.UTF8_TWO_BYTES) {
+                _charBuffer[_charBufferLength++] = (char) b1;
+            } else {
+                switch(state) {
+                    case DecoderStateTables.UTF8_TWO_BYTES:
+                    {
+                        // Decode byte 2
+                        if (end == _octetBufferOffset) {
+                            decodeUtf8StringLengthTooSmall();
+                        }
+                        final int b2 = _octetBuffer[_octetBufferOffset++] & 0xFF;
+                        if ((b2 & 0xC0) != 0x80) {
+                            decodeUtf8StringIllegalState();
+                        }
+
+                        _charBuffer[_charBufferLength++] = (char) (
+                            ((b1 & 0x1F) << 6) 
+                            | (b2 & 0x3F));
+                        break;
+                    }
+                    case DecoderStateTables.UTF8_THREE_BYTES:
+                        decodeUtf8ThreeByteChar(end, b1);
+                        break;
+                    case DecoderStateTables.UTF8_FOUR_BYTES:
+                        decodeUtf8FourByteChar(end, b1);
+                        break;
+                    default:
+                        decodeUtf8NCNameIllegalState();
+                }
+            }            
         }
     }
 
-    public final void decodeUtf16StringIntoCharBuffer() {
-        throw new UnsupportedOperationException("UTF-16 decoding not implemented");
+    public final void decodeUtf8ThreeByteChar(int end, int b1) throws IOException {
+        // Decode byte 2
+        if (end == _octetBufferOffset) {
+            decodeUtf8StringLengthTooSmall();
+        }
+        final int b2 = _octetBuffer[_octetBufferOffset++] & 0xFF;
+        if ((b2 & 0xC0) != 0x80
+            || (b1 == 0xED && b2 >= 0xA0)
+            || ((b1 & 0x0F) == 0 && (b2 & 0x20) == 0)) {
+            decodeUtf8StringIllegalState();
+        }        
+
+        // Decode byte 3
+        if (end == _octetBufferOffset) {
+            decodeUtf8StringLengthTooSmall();
+        }
+        final int b3 = _octetBuffer[_octetBufferOffset++] & 0xFF;
+        if ((b3 & 0xC0) != 0x80) {
+            decodeUtf8StringIllegalState();
+        }
+
+        _charBuffer[_charBufferLength++] = (char) (
+            (b1 & 0x0F) << 12
+            | (b2 & 0x3F) << 6
+            | (b3 & 0x3F));
+    }
+    
+    public final void decodeUtf8FourByteChar(int end, int b1) throws IOException {
+        // Decode byte 2
+        if (end == _octetBufferOffset) {
+            decodeUtf8StringLengthTooSmall();
+        }
+        final int b2 = _octetBuffer[_octetBufferOffset++] & 0xFF;
+        if ((b2 & 0xC0) != 0x80
+            || ((b2 & 0x30) == 0 && (b1 & 0x07) == 0)) {
+            decodeUtf8StringIllegalState();
+        }
+
+        // Decode byte 3
+        if (end == _octetBufferOffset) {
+            decodeUtf8StringLengthTooSmall();
+        }
+        final int b3 = _octetBuffer[_octetBufferOffset++] & 0xFF;
+        if ((b3 & 0xC0) != 0x80) {
+            decodeUtf8StringIllegalState();
+        }
+
+        // Decode byte 4
+        if (end == _octetBufferOffset) {
+            decodeUtf8StringLengthTooSmall();
+        }
+        final int b4 = _octetBuffer[_octetBufferOffset++] & 0xFF;
+        if ((b4 & 0xC0) != 0x80) {
+            decodeUtf8StringIllegalState();
+        }
+        
+        final int uuuuu = ((b1 << 2) & 0x001C) | ((b2 >> 4) & 0x0003);
+        if (uuuuu > 0x10) {
+            decodeUtf8StringIllegalState();
+        }
+        final int wwww = uuuuu - 1;
+        
+        final int hs = 0xD800 |
+             ((wwww << 6) & 0x03C0) | ((b2 << 2) & 0x003C) |
+             ((b3 >> 4) & 0x0003);
+        final int ls = 0xDC00 | ((b3 << 6) & 0x03C0) | (b4 & 0x003F);
+        
+        _charBuffer[_charBufferLength++] = (char)hs;
+        _charBuffer[_charBufferLength++] = (char)ls;
+    }
+
+    public final void decodeUtf8StringLengthTooSmall() throws IOException {
+        throw new IOException("Length deliminator too small");
+    }
+
+    public final void decodeUtf8StringIllegalState() throws IOException {
+        throw new IOException("Illegal state for UTF-8 encoded string");
+    }
+
+    public final void decodeUtf8NCNameIllegalState() throws IOException {
+        throw new IOException("Illegal state for UTF-8 encoded NCName");
+    }
+    
+    public final void decodeUtf16StringIntoCharBuffer() throws IOException {
+        throw new IOException("UTF-16 decoding not implemented");
     }
 
     protected final int read() throws IOException {

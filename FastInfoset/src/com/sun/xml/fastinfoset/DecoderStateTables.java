@@ -72,7 +72,7 @@ public class DecoderStateTables {
     public final static int TERMINATOR_SINGLE               = 22;
     public final static int TERMINATOR_DOUBLE               = 23;
 
-    public static int[] DII = new int[256];
+    public static final int[] DII = new int[256];
     
     private static int[][] DII_RANGES = {
         // EII
@@ -171,7 +171,7 @@ public class DecoderStateTables {
         { 0xFF, TERMINATOR_DOUBLE }
     };
     
-    public static int[] EII = new int[256];
+    public static final int[] EII = new int[256];
     
     private static int[][] EII_RANGES = {
         // EII
@@ -359,7 +359,7 @@ public class DecoderStateTables {
     public final static int AII_TERMINATOR_SINGLE           = 4;
     public final static int AII_TERMINATOR_DOUBLE           = 5;
 
-    public static int[] AII = new int[256];
+    public static final int[] AII = new int[256];
 
     private static int[][] AII_RANGES = {
         // %00000000 to %00111111  AII small index
@@ -414,7 +414,7 @@ public class DecoderStateTables {
     public final static int NISTRING_INDEX_LARGE           = 10;
     public final static int NISTRING_EMPTY                 = 11;
 
-    public static int[] NISTRING = new int[256];
+    public static final int[] NISTRING = new int[256];
 
     private static int[][] NISTRING_RANGES = {
         // UTF-8 string
@@ -531,7 +531,7 @@ public class DecoderStateTables {
     public final static int ISTRING_INDEX_MEDIUM        = 4;
     public final static int ISTRING_INDEX_LARGE         = 5;
 
-    public static int[] ISTRING = new int[256];
+    public static final int[] ISTRING = new int[256];
     
     private static int[][] ISTRING_RANGES = {
         // %00000000 to %00111111 small length
@@ -561,6 +561,85 @@ public class DecoderStateTables {
         // %11110000 to %11111111 ILLEGAL
         { 0xFF, STATE_ILLEGAL },
     };
+
+    
+    // UTF-8 states
+    public final static int UTF8_NCNAME         = 0;
+    public final static int UTF8_NCNAME_CHAR    = 1;
+    public final static int UTF8_TWO_BYTES      = 2;
+    public final static int UTF8_THREE_BYTES    = 3;
+    public final static int UTF8_FOUR_BYTES     = 4;
+
+    public static final int[] UTF8 = new int[256];
+    
+    private static int[][] UTF8_RANGES = {
+        
+        // Basic Latin
+        
+        // %00000000 to %00101100
+        { 0x2C, STATE_ILLEGAL },
+                
+        // '-' '.'        
+        // %%00101101 to %00101110 [#x002D-#x002E]
+        { 0x2E, UTF8_NCNAME_CHAR },
+
+        // %00101111
+        { 0x2F, STATE_ILLEGAL },
+        
+        // [0-9]        
+        // %0011000 to %00111001  [#x0030-#x0039]
+        { 0x39, UTF8_NCNAME_CHAR },
+
+        // %01000000
+        { 0x40, STATE_ILLEGAL },
+
+        // [A-Z]        
+        // %01000001 to %01011010 [#x0041-#x005A]
+        { 0x5A, UTF8_NCNAME },
+        
+        // %01011110
+        { 0x5E, STATE_ILLEGAL },
+        
+        // '_'
+        // %01011111 [#x005F]
+        { 0x5F, UTF8_NCNAME },
+                
+        // %01100000
+        { 0x60, STATE_ILLEGAL },
+              
+        // [a-z]        
+        // %01100001 to %01111010 [#x0061-#x007A]
+        { 0x7A, UTF8_NCNAME },
+                
+        // %01111011 to %01111111
+        { 0x7F, STATE_ILLEGAL },
+                
+                
+        // Two bytes
+
+        // %10000000 to %11000001                
+        { 0xC1, STATE_ILLEGAL },
+                
+        // %11000010 to %11011111
+        { 0xDF, UTF8_TWO_BYTES },
+
+                
+        // Three bytes
+                
+        // %11100000 to %11101111
+        { 0xEF, UTF8_THREE_BYTES },
+
+                
+        // Four bytes 
+                
+        // %11110000 to %11110111                
+        { 0xF7, UTF8_FOUR_BYTES },
+
+                
+        // %11111000 to %11111111                
+        { 0xFF, STATE_ILLEGAL }
+    };
+    
     
     private static void constructTable(int[] table, int[][] ranges) {
         int start = 0x00;
@@ -589,6 +668,9 @@ public class DecoderStateTables {
 
         // Identifying string
         constructTable(ISTRING, ISTRING_RANGES);        
+
+        // UTF-8 states
+        constructTable(UTF8, UTF8_RANGES);        
     }
     
     private DecoderStateTables() {

@@ -1192,7 +1192,7 @@ public abstract class Encoder extends DefaultHandler {
                 _encodingBuffer[byteLength++] =
                     (byte) (0xC0 | (c >> 6));    // first 5
                 _encodingBuffer[byteLength++] =
-                    (byte) (0x40 | (c & 0x3F));  // second 6
+                    (byte) (0x80 | (c & 0x3F));  // second 6
             }
             else {                   // up to 16 bits
                 _encodingBuffer[byteLength++] =
@@ -1202,6 +1202,7 @@ public abstract class Encoder extends DefaultHandler {
                 _encodingBuffer[byteLength++] =
                     (byte) (0x80 | (c & 0x3F));  // third 6
             }
+            // TODO High and low surrogates
         }
                            
         return byteLength;
