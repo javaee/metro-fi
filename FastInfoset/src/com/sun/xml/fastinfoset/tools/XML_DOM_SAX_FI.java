@@ -39,7 +39,7 @@
 
 package com.sun.xml.fastinfoset.tools;
 
-import com.sun.xml.fastinfoset.api.sax.FIResult;
+import com.sun.xml.fastinfoset.api.FIResult;
 import java.io.InputStream;
 import java.io.OutputStream;
 
