@@ -40,6 +40,8 @@
 package com.sun.xml.fastinfoset.api;
 
 import java.io.OutputStream;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.ext.LexicalHandler;
 import javax.xml.transform.sax.SAXResult;
 import com.sun.xml.fastinfoset.sax.SAXDocumentSerializer;
 
@@ -65,11 +67,31 @@ import com.sun.xml.fastinfoset.sax.SAXDocumentSerializer;
  */
 public class FIResult extends SAXResult {
    
+    OutputStream _outputStream;
+    
     public FIResult(OutputStream outputStream) {
-        SAXDocumentSerializer serializer = new SAXDocumentSerializer();
-        serializer.setOutputStream(outputStream);
-        setHandler(serializer);
-        setLexicalHandler(serializer);                
+        _outputStream = outputStream;
     }
 
+    public ContentHandler getHandler() {
+        ContentHandler handler = super.getHandler();
+        if (handler == null) {
+            handler = new SAXDocumentSerializer();
+            setHandler(handler);
+        }
+        ((SAXDocumentSerializer) handler).setOutputStream(_outputStream);
+        return handler;        
+    }
+    
+    public LexicalHandler getLexicalHandler() {
+        return (LexicalHandler) getHandler();
+    }
+    
+    public OutputStream getOutputStream() {
+        return _outputStream;
+    }    
+    
+    public void setOutputStream(OutputStream outputStream) {
+        _outputStream = outputStream;
+    }    
 }

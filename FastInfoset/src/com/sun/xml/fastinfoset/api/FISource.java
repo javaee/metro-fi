@@ -44,6 +44,7 @@ import org.xml.sax.InputSource;
 import javax.xml.transform.sax.SAXSource;
 import com.sun.xml.fastinfoset.sax.SAXDocumentParser;
 import com.sun.xml.fastinfoset.*;
+import org.xml.sax.XMLReader;
 
 /**
  *  A JAXP Source implementation that supports the parsing fast
@@ -74,9 +75,23 @@ public class FISource extends SAXSource {
    
     public FISource(InputStream inputStream) {
         super(new InputSource(inputStream));
-        SAXDocumentParser parser = new SAXDocumentParser();
-        parser.setInputStream(inputStream);
-        setXMLReader(parser);        
     }
 
+    public XMLReader getXMLReader() {
+        XMLReader reader = super.getXMLReader();
+        if (reader == null) {
+            reader = new SAXDocumentParser();
+            setXMLReader(reader);
+        }
+        ((SAXDocumentParser) reader).setInputStream(getInputStream());
+        return reader;
+    }
+    
+    public InputStream getInputStream() {
+        return getInputSource().getByteStream();
+    }
+    
+    public void setInputStream(InputStream inputStream) {
+        setInputSource(new InputSource(inputStream));
+    }
 }
