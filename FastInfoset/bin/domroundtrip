@@ -1,0 +1,11 @@
+#!/bin/sh
+echo -n $1
+xmltodomtofi $1 > $1.dom.finf
+domtosaxevent $1 > $1.sax-event
+domtosaxevent $1.dom.finf > $1.dom.finf.sax-event
+diff $1.sax-event $1.dom.finf.sax-event > $1.dom.sax-event.diff
+if [ -s $1.dom.sax-event.diff ]; then
+	echo : FAILED, see $1.dom.sax-event.diff
+else
+	echo : PASSED
+fi
