@@ -44,6 +44,7 @@ import com.sun.xml.fastinfoset.algorithm.BASE64EncodingAlgorithm;
 import com.sun.xml.fastinfoset.algorithm.FloatEncodingAlgorithm;
 import com.sun.xml.fastinfoset.algorithm.IntEncodingAlgorithm;
 import com.sun.xml.fastinfoset.algorithm.ShortEncodingAlgorithm;
+import com.sun.xml.fastinfoset.dom.DOMDocumentParser;
 import com.sun.xml.fastinfoset.sax.AttributesHolder;
 import com.sun.xml.fastinfoset.sax.SAXDocumentParser;
 import com.sun.xml.fastinfoset.sax.SAXDocumentSerializer;
@@ -57,12 +58,16 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLStreamReader;
 import junit.framework.*;
+import org.apache.crimson.tree.TextNode;
 import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
 import org.jvnet.fastinfoset.FastInfosetParser;
 import org.jvnet.fastinfoset.sax.EncodingAlgorithmAttributes;
 import org.jvnet.fastinfoset.sax.FastInfosetDefaultHandler;
+import org.w3c.dom.Document;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -72,6 +77,14 @@ public class AlgorithmTest extends TestCase {
     protected static final String APPLICATION_DEFINED_ALGORITHM_URI = "algorithm-32";
     protected static final String EXTERNAL_VOCABULARY_URI_STRING = "urn:external-vocabulary";
     
+    protected String _base64String = "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygp" +
+            "KissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJT" +
+            "VFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9" +
+            "fn+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaan" +
+            "qKmqq6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR" +
+            "0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7" +
+            "/P3+/w==";
+        
     protected AttributesHolder _attributes = new AttributesHolder();
     
     protected byte[] _byteArray;
@@ -111,14 +124,7 @@ public class AlgorithmTest extends TestCase {
             data[i] = (byte)i;
         }
         
-        String s = "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygp" +
-                "KissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJT" +
-                "VFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9" +
-                "fn+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaan" +
-                "qKmqq6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR" +
-                "0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7" +
-                "/P3+/w==";
-        _testBase64Algorithm(s, s, data);
+        _testBase64Algorithm(_base64String, _base64String, data);
     }
     
     public void _testBase64Algorithm(String base64Characters, String base64CharactersNoWS, byte[] b) throws Exception {
@@ -633,14 +639,6 @@ public class AlgorithmTest extends TestCase {
         ds.writeEndDocument();
         ds.close();
         
-        String s = "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygp" +
-                "KissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJT" +
-                "VFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9" +
-                "fn+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaan" +
-                "qKmqq6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR" +
-                "0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7" +
-                "/P3+/w==";
-        
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
         StAXDocumentParser dp = new StAXDocumentParser(bais);
         while(dp.hasNext()) {
@@ -662,9 +660,40 @@ public class AlgorithmTest extends TestCase {
                 }
 
                 String c = dp.getText();
-                assertEquals(s.length(), c.length());
-                assertEquals(s, c);
+                assertEquals(_base64String.length(), c.length());
+                assertEquals(_base64String, c);
             }
         }
+    }
+    
+    public void testDOMBase64EncodingAlgorithm() throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        StAXDocumentSerializer ds = new StAXDocumentSerializer(baos);
+
+        byte[] data = new byte[256];
+        for (int i = 0; i < 256; i++) {
+            data[i] = (byte)i;
+        }
+        
+        ds.writeStartDocument();
+            ds.writeStartElement("element");
+                ds.writeOctets(data, 0, data.length);
+            ds.writeEndElement();
+        ds.writeEndDocument();
+        ds.close();
+        
+        
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        DOMDocumentParser dp = new DOMDocumentParser();
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        Document d = db.newDocument();
+        dp.parse(d, bais);
+        
+        TextNode t = (TextNode)d.getFirstChild().getFirstChild();
+        String c = t.getNodeValue();
+        assertEquals(_base64String.length(), c.length());
+        assertEquals(_base64String, c);
     }
 }
