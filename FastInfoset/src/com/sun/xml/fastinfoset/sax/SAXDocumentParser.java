@@ -187,37 +187,37 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             if (value instanceof LexicalHandler) {
                 setLexicalHandler((LexicalHandler)value);
             } else {
-                throw new SAXNotSupportedException();
+                throw new SAXNotSupportedException(Properties.LEXICAL_HANDLER_PROPERTY);
             }
         } else if (name.equals(FastInfosetReader.EXTERNAL_VOCABULARIES_PROPERTY)) {
             if (value instanceof Map) {
                 _externalVocabularies = (Map)value;
             } else {
-                throw new SAXNotSupportedException();
+                throw new SAXNotSupportedException(FastInfosetReader.EXTERNAL_VOCABULARIES_PROPERTY);
             }
         } else if (name.equals(FastInfosetReader.REGISTERED_ENCODING_ALGORITHMS_PROPERTY)) {
             if (value instanceof Map) {
                 setRegisteredEncodingAlgorithms((Map)value);
             } else {
-                throw new SAXNotSupportedException();
+                throw new SAXNotSupportedException(FastInfosetReader.REGISTERED_ENCODING_ALGORITHMS_PROPERTY);
             }
         } else if (name.equals(FastInfosetReader.ENCODING_ALGORITHM_CONTENT_HANDLER_PROPERTY)) {
             if (value instanceof EncodingAlgorithmContentHandler) {
                 setEncodingAlgorithmContentHandler((EncodingAlgorithmContentHandler)value);
             } else {
-                throw new SAXNotSupportedException();
+                throw new SAXNotSupportedException(FastInfosetReader.ENCODING_ALGORITHM_CONTENT_HANDLER_PROPERTY);
             }
         } else if (name.equals(FastInfosetReader.PRIMITIVE_TYPE_CONTENT_HANDLER_PROPERTY)) {
             if (value instanceof PrimitiveTypeContentHandler) {
                 setPrimitiveTypeContentHandler((PrimitiveTypeContentHandler)value);
             } else {
-                throw new SAXNotSupportedException();
+                throw new SAXNotSupportedException(FastInfosetReader.PRIMITIVE_TYPE_CONTENT_HANDLER_PROPERTY);
             }
         } else if (name.equals(FastInfosetReader.BUFFER_SIZE_PROPERTY)) {
             if (value instanceof Integer) {
                 setBufferSize(((Integer)value).intValue());
             } else {
-                throw new SAXNotSupportedException();
+                throw new SAXNotSupportedException(FastInfosetReader.BUFFER_SIZE_PROPERTY);
             }
         } else {
             throw new SAXNotRecognizedException("Property not recognized: " +
