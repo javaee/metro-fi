@@ -143,15 +143,6 @@ public class JapexDriverBase implements JapexDriver {
 
             // Set actual number of millis
             millis -= startTime;
-
-            // Accumulate actual number of iterations
-            synchronized (tc) {
-                int actualRunIterations =  
-                    tc.hasParam(Constants.ACTUAL_RUN_ITERATIONS) ? 
-                        tc.getIntParam(Constants.ACTUAL_RUN_ITERATIONS) : 0;
-                tc.setIntParam(Constants.ACTUAL_RUN_ITERATIONS, 
-                               actualRunIterations + runIterations);
-            }
         }
         else {
             // Adjust runIterations based on number of threads
@@ -164,7 +155,15 @@ public class JapexDriverBase implements JapexDriver {
             }
             nanos = Util.currentTimeNanos() - nanos;            
             
-            // japex.actualRunTime set elsewhere
+        }
+        
+        // Accumulate actual number of iterations
+        synchronized (tc) {
+            int actualRunIterations =  
+                tc.hasParam(Constants.ACTUAL_RUN_ITERATIONS) ? 
+                    tc.getIntParam(Constants.ACTUAL_RUN_ITERATIONS) : 0;
+            tc.setIntParam(Constants.ACTUAL_RUN_ITERATIONS, 
+                           actualRunIterations + runIterations);
         }
     }
     
