@@ -70,10 +70,11 @@ public class StartElementEvent extends EventBase implements StartElement {
     }
     
     public StartElementEvent() {
-        super(START_ELEMENT);
+        init();
     }
     
     public StartElementEvent(String prefix, String uri, String localpart) {
+        init();
         if (uri == null) uri = "";
         if (prefix == null) prefix ="";
         _qname = new QName(uri, localpart, prefix);
@@ -81,8 +82,8 @@ public class StartElementEvent extends EventBase implements StartElement {
     }
     
     public StartElementEvent(QName qname) {
+        init();
         _qname = qname;
-        setEventType(START_ELEMENT);
     }
     
     public StartElementEvent(StartElement startelement) {
