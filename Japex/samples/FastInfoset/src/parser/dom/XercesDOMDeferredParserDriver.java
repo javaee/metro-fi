@@ -38,52 +38,41 @@
  */
 
 package parser.dom;
+
 import java.io.File;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import javax.xml.parsers.SAXParserFactory;
-import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import com.sun.japex.*;
+import org.w3c.dom.Document;
+import com.sun.org.apache.xerces.internal.parsers.DOMParser;
 import org.xml.sax.InputSource;
 
+public class XercesDOMDeferredParserDriver extends JapexDriverBase {
 
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.sax.SAXSource;
-
-import org.w3c.dom.Document;
-import com.sun.japex.*;
-
-
-public class JAXPDriver extends JapexDriverBase {
     ByteArrayInputStream _inputStream;
-
-    Transformer _transformer;
-    SAXSource _source;
     
-    /** Creates a new instance of JAXPDriver */
-    public JAXPDriver() {
-    }
-
+    DOMParser _parser;
+       
     public void initializeDriver() {
         try {
-            _transformer = TransformerFactory.newInstance().newTransformer();
+            _parser = new DOMParser();
+            _parser.setFeature("http://xml.org/sax/features/namespaces", true);
+            _parser.setFeature("http://apache.org/xml/features/dom/defer-node-expansion", true);
         } catch (Exception e) {
             e.printStackTrace();
+            try { Thread.currentThread().sleep(5000); } catch (Exception ee) {}
         }
     }   
-
-
+    
     public void prepare(TestCase testCase) {
         String xmlFile = testCase.getParam("xmlfile");
         if (xmlFile == null) {
             throw new RuntimeException("xmlfile not specified");
         }
-        
         // Load file into byte array to factor out IO
         try {
             // TODO must use URL here
@@ -91,20 +80,18 @@ public class JAXPDriver extends JapexDriverBase {
             byte[] xmlFileByteArray = com.sun.japex.Util.streamToByteArray(fis);
             _inputStream = new ByteArrayInputStream(xmlFileByteArray);
             fis.close();
-            
-            _source = new SAXSource(new InputSource(_inputStream));
         }
         catch (IOException e) {
             e.printStackTrace();
         }
 
     }
-
+    
     public void warmup(TestCase testCase) {
         try {
-            DOMResult result = new DOMResult();
             _inputStream.reset();
-            _transformer.transform(_source, result);
+            _parser.parse(new InputSource(_inputStream));
+            Document d = _parser.getDocument();
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -113,9 +100,9 @@ public class JAXPDriver extends JapexDriverBase {
     
     public void run(TestCase testCase) {
         try {
-            DOMResult result = new DOMResult();
             _inputStream.reset();
-            _transformer.transform(_source, result);
+            _parser.parse(new InputSource(_inputStream));
+            Document d = _parser.getDocument();
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -126,5 +113,5 @@ public class JAXPDriver extends JapexDriverBase {
     }
     
     public void terminateDriver() {
-    }      
+    }          
 }

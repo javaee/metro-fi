@@ -41,39 +41,28 @@ package parser.dom;
 
 import com.sun.japex.JapexDriverBase;
 import com.sun.japex.TestCase;
+import com.sun.org.apache.xml.internal.utils.DOMBuilder;
 import com.sun.xml.fastinfoset.sax.SAXDocumentParser;
 import com.sun.xml.fastinfoset.sax.SAXDocumentSerializer;
 import java.io.File;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.parsers.SAXParser;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMResult;
 
-import org.jvnet.fastinfoset.FastInfosetSource;
 
-public class FIDOMDriver extends JapexDriverBase {
+
+public class FISAXXercesDOMBuilderDriver extends JapexDriverBase {
     ByteArrayInputStream _inputStream;
 
     SAXDocumentParser _fidp;
-    Transformer _transformer;
-    FastInfosetSource _source;
-    DOMResult _result;
+    DocumentBuilder _db;
     
-    /** Creates a new instance of FIDOMDriver */
-    public FIDOMDriver() {
-    }
-
     public void initializeDriver() {
-        try {
-            _transformer = TransformerFactory.newInstance().newTransformer();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }   
 
 
@@ -100,18 +89,24 @@ public class FIDOMDriver extends JapexDriverBase {
             fis.close();
 
             _inputStream = new ByteArrayInputStream(baos.toByteArray());
-            _source = new FastInfosetSource(_inputStream);
+            _fidp = new SAXDocumentParser();
+            
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            _db = dbf.newDocumentBuilder();
         }
         catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
     public void warmup(TestCase testCase) {
         try {
-            DOMResult result = new DOMResult();
             _inputStream.reset();
-            _transformer.transform(_source, result);
+            _fidp.setInputStream(_inputStream);
+            DOMBuilder db = new DOMBuilder(_db.newDocument());
+            _fidp.setContentHandler(db);
+            _fidp.setLexicalHandler(db);
+            _fidp.parse();
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -120,9 +115,12 @@ public class FIDOMDriver extends JapexDriverBase {
     
     public void run(TestCase testCase) {
         try {
-            DOMResult result = new DOMResult();
             _inputStream.reset();
-            _transformer.transform(_source, result);
+            _fidp.setInputStream(_inputStream);
+            DOMBuilder db = new DOMBuilder(_db.newDocument());
+            _fidp.setContentHandler(db);
+            _fidp.setLexicalHandler(db);
+            _fidp.parse();
         }
         catch (Exception e) {
             e.printStackTrace();

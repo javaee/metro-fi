@@ -41,38 +41,34 @@ package parser.dom;
 
 import java.io.File;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
-
-import javax.xml.transform.dom.DOMSource;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
-import javax.xml.stream.XMLOutputFactory;
 import com.sun.japex.*;
+import com.sun.org.apache.xerces.internal.parsers.DOMParser;
+import org.xml.sax.InputSource;
 
-public class DOMParserDriver extends JapexDriverBase {
+public class XercesDOMParserDriver extends JapexDriverBase {
 
     ByteArrayInputStream _inputStream;
     
     DocumentBuilder _docBuilder;
-    
-    /** Creates a new instance of DOMParserDriver */
-    public DOMParserDriver() {
-    }
-    
+    DOMParser _parser;
+        
     public void initializeDriver() {
         try {
-            XMLOutputFactory factory = XMLOutputFactory.newInstance(); 
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-            _docBuilder = dbf.newDocumentBuilder();             
+            _parser = new DOMParser();
+            _parser.setFeature("http://xml.org/sax/features/namespaces", true);
+            _parser.setFeature("http://apache.org/xml/features/dom/defer-node-expansion", false);
         } catch (Exception e) {
             e.printStackTrace();
+            try { Thread.currentThread().sleep(5000); } catch (Exception ee) {}
         }
     }   
+    
     public void prepare(TestCase testCase) {
         String xmlFile = testCase.getParam("xmlfile");
         if (xmlFile == null) {
@@ -95,7 +91,8 @@ public class DOMParserDriver extends JapexDriverBase {
     public void warmup(TestCase testCase) {
         try {
             _inputStream.reset();
-            Document document = _docBuilder.parse(_inputStream);
+            _parser.parse(new InputSource(_inputStream));
+            Document d = _parser.getDocument();
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -105,7 +102,8 @@ public class DOMParserDriver extends JapexDriverBase {
     public void run(TestCase testCase) {
         try {
             _inputStream.reset();
-            Document document = _docBuilder.parse(_inputStream);
+            _parser.parse(new InputSource(_inputStream));
+            Document d = _parser.getDocument();
         }
         catch (Exception e) {
             e.printStackTrace();
