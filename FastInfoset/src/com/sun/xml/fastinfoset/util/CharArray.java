@@ -39,7 +39,7 @@
 
 package com.sun.xml.fastinfoset.util;
 
-public class CharArray {
+public class CharArray implements CharSequence {
     public char[] ch;
     public int start;
     public int length;
@@ -53,7 +53,7 @@ public class CharArray {
         set(_ch, _start, _length, copy);
     }
     
-    public void set(char[] _ch, int _start, int _length, boolean copy) {
+    public final void set(char[] _ch, int _start, int _length, boolean copy) {
         if (copy) {
             ch = new char[_length];
             start = 0;
@@ -66,7 +66,7 @@ public class CharArray {
         }
     }
     
-    public void cloneArray() {
+    public final void cloneArray() {
         char[] _ch = new char[length];
         System.arraycopy(ch, start, _ch, 0, length);
         ch = _ch;
@@ -79,13 +79,34 @@ public class CharArray {
                                                                                 
     public int hashCode() {
         if (_hash == 0) {
+            // Same hash code algorithm as used for String
+            // s[0]*31^(n-1) + s[1]*31^(n-2) + ... + s[n-1]
             for (int i = start; i < start + length; i++) {
                 _hash = 31*_hash + ch[i];
             }
         }
         return _hash;
     }
-                                                                                
+
+    public final boolean equalsCharArray(CharArray cha) {
+        if (this == cha) {
+            return true;
+        }
+        
+        if (length == cha.length) {
+            int n = length;
+            int i = start;
+            int j = cha.start;
+            while (n-- != 0) {
+                if (ch[i++] != cha.ch[j++])
+                    return false;
+            }
+            return true;
+        }
+        
+        return false;
+    }
+    
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -104,5 +125,19 @@ public class CharArray {
             }
         }
         return false;
+    }
+
+    // CharSequence interface
+    
+    public final int length() {
+        return length;
+    }
+
+    public final char charAt(int index) {
+        return ch[start + index];
+    }
+
+    public final CharSequence subSequence(int start, int end) {
+        return new CharArray(ch, this.start + start, length - (end - start), false);
     }
 }

@@ -47,7 +47,7 @@ public class QualifiedName {
     public final String localName;
     public final String qName;
     public final int index;
-    public QName qNameObject;
+    private QName qNameObject;
     
     public QualifiedName(String prefix, String namespaceName, String localName, String qName) {
         this.prefix = (prefix == null) ? "" : prefix;
@@ -108,7 +108,7 @@ public class QualifiedName {
         this.index = -1;
     }
     
-    public QName getQName() {
+    public final QName getQName() {
         if (qNameObject == null) {
             qNameObject = new QName(namespaceName, localName, prefix);
         }

@@ -43,6 +43,11 @@ import com.sun.xml.fastinfoset.Decoder;
 import com.sun.xml.fastinfoset.DecoderStateTables;
 import com.sun.xml.fastinfoset.EncodingConstants;
 import com.sun.xml.fastinfoset.QualifiedName;
+import com.sun.xml.fastinfoset.api.ReferencedVocabulary;
+import com.sun.xml.fastinfoset.api.Vocabulary;
+import com.sun.xml.fastinfoset.api.sax.EncodingAlgorithmContentHandler;
+import com.sun.xml.fastinfoset.api.sax.FastInfosetReader;
+import com.sun.xml.fastinfoset.api.sax.PrimitiveTypeContentHandler;
 import com.sun.xml.fastinfoset.util.CharArray;
 import com.sun.xml.fastinfoset.util.CharArrayString;
 import java.io.IOException;
@@ -57,11 +62,10 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
-import org.xml.sax.XMLReader;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.DefaultHandler;
 
-public class SAXDocumentParser extends Decoder implements XMLReader {
+public class SAXDocumentParser extends Decoder implements FastInfosetReader {
 
     public static final String STRING_INTERNING_FEATURE_PROPERTY =
         "com.sun.xml.fast-infoset.property.feature.string-interning";
@@ -122,6 +126,8 @@ public class SAXDocumentParser extends Decoder implements XMLReader {
         _lexicalHandler = null;
     }
 
+    // XMLReader interface
+    
     public boolean getFeature(String name)
             throws SAXNotRecognizedException, SAXNotSupportedException {
         if (name.equals(Features.NAMESPACES_FEATURE)) {
@@ -220,17 +226,64 @@ public class SAXDocumentParser extends Decoder implements XMLReader {
             parse(s);
         }
     }
-                                                                                
+    
     public void parse(String systemId) throws IOException, SAXException {
         systemId = SystemIdResolver.getAbsoluteURI(systemId);
         parse(new URL(systemId).openStream());
     }
 
-    public final void parse(InputStream s) throws IOException {
+
+    // FastInfosetReader
+    
+    public final void parse(InputStream s) throws IOException, SAXException {
         setInputStream(s);
         parse();
     }
+    
+    public void setEncodingAlgorithmContentHandler(EncodingAlgorithmContentHandler handler) {
+        throw new UnsupportedOperationException();
+    }
 
+    public EncodingAlgorithmContentHandler getEncodingAlgorithmContentHandler() {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setPrimitiveTypeContentHandler(PrimitiveTypeContentHandler handler) {
+        throw new UnsupportedOperationException();
+    }
+
+    public PrimitiveTypeContentHandler getPrimitiveTypeContentHandler() {
+        throw new UnsupportedOperationException();
+    }
+
+    
+    // VocabularyReader
+    
+    public void setExternalVocabularies(Map referencedVocabualries) {
+        throw new UnsupportedOperationException();
+    }
+    
+    public void setDynamicVocabulary(Vocabulary v) {
+        throw new UnsupportedOperationException();
+    }
+
+    public ReferencedVocabulary getExternalVocabulary() {
+        throw new UnsupportedOperationException();
+    }
+
+    public Vocabulary getIntitialVocabulary() {
+        throw new UnsupportedOperationException();
+    }
+
+    public Vocabulary getDynamicVocabulary() {
+        throw new UnsupportedOperationException();
+    }
+
+    public Vocabulary getFinalVocabulary() { 
+        throw new UnsupportedOperationException();
+    }
+
+    
     public final void parse() throws IOException {
         reset();
         decodeHeader();                                                                                

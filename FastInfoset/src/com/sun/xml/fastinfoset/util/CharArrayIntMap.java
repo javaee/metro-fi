@@ -55,7 +55,7 @@ public class CharArrayIntMap extends KeyIntMap {
     }
     
     private Entry[] _table;
-
+    
     public CharArrayIntMap(int initialCapacity, float loadFactor) {
         super(initialCapacity, loadFactor);
 
@@ -111,7 +111,7 @@ public class CharArrayIntMap extends KeyIntMap {
         
         final int tableIndex = indexFor(hash, _table.length);
         for (Entry e = _table[tableIndex]; e != null; e = e._next) {
-            if (e._hash == hash && eq(key, e._key)) {
+            if (e._hash == hash && key.equalsCharArray(e._key)) {
                 return e._value;
             }
         }
@@ -119,11 +119,11 @@ public class CharArrayIntMap extends KeyIntMap {
         addEntry(key, hash, _size + _readOnlyMapSize, tableIndex);        
         return NOT_PRESENT;
     }
-
+    
     public final int get(CharArray key) {
         return get(key, hashHash(key.hashCode()));
     }
-    
+
     private final int get(CharArray key, int hash) {
         if (_readOnlyMap != null) {
             final int i = _readOnlyMap.get(key, hash);
@@ -134,14 +134,13 @@ public class CharArrayIntMap extends KeyIntMap {
 
         final int tableIndex = indexFor(hash, _table.length);
         for (Entry e = _table[tableIndex]; e != null; e = e._next) {
-            if (e._hash == hash && eq(key, e._key)) {
+            if (e._hash == hash && key.equalsCharArray(e._key)) {
                 return e._value;
             }
         }
                 
         return -1;
     }
-
 
     private final void addEntry(CharArray key, int hash, int value, int bucketIndex) {
 	Entry e = _table[bucketIndex];
@@ -182,9 +181,5 @@ public class CharArrayIntMap extends KeyIntMap {
                 } while (e != null);
             }
         }
-    }
-        
-    private final boolean eq(CharArray x, CharArray y) {
-        return x == y || x.equals(y);
-    }
+    }        
 }

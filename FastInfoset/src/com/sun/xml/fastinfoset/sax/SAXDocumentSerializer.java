@@ -42,28 +42,46 @@ package com.sun.xml.fastinfoset.sax;
 import com.sun.xml.fastinfoset.Encoder;
 import com.sun.xml.fastinfoset.EncodingConstants;
 import com.sun.xml.fastinfoset.QualifiedName;
-import com.sun.xml.fastinfoset.util.AccessibleByteArrayOutputStream;
+import com.sun.xml.fastinfoset.api.ReferencedVocabulary;
+import com.sun.xml.fastinfoset.api.Vocabulary;
+import com.sun.xml.fastinfoset.api.sax.FastInfosetWriter;
 import com.sun.xml.fastinfoset.util.LocalNameQualifiedNamesMap;
 import java.io.IOException;
 import java.io.OutputStream;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.ext.LexicalHandler;
 
-public class SAXDocumentSerializer extends Encoder implements LexicalHandler {
+
+public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter {
     protected boolean _elementHasNamespaces = false;
         
-    protected AccessibleByteArrayOutputStream _elementWithNamespacesOutputStream;
-    protected OutputStream _outputStream;
-
     public SAXDocumentSerializer() {
-        _elementWithNamespacesOutputStream = new AccessibleByteArrayOutputStream();
+    }
+    
+    // VocabularyWriter
+    
+    public void setExternalVocabulary(ReferencedVocabulary referencedVocabulary) {
+        throw new UnsupportedOperationException();
+    }
+    
+    public void setIntitialVocabulary(Vocabulary initialVocabulary) {
+        throw new UnsupportedOperationException();
+    }
+    
+    public void setDynamicVocabulary(Vocabulary dynamicVocabulary) {
+        throw new UnsupportedOperationException();
     }
 
-    public void setOutputStream(OutputStream outputStream) {
-        super.setOutputStream(outputStream);
-        _outputStream = outputStream;
+    public Vocabulary getDynamicVocabulary() {
+        throw new UnsupportedOperationException();
     }
+
+    public Vocabulary getFinalVocabulary() {
+        throw new UnsupportedOperationException();
+    }
+    
+    
+    // ContentHandler
     
     public final void startDocument() throws SAXException {
         try {
@@ -227,6 +245,42 @@ public class SAXDocumentSerializer extends Encoder implements LexicalHandler {
     }
 
     public final void endEntity(String name) throws SAXException {
+    }
+    
+    
+    // EncodingAlgorithmContentHandler
+    
+    public final void octets(String URI, int algorithm, byte[] b, int start, int length)  throws SAXException {
+    }
+
+    public final void object(String URI, int algorithm, Object o)  throws SAXException {
+    }
+    
+    
+    // PrimitiveTypeContentHandler
+    
+    public final void booleans(boolean [] b, int start, int length) throws SAXException {
+    }
+
+    public final void bytes(byte[] b, int start, int length) throws SAXException {
+    }
+    
+    public final void shorts(short[] s, int start, int length) throws SAXException {
+    }
+    
+    public final void ints(int [] i, int start, int length) throws SAXException {
+    }
+    
+    public final void longs(long [] l, int start, int length) throws SAXException {
+    }
+    
+    public final void floats(float [] f, int start, int length) throws SAXException {
+    }
+    
+    public final void doubles(double [] d, int start, int length) throws SAXException {
+    }
+
+    public final void uuids(long[] msb, long[] lsb, int start, int length) throws SAXException {
     }
     
     

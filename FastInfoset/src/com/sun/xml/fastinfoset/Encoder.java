@@ -201,6 +201,13 @@ public abstract class Encoder extends DefaultHandler {
         boolean addToTable = (length < _v.characterContentChunkSizeContraint) ? true : false;
         encodeNonIdentifyingStringOnFirstBit(ch, start, length, _v.otherString, addToTable, true);
     }
+
+    protected final void encodeCommentNoClone(char[] ch, int start, int length) throws IOException {
+        write(EncodingConstants.COMMENT);
+
+        boolean addToTable = (length < _v.characterContentChunkSizeContraint) ? true : false;
+        encodeNonIdentifyingStringOnFirstBit(ch, start, length, _v.otherString, addToTable, false);
+    }
     
     /*
      * C.18
