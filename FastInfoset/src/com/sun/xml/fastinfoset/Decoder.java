@@ -39,6 +39,7 @@
 
 package com.sun.xml.fastinfoset;
 
+import com.sun.xml.fastinfoset.alphabet.BuiltInRestrictedAlphabets;
 import com.sun.xml.fastinfoset.util.CharArray;
 import com.sun.xml.fastinfoset.util.CharArrayArray;
 import com.sun.xml.fastinfoset.util.ContiguousCharArrayArray;
@@ -539,8 +540,8 @@ public abstract class Decoder implements FastInfosetParser {
                 _identifier |= (b2 & 0xF0) >> 4;
 
                 decodeOctetsOnFifthBitOfNonIdentifyingStringOnFirstBit(b2);
-                // TODO obtain restricted alphabet given _identifier value
-                decodeRAOctetsAsCharBuffer(null);
+                
+                decodeRestrictedAlphabetAsCharBuffer();
                 return NISTRING_STRING;
             }
             case DecoderStateTables.NISTRING_EA:
@@ -978,15 +979,110 @@ public abstract class Decoder implements FastInfosetParser {
         }
     }
 
-    public final void decodeRAOctetsAsCharBuffer(char[] restrictedAlphabet) throws IOException {
-        throw new UnsupportedOperationException("Restricted alphabet decoding not implemented");
+    protected final void decodeRestrictedAlphabetAsCharBuffer() throws FastInfosetException, IOException {
+        if (_identifier <= EncodingConstants.RESTRICTED_ALPHABET_BUILTIN_END) {
+            decodeFourBitAlphabetOctetsAsCharBuffer(BuiltInRestrictedAlphabets.table[_identifier]);
+            // decodeAlphabetOctetsAsCharBuffer(BuiltInRestrictedAlphabets.table[_identifier]);
+        } else if (_identifier >= EncodingConstants.RESTRICTED_ALPHABET_APPLICATION_START) {
+            CharArray ca = _v.restrictedAlphabet.get(_identifier - EncodingConstants.RESTRICTED_ALPHABET_APPLICATION_START);
+            if (ca == null) {
+                throw new FastInfosetException("Restricted alphabet not present for identifier " + _identifier);
+            }
+            decodeAlphabetOctetsAsCharBuffer(ca.ch);            
+        } else {
+            // Reserved built-in algorithms for future use
+            // TODO should use sax property to decide if event will be
+            // reported, allows for support through handler if required.
+            throw new FastInfosetException("Restricted alphabet identifiers 2 up to and including 31 are reserved for future use");
+        }
     }
-
-    public final String decodeRAOctetsAsString(char[] restrictedAlphabet) throws IOException {
-        decodeRAOctetsAsCharBuffer(null);
+    
+    protected final String decodeRestrictedAlphabetAsString() throws FastInfosetException, IOException {
+        decodeRestrictedAlphabetAsCharBuffer();
+        return new String(_charBuffer, 0, _charBufferLength);
+    }
+    
+    public final String decodeRAOctetsAsString(char[] restrictedAlphabet) throws FastInfosetException, IOException {
+        decodeAlphabetOctetsAsCharBuffer(null);
         return new String(_charBuffer, 0, _charBufferLength);
     }
 
+    public final void decodeFourBitAlphabetOctetsAsCharBuffer(char[] restrictedAlphabet) throws FastInfosetException, IOException {
+        _charBufferLength = 0;
+        final int characters = _octetBufferLength / 2;
+        if (_charBuffer.length < characters) {
+            _charBuffer = new char[characters];
+        }
+        
+        int v = 0;
+        for (int i = 0; i < _octetBufferLength - 1; i++) {
+            v = _octetBuffer[_octetBufferStart++] & 0xFF;
+            _charBuffer[_charBufferLength++] = restrictedAlphabet[v >> 4];
+            _charBuffer[_charBufferLength++] = restrictedAlphabet[v & 0x0F];            
+        }
+        v = _octetBuffer[_octetBufferStart++] & 0xFF;            
+        _charBuffer[_charBufferLength++] = restrictedAlphabet[v >> 4];
+        v &= 0x0F;
+        if (v != 0x0F) {
+            _charBuffer[_charBufferLength++] = restrictedAlphabet[v & 0x0F];
+        }
+    }
+    
+    public final void decodeAlphabetOctetsAsCharBuffer(char[] restrictedAlphabet) throws FastInfosetException, IOException {
+        if (restrictedAlphabet.length < 2) {
+            throw new IllegalArgumentException("Restricted Alphabet must contain 2 or more characters");
+        }
+
+        int bitsPerCharacter = 1;
+        while ((1 << bitsPerCharacter) <= restrictedAlphabet.length) {
+            bitsPerCharacter++;
+        }
+        final int terminatingValue = (1 << bitsPerCharacter) - 1;
+        
+        int characters = (_octetBufferLength << 3) / bitsPerCharacter;
+        if (characters == 0) {
+            throw new IOException("");
+        }
+
+        _charBufferLength = 0;
+        if (_charBuffer.length < characters) {
+            _charBuffer = new char[characters];
+        }
+        
+        resetBits();
+        for (int i = 0; i < characters; i++) {
+            int value = readBits(bitsPerCharacter);
+            if (bitsPerCharacter < 8 && value == terminatingValue) {
+                int octetPosition = (i * bitsPerCharacter) >>> 3;
+                if (octetPosition != _octetBufferLength - 1) {
+                    throw new FastInfosetException("Restricted alphabet incorrectly terminated");
+                }
+                break;
+            }
+            _charBuffer[_charBufferLength++] = restrictedAlphabet[value];
+        }
+    }
+
+    protected int _bitsLeftInOctet;
+    
+    public final void resetBits() {
+        _bitsLeftInOctet = 0;
+    }
+    
+    public final int readBits(int bits) throws IOException {
+        int value = 0;
+        while (bits > 0) {
+            if (_bitsLeftInOctet == 0) {
+                _b = _octetBuffer[_octetBufferStart++] & 0xFF;
+                _bitsLeftInOctet = 8;
+            }
+            int bit = ((_b & (1 << --_bitsLeftInOctet)) > 0) ? 1 : 0;
+            value |= (bit << --bits);
+        }
+        
+        return value;
+    }
+    
     public final void decodeUtf8StringAsCharBuffer() throws IOException {
         ensureOctetBufferSize();
         decodeUtf8StringIntoCharBuffer();

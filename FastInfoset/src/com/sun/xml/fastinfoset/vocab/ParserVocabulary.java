@@ -47,7 +47,7 @@ import com.sun.xml.fastinfoset.util.ValueArray;
 import java.net.URI;
 
 public class ParserVocabulary extends Vocabulary {
-    public final StringArray restrictedAlphabet = new StringArray();
+    public final CharArrayArray restrictedAlphabet = new CharArrayArray();
     public final StringArray encodingAlgorithm = new StringArray();
 
     public final StringArray namespaceName = new StringArray();

@@ -385,15 +385,17 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     return _eventType = CHARACTERS;
                 case DecoderStateTables.CII_RA:
                 {
-                    // Decode resitricted alphabet integer
+                    final boolean addToTable = (_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0;
+                    
                     _identifier = (b & 0x02) << 6;
                     final int b2 = read();
                     _identifier |= (b2 & 0xFC) >> 2;
                     
                     decodeOctetsOnSeventhBitOfNonIdentifyingStringOnThirdBit(b2);
-                    // TODO obtain restricted alphabet given _identifier value
-                    decodeRAOctetsAsCharBuffer(null);
-                    if ((b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
+                    
+                    decodeRestrictedAlphabetAsCharBuffer();
+                    
+                    if (addToTable) {
                         _v.characterContentChunk.add(_charBuffer, _charBufferLength);
                     }
                     
@@ -1244,8 +1246,8 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     _identifier |= (b & 0xF0) >> 4;
                     
                     decodeOctetsOnFifthBitOfNonIdentifyingStringOnFirstBit(b);
-                    // TODO obtain restricted alphabet given _identifier value
-                    value = decodeRAOctetsAsString(null);
+                    
+                    value = decodeRestrictedAlphabetAsString();
                     if (addToTable) {
                         _v.attributeValue.add(value);
                     }

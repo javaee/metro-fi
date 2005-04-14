@@ -40,6 +40,7 @@
 package com.sun.xml.fastinfoset;
 
 import java.io.UnsupportedEncodingException;
+import org.jvnet.fastinfoset.RestrictedAlphabet;
 
 public final class EncodingConstants {
     public static byte[] XML_DECL = null;
@@ -53,6 +54,8 @@ public final class EncodingConstants {
             // then not necessary to call String.getBytes account
             // for failure
         }
+        
+        initiateCharacterTables();
     }
     
     public static final String XML_NAMESPACE_PREFIX = "xml";
@@ -155,6 +158,9 @@ public final class EncodingConstants {
     public static final int ENCODING_ALGORITHM_APPLICATION_START = 32;
     public static final int ENCODING_ALGORITHM_APPLICATION_MAX = 255;
     
+    public static final int RESTRICTED_ALPHABET_BUILTIN_END = 1;
+    public static final int RESTRICTED_ALPHABET_APPLICATION_START = 32;
+    public static final int RESTRICTED_ALPHABET_APPLICATION_MAX = 255;
     
     // Octet string length contants
     
@@ -289,5 +295,40 @@ public final class EncodingConstants {
         INTEGER_4TH_BIT_MEDIUM_FLAG,
         INTEGER_4TH_BIT_LARGE_FLAG,
         INTEGER_4TH_BIT_LARGE_LARGE_FLAG
-    };    
+    };
+    
+    
+    public static int[] NUMERIC_CHARACTERS_TABLE;
+    
+    public static int[] DATE_TIME_CHARACTERS_TABLE;
+    
+    private static void initiateCharacterTables() {
+        NUMERIC_CHARACTERS_TABLE = new int[maxCharacter(RestrictedAlphabet.NUMERIC_CHARACTERS) + 1];
+        DATE_TIME_CHARACTERS_TABLE = new int[maxCharacter(RestrictedAlphabet.DATE_TIME_CHARACTERS) + 1];
+    
+        for (int i = 0; i < NUMERIC_CHARACTERS_TABLE.length ; i++) {
+            NUMERIC_CHARACTERS_TABLE[i] = -1;
+        }
+        for (int i = 0; i < DATE_TIME_CHARACTERS_TABLE.length ; i++) {
+            DATE_TIME_CHARACTERS_TABLE[i] = -1;
+        }
+        
+        for (int i = 0; i < RestrictedAlphabet.NUMERIC_CHARACTERS.length() ; i++) {
+            NUMERIC_CHARACTERS_TABLE[RestrictedAlphabet.NUMERIC_CHARACTERS.charAt(i)] = i;
+        }        
+        for (int i = 0; i < RestrictedAlphabet.DATE_TIME_CHARACTERS.length() ; i++) {
+            DATE_TIME_CHARACTERS_TABLE[RestrictedAlphabet.DATE_TIME_CHARACTERS.charAt(i)] = i;
+        }
+    }
+    
+    private static int maxCharacter(String alphabet) {
+        int c = 0;
+        for (int i = 0; i < alphabet.length() ; i++) {
+            if (c < alphabet.charAt(i)) {
+                c = alphabet.charAt(i);
+            }
+        }
+        
+        return c;
+    }
 }

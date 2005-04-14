@@ -45,6 +45,7 @@ import com.sun.xml.fastinfoset.EncodingConstants;
 import com.sun.xml.fastinfoset.QualifiedName;
 import com.sun.xml.fastinfoset.algorithm.BuiltInEncodingAlgorithmFactory;
 import com.sun.xml.fastinfoset.algorithm.BuiltInEncodingAlgorithmState;
+import com.sun.xml.fastinfoset.alphabet.BuiltInRestrictedAlphabets;
 import org.jvnet.fastinfoset.sax.EncodingAlgorithmContentHandler;
 import org.jvnet.fastinfoset.sax.FastInfosetReader;
 import org.jvnet.fastinfoset.sax.PrimitiveTypeContentHandler;
@@ -53,7 +54,6 @@ import com.sun.xml.fastinfoset.util.CharArrayString;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Map;
 import org.jvnet.fastinfoset.EncodingAlgorithm;
 import org.jvnet.fastinfoset.EncodingAlgorithmException;
@@ -683,23 +683,26 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     break;
                 case DecoderStateTables.CII_RA:
                 {
+                    final boolean addToTable = (_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0;
+                    
                     // Decode resitricted alphabet integer
                     _identifier = (_b & 0x02) << 6;
-                    final int b2 = read();
-                    _identifier |= (b2 & 0xFC) >> 2;
+                    _b = read();
+                    _identifier |= (_b & 0xFC) >> 2;
                     
-                    decodeOctetsOnSeventhBitOfNonIdentifyingStringOnThirdBit(b2);
-                    // TODO obtain restricted alphabet given _identifier value
-                    decodeRAOctetsAsCharBuffer(null);
-                    if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
+                    decodeOctetsOnSeventhBitOfNonIdentifyingStringOnThirdBit(_b);
+                    
+                    decodeRestrictedAlphabetAsCharBuffer();
+                    
+                    if (addToTable) {
                         _v.characterContentChunk.add(_charBuffer, _charBufferLength);
                     }
-                    
+
                     try {
                         _contentHandler.characters(_charBuffer, 0, _charBufferLength);
                     } catch (SAXException e) {
                         throw new FastInfosetException("processCII", e);
-                    }
+                    }                    
                     break;
                 }
                 case DecoderStateTables.CII_EA:
@@ -1050,8 +1053,8 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     _identifier |= (b & 0xF0) >> 4;
                     
                     decodeOctetsOnFifthBitOfNonIdentifyingStringOnFirstBit(b);
-                    // TODO obtain restricted alphabet given _identifier value
-                    value = decodeRAOctetsAsString(null);
+                    
+                    value = decodeRestrictedAlphabetAsString();
                     if (addToTable) {
                         _v.attributeValue.add(value);
                     }
@@ -1177,7 +1180,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 break;
         }
     }
-    
+        
     protected final void processCIIEncodingAlgorithm() throws FastInfosetException, IOException {
         if (_identifier <= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
             if (_primitiveHandler != null) {

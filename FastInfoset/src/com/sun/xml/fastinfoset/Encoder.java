@@ -60,6 +60,7 @@ import org.jvnet.fastinfoset.Vocabulary;
 import org.xml.sax.helpers.DefaultHandler;
 
 public abstract class Encoder extends DefaultHandler implements FastInfosetSerializer {
+    
     // Character encoding scheme system property
     public static final String CHARACTER_ENCODING_SCHEME_SYSTEM_PROPERTY =
         "com.sun.xml.fastinfoset.serializer.character-encoding-scheme";
@@ -278,7 +279,39 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         final boolean addToTable = (length < _v.characterContentChunkSizeContraint) ? true : false;
         encodeNonIdentifyingStringOnThirdBit(ch, start, length, _v.characterContentChunk, addToTable, false);
     }
+    
+    protected final void encodeFourBitCharacters(int id, int[] table, char[] ch, int start, int length) throws FastInfosetException, IOException {
+        // This procedure assumes that id <= 64
+        _b = (length < _v.characterContentChunkSizeContraint) ?
+            EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_RESTRICTED_ALPHABET_FLAG | EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG :
+            EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_RESTRICTED_ALPHABET_FLAG;
+        write (_b);
 
+        // Encode bottom 6 bits of enoding algorithm id
+        _b = id << 2;
+
+        encodeNonEmptyFourBitCharacterStringOnSeventhBit(table, ch, start, length);        
+    }
+    
+    protected final void encodeAlphabetCharacters(String alphabet, char[] ch, int start, int length) throws FastInfosetException, IOException {
+        int id = _v.restrictedAlphabet.get(alphabet);
+        if (id == KeyIntMap.NOT_PRESENT) {
+            throw new FastInfosetException("Restricted alphabet not present in restricted alphabet table");
+        }
+        id += EncodingConstants.RESTRICTED_ALPHABET_APPLICATION_START;
+        
+        _b = (length < _v.characterContentChunkSizeContraint) ?
+            EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_RESTRICTED_ALPHABET_FLAG | EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG :
+            EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_RESTRICTED_ALPHABET_FLAG;        
+        _b |= (id & 0xC0) >> 6;
+        write (_b);
+
+        // Encode bottom 6 bits of enoding algorithm id
+        _b = (id & 0x3F) << 2;
+
+        encodeNonEmptyNBitCharacterStringOnSeventhBit(alphabet, ch, start, length);        
+    }
+            
     protected final void encodeProcessingInstruction(String target, String data) throws IOException {
         write(EncodingConstants.PROCESSING_INSTRUCTION);
 
@@ -883,6 +916,96 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         write(_encodingBuffer, length);
     }
 
+    /*
+     * C.24
+     */
+    protected final void encodeNonEmptyFourBitCharacterStringOnSeventhBit(int[] table, char[] ch, int start, int length) throws FastInfosetException, IOException {
+        final int octetPairLength = length / 2;
+        final int octetSingleLength = length % 2;
+        
+        // Encode the length
+        encodeNonZeroOctetStringLengthOnSenventhBit(octetPairLength + octetSingleLength);
+
+        ensureSize(octetPairLength + octetSingleLength);
+        // Encode all pairs
+        int v = 0;
+        for (int i = 0; i < octetPairLength; i++) {
+            v = (table[ch[start++]] << 4) | table[ch[start++]];
+            if (v < 0) {
+                throw new FastInfosetException("Character(s) not in restricted alphabet range");
+            }
+            _octetBuffer[_octetBufferIndex++] = (byte)v;
+        }
+        // Encode single character at end with termination bits
+        if (octetSingleLength == 1) {
+            v = (table[ch[start]] << 4) | 0x0F;
+            if (v < 0) {
+                throw new FastInfosetException("Character(s) not in restricted alphabet range");
+            }
+            _octetBuffer[_octetBufferIndex++] = (byte)v;
+        }        
+    }
+    
+    /*
+     * C.24
+     */
+    protected final void encodeNonEmptyNBitCharacterStringOnSeventhBit(String alphabet, char[] ch, int start, int length) throws FastInfosetException, IOException {
+        int bitsPerCharacter = 1;
+        while ((1 << bitsPerCharacter) <= alphabet.length()) {
+            bitsPerCharacter++;
+        }
+        final int terminatingValue = (1 << bitsPerCharacter) - 1;
+        
+        final int bits = length * bitsPerCharacter;
+        final int octets = bits / 8;
+        final int bitsOfLastOctet = bits % 8;
+        final int totalOctets = octets + ((bitsOfLastOctet > 0) ? 1 : 0);
+        
+        // Encode the length
+        encodeNonZeroOctetStringLengthOnSenventhBit(totalOctets);
+
+        resetBits();
+        ensureSize(totalOctets);
+        int v = 0;
+        for (int i = 0; i < length; i++) {
+            final char c = ch[start + i];
+            // This is grotesquely slow, need to use hash table of character to int value
+            for (v = 0; v < alphabet.length(); v++) {
+                if (c == alphabet.charAt(v)) {
+                    break;
+                }
+            }
+            if (v == alphabet.length()) {
+                throw new FastInfosetException("Character(s) not in restricted alphabet range");
+            }
+            writeBits(bitsPerCharacter, v);            
+        }        
+        
+        if (bitsOfLastOctet > 0) {
+            _b |= (1 << (8 - bitsOfLastOctet)) - 1;
+            write(_b);
+        }
+    }
+
+    protected int _bitsLeftInOctet;
+    
+    public final void resetBits() {
+        _bitsLeftInOctet = 8;
+        _b = 0;
+    }
+    
+    protected final void writeBits(int bits, int v) throws IOException {
+        while (bits > 0) {
+            final int bit = (v & (1 << --bits)) > 0 ? 1 : 0;
+            _b |= bit << (--_bitsLeftInOctet);
+            if (_bitsLeftInOctet == 0) {
+                write(_b);
+                _bitsLeftInOctet = 8;
+                _b = 0;
+            }
+        }
+    }
+    
     /*
      * C.24
      */

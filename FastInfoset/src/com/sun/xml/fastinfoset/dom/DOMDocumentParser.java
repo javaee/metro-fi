@@ -375,19 +375,22 @@ public class DOMDocumentParser extends Decoder {
                 }
                 case DecoderStateTables.CII_RA:
                 {
+                    final boolean addToTable = (_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0;
+                    
                     // Decode resitricted alphabet integer
                     _identifier = (_b & 0x02) << 6;
-                    final int b2 = read();
-                    _identifier |= (b2 & 0xFC) >> 2;
+                    _b = read();
+                    _identifier |= (_b & 0xFC) >> 2;
 
-                    decodeOctetsOnSeventhBitOfNonIdentifyingStringOnThirdBit(b2);
-                    // TODO obtain restricted alphabet given _identifier value
-                    decodeRAOctetsAsCharBuffer(null);                    
-                    if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
+                    decodeOctetsOnSeventhBitOfNonIdentifyingStringOnThirdBit(_b);
+                    
+                    String v = decodeRestrictedAlphabetAsString();                    
+                    if (addToTable) {
                         _v.characterContentChunk.add(_charBuffer, _charBufferLength);
                     }
                     
-                    throw new UnsupportedOperationException("Restricted alphabet");
+                    _currentNode.appendChild(_document.createTextNode(v));
+                    break;
                 }
                 case DecoderStateTables.CII_EA:
                 {
@@ -714,13 +717,15 @@ public class DOMDocumentParser extends Decoder {
                     _identifier |= (b & 0xF0) >> 4;
                     
                     decodeOctetsOnFifthBitOfNonIdentifyingStringOnFirstBit(b);
-                    // TODO obtain restricted alphabet given _identifier value
-                    value = decodeRAOctetsAsString(null);
+                    
+                    value = decodeRestrictedAlphabetAsString();
                     if (addToTable) {
                         _v.attributeValue.add(value);
                     }
 
-                    throw new UnsupportedOperationException("Restricted alphabet");
+                    a.setValue(value);                
+                    _currentElement.setAttributeNode(a);
+                    break;
                 }
                 case DecoderStateTables.NISTRING_EA:
                 {

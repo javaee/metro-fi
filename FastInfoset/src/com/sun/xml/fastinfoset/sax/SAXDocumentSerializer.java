@@ -42,17 +42,12 @@ package com.sun.xml.fastinfoset.sax;
 import com.sun.xml.fastinfoset.Encoder;
 import com.sun.xml.fastinfoset.EncodingConstants;
 import com.sun.xml.fastinfoset.QualifiedName;
-import com.sun.xml.fastinfoset.util.KeyIntMap;
-import org.jvnet.fastinfoset.ReferencedVocabulary;
-import org.jvnet.fastinfoset.Vocabulary;
 import org.jvnet.fastinfoset.sax.FastInfosetWriter;
 import com.sun.xml.fastinfoset.util.LocalNameQualifiedNamesMap;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import org.jvnet.fastinfoset.EncodingAlgorithmException;
 import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
 import org.jvnet.fastinfoset.FastInfosetException;
+import org.jvnet.fastinfoset.RestrictedAlphabet;
 import org.jvnet.fastinfoset.sax.EncodingAlgorithmAttributes;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -205,7 +200,7 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
 
             encodeCharacters(ch, start, length);
         } catch (IOException e) {
-            throw new SAXException("startElement", e);
+            throw new SAXException(e);
         }
     }
 
@@ -380,6 +375,55 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
     }
 
 
+    // RestrictedAlphabetContentHandler
+    
+    public void numericCharacters(char ch[], int start, int length) throws SAXException {
+        if (length <= 0) {
+            return;
+        }
+
+        try {
+            encodeTermination();
+
+            encodeFourBitCharacters(RestrictedAlphabet.NUMERIC_CHARACTERS_INDEX, EncodingConstants.NUMERIC_CHARACTERS_TABLE, ch, start, length);
+        } catch (IOException e) {
+            throw new SAXException(e);
+        } catch (FastInfosetException e) {
+            throw new SAXException(e);
+        }
+    }
+    
+    public void dateTimeCharacters(char ch[], int start, int length) throws SAXException {
+        if (length <= 0) {
+            return;
+        }
+
+        try {
+            encodeTermination();
+
+            encodeFourBitCharacters(RestrictedAlphabet.DATE_TIME_CHARACTERS_INDEX, EncodingConstants.DATE_TIME_CHARACTERS_TABLE, ch, start, length);
+        } catch (IOException e) {
+            throw new SAXException(e);
+        } catch (FastInfosetException e) {
+            throw new SAXException(e);
+        }
+    }
+    
+    public void alphabetCharacters(String alphabet, char ch[], int start, int length) throws SAXException {
+        if (length <= 0) {
+            return;
+        }
+
+        try {
+            encodeTermination();
+
+            encodeAlphabetCharacters(alphabet, ch, start, length);
+        } catch (IOException e) {
+            throw new SAXException(e);
+        } catch (FastInfosetException e) {
+            throw new SAXException(e);
+        }
+    }
 
 
 
