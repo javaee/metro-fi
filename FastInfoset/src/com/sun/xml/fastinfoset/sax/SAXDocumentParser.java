@@ -110,7 +110,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
     protected BuiltInEncodingAlgorithmState builtInAlgorithmState =
             new BuiltInEncodingAlgorithmState();
     
-    protected AttributesHolder _attributes = new AttributesHolder();
+    protected AttributesHolder _attributes;
     
     protected String[] _namespaceAIIs = new String[16];
     
@@ -121,6 +121,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
     /** Creates a new instance of DocumetParser2 */
     public SAXDocumentParser() {
         DefaultHandler handler = new DefaultHandler();
+        _attributes = new AttributesHolder(this);
         
         _entityResolver = handler;
         _dtdHandler = handler;
@@ -1359,4 +1360,28 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 decodeFromBytes(_octetBuffer, _octetBufferStart, _octetBufferLength);
     }
     
+    final StringBuffer convertEncodingAlgorithmDataToString(int identifier, String URI, Object data) throws FastInfosetException, IOException {
+        EncodingAlgorithm ea = null;
+        if (identifier <= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
+            ea = BuiltInEncodingAlgorithmFactory.table[_identifier];
+        } else if (identifier >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
+            if (URI == null) {
+                throw new EncodingAlgorithmException("URI not present for encoding algorithm identifier " + identifier);
+            }
+            
+            ea = (EncodingAlgorithm)_registeredEncodingAlgorithms.get(URI);
+            if (ea == null) {
+                throw new EncodingAlgorithmException("Encoding algorithm not registered for URI " + URI);
+            }
+        } else {
+            // Reserved built-in algorithms for future use
+            // TODO should use sax property to decide if event will be
+            // reported, allows for support through handler if required.
+            throw new EncodingAlgorithmException("Encoding algorithm identifiers 10 up to and including 31 are reserved for future use");
+        }
+
+        final StringBuffer sb = new StringBuffer();
+        ea.convertToCharacters(data, sb);
+        return sb;
+    }
 }

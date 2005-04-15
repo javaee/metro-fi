@@ -40,12 +40,16 @@
 package com.sun.xml.fastinfoset.sax;
 
 import com.sun.xml.fastinfoset.QualifiedName;
+import java.io.IOException;
+import org.jvnet.fastinfoset.FastInfosetException;
 
 import org.jvnet.fastinfoset.sax.EncodingAlgorithmAttributes;
 
 public class AttributesHolder implements EncodingAlgorithmAttributes {
     private static final int DEFAULT_CAPACITY = 8;
 
+    private SAXDocumentParser _saxParser;
+    
     private int _attributeCount;
     
     private QualifiedName[] _names;
@@ -64,6 +68,11 @@ public class AttributesHolder implements EncodingAlgorithmAttributes {
         _algorithmData = new Object[DEFAULT_CAPACITY];
     }
 
+    public AttributesHolder(SAXDocumentParser saxParser) {
+        this();
+        _saxParser = saxParser;
+    }
+    
     // org.xml.sax.Attributes
     
     public final int getLength() {
@@ -87,7 +96,25 @@ public class AttributesHolder implements EncodingAlgorithmAttributes {
     }
 
     public final String getValue(int index) {
-        return _values[index];
+        final String value = _values[index];
+        if (value != null) {
+            return value;
+        }
+        
+        if (_algorithmData[index] == null || _saxParser == null) {
+            return null;
+        }
+                
+        try {
+            return _values[index] = _saxParser.convertEncodingAlgorithmDataToString(
+                    _algorithmIds[index],
+                    _algorithmURIs[index],
+                    _algorithmData[index]).toString();
+        } catch (IOException e) {
+            return null;
+        } catch (FastInfosetException e) {
+            return null;
+        }
     }
 
     public final int getIndex(String qName) {
@@ -232,6 +259,5 @@ public class AttributesHolder implements EncodingAlgorithmAttributes {
         _algorithmURIs = algorithmURIs;
         _algorithmIds = algorithmIds;
         _algorithmData = algorithmData;
-    }
-    
+    }    
 }
