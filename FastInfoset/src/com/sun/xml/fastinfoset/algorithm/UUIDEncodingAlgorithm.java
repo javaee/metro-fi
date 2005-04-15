@@ -60,8 +60,8 @@ public class UUIDEncodingAlgorithm extends LongEncodingAlgorithm {
             public void word(int start, int end) {
                 String uuidValue = cb.subSequence(start, end).toString();
                 fromUUIDString(uuidValue);
-                longList.add(_msb);
-                longList.add(_lsb);
+                longList.add(new Long(_msb));
+                longList.add(new Long(_lsb));
             }
         }
         );
