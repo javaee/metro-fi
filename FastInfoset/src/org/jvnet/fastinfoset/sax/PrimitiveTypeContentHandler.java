@@ -221,14 +221,13 @@ public interface PrimitiveTypeContentHandler {
      * when processing data encoded using the "uuid" encoding
      * algorithm, see subclause 10.10<p>.
      *
-     * @param msb the array of long of the most sigificant bits of
-     * the UUIDs
-     * @param lsb the array of long of the least sigificant bits of
-     * the UUIDs
+     * @param msblsb the array of long containing pairs of most signficant
+     * bits and least significant bits of the UUIDs
      * @param start the start position in the array
-     * @param length the number of UUID to read from the array
+     * @param length the number of long to read from the array. This will 
+     * be twice the number of UUIDs, which are pairs of two long values
      * @throws org.xml.sax.SAXException any SAX exception, possibly
      *            wrapping another exception
      */    
-    public void uuids(long[] msb, long[] lsb, int start, int length) throws SAXException;
+    public void uuids(long[] msblsb, int start, int length) throws SAXException;
 }

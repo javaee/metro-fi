@@ -370,7 +370,7 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
         throw new SAXException("Non Implemented");
     }
 
-    public final void uuids(long[] msb, long[] lsb, int start, int length) throws SAXException {
+    public void uuids(long[] msblsb, int start, int length) throws SAXException {
         throw new SAXException("Non Implemented");
     }
 

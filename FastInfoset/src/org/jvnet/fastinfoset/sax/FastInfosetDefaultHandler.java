@@ -102,6 +102,6 @@ public class FastInfosetDefaultHandler extends DefaultHandler implements
     public void doubles(double[] d, int start, int length) throws SAXException {
     }
 
-    public void uuids(long[] msb, long[] lsb, int start, int length) throws SAXException {
+    public void uuids(long[] msblsb, int start, int length) throws SAXException {
     }
 }
