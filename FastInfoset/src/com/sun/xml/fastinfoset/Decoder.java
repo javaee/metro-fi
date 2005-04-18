@@ -40,6 +40,7 @@
 package com.sun.xml.fastinfoset;
 
 import com.sun.xml.fastinfoset.alphabet.BuiltInRestrictedAlphabets;
+import com.sun.xml.fastinfoset.org.apache.xerces.util.XMLChar;
 import com.sun.xml.fastinfoset.util.CharArray;
 import com.sun.xml.fastinfoset.util.CharArrayArray;
 import com.sun.xml.fastinfoset.util.ContiguousCharArrayArray;
@@ -1163,16 +1164,35 @@ public abstract class Decoder implements FastInfosetParser {
                             decodeUtf8StringIllegalState();
                         }
 
+                        // Character guaranteed to be in [0x20, 0xD7FF] range
+                        // since a character encoded in two bytes will be in the 
+                        // range [0x80, 0x1FFF]
                         _charBuffer[_charBufferLength++] = (char) (
                             ((b1 & 0x1F) << 6)
                             | (b2 & 0x3F));
                         break;
                     }
                     case DecoderStateTables.UTF8_THREE_BYTES:
-                        decodeUtf8ThreeByteChar(_charBuffer, end, b1);
-                        break;
+                        final char c = decodeUtf8ThreeByteChar(end, b1);
+                        if (XMLChar.isContent(c)) {
+                            _charBuffer[_charBufferLength++] = c;
+                            break;
+                        } else {
+                            decodeUtf8StringIllegalState();
+                        }
                     case DecoderStateTables.UTF8_FOUR_BYTES:
-                        decodeUtf8FourByteChar(_charBuffer, end, b1);
+                        decodeUtf8FourByteChar(end, b1);
+                        if (XMLChar.isContent(_utf8_highSurrogate)) {
+                            _charBuffer[_charBufferLength++] = _utf8_highSurrogate;
+                        } else {
+                            decodeUtf8StringIllegalState();
+                        }
+                        
+                        if (XMLChar.isContent(_utf8_lowSurrogate)) {
+                            _charBuffer[_charBufferLength++] = _utf8_lowSurrogate;
+                        } else {
+                            decodeUtf8StringIllegalState();
+                        }
                         break;
                     default:
                         decodeUtf8StringIllegalState();
@@ -1211,16 +1231,37 @@ public abstract class Decoder implements FastInfosetParser {
                         decodeUtf8StringIllegalState();
                     }
 
-                    _charBuffer[_charBufferLength++] = (char) (
+                    final char c = (char) (
                         ((b1 & 0x1F) << 6)
                         | (b2 & 0x3F));
-                    break;
+                    if (XMLChar.isNCNameStart(c)) {
+                        _charBuffer[_charBufferLength++] = c;
+                        break;
+                    } else {
+                        decodeUtf8NCNameIllegalState();
+                    }
                 }
                 case DecoderStateTables.UTF8_THREE_BYTES:
-                    decodeUtf8ThreeByteChar(_charBuffer, end, b1);
+                    final char c = decodeUtf8ThreeByteChar(end, b1);
+                    if (XMLChar.isNCNameStart(c)) {
+                        _charBuffer[_charBufferLength++] = c;
+                        break;
+                    } else {
+                        decodeUtf8NCNameIllegalState();
+                    }
                     break;
                 case DecoderStateTables.UTF8_FOUR_BYTES:
-                    decodeUtf8FourByteChar(_charBuffer, end, b1);
+                    decodeUtf8FourByteChar(end, b1);
+                    if (XMLChar.isNCNameStart(_utf8_highSurrogate)) {
+                        _charBuffer[_charBufferLength++] = _utf8_highSurrogate;
+                    } else {
+                        decodeUtf8NCNameIllegalState();
+                    }
+                    if (XMLChar.isNCName(_utf8_lowSurrogate)) {
+                        _charBuffer[_charBufferLength++] = _utf8_lowSurrogate;
+                    } else {
+                        decodeUtf8NCNameIllegalState();
+                    }
                     break;
                 case DecoderStateTables.UTF8_NCNAME_NCNAME_CHAR:
                 default:
@@ -1246,16 +1287,37 @@ public abstract class Decoder implements FastInfosetParser {
                             decodeUtf8StringIllegalState();
                         }
 
-                        _charBuffer[_charBufferLength++] = (char) (
+                        final char c = (char) (
                             ((b1 & 0x1F) << 6)
                             | (b2 & 0x3F));
-                        break;
+                        if (XMLChar.isNCName(c)) {
+                            _charBuffer[_charBufferLength++] = c;
+                            break;
+                        } else {
+                            decodeUtf8NCNameIllegalState();
+                        }
                     }
                     case DecoderStateTables.UTF8_THREE_BYTES:
-                        decodeUtf8ThreeByteChar(_charBuffer, end, b1);
+                        final char c = decodeUtf8ThreeByteChar(end, b1);
+                        if (XMLChar.isNCName(c)) {
+                            _charBuffer[_charBufferLength++] = c;
+                            break;
+                        } else {
+                            decodeUtf8NCNameIllegalState();
+                        }
                         break;
                     case DecoderStateTables.UTF8_FOUR_BYTES:
-                        decodeUtf8FourByteChar(_charBuffer, end, b1);
+                        decodeUtf8FourByteChar(end, b1);
+                        if (XMLChar.isNCName(_utf8_highSurrogate)) {
+                            _charBuffer[_charBufferLength++] = _utf8_highSurrogate;
+                        } else {
+                            decodeUtf8NCNameIllegalState();
+                        }
+                        if (XMLChar.isNCName(_utf8_lowSurrogate)) {
+                            _charBuffer[_charBufferLength++] = _utf8_lowSurrogate;
+                        } else {
+                            decodeUtf8NCNameIllegalState();
+                        }
                         break;
                     default:
                         decodeUtf8NCNameIllegalState();
@@ -1264,7 +1326,7 @@ public abstract class Decoder implements FastInfosetParser {
         }
     }
 
-    public final void decodeUtf8ThreeByteChar(char[] c, int end, int b1) throws IOException {
+    public final char decodeUtf8ThreeByteChar(int end, int b1) throws IOException {
         // Decode byte 2
         if (end == _octetBufferOffset) {
             decodeUtf8StringLengthTooSmall();
@@ -1285,13 +1347,16 @@ public abstract class Decoder implements FastInfosetParser {
             decodeUtf8StringIllegalState();
         }
 
-        c[_charBufferLength++] = (char) (
+        return (char) (
             (b1 & 0x0F) << 12
             | (b2 & 0x3F) << 6
             | (b3 & 0x3F));
     }
 
-    public final void decodeUtf8FourByteChar(char[] c, int end, int b1) throws IOException {
+    private char _utf8_highSurrogate;
+    private char _utf8_lowSurrogate;
+    
+    public final void decodeUtf8FourByteChar(int end, int b1) throws IOException {
         // Decode byte 2
         if (end == _octetBufferOffset) {
             decodeUtf8StringLengthTooSmall();
@@ -1326,13 +1391,10 @@ public abstract class Decoder implements FastInfosetParser {
         }
         final int wwww = uuuuu - 1;
 
-        final int hs = 0xD800 |
+        _utf8_highSurrogate = (char) (0xD800 |
              ((wwww << 6) & 0x03C0) | ((b2 << 2) & 0x003C) |
-             ((b3 >> 4) & 0x0003);
-        final int ls = 0xDC00 | ((b3 << 6) & 0x03C0) | (b4 & 0x003F);
-
-        c[_charBufferLength++] = (char)hs;
-        c[_charBufferLength++] = (char)ls;
+             ((b3 >> 4) & 0x0003));
+        _utf8_lowSurrogate = (char) (0xDC00 | ((b3 << 6) & 0x03C0) | (b4 & 0x003F));    
     }
 
     public final void decodeUtf8StringLengthTooSmall() throws IOException {
