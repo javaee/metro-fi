@@ -101,6 +101,7 @@
                 </fileset>
                 <fileset dir="${basedir}">
                     <include name="README-PACKAGE.txt"/>
+                    <include name="XERCES-APACHE-1.1-license.txt"/>
                     <include name="bin/*"/>
                     <include name="lib/*.jar"/>
                     <include name="${dist.dir}/${app.jar}"/>
