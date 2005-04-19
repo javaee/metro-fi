@@ -39,8 +39,13 @@
 
 package com.sun.xml.fastinfoset.sax;
 
+import com.sun.xml.fastinfoset.EncodingConstants;
 import com.sun.xml.fastinfoset.QualifiedName;
+import com.sun.xml.fastinfoset.algorithm.BuiltInEncodingAlgorithmFactory;
 import java.io.IOException;
+import java.util.Map;
+import org.jvnet.fastinfoset.EncodingAlgorithm;
+import org.jvnet.fastinfoset.EncodingAlgorithmException;
 import org.jvnet.fastinfoset.FastInfosetException;
 
 import org.jvnet.fastinfoset.sax.EncodingAlgorithmAttributes;
@@ -48,7 +53,7 @@ import org.jvnet.fastinfoset.sax.EncodingAlgorithmAttributes;
 public class AttributesHolder implements EncodingAlgorithmAttributes {
     private static final int DEFAULT_CAPACITY = 8;
 
-    private SAXDocumentParser _saxParser;
+    private Map _registeredEncodingAlgorithms;
     
     private int _attributeCount;
     
@@ -68,9 +73,9 @@ public class AttributesHolder implements EncodingAlgorithmAttributes {
         _algorithmData = new Object[DEFAULT_CAPACITY];
     }
 
-    public AttributesHolder(SAXDocumentParser saxParser) {
+    public AttributesHolder(Map registeredEncodingAlgorithms) {
         this();
-        _saxParser = saxParser;
+        _registeredEncodingAlgorithms = registeredEncodingAlgorithms;
     }
     
     // org.xml.sax.Attributes
@@ -101,12 +106,12 @@ public class AttributesHolder implements EncodingAlgorithmAttributes {
             return value;
         }
         
-        if (_algorithmData[index] == null || _saxParser == null) {
+        if (_algorithmData[index] == null || _registeredEncodingAlgorithms == null) {
             return null;
         }
                 
         try {
-            return _values[index] = _saxParser.convertEncodingAlgorithmDataToString(
+            return _values[index] = convertEncodingAlgorithmDataToString(
                     _algorithmIds[index],
                     _algorithmURIs[index],
                     _algorithmData[index]).toString();
@@ -259,5 +264,30 @@ public class AttributesHolder implements EncodingAlgorithmAttributes {
         _algorithmURIs = algorithmURIs;
         _algorithmIds = algorithmIds;
         _algorithmData = algorithmData;
+    }
+    
+    private final StringBuffer convertEncodingAlgorithmDataToString(int identifier, String URI, Object data) throws FastInfosetException, IOException {
+        EncodingAlgorithm ea = null;
+        if (identifier <= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
+            ea = BuiltInEncodingAlgorithmFactory.table[identifier];
+        } else if (identifier >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
+            if (URI == null) {
+                throw new EncodingAlgorithmException("URI not present for encoding algorithm identifier " + identifier);
+            }
+            
+            ea = (EncodingAlgorithm)_registeredEncodingAlgorithms.get(URI);
+            if (ea == null) {
+                throw new EncodingAlgorithmException("Encoding algorithm not registered for URI " + URI);
+            }
+        } else {
+            // Reserved built-in algorithms for future use
+            // TODO should use sax property to decide if event will be
+            // reported, allows for support through handler if required.
+            throw new EncodingAlgorithmException("Encoding algorithm identifiers 10 up to and including 31 are reserved for future use");
+        }
+
+        final StringBuffer sb = new StringBuffer();
+        ea.convertToCharacters(data, sb);
+        return sb;
     }    
 }
