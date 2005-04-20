@@ -260,8 +260,14 @@ public class DOMDocumentSerializer extends Encoder {
             }                
         }
         
-        encodeLiteralElementQualifiedNameOnThirdBit(namespaceURI, getPrefixFromQualifiedName(qName), 
-                localName, entry);
+        // Was DOM node created using an NS-aware call?
+        if (localName != null) {
+            encodeLiteralElementQualifiedNameOnThirdBit(namespaceURI, getPrefixFromQualifiedName(qName), 
+                    localName, entry);
+        }
+        else {
+            encodeLiteralElementQualifiedNameOnThirdBit(namespaceURI, "", qName, entry);            
+        }
     }
 
     protected final void encodeAttribute(String namespaceURI, String qName, String localName) throws IOException {
@@ -275,7 +281,14 @@ public class DOMDocumentSerializer extends Encoder {
                 }
             }                
         } 
-        encodeLiteralAttributeQualifiedNameOnSecondBit(namespaceURI, getPrefixFromQualifiedName(qName), 
-                localName, entry);
+        
+        // Was DOM node created using an NS-aware call?
+        if (localName != null) {
+            encodeLiteralAttributeQualifiedNameOnSecondBit(namespaceURI, getPrefixFromQualifiedName(qName), 
+                    localName, entry);
+        }
+        else {
+            encodeLiteralAttributeQualifiedNameOnSecondBit(namespaceURI, "", qName, entry);            
+        }
     }    
 }
