@@ -41,6 +41,7 @@ package com.sun.xml.fastinfoset.vocab;
 
 import com.sun.xml.fastinfoset.util.CharArrayArray;
 import com.sun.xml.fastinfoset.util.ContiguousCharArrayArray;
+import com.sun.xml.fastinfoset.util.PrefixArray;
 import com.sun.xml.fastinfoset.util.QualifiedNameArray;
 import com.sun.xml.fastinfoset.util.StringArray;
 import com.sun.xml.fastinfoset.util.ValueArray;
@@ -51,7 +52,7 @@ public class ParserVocabulary extends Vocabulary {
     public final StringArray encodingAlgorithm = new StringArray();
 
     public final StringArray namespaceName = new StringArray();
-    public final StringArray prefix = new StringArray();
+    public final PrefixArray prefix = new PrefixArray();
     public final StringArray localName = new StringArray();
     public final StringArray otherNCName = new StringArray();
     public final StringArray otherURI = new StringArray();

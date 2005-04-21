@@ -47,6 +47,8 @@ public class QualifiedName {
     public final String localName;
     public final String qName;
     public final int index;
+    public final int prefixIndex;
+    public final int namespaceNameIndex;
     private QName qNameObject;
     
     public QualifiedName(String prefix, String namespaceName, String localName, String qName) {
@@ -55,6 +57,8 @@ public class QualifiedName {
         this.localName = localName;
         this.qName = qName;
         this.index = -1;
+        this.prefixIndex = 0;
+        this.namespaceNameIndex = 0;        
     }    
 
     public QualifiedName(String prefix, String namespaceName, String localName, String qName, int index) {
@@ -63,8 +67,20 @@ public class QualifiedName {
         this.localName = localName;
         this.qName = qName;
         this.index = index;
+        this.prefixIndex = 0;
+        this.namespaceNameIndex = 0;        
     }    
-
+    
+    public QualifiedName(String prefix, String namespaceName, String localName, String qName, int index, int prefixIndex, int namespaceNameIndex) {
+        this.prefix = prefix;
+        this.namespaceName = namespaceName;
+        this.localName = localName;
+        this.qName = qName;
+        this.index = index;
+        this.prefixIndex = prefixIndex + 1;
+        this.namespaceNameIndex = namespaceNameIndex + 1;
+    }    
+    
     public QualifiedName(String prefix, String namespaceName, String localName) {
         this.prefix = prefix;
         this.namespaceName = namespaceName;
@@ -80,8 +96,39 @@ public class QualifiedName {
         }
 
         this.index = -1;
+        this.prefixIndex = 0;
+        this.namespaceNameIndex = 0;        
     }    
 
+    public QualifiedName(String prefix, String namespaceName, String localName, int prefixIndex, int namespaceNameIndex, char[] charBuffer) {
+        this.prefix = prefix;
+        this.namespaceName = namespaceName;
+        this.localName = localName;
+
+        if (charBuffer != null) {
+            final int l1 = prefix.length();
+            final int l2 = localName.length();
+            final int total = l1 + l2 + 1;
+            if (total < charBuffer.length) {
+                prefix.getChars(0, l1, charBuffer, 0);
+                charBuffer[l1] = ':';
+                localName.getChars(0, l2, charBuffer, l1 + 1);
+                this.qName = new String(charBuffer, 0, total);
+            } else {
+                StringBuffer b = new StringBuffer(this.prefix);
+                b.append(':');
+                b.append(this.localName);
+                this.qName = b.toString();
+            }
+        } else {
+            this.qName = this.localName;
+        }
+
+        this.prefixIndex = prefixIndex + 1;
+        this.namespaceNameIndex = namespaceNameIndex + 1;
+        this.index = -1;
+    }    
+    
     public QualifiedName(String prefix, String namespaceName, String localName, int index) {
         this.prefix = prefix;
         this.namespaceName = namespaceName;
@@ -97,6 +144,27 @@ public class QualifiedName {
         }
 
         this.index = index;
+        this.prefixIndex = 0;
+        this.namespaceNameIndex = 0;        
+    }    
+    
+    public QualifiedName(String prefix, String namespaceName, String localName, int index, int prefixIndex, int namespaceNameIndex) {
+        this.prefix = prefix;
+        this.namespaceName = namespaceName;
+        this.localName = localName;
+
+        if (this.prefix != null && this.prefix != "") {
+            StringBuffer b = new StringBuffer(this.prefix);
+            b.append(':');
+            b.append(this.localName);
+            this.qName = b.toString();
+        } else {
+            this.qName = this.localName;
+        }
+
+        this.index = index;
+        this.prefixIndex = prefixIndex + 1;
+        this.namespaceNameIndex = namespaceNameIndex + 1;
     }    
     
     // Qualified Name as a Namespace Name
@@ -106,6 +174,8 @@ public class QualifiedName {
         this.localName = "";
         this.qName = "";
         this.index = -1;
+        this.prefixIndex = 0;
+        this.namespaceNameIndex = 0;        
     }
     
     public final QName getQName() {

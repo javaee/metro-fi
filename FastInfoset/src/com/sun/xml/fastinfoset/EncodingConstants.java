@@ -66,6 +66,7 @@ public final class EncodingConstants {
             
     public static final String XMLNS_NAMESPACE_PREFIX = "xmlns";    
     public static final int XMLNS_NAMESPACE_PREFIX_LENGTH = XMLNS_NAMESPACE_PREFIX.length();
+    public static final char[] XMLNS_NAMESPACE_PREFIX_CHARS = XMLNS_NAMESPACE_PREFIX.toCharArray();
     public static final String XMLNS_NAMESPACE_NAME = "http://www.w3.org/2000/xmlns/";
     public static final int XMLNS_NAMESPACE_NAME_LENGTH = XMLNS_NAMESPACE_NAME.length();
     public static final char[] XMLNS_NAMESPACE_NAME_CHARS = XMLNS_NAMESPACE_NAME.toCharArray();
@@ -124,11 +125,13 @@ public final class EncodingConstants {
     
     public static final int NAMESPACE_ATTRIBUTE = 0xCC; // 110011 00
     public static final int NAMESPACE_ATTRIBUTE_MASK = 0xFC; // 6 bits
+    public static final int NAMESPACE_ATTRIBUTE_PREFIX_NAME_MASK = 0x03; // 2 bits
     public static final int NAMESPACE_ATTRIBUTE_PREFIX_FLAG = 0x02;
     public static final int NAMESPACE_ATTRIBUTE_NAME_FLAG = 0x01;
     
     public static final int ATTRIBUTE_LITERAL_QNAME_FLAG = 0x78; // 01111000
     
+    public static final int LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK = 0x03;
     public static final int LITERAL_QNAME_PREFIX_FLAG = 0x02;
     public static final int LITERAL_QNAME_NAMESPACE_NAME_FLAG = 0x01;
 

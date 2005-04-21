@@ -91,6 +91,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     
     protected String[] _namespaceAIIsPrefix = new String[32];
     protected String[] _namespaceAIIsNamespaceName = new String[32];
+    protected int[] _namespaceAIIsPrefixIndex = new int[32];
     protected int _namespaceAIIsIndex;
     
     /**
@@ -141,7 +142,6 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     
     public StAXDocumentParser() {
         reset();
-        resetNamespaces();
     }
     
     public StAXDocumentParser(InputStream s) {
@@ -154,12 +154,6 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         _manager = manager;
     }
     
-    public void resetNamespaces() {
-        _prefixMap.clear();
-        _prefixMap.put("", "");
-        _prefixMap.put(EncodingConstants.XML_NAMESPACE_PREFIX, EncodingConstants.XML_NAMESPACE_NAME);
-    }
-
     public void setInputStream(InputStream s) {
         super.setInputStream(s);        
         reset();
@@ -167,17 +161,34 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     
     public void reset() {
         super.reset();
-        
         if (_internalState != INTERNAL_STATE_START_DOCUMENT &&
             _internalState != INTERNAL_STATE_END_DOCUMENT) {
-            resetNamespaces();
-        
+            
+            for (int i = _namespaceAIIsIndex - 1; i >= 0; i--) {
+                popNamespaceDecl(_namespaceAIIsPrefixIndex[i]);
+            }
+       
             _stackCount = -1;
 
             _namespaceAIIsIndex = 0;
             _characters = null;
             _algorithmData = null;
         }
+        
+        _eventType = START_DOCUMENT;
+        _internalState = INTERNAL_STATE_START_DOCUMENT;        
+    }
+
+    protected void resetOnError() {
+        super.reset();
+        
+        _v.prefix.clearCompletely();
+
+        _stackCount = -1;
+
+        _namespaceAIIsIndex = 0;
+        _characters = null;
+        _algorithmData = null;
         
         _eventType = START_DOCUMENT;
         _internalState = INTERNAL_STATE_START_DOCUMENT;        
@@ -204,8 +215,8 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                         break;
                     case INTERNAL_STATE_START_ELEMENT_TERMINATE:
                         if (_currentNamespaceAIIsEnd > 0) {
-                            for (int i = _currentNamespaceAIIsStart; i < _currentNamespaceAIIsEnd; i++) {
-                                popNamespaceDecl(_namespaceAIIsPrefix[i]);
+                            for (int i = _currentNamespaceAIIsEnd - 1; i >= _currentNamespaceAIIsStart; i--) {
+                                popNamespaceDecl(_namespaceAIIsPrefixIndex[i]);
                             }
                             _namespaceAIIsIndex = _currentNamespaceAIIsStart;
                         }
@@ -220,26 +231,26 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                         return _eventType = END_ELEMENT;
                     case INTERNAL_STATE_SINGLE_TERMINATE_ELEMENT_WITH_NAMESPACES:
                         // Undeclare namespaces
-                        for (int i = _currentNamespaceAIIsStart; i < _currentNamespaceAIIsEnd; i++) {
-                            popNamespaceDecl(_namespaceAIIsPrefix[i]);
+                        for (int i = _currentNamespaceAIIsEnd - 1; i >= _currentNamespaceAIIsStart; i--) {
+                            popNamespaceDecl(_namespaceAIIsPrefixIndex[i]);
                         }
                         _namespaceAIIsIndex = _currentNamespaceAIIsStart;
                         _internalState = INTERNAL_STATE_VOID;
                         break;
                     case INTERNAL_STATE_DOUBLE_TERMINATE_ELEMENT:
+                        // Undeclare namespaces
+                        if (_currentNamespaceAIIsEnd > 0) {
+                            for (int i = _currentNamespaceAIIsEnd - 1; i >= _currentNamespaceAIIsStart; i--) {
+                                popNamespaceDecl(_namespaceAIIsPrefixIndex[i]);
+                            }
+                            _namespaceAIIsIndex = _currentNamespaceAIIsStart;
+                        }
+                        
                         if (_stackCount == -1) {
                             _internalState = INTERNAL_STATE_END_DOCUMENT;
                             return _eventType = END_DOCUMENT;
                         }
-                        
-                        // Undeclare namespaces
-                        if (_currentNamespaceAIIsEnd > 0) {
-                            for (int i = _currentNamespaceAIIsStart; i < _currentNamespaceAIIsEnd; i++) {
-                                popNamespaceDecl(_namespaceAIIsPrefix[i]);
-                            }
-                            _namespaceAIIsIndex = _currentNamespaceAIIsStart;
-                        }
-                    
+                                            
                         // Pop information off the stack
                         _qualifiedName = _qNameStack[_stackCount];
                         _currentNamespaceAIIsStart = _namespaceAIIsStartStack[_stackCount];
@@ -270,38 +281,17 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     processEII(_v.elementName.get(b & EncodingConstants.INTEGER_3RD_BIT_SMALL_MASK), true);
                     return _eventType;
                 case DecoderStateTables.EII_INDEX_MEDIUM:
-                {
-                    final int i = (((b & EncodingConstants.INTEGER_3RD_BIT_MEDIUM_MASK) << 8) | read())
-                            + EncodingConstants.INTEGER_3RD_BIT_SMALL_LIMIT;
-                    processEII(_v.elementName.get(i), (b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
+                    processEII(processEIIIndexMedium(b), (b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
                     return _eventType;
-                }
                 case DecoderStateTables.EII_INDEX_LARGE:
-                {
-                    int i;
-                    if ((b & 0x10) > 0) {
-                        // EII large index
-                        i = (((b & EncodingConstants.INTEGER_3RD_BIT_LARGE_MASK) << 16) | (read() << 8) | read())
-                                + EncodingConstants.INTEGER_3RD_BIT_MEDIUM_LIMIT;
-                    } else {
-                        // EII large large index
-                        i = (((read() & EncodingConstants.INTEGER_3RD_BIT_LARGE_LARGE_MASK) << 16) | (read() << 8) | read())
-                                + EncodingConstants.INTEGER_3RD_BIT_LARGE_LIMIT;
-                    }
-                    processEII(_v.elementName.get(i), (b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
+                    processEII(processEIIIndexLarge(b), (b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
                     return _eventType;
-                }
                 case DecoderStateTables.EII_LITERAL:
                 {
-                    final String prefix = ((b & EncodingConstants.LITERAL_QNAME_PREFIX_FLAG) > 0)
-                    ? decodeIdentifyingNonEmptyStringIndexOnFirstBitAsPrefix(_v.prefix) : "";
-                    final String namespaceName = ((b & EncodingConstants.LITERAL_QNAME_NAMESPACE_NAME_FLAG) > 0)
-                    ? decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(_v.namespaceName) : "";
-                    final String localName = decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName);
-                    
-                    final QualifiedName qualifiedName = new QualifiedName(prefix, namespaceName, localName, "");
-                    _v.elementName.add(qualifiedName);
-                    processEII(qualifiedName, (b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
+                    final QualifiedName qn = decodeLiteralQualifiedName(
+                                b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK);
+                    _v.elementName.add(qn);
+                    processEII(qn, (b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
                     return _eventType;
                 }
                 case DecoderStateTables.EII_NAMESPACES:
@@ -520,15 +510,15 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     throw new FastInfosetException("Illegal state when decoding a child of an EII");
             }
         } catch (IOException e) {
-            reset();
+            resetOnError();
             e.printStackTrace();
             throw new XMLStreamException(e);
         } catch (FastInfosetException e) {
-            reset();
+            resetOnError();
             e.printStackTrace();
             throw new XMLStreamException(e);
         } catch (RuntimeException e) {
-            reset();
+            resetOnError();
             e.printStackTrace();
             throw e;
         }
@@ -986,36 +976,74 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     
     //
     
+    protected final void resizeNamespaceAIIs() {
+        final String[] namespaceAIIsPrefix = new String[_namespaceAIIsIndex * 2];
+        System.arraycopy(_namespaceAIIsPrefix, 0, namespaceAIIsPrefix, 0, _namespaceAIIsIndex);
+        _namespaceAIIsPrefix = namespaceAIIsPrefix;
+
+        final String[] namespaceAIIsNamespaceName = new String[_namespaceAIIsIndex * 2];
+        System.arraycopy(_namespaceAIIsNamespaceName, 0, namespaceAIIsNamespaceName, 0, _namespaceAIIsIndex);
+        _namespaceAIIsNamespaceName = namespaceAIIsNamespaceName;
+
+        final int[] namespaceAIIsPrefixIndex = new int[_namespaceAIIsIndex * 2];
+        System.arraycopy(_namespaceAIIsPrefixIndex, 0, namespaceAIIsPrefixIndex, 0, _namespaceAIIsIndex);
+        _namespaceAIIsPrefixIndex = namespaceAIIsPrefixIndex;
+    }
+    
     protected final void processEIIWithNamespaces(boolean hasAttributes) throws FastInfosetException, IOException {
+        _v.prefix.incrementDeclarationId();
         
         _currentNamespaceAIIsStart = _namespaceAIIsIndex;
+        String prefix = "", namespaceName = "";
         int b = read();
         while ((b & EncodingConstants.NAMESPACE_ATTRIBUTE_MASK) == EncodingConstants.NAMESPACE_ATTRIBUTE) {
-            // NOTE a prefix without a namespace name is an undeclaration
-            // of the namespace bound to the prefix
-            // TODO need to investigate how the startPrefixMapping works in
-            // relation to undeclaration
-            
             if (_namespaceAIIsIndex == _namespaceAIIsPrefix.length) {
-                final String[] namespaceAIIsPrefix = new String[_namespaceAIIsIndex * 2];
-                System.arraycopy(_namespaceAIIsPrefix, 0, namespaceAIIsPrefix, 0, _namespaceAIIsIndex);
-                _namespaceAIIsPrefix = namespaceAIIsPrefix;
-                
-                final String[] namespaceAIIsNamespaceName = new String[_namespaceAIIsIndex * 2];
-                System.arraycopy(_namespaceAIIsNamespaceName, 0, namespaceAIIsNamespaceName, 0, _namespaceAIIsIndex);
-                _namespaceAIIsNamespaceName = namespaceAIIsNamespaceName;
+                resizeNamespaceAIIs();
             }
             
-            // Prefix
-            final String prefix = _namespaceAIIsPrefix[_namespaceAIIsIndex] = ((b & EncodingConstants.NAMESPACE_ATTRIBUTE_PREFIX_FLAG) > 0)
-            ? decodeIdentifyingNonEmptyStringOnFirstBitAsPrefix(_v.prefix) : "";
-            
-            // Namespace name
-            final String namespaceName = _namespaceAIIsNamespaceName[_namespaceAIIsIndex++] = ((b & EncodingConstants.NAMESPACE_ATTRIBUTE_NAME_FLAG) > 0)
-            ? decodeIdentifyingNonEmptyStringOnFirstBitAsNamespaceName(_v.namespaceName) : "";
-            
+            switch (b & EncodingConstants.NAMESPACE_ATTRIBUTE_PREFIX_NAME_MASK) {
+                // no prefix, no namespace
+                // Undeclaration of default namespace
+                case 0:
+                    prefix = namespaceName =
+                            _namespaceAIIsPrefix[_namespaceAIIsIndex] = 
+                            _namespaceAIIsNamespaceName[_namespaceAIIsIndex] = "";
+                    
+                    _namespaceNameIndex = _prefixIndex = _namespaceAIIsPrefixIndex[_namespaceAIIsIndex++] = -1;
+                    break;
+                // no prefix, namespace
+                // Declaration of default namespace
+                case 1:
+                    prefix = _namespaceAIIsPrefix[_namespaceAIIsIndex] = "";
+                    namespaceName = _namespaceAIIsNamespaceName[_namespaceAIIsIndex] = 
+                            decodeIdentifyingNonEmptyStringOnFirstBitAsNamespaceName(false);
+                           
+                    _prefixIndex = _namespaceAIIsPrefixIndex[_namespaceAIIsIndex++] = -1;
+                    break;
+                // prefix, no namespace
+                // Undeclaration of namespace
+                case 2:
+                    prefix = _namespaceAIIsPrefix[_namespaceAIIsIndex] = 
+                            decodeIdentifyingNonEmptyStringOnFirstBitAsPrefix(false);
+                    namespaceName = _namespaceAIIsNamespaceName[_namespaceAIIsIndex] = "";
+                    
+                    _namespaceNameIndex = -1;
+                    _namespaceAIIsPrefixIndex[_namespaceAIIsIndex++] = _prefixIndex;
+                    break;
+                // prefix, namespace
+                // Declaration of prefixed namespace 
+                case 3:
+                    prefix = _namespaceAIIsPrefix[_namespaceAIIsIndex] = 
+                            decodeIdentifyingNonEmptyStringOnFirstBitAsPrefix(true);
+                    namespaceName = _namespaceAIIsNamespaceName[_namespaceAIIsIndex] = 
+                            decodeIdentifyingNonEmptyStringOnFirstBitAsNamespaceName(true);
+                    
+                    _namespaceAIIsPrefixIndex[_namespaceAIIsIndex++] = _prefixIndex;
+                    break;
+            }
+                        
             // Push namespace declarations onto the stack
-            pushNamespaceDecl(prefix, namespaceName);
+            pushNamespaceDecl(prefix, namespaceName, _prefixIndex, _namespaceNameIndex);
             
             b = read();
         }
@@ -1030,38 +1058,17 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 processEII(_v.elementName.get(b), hasAttributes);
                 break;
             case DecoderStateTables.EII_INDEX_MEDIUM:
-            {
-                final int i = (((b & EncodingConstants.INTEGER_3RD_BIT_MEDIUM_MASK) << 8) | read())
-                + EncodingConstants.INTEGER_3RD_BIT_SMALL_LIMIT;
-                processEII(_v.elementName.get(i), hasAttributes);
+                processEII(processEIIIndexMedium(b), hasAttributes);
                 break;
-            }
             case DecoderStateTables.EII_INDEX_LARGE:
-            {
-                int i;
-                if ((b & 0x10) > 0) {
-                    // EII large index
-                    i = (((b & EncodingConstants.INTEGER_3RD_BIT_LARGE_MASK) << 16) | (read() << 8) | read())
-                    + EncodingConstants.INTEGER_3RD_BIT_MEDIUM_LIMIT;
-                } else {
-                    // EII large large index
-                    i = (((read() & EncodingConstants.INTEGER_3RD_BIT_LARGE_LARGE_MASK) << 16) | (read() << 8) | read())
-                    + EncodingConstants.INTEGER_3RD_BIT_LARGE_LIMIT;
-                }
-                processEII(_v.elementName.get(i), hasAttributes);
+                processEII(processEIIIndexLarge(b), hasAttributes);
                 break;
-            }
             case DecoderStateTables.EII_LITERAL:
             {
-                final String prefix = ((b & EncodingConstants.LITERAL_QNAME_PREFIX_FLAG) > 0)
-                ? decodeIdentifyingNonEmptyStringIndexOnFirstBitAsPrefix(_v.prefix) : "";
-                final String namespaceName = ((b & EncodingConstants.LITERAL_QNAME_NAMESPACE_NAME_FLAG) > 0)
-                ? decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(_v.namespaceName) : "";
-                final String localName = decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName);
-                
-                final QualifiedName qualifiedName = new QualifiedName(prefix, namespaceName, localName, "");
-                _v.elementName.add(qualifiedName);
-                processEII(qualifiedName, hasAttributes);
+                final QualifiedName qn = decodeLiteralQualifiedName(
+                            b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK);
+                _v.elementName.add(qn);
+                processEII(qn, hasAttributes);
                 break;
             }
             default:
@@ -1070,6 +1077,10 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     }
     
     protected final void processEII(QualifiedName name, boolean hasAttributes) throws FastInfosetException, IOException {
+        if (_v.prefix._currentInScope[name.prefixIndex] != name.namespaceNameIndex) {
+            throw new FastInfosetException("Qualified name of EII not in scope");
+        }
+
         _eventType = START_ELEMENT;
         _qualifiedName = name;
 
@@ -1120,29 +1131,22 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 case DecoderStateTables.AII_INDEX_MEDIUM:
                 {
                     final int i = (((b & EncodingConstants.INTEGER_2ND_BIT_MEDIUM_MASK) << 8) | read())
-                    + EncodingConstants.INTEGER_2ND_BIT_SMALL_LIMIT;
+                            + EncodingConstants.INTEGER_2ND_BIT_SMALL_LIMIT;
                     name = _v.attributeName.get(i);
                     break;
                 }
                 case DecoderStateTables.AII_INDEX_LARGE:
                 {
                     final int i = (((b & EncodingConstants.INTEGER_2ND_BIT_LARGE_MASK) << 16) | (read() << 8) | read())
-                    + EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT;
+                            + EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT;
                     name = _v.attributeName.get(i);
                     break;
                 }
                 case DecoderStateTables.AII_LITERAL:
-                {
-                    final String prefix = ((b & EncodingConstants.LITERAL_QNAME_PREFIX_FLAG) > 0)
-                    ? decodeIdentifyingNonEmptyStringIndexOnFirstBitAsPrefix(_v.prefix) : "";
-                    final String namespaceName = ((b & EncodingConstants.LITERAL_QNAME_NAMESPACE_NAME_FLAG) > 0)
-                    ? decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(_v.namespaceName) : "";
-                    final String localName = decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName);
-                    
-                    name = new QualifiedName(prefix, namespaceName, localName, "");
+                    name = decodeLiteralQualifiedName(
+                            b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK);
                     _v.attributeName.add(name);
                     break;
-                }
                 case DecoderStateTables.AII_TERMINATOR_DOUBLE:
                     _internalState = INTERNAL_STATE_START_ELEMENT_TERMINATE;
                 case DecoderStateTables.AII_TERMINATOR_SINGLE:
@@ -1154,6 +1158,10 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
             }
             
             // [normalized value] of AII
+ 
+            if (name.prefixIndex > 0 && _v.prefix._currentInScope[name.prefixIndex] != name.namespaceNameIndex) {
+                throw new FastInfosetException("Qualified name of AII not in scope");
+            }
             
             b = read();
             switch(DecoderStateTables.NISTRING[b]) {
@@ -1302,6 +1310,66 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
             
         } while (!terminate);
     }
+
+    protected final QualifiedName processEIIIndexMedium(int b) throws FastInfosetException, IOException {
+        final int i = (((b & EncodingConstants.INTEGER_3RD_BIT_MEDIUM_MASK) << 8) | read())
+            + EncodingConstants.INTEGER_3RD_BIT_SMALL_LIMIT;
+        return _v.elementName.get(i);
+    }
+
+    protected final QualifiedName processEIIIndexLarge(int b) throws FastInfosetException, IOException {
+        int i;
+        if ((b & 0x10) > 0) {
+            // EII large index
+            i = (((b & EncodingConstants.INTEGER_3RD_BIT_LARGE_MASK) << 16) | (read() << 8) | read())
+                + EncodingConstants.INTEGER_3RD_BIT_MEDIUM_LIMIT;
+        } else {
+            // EII large large index
+            i = (((read() & EncodingConstants.INTEGER_3RD_BIT_LARGE_LARGE_MASK) << 16) | (read() << 8) | read())
+                + EncodingConstants.INTEGER_3RD_BIT_LARGE_LIMIT;
+        }
+        return _v.elementName.get(i);
+    }
+    
+    protected final QualifiedName processLiteralQualifiedName(int state) throws FastInfosetException, IOException {
+        switch (state) {
+            // no prefix, no namespace
+            case 0:
+                return new QualifiedName(
+                        "", 
+                        "", 
+                        decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName),
+                        "",
+                        0,
+                        -1,
+                        -1);
+            // no prefix, namespace
+            case 1:
+                return new QualifiedName(
+                        "",
+                        decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(false), 
+                        decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName),
+                        "",
+                        0,
+                        -1,
+                        _namespaceNameIndex);
+            // prefix, no namespace
+            case 2:
+                throw new FastInfosetException("Literal qualified name with prefix but no namespace name");
+            // prefix, namespace
+            case 3:
+                return new QualifiedName(
+                        decodeIdentifyingNonEmptyStringIndexOnFirstBitAsPrefix(true), 
+                        decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(true), 
+                        decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName),
+                        "",
+                        0,
+                        _prefixIndex,
+                        _namespaceNameIndex);
+            default:
+                throw new FastInfosetException("Illegal state when decoding literal qualified name of EII");                
+        }        
+    }
     
     protected final void processCommentII() throws FastInfosetException, IOException {
         _eventType = COMMENT;
@@ -1431,47 +1499,15 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     }
     
     public final String getNamespaceDecl(String prefix) {
-        try {
-            Object o = _prefixMap.get(prefix);
-            if (o instanceof String) {
-                return (String) o;
-            } else if (o instanceof Stack) {
-                return (String) ((Stack) o).peek();
-            }
-        } catch (EmptyStackException e) {
-            // falls through
-        }
-        return null;
+        return _v.prefix.getNamespaceFromPrefix(prefix);
     }
     
-    private final void popNamespaceDecl(String prefix) {
-        try {
-            Object o = _prefixMap.get(prefix);
-            if (o instanceof String) {
-                _prefixMap.remove(prefix);
-            } else if (o instanceof Stack) {
-                ((Stack) o).pop();
-            }
-        } catch (EmptyStackException e) {
-            // falls through
-        }
+    private final void popNamespaceDecl(int prefixIndex) {
+        _v.prefix.popScopeWithPrefixEntry(prefixIndex);
     }
     
-    private final void pushNamespaceDecl(String prefix, String namespace) {
-        try {
-            Object o = _prefixMap.get(prefix);
-            if (o == null) {
-                _prefixMap.put(prefix, namespace);
-            } else if (o instanceof String) {
-                Stack s = new Stack();
-                s.push(o); s.push(namespace);
-                _prefixMap.put(prefix, s);
-            } else {
-                ((Stack) o).push(namespace);
-            }
-        } catch (ClassCastException e) {
-            throw new RuntimeException("Malformed namespace stack.");
-        }
+    private final void pushNamespaceDecl(String prefix, String namespaceName, int prefixIndex, int namespaceNameIndex) throws FastInfosetException {
+        _v.prefix.pushScopeWithPrefixEntry(prefix, namespaceName, prefixIndex, namespaceNameIndex);
     }
     
     

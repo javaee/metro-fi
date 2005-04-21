@@ -43,6 +43,7 @@ import com.sun.xml.fastinfoset.QualifiedName;
 import com.sun.xml.fastinfoset.util.CharArray;
 import com.sun.xml.fastinfoset.util.KeyIntMap;
 import com.sun.xml.fastinfoset.util.LocalNameQualifiedNamesMap;
+import com.sun.xml.fastinfoset.util.PrefixArray;
 import com.sun.xml.fastinfoset.util.QualifiedNameArray;
 import com.sun.xml.fastinfoset.util.StringArray;
 import com.sun.xml.fastinfoset.util.StringIntMap;
@@ -161,6 +162,16 @@ public class VocabularyGenerator extends DefaultHandler implements LexicalHandle
             a.add(s);
         }
     }
+
+    public void addToTable(String s, StringIntMap m, PrefixArray a) {
+        if (s == "") {
+            return;
+        }
+        
+        if (m.obtainIndex(s) == KeyIntMap.NOT_PRESENT) {
+            a.add(s);
+        }
+    }
     
     public void addToCharArrayTable(CharArray c) {
         if (_serializerVocabulary.characterContentChunk.obtainIndex(c.ch, c.start, c.length, false) == KeyIntMap.NOT_PRESENT) {
@@ -202,7 +213,7 @@ public class VocabularyGenerator extends DefaultHandler implements LexicalHandle
         if (localNameIndex == KeyIntMap.NOT_PRESENT) {
             _parserVocabulary.localName.add(localName);
         }
-        QualifiedName name = new QualifiedName(prefix, namespaceURI, localName, m.getNextIndex());
+        QualifiedName name = new QualifiedName(prefix, namespaceURI, localName, m.getNextIndex(), prefixIndex, namespaceURIIndex);
         entry.addQualifiedName(name);
         a.add(name);
     }

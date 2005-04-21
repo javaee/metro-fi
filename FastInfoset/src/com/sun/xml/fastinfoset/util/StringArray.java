@@ -96,7 +96,7 @@ public class StringArray extends ValueArray {
         }
    }
  
-    public final void add(String s) {
+    public final int add(String s) {
         if (_size == _array.length) {
             final String[] newArray = new String[_size * 3 / 2 + 1];
             System.arraycopy(_array, 0, newArray, 0, _size);
@@ -104,5 +104,6 @@ public class StringArray extends ValueArray {
         }
             
        _array[_size++] = s;
+       return _size;
     }
 }

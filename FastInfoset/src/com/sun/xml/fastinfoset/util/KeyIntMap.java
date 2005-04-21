@@ -132,7 +132,7 @@ public abstract class KeyIntMap {
     public abstract void setReadOnlyMap(KeyIntMap readOnlyMap, boolean clear);
 
     
-    static final int hashHash(int h) {
+    public static final int hashHash(int h) {
         h += ~(h << 9);
         h ^=  (h >>> 14);
         h +=  (h << 4);
@@ -140,7 +140,7 @@ public abstract class KeyIntMap {
         return h;
     }
 
-    static final int indexFor(int h, int length) {
+    public static final int indexFor(int h, int length) {
         return h & (length-1);
     }
 

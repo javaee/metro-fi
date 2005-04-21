@@ -64,10 +64,14 @@ public class DOMDocumentParser extends Decoder {
     
     protected Element _currentElement;
 
-    protected Attr[] _namespaceAttributes = new Attr[8];
+    protected Attr[] _namespaceAttributes = new Attr[16];
 
     protected int _namespaceAttributesIndex;
     
+    protected int[] _namespacePrefixes = new int[16];
+    
+    protected int _namespacePrefixesIndex;
+
     public void parse(Document d, InputStream s) throws FastInfosetException, IOException {        
         _currentNode = _document = d;
         _namespaceAttributesIndex = 0;
@@ -80,10 +84,28 @@ public class DOMDocumentParser extends Decoder {
         parse();
     }
     
+    protected void resetOnError() {
+        _namespacePrefixesIndex = 0;
+        
+        _v.prefix.clearCompletely();
+    }
+    
     protected final void parse() throws FastInfosetException, IOException {
-        reset();
-        decodeHeader();                                                                                
-        processDII();
+        try {
+            reset();
+            decodeHeader();                                                                                
+            processDII();
+        } catch (RuntimeException e) {
+            resetOnError();
+            // Wrap runtime exception
+            throw new FastInfosetException(e);
+        } catch (FastInfosetException e) {
+            resetOnError();
+            throw e;
+        } catch (IOException e) {
+            resetOnError();
+            throw e;
+        }
     }
     
     protected final void processDII() throws FastInfosetException, IOException {        
@@ -115,9 +137,14 @@ public class DOMDocumentParser extends Decoder {
                     firstElementHasOccured = true;
                     break;
                 case DecoderStateTables.EII_LITERAL:
-                    processEII(processEIILiteral(), (_b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
+                {
+                    final QualifiedName qn = processLiteralQualifiedName(
+                                _b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK);
+                    _v.elementName.add(qn);
+                    processEII(qn, (_b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
                     firstElementHasOccured = true;
                     break;
+                }
                 case DecoderStateTables.EII_NAMESPACES:
                     processEIIWithNamespaces();
                     firstElementHasOccured = true;
@@ -258,6 +285,10 @@ public class DOMDocumentParser extends Decoder {
     }
 
     protected final void processEII(QualifiedName name, boolean hasAttributes) throws FastInfosetException, IOException {
+        if (_v.prefix._currentInScope[name.prefixIndex] != name.namespaceNameIndex) {
+            throw new FastInfosetException("Qualified name of EII not in scope");
+        }
+        
         final Node parentCurrentNode = _currentNode;
         
         _currentNode = _currentElement = createElement(name.namespaceName, name.qName, name.localName);
@@ -292,8 +323,13 @@ public class DOMDocumentParser extends Decoder {
                     processEII(decodeEIIIndexLarge(), (_b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
                     break;
                 case DecoderStateTables.EII_LITERAL:
-                    processEII(processEIILiteral(), (_b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
+                {
+                    final QualifiedName qn = processLiteralQualifiedName(
+                                _b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK);
+                    _v.elementName.add(qn);
+                    processEII(qn, (_b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
                     break;
+                }
                 case DecoderStateTables.EII_NAMESPACES:
                     processEIIWithNamespaces();
                     break;
@@ -482,41 +518,79 @@ public class DOMDocumentParser extends Decoder {
 
     protected final void processEIIWithNamespaces() throws FastInfosetException, IOException {
         final boolean hasAttributes = (_b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0;
-                
+
+        _v.prefix.incrementDeclarationId();
+
+        String prefix;
+        Attr a = null;
+        final int start = _namespacePrefixesIndex;
         int b = read();
         while ((b & EncodingConstants.NAMESPACE_ATTRIBUTE_MASK) == EncodingConstants.NAMESPACE_ATTRIBUTE) {
-            // NOTE a prefix without a namespace name is an undeclaration
-            // of the namespace bound to the prefix
-            // TODO need to investigate how the startPrefixMapping works in
-            // relation to undeclaration
-
-            // Prefix
-            final String prefix = ((b & EncodingConstants.NAMESPACE_ATTRIBUTE_PREFIX_FLAG) > 0) 
-                ? decodeIdentifyingNonEmptyStringOnFirstBitAsPrefix(_v.prefix) : null;
-
-            // Namespace name
-            final String namespaceName = ((b & EncodingConstants.NAMESPACE_ATTRIBUTE_NAME_FLAG) > 0) 
-                ? decodeIdentifyingNonEmptyStringOnFirstBitAsNamespaceName(_v.namespaceName) : null;
-            
             if (_namespaceAttributesIndex == _namespaceAttributes.length) {
-                final Attr[] a = new Attr[_namespaceAttributesIndex * 3 / 2 + 1];
-                System.arraycopy(_namespaceAttributes, 0, a, 0, _namespaceAttributesIndex);
-                _namespaceAttributes = a;
+                final Attr[] newNamespaceAttributes = new Attr[_namespaceAttributesIndex * 3 / 2 + 1];
+                System.arraycopy(_namespaceAttributes, 0, newNamespaceAttributes, 0, _namespaceAttributesIndex);
+                _namespaceAttributes = newNamespaceAttributes;
             }
 
-            Attr a;
-            if (prefix != null) {
-                a = createAttribute(
-                        "http://www.w3.org/2000/xmlns/",
-                        "xmlns:" + prefix, 
-                        prefix);
-            } else {
-                a = createAttribute(
-                        "http://www.w3.org/2000/xmlns/",
-                        "xmlns", 
-                        "xmlns");
+            if (_namespacePrefixesIndex == _namespacePrefixes.length) {
+                final int[] namespaceAIIs = new int[_namespacePrefixesIndex * 3 / 2 + 1];
+                System.arraycopy(_namespacePrefixes, 0, namespaceAIIs, 0, _namespacePrefixesIndex);
+                _namespacePrefixes = namespaceAIIs;
             }
-            a.setValue (namespaceName);    
+
+            
+            switch (b & EncodingConstants.NAMESPACE_ATTRIBUTE_PREFIX_NAME_MASK) {
+                // no prefix, no namespace
+                // Undeclaration of default namespace
+                case 0:
+                    a = createAttribute(
+                            EncodingConstants.XMLNS_NAMESPACE_NAME,
+                            EncodingConstants.XMLNS_NAMESPACE_PREFIX, 
+                            EncodingConstants.XMLNS_NAMESPACE_PREFIX);
+                    a.setValue ("");
+                    
+                    _prefixIndex = _namespaceNameIndex = _namespacePrefixes[_namespacePrefixesIndex++] = -1;
+                    break;
+                // no prefix, namespace
+                // Declaration of default namespace
+                case 1:
+                    a = createAttribute(
+                            EncodingConstants.XMLNS_NAMESPACE_NAME,
+                            EncodingConstants.XMLNS_NAMESPACE_PREFIX, 
+                            EncodingConstants.XMLNS_NAMESPACE_PREFIX);
+                    a.setValue (decodeIdentifyingNonEmptyStringOnFirstBitAsNamespaceName(false));
+                           
+                    _prefixIndex = _namespacePrefixes[_namespacePrefixesIndex++] = -1;
+                    break;
+                // prefix, no namespace
+                // Undeclaration of namespace
+                case 2:
+                    prefix = decodeIdentifyingNonEmptyStringOnFirstBitAsPrefix(false);
+                    a = createAttribute(
+                            EncodingConstants.XMLNS_NAMESPACE_NAME,
+                            createQualifiedNameString(EncodingConstants.XMLNS_NAMESPACE_PREFIX_CHARS, prefix),
+                            prefix);
+                    a.setValue ("");
+                    
+                    _namespaceNameIndex = -1;
+                    _namespacePrefixes[_namespacePrefixesIndex++] = _prefixIndex;
+                    break;
+                // prefix, namespace
+                // Declaration of prefixed namespace 
+                case 3:
+                    prefix = decodeIdentifyingNonEmptyStringOnFirstBitAsPrefix(true);
+                    a = createAttribute(
+                            EncodingConstants.XMLNS_NAMESPACE_NAME,
+                            createQualifiedNameString(EncodingConstants.XMLNS_NAMESPACE_PREFIX_CHARS, prefix),
+                            prefix);
+                    a.setValue (decodeIdentifyingNonEmptyStringOnFirstBitAsNamespaceName(true));
+                    
+                    _namespacePrefixes[_namespacePrefixesIndex++] = _prefixIndex;
+                    break;
+            }
+                        
+            _v.prefix.pushScope(_prefixIndex, _namespaceNameIndex);
+            
             _namespaceAttributes[_namespaceAttributesIndex++] = a;
             
             b = read();
@@ -524,20 +598,12 @@ public class DOMDocumentParser extends Decoder {
         if (b != EncodingConstants.TERMINATOR) {
             throw new IOException("Namespace names of EII not terminated correctly");
         }
+        final int end = _namespacePrefixesIndex;
 
         _b = read();
-        if (hasAttributes) {
-            // Re-flag attribute flag
-            // This is so the EII table can be reused.
-            _b |= EncodingConstants.ELEMENT_ATTRIBUTE_FLAG;
-        }
-
         switch(DecoderStateTables.EII[_b]) {
             case DecoderStateTables.EII_NO_AIIS_INDEX_SMALL:
-                processEII(_v.elementName.get(_b), false);
-                break;
-            case DecoderStateTables.EII_AIIS_INDEX_SMALL:
-                processEII(_v.elementName.get(_b & EncodingConstants.INTEGER_3RD_BIT_SMALL_MASK), true);
+                processEII(_v.elementName.get(_b), hasAttributes);
                 break;
             case DecoderStateTables.EII_INDEX_MEDIUM:
                 processEII(decodeEIIIndexMedium(), hasAttributes);
@@ -546,23 +612,59 @@ public class DOMDocumentParser extends Decoder {
                 processEII(decodeEIIIndexLarge(), hasAttributes);
                 break;
             case DecoderStateTables.EII_LITERAL:
-                processEII(processEIILiteral(), hasAttributes);
+            {
+                final QualifiedName qn = processLiteralQualifiedName(
+                            _b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK);
+                _v.elementName.add(qn);
+                processEII(qn, hasAttributes);
                 break;
+            }
             default:
                 throw new IOException("Illegal state when decoding EII after the namespace AIIs");
         }
+        
+        for (int i = start; i < end; i++) {
+            _v.prefix.popScope(_namespacePrefixes[i]);
+        }
+        _namespacePrefixesIndex = start;
+        
     }
 
-    protected final QualifiedName processEIILiteral() throws FastInfosetException, IOException {
-        final String prefix = ((_b & EncodingConstants.LITERAL_QNAME_PREFIX_FLAG) > 0) 
-            ? decodeIdentifyingNonEmptyStringIndexOnFirstBitAsPrefix(_v.prefix) : null;
-        final String namespaceName = ((_b & EncodingConstants.LITERAL_QNAME_NAMESPACE_NAME_FLAG) > 0) 
-            ? decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(_v.namespaceName) : null;
-        final String localName = decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName);
-
-        final QualifiedName qualifiedName = new QualifiedName(prefix, namespaceName, localName);
-        _v.elementName.add(qualifiedName);
-        return qualifiedName;
+    protected final QualifiedName processLiteralQualifiedName(int state) throws FastInfosetException, IOException {
+        switch (state) {
+            // no prefix, no namespace
+            case 0:
+                return new QualifiedName(
+                        null, 
+                        null, 
+                        decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName),
+                        -1,
+                        -1,
+                        null);
+            // no prefix, namespace
+            case 1:
+                return new QualifiedName(
+                        null,
+                        decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(false), 
+                        decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName),
+                        -1,
+                        _namespaceNameIndex,
+                        null);
+            // prefix, no namespace
+            case 2:
+                throw new FastInfosetException("Literal qualified name with prefix but no namespace name");
+            // prefix, namespace
+            case 3:
+                return new QualifiedName(
+                        decodeIdentifyingNonEmptyStringIndexOnFirstBitAsPrefix(true), 
+                        decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(true), 
+                        decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName),
+                        _prefixIndex,
+                        _namespaceNameIndex, 
+                        _charBuffer);
+            default:
+                throw new FastInfosetException("Illegal state when decoding literal qualified name of EII");                
+        }        
     }
 
     protected final void processAIIs() throws FastInfosetException, IOException {
@@ -592,17 +694,10 @@ public class DOMDocumentParser extends Decoder {
                     break;
                 }
                 case DecoderStateTables.AII_LITERAL:
-                {
-                    final String prefix = ((b & EncodingConstants.LITERAL_QNAME_PREFIX_FLAG) > 0) 
-                        ? decodeIdentifyingNonEmptyStringIndexOnFirstBitAsPrefix(_v.prefix) : null;
-                    final String namespaceName = ((b & EncodingConstants.LITERAL_QNAME_NAMESPACE_NAME_FLAG) > 0) 
-                        ? decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(_v.namespaceName) : null;
-                    final String localName = decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName);
-
-                    name = new QualifiedName(prefix, namespaceName, localName);
+                    name = processLiteralQualifiedName(
+                            b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK);
                     _v.attributeName.add(name);
                     break;
-                }
                 case DecoderStateTables.AII_TERMINATOR_DOUBLE:                    
                     _doubleTerminate = true;
                 case DecoderStateTables.AII_TERMINATOR_SINGLE:
@@ -611,6 +706,10 @@ public class DOMDocumentParser extends Decoder {
                     continue;
                 default:
                     throw new IOException("Illegal state when decoding AIIs");
+            }
+
+            if (name.prefixIndex > 0 && _v.prefix._currentInScope[name.prefixIndex] != name.namespaceNameIndex) {
+                throw new FastInfosetException("Qualified name of AII not in scope");
             }
 
             Attr a = createAttribute(

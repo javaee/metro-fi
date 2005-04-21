@@ -45,10 +45,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import com.sun.japex.*;
 import com.sun.org.apache.xerces.internal.parsers.DOMParser;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 public class XercesDOMParserDriver extends JapexDriverBase {
@@ -93,6 +95,7 @@ public class XercesDOMParserDriver extends JapexDriverBase {
             _inputStream.reset();
             _parser.parse(new InputSource(_inputStream));
             Document d = _parser.getDocument();
+            // traverse(d);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -104,6 +107,7 @@ public class XercesDOMParserDriver extends JapexDriverBase {
             _inputStream.reset();
             _parser.parse(new InputSource(_inputStream));
             Document d = _parser.getDocument();
+            // traverse(d);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -115,4 +119,23 @@ public class XercesDOMParserDriver extends JapexDriverBase {
     
     public void terminateDriver() {
     }          
+    
+    public final void traverse(Node n) {
+        Object o = n.getNodeValue();
+        
+        if (n.hasAttributes()) {
+            NamedNodeMap nnm = n.getAttributes();
+            for (int i = 0; i < nnm.getLength(); i++) {
+                Node an = nnm.item(i);
+                o = an.getNodeValue();
+            }
+        }
+        
+        if (n.hasChildNodes()) {
+            NodeList nl = n.getChildNodes();
+            for (int i = 0; i < nl.getLength(); i++) {
+                traverse(nl.item(i));
+            }
+        }
+    }
 }
