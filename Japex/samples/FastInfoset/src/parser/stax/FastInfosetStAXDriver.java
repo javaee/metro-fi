@@ -39,40 +39,21 @@ package parser.stax;
  */
 
 import java.io.*;
-import org.xml.sax.InputSource;
 import javax.xml.parsers.*;
-import java.util.Properties;
-
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import com.sun.xml.fastinfoset.stax.StAXInputFactory;
 import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
-import com.sun.xml.fastinfoset.tools.XML_SAX_FI;
 
 import com.sun.japex.*;
+import com.sun.xml.fastinfoset.sax.SAXDocumentSerializer;
 
 public class FastInfosetStAXDriver extends JapexDriverBase {
     
     String _xmlFile;
     InputStream _inputStream;
 
-    XMLInputFactory _factory = null;
-    XMLStreamReader _streamReader = null;
+    StAXDocumentParser _staxParser = null;
     
-    public FastInfosetStAXDriver() {
-    }
-
     public void initializeDriver() {
-        System.setProperty("javax.xml.stream.XMLInputFactory", 
-                       "com.sun.xml.fastinfoset.stax.StAXInputFactory");
-        try {
-            _factory = XMLInputFactory.newInstance();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+        _staxParser = new StAXDocumentParser();
     }   
     
     public void prepare(TestCase testCase) {
@@ -81,31 +62,35 @@ public class FastInfosetStAXDriver extends JapexDriverBase {
             throw new RuntimeException("xmlfile not specified");
         }
         
-        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        BufferedOutputStream bufferedStream = new BufferedOutputStream(byteStream);
         // Load file into byte array to factor out IO
-        try {            
-            FileReader xmlfile = new FileReader(_xmlFile);
-            StAXDocumentParser sr = null;
-            XML_SAX_FI convertor = new XML_SAX_FI();
-            convertor.convert(xmlfile, bufferedStream);
-/**
-            ByteArrayInputStream byteInputStream = new ByteArrayInputStream(byteStream.toByteArray());
-            _inputStream = new BufferedInputStream(byteInputStream);     
-*/
-            _inputStream = new ByteArrayInputStream(byteStream.toByteArray());
+        try {
+	    SAXParserFactory spf = SAXParserFactory.newInstance();
+            spf.setNamespaceAware(true);
+            SAXParser parser = spf.newSAXParser();
+
+	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	    SAXDocumentSerializer ds = new SAXDocumentSerializer();
+            
+            ds.setOutputStream(baos);
+
+            // TODO must use URL here
+            FileInputStream fis = new FileInputStream(new File(_xmlFile));
+            parser.parse(fis, ds);
+            fis.close();
+
+            _inputStream = new ByteArrayInputStream(baos.toByteArray());            
         }
         catch (Exception e) {
             e.printStackTrace();
-        }
+        }        
     }
     
     public void warmup(TestCase testCase) {
         try {
             _inputStream.reset();
-            _streamReader = _factory.createXMLStreamReader(_inputStream);
-            while (_streamReader.hasNext()) {
-                _streamReader.next();
+            _staxParser.setInputStream(_inputStream);
+            while (_staxParser.hasNext()) {
+                _staxParser.next();
             }
         }
         catch (Exception e) {
@@ -116,9 +101,9 @@ public class FastInfosetStAXDriver extends JapexDriverBase {
     public void run(TestCase testCase) {
         try {
             _inputStream.reset();
-            _streamReader = _factory.createXMLStreamReader(_inputStream);
-            while (_streamReader.hasNext()) {
-                _streamReader.next();
+            _staxParser.setInputStream(_inputStream);
+            while (_staxParser.hasNext()) {
+                _staxParser.next();
             }
         }
         catch (Exception e) {
@@ -126,9 +111,6 @@ public class FastInfosetStAXDriver extends JapexDriverBase {
         }
     }
     
-    protected void parse() {
-    
-    }
     public void finish(TestCase testCase) {
     }
     
