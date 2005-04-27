@@ -49,6 +49,9 @@ public class QualifiedName {
     public final int index;
     public final int prefixIndex;
     public final int namespaceNameIndex;
+    public final int localNameIndex;
+    public int attributeId;
+    public int attributeHash;
     private QName qNameObject;
     
     public QualifiedName(String prefix, String namespaceName, String localName, String qName) {
@@ -59,6 +62,7 @@ public class QualifiedName {
         this.index = -1;
         this.prefixIndex = 0;
         this.namespaceNameIndex = 0;        
+        this.localNameIndex = -1;
     }    
 
     public QualifiedName(String prefix, String namespaceName, String localName, String qName, int index) {
@@ -69,9 +73,10 @@ public class QualifiedName {
         this.index = index;
         this.prefixIndex = 0;
         this.namespaceNameIndex = 0;        
+        this.localNameIndex = -1;
     }    
     
-    public QualifiedName(String prefix, String namespaceName, String localName, String qName, int index, int prefixIndex, int namespaceNameIndex) {
+    public QualifiedName(String prefix, String namespaceName, String localName, String qName, int index, int prefixIndex, int namespaceNameIndex, int localNameIndex) {
         this.prefix = prefix;
         this.namespaceName = namespaceName;
         this.localName = localName;
@@ -79,6 +84,7 @@ public class QualifiedName {
         this.index = index;
         this.prefixIndex = prefixIndex + 1;
         this.namespaceNameIndex = namespaceNameIndex + 1;
+        this.localNameIndex = localNameIndex;
     }    
     
     public QualifiedName(String prefix, String namespaceName, String localName) {
@@ -98,9 +104,10 @@ public class QualifiedName {
         this.index = -1;
         this.prefixIndex = 0;
         this.namespaceNameIndex = 0;        
+        this.localNameIndex = -1;
     }    
 
-    public QualifiedName(String prefix, String namespaceName, String localName, int prefixIndex, int namespaceNameIndex, char[] charBuffer) {
+    public QualifiedName(String prefix, String namespaceName, String localName, int prefixIndex, int namespaceNameIndex, int localNameIndex, char[] charBuffer) {
         this.prefix = prefix;
         this.namespaceName = namespaceName;
         this.localName = localName;
@@ -126,6 +133,7 @@ public class QualifiedName {
 
         this.prefixIndex = prefixIndex + 1;
         this.namespaceNameIndex = namespaceNameIndex + 1;
+        this.localNameIndex = localNameIndex;
         this.index = -1;
     }    
     
@@ -146,9 +154,10 @@ public class QualifiedName {
         this.index = index;
         this.prefixIndex = 0;
         this.namespaceNameIndex = 0;        
+        this.localNameIndex = -1;
     }    
     
-    public QualifiedName(String prefix, String namespaceName, String localName, int index, int prefixIndex, int namespaceNameIndex) {
+    public QualifiedName(String prefix, String namespaceName, String localName, int index, int prefixIndex, int namespaceNameIndex, int localNameIndex) {
         this.prefix = prefix;
         this.namespaceName = namespaceName;
         this.localName = localName;
@@ -165,6 +174,7 @@ public class QualifiedName {
         this.index = index;
         this.prefixIndex = prefixIndex + 1;
         this.namespaceNameIndex = namespaceNameIndex + 1;
+        this.localNameIndex = localNameIndex;
     }    
     
     // Qualified Name as a Namespace Name
@@ -175,7 +185,8 @@ public class QualifiedName {
         this.qName = "";
         this.index = -1;
         this.prefixIndex = 0;
-        this.namespaceNameIndex = 0;        
+        this.namespaceNameIndex = 0;       
+        this.localNameIndex = -1;
     }
     
     public final QName getQName() {
@@ -184,5 +195,10 @@ public class QualifiedName {
         }
         
         return qNameObject;
+    }
+    
+    public final void createAttributeValues(int size) {
+        attributeId = localNameIndex | (namespaceNameIndex << 20);
+        attributeHash = localNameIndex % size;
     }
 }

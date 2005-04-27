@@ -41,7 +41,7 @@ package com.sun.xml.fastinfoset.util;
 
 public class StringArray extends ValueArray {
     
-    private String[] _array;
+    public String[] _array;
     
     private StringArray _readOnlyArray;
 
@@ -54,10 +54,10 @@ public class StringArray extends ValueArray {
     }
 
     public final void clear() {
-        for (int i = 0; i < _size; i++) {
+        for (int i = _readOnlyArraySize; i < _size; i++) {
             _array[i] = null;
         }
-        _size = 0;
+        _size = _readOnlyArraySize;
     }
 
     public final String[] getArray() {
@@ -77,24 +77,30 @@ public class StringArray extends ValueArray {
         if (readOnlyArray != null) {
             _readOnlyArray = readOnlyArray;
             _readOnlyArraySize = readOnlyArray.getSize();
-            
+           
             if (clear) {
                 clear();
             }
+
+            _array = getCompleteArray();
+            _size = _readOnlyArraySize;
+        }
+    }
+
+    public final String[] getCompleteArray() {
+        if (_readOnlyArray == null) {
+            return _array;
+        } else {
+            final String[] ra = _readOnlyArray.getCompleteArray();
+            final String[] a = new String[_readOnlyArraySize + _array.length];
+            System.arraycopy(ra, 0, a, 0, _readOnlyArraySize);
+            return a;
         }
     }
     
     public final String get(int i) {
-        if (_readOnlyArray == null) {
-            return _array[i];
-        } else {
-            if (i < _readOnlyArraySize) {
-               return _readOnlyArray.get(i); 
-            } else {
-                return _array[i - _readOnlyArraySize];
-            }
-        }
-   }
+        return _array[i];
+    }
  
     public final int add(String s) {
         if (_size == _array.length) {

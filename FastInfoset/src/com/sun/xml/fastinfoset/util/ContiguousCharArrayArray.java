@@ -46,6 +46,7 @@ public class ContiguousCharArrayArray extends ValueArray {
     
     public char[] _array;
     public int _arrayIndex;
+    public int _readOnlyArrayIndex;
     
     private CharArray _charArray = new CharArray();
     
@@ -63,10 +64,14 @@ public class ContiguousCharArrayArray extends ValueArray {
     }
     
     public final void clear() {
-        _arrayIndex = 0;
-        _size = 0;
+        _arrayIndex = _readOnlyArrayIndex;
+        _size = _readOnlyArraySize;
     }
 
+    public final int getArrayIndex() {
+        return _arrayIndex;
+    }
+    
     public final void setReadOnlyArray(ValueArray readOnlyArray, boolean clear) {
         if (!(readOnlyArray instanceof ContiguousCharArrayArray)) {
             throw new IllegalArgumentException("Illegal class: "
@@ -80,28 +85,56 @@ public class ContiguousCharArrayArray extends ValueArray {
         if (readOnlyArray != null) {
             _readOnlyArray = readOnlyArray;
             _readOnlyArraySize = readOnlyArray.getSize();
-                        
+            _readOnlyArrayIndex = readOnlyArray.getArrayIndex();
+            
             if (clear) {
                 clear();
             }
+
+            _charArray.ch = _array = getCompleteCharArray();
+            _offset = getCompleteOffsetArray();
+            _length = getCompleteLengthArray();
+            _size = _readOnlyArraySize;
+        }
+    }
+
+    public final char[] getCompleteCharArray() {
+        if (_readOnlyArray == null) {
+            return _array;
+        } else {
+            final char[] ra = _readOnlyArray.getCompleteCharArray();
+            final char[] a = new char[_readOnlyArrayIndex + _array.length];
+            System.arraycopy(ra, 0, a, 0, _readOnlyArrayIndex);
+            return a;
+        }
+    }
+    
+    public final int[] getCompleteOffsetArray() {
+        if (_readOnlyArray == null) {
+            return _offset;
+        } else {
+            final int[] ra = _readOnlyArray.getCompleteOffsetArray();
+            final int[] a = new int[_readOnlyArraySize + _offset.length];
+            System.arraycopy(ra, 0, a, 0, _readOnlyArraySize);
+            return a;
+        }
+    }
+    
+    public final int[] getCompleteLengthArray() {
+        if (_readOnlyArray == null) {
+            return _length;
+        } else {
+            final int[] ra = _readOnlyArray.getCompleteOffsetArray();
+            final int[] a = new int[_readOnlyArraySize + _length.length];
+            System.arraycopy(ra, 0, a, 0, _readOnlyArraySize);
+            return a;
         }
     }
     
     public final CharArray get(int i) {
-        if (_readOnlyArray == null) {
-            _charArray.start = _offset[i];
-            _charArray.length = _length[i];
-            return _charArray;
-        } else {
-            if (i < _readOnlyArraySize) {
-               return _readOnlyArray.get(i); 
-            } else {
-                i -= _readOnlyArraySize;
-                _charArray.start = _offset[i];
-                _charArray.length = _length[i];
-                return _charArray;
-            }
-        }
+        _charArray.start = _offset[i];
+        _charArray.length = _length[i];
+        return _charArray;
    }
     
     public final void add(int o, int l) {

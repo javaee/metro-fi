@@ -41,6 +41,7 @@ package com.sun.xml.fastinfoset.sax;
 
 import com.sun.xml.fastinfoset.QualifiedName;
 import com.sun.xml.fastinfoset.util.CharArray;
+import com.sun.xml.fastinfoset.util.DuplicateAttributeVerifier;
 import com.sun.xml.fastinfoset.util.KeyIntMap;
 import com.sun.xml.fastinfoset.util.LocalNameQualifiedNamesMap;
 import com.sun.xml.fastinfoset.util.PrefixArray;
@@ -94,10 +95,10 @@ public class VocabularyGenerator extends DefaultHandler implements LexicalHandle
     }
 
     public void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException {
-        addToNameTable(namespaceURI, qName, localName, _serializerVocabulary.elementName, _parserVocabulary.elementName);
+        addToNameTable(namespaceURI, qName, localName, _serializerVocabulary.elementName, _parserVocabulary.elementName, false);
         
         for (int a = 0; a < atts.getLength(); a++) {            
-            addToNameTable(atts.getURI(a), atts.getQName(a), atts.getLocalName(a), _serializerVocabulary.attributeName, _parserVocabulary.attributeName);
+            addToNameTable(atts.getURI(a), atts.getQName(a), atts.getLocalName(a), _serializerVocabulary.attributeName, _parserVocabulary.attributeName, true);
         
             String value = atts.getValue(a);
             if (value.length() < _serializerVocabulary.attributeValueSizeConstraint) {
@@ -179,7 +180,9 @@ public class VocabularyGenerator extends DefaultHandler implements LexicalHandle
         }        
     }
 
-    public void addToNameTable(String namespaceURI, String qName, String localName, LocalNameQualifiedNamesMap m, QualifiedNameArray a) throws SAXException {        
+    public void addToNameTable(String namespaceURI, String qName, String localName, 
+            LocalNameQualifiedNamesMap m, QualifiedNameArray a,
+            boolean isAttribute) throws SAXException {        
         LocalNameQualifiedNamesMap.Entry entry = m.obtainEntry(qName);
         if (entry._valueIndex > 0) {
             QualifiedName[] names = entry._value;
@@ -212,8 +215,12 @@ public class VocabularyGenerator extends DefaultHandler implements LexicalHandle
         localNameIndex = _serializerVocabulary.localName.obtainIndex(localName);
         if (localNameIndex == KeyIntMap.NOT_PRESENT) {
             _parserVocabulary.localName.add(localName);
+            localNameIndex = _parserVocabulary.localName.getSize() - 1;
         }
-        QualifiedName name = new QualifiedName(prefix, namespaceURI, localName, m.getNextIndex(), prefixIndex, namespaceURIIndex);
+        QualifiedName name = new QualifiedName(prefix, namespaceURI, localName, m.getNextIndex(), prefixIndex, namespaceURIIndex, localNameIndex);
+        if (isAttribute) {
+            name.createAttributeValues(DuplicateAttributeVerifier.MAP_SIZE);
+        }
         entry.addQualifiedName(name);
         a.add(name);
     }

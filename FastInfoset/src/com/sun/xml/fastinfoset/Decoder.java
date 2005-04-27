@@ -44,6 +44,7 @@ import com.sun.xml.fastinfoset.org.apache.xerces.util.XMLChar;
 import com.sun.xml.fastinfoset.util.CharArray;
 import com.sun.xml.fastinfoset.util.CharArrayArray;
 import com.sun.xml.fastinfoset.util.ContiguousCharArrayArray;
+import com.sun.xml.fastinfoset.util.DuplicateAttributeVerifier;
 import com.sun.xml.fastinfoset.util.PrefixArray;
 import com.sun.xml.fastinfoset.util.QualifiedNameArray;
 import com.sun.xml.fastinfoset.util.StringArray;
@@ -110,6 +111,16 @@ public abstract class Decoder implements FastInfosetParser {
     protected Map _registeredEncodingAlgorithms = new HashMap();
     
     protected ParserVocabulary _v;
+
+    protected PrefixArray _prefixTable;
+    
+    protected QualifiedNameArray _elementNameTable;
+    
+    protected QualifiedNameArray _attributeNameTable;
+
+    protected ContiguousCharArrayArray _characterContentChunkTable;
+
+    protected StringArray _attributeValueTable;
     
     protected boolean _vIsInternal;
 
@@ -145,8 +156,15 @@ public abstract class Decoder implements FastInfosetParser {
 
     protected int _charBufferLength;
 
+    protected DuplicateAttributeVerifier _duplicateAttributeVerifier = new DuplicateAttributeVerifier();
+    
     public Decoder() {
         _v = new ParserVocabulary();
+        _prefixTable = _v.prefix;
+        _elementNameTable = _v.elementName;
+        _attributeNameTable = _v.attributeName;
+        _characterContentChunkTable = _v.characterContentChunk;
+        _attributeValueTable = _v.attributeValue;
         _vIsInternal = true;
     }
 
@@ -214,6 +232,11 @@ public abstract class Decoder implements FastInfosetParser {
 
     public void setVocabulary(ParserVocabulary v) {
         _v = v;
+        _prefixTable = _v.prefix;
+        _elementNameTable = _v.elementName;
+        _attributeNameTable = _v.attributeName;
+        _characterContentChunkTable = _v.characterContentChunk;
+        _attributeValueTable = _v.attributeValue;
         _vIsInternal = false;
     }
 
@@ -455,7 +478,7 @@ public abstract class Decoder implements FastInfosetParser {
     protected final QualifiedName decodeEIIIndexMedium() throws FastInfosetException, IOException {
         final int i = (((_b & EncodingConstants.INTEGER_3RD_BIT_MEDIUM_MASK) << 8) | read())
             + EncodingConstants.INTEGER_3RD_BIT_SMALL_LIMIT;
-        return _v.elementName.get(i);
+        return _v.elementName._array[i];
     }
 
     protected final QualifiedName decodeEIIIndexLarge() throws FastInfosetException, IOException {
@@ -469,7 +492,7 @@ public abstract class Decoder implements FastInfosetParser {
             i = (((read() & EncodingConstants.INTEGER_3RD_BIT_LARGE_LARGE_MASK) << 16) | (read() << 8) | read())
                 + EncodingConstants.INTEGER_3RD_BIT_LARGE_LIMIT;
         }
-        return _v.elementName.get(i);
+        return _v.elementName._array[i];
     }
 
     protected final QualifiedName decodeLiteralQualifiedName(int state) throws FastInfosetException, IOException {
@@ -482,6 +505,7 @@ public abstract class Decoder implements FastInfosetParser {
                         decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName),
                         -1,
                         -1,
+                        _identifier,
                         null);
             // no prefix, namespace
             case 1:
@@ -491,6 +515,7 @@ public abstract class Decoder implements FastInfosetParser {
                         decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName),
                         -1,
                         _namespaceNameIndex,
+                        _identifier,
                         null);
             // prefix, no namespace
             case 2:
@@ -502,7 +527,8 @@ public abstract class Decoder implements FastInfosetParser {
                         decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(true), 
                         decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName),
                         _prefixIndex,
-                        _namespaceNameIndex, 
+                        _namespaceNameIndex,
+                        _identifier,
                         _charBuffer);
             default:
                 throw new FastInfosetException("Illegal state when decoding literal qualified name of EII");                
@@ -694,15 +720,15 @@ public abstract class Decoder implements FastInfosetParser {
             }
             case DecoderStateTables.ISTRING_INDEX_SMALL:
                 _identifier = b & EncodingConstants.INTEGER_2ND_BIT_SMALL_MASK;
-                return table.get(_identifier);
+                return table._array[_identifier];
             case DecoderStateTables.ISTRING_INDEX_MEDIUM:
                 _identifier = (((b & EncodingConstants.INTEGER_2ND_BIT_MEDIUM_MASK) << 8) | read())
                     + EncodingConstants.INTEGER_2ND_BIT_SMALL_LIMIT;
-                return table.get(_identifier);
+                return table._array[_identifier];
             case DecoderStateTables.ISTRING_INDEX_LARGE:
                 _identifier = (((b & EncodingConstants.INTEGER_2ND_BIT_LARGE_MASK) << 16) | (read() << 8) | read())
                     + EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT;
-                return table.get(_identifier);
+                return table._array[_identifier];
             default:
                 throw new FastInfosetException("Illegal state when decoding identifying string on first bit");
         }
@@ -791,15 +817,15 @@ public abstract class Decoder implements FastInfosetParser {
                 }
             case DecoderStateTables.ISTRING_INDEX_SMALL:
                 _prefixIndex = b & EncodingConstants.INTEGER_2ND_BIT_SMALL_MASK;
-                return _v.prefix.get(_prefixIndex - 1);
+                return _v.prefix._array[_prefixIndex - 1];
             case DecoderStateTables.ISTRING_INDEX_MEDIUM:
                 _prefixIndex = (((b & EncodingConstants.INTEGER_2ND_BIT_MEDIUM_MASK) << 8) | read())
                     + EncodingConstants.INTEGER_2ND_BIT_SMALL_LIMIT;
-                return _v.prefix.get(_prefixIndex - 1);
+                return _v.prefix._array[_prefixIndex - 1];
             case DecoderStateTables.ISTRING_INDEX_LARGE:
                 _prefixIndex = (((b & EncodingConstants.INTEGER_2ND_BIT_LARGE_MASK) << 16) | (read() << 8) | read())
                     + EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT;
-                return _v.prefix.get(_prefixIndex - 1);
+                return _v.prefix._array[_prefixIndex - 1];
             default:
                 throw new FastInfosetException("Illegal state when decoding identifying string for prefix on first bit");
         }
@@ -825,15 +851,15 @@ public abstract class Decoder implements FastInfosetParser {
                 }
             case DecoderStateTables.ISTRING_INDEX_SMALL:
                 _prefixIndex = b & EncodingConstants.INTEGER_2ND_BIT_SMALL_MASK;
-                return _v.prefix.get(_prefixIndex - 1);
+                return _v.prefix._array[_prefixIndex - 1];
             case DecoderStateTables.ISTRING_INDEX_MEDIUM:
                 _prefixIndex = (((b & EncodingConstants.INTEGER_2ND_BIT_MEDIUM_MASK) << 8) | read())
                     + EncodingConstants.INTEGER_2ND_BIT_SMALL_LIMIT;
-                return _v.prefix.get(_prefixIndex - 1);
+                return _v.prefix._array[_prefixIndex - 1];
             case DecoderStateTables.ISTRING_INDEX_LARGE:
                 _prefixIndex = (((b & EncodingConstants.INTEGER_2ND_BIT_LARGE_MASK) << 16) | (read() << 8) | read())
                     + EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT;
-                return _v.prefix.get(_prefixIndex - 1);
+                return _v.prefix._array[_prefixIndex - 1];
             default:
                 throw new FastInfosetException("Illegal state when decoding identifying string for prefix on first bit");
         }
@@ -911,15 +937,15 @@ public abstract class Decoder implements FastInfosetParser {
                 }
             case DecoderStateTables.ISTRING_INDEX_SMALL: 
                 _namespaceNameIndex = b & EncodingConstants.INTEGER_2ND_BIT_SMALL_MASK;
-                return _v.namespaceName.get(_namespaceNameIndex - 1);
+                return _v.namespaceName._array[_namespaceNameIndex - 1];
             case DecoderStateTables.ISTRING_INDEX_MEDIUM:
                 _namespaceNameIndex = (((b & EncodingConstants.INTEGER_2ND_BIT_MEDIUM_MASK) << 8) | read())
                     + EncodingConstants.INTEGER_2ND_BIT_SMALL_LIMIT;
-                return _v.namespaceName.get(_namespaceNameIndex - 1);
+                return _v.namespaceName._array[_namespaceNameIndex - 1];
             case DecoderStateTables.ISTRING_INDEX_LARGE:
                 _namespaceNameIndex = (((b & EncodingConstants.INTEGER_2ND_BIT_LARGE_MASK) << 16) | (read() << 8) | read())
                     + EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT;
-                return _v.namespaceName.get(_namespaceNameIndex - 1);
+                return _v.namespaceName._array[_namespaceNameIndex - 1];
             default:
                 throw new FastInfosetException("Illegal state when decoding identifying string for namespace name on first bit");
         }
@@ -940,15 +966,15 @@ public abstract class Decoder implements FastInfosetParser {
                 }
             case DecoderStateTables.ISTRING_INDEX_SMALL: 
                 _namespaceNameIndex = b & EncodingConstants.INTEGER_2ND_BIT_SMALL_MASK;
-                return _v.namespaceName.get(_namespaceNameIndex - 1);
+                return _v.namespaceName._array[_namespaceNameIndex - 1];
             case DecoderStateTables.ISTRING_INDEX_MEDIUM:
                 _namespaceNameIndex = (((b & EncodingConstants.INTEGER_2ND_BIT_MEDIUM_MASK) << 8) | read())
                     + EncodingConstants.INTEGER_2ND_BIT_SMALL_LIMIT;
-                return _v.namespaceName.get(_namespaceNameIndex - 1);
+                return _v.namespaceName._array[_namespaceNameIndex - 1];
             case DecoderStateTables.ISTRING_INDEX_LARGE:
                 _namespaceNameIndex = (((b & EncodingConstants.INTEGER_2ND_BIT_LARGE_MASK) << 16) | (read() << 8) | read())
                     + EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT;
-                return _v.namespaceName.get(_namespaceNameIndex - 1);
+                return _v.namespaceName._array[_namespaceNameIndex - 1];
             default:
                 throw new FastInfosetException("Illegal state when decoding identifying string for namespace name on first bit");
         }

@@ -43,8 +43,11 @@ import com.sun.xml.fastinfoset.EncodingConstants;
 import org.jvnet.fastinfoset.FastInfosetException;
 
 public class PrefixArray extends ValueArray {
+    public static final int PREFIX_MAP_SIZE = 64;
     
-    private String[] _array;
+    private int _initialCapacity;
+    
+    public String[] _array;
     
     private PrefixArray _readOnlyArray;
 
@@ -53,7 +56,7 @@ public class PrefixArray extends ValueArray {
         private int prefixId;
     }
 
-    private PrefixEntry[] _prefixMap = new PrefixEntry[64];
+    private PrefixEntry[] _prefixMap = new PrefixEntry[PREFIX_MAP_SIZE];
     
     private PrefixEntry _prefixPool;
     
@@ -76,6 +79,8 @@ public class PrefixArray extends ValueArray {
     public int _declarationId;
     
     public PrefixArray(int initialCapacity) {
+        _initialCapacity = initialCapacity;
+        
         _array = new String[initialCapacity];
         // Sizes of _inScopeNamespaces and _currentInScope need to be two
         // greater than _array because 0 represents the empty string and
@@ -174,50 +179,33 @@ public class PrefixArray extends ValueArray {
     }
     
     public final void clear() {
-        for (int i = 0; i < _size; i++) {
+        for (int i = _readOnlyArraySize; i < _size; i++) {
             _array[i] = null;
         }
-        _size = 0;
+        _size = _readOnlyArraySize;
     }
 
     public final void clearCompletely() {
+        _prefixPool = null;
+        _namespacePool = null;
+        
         for (int i = 0; i < _size + 2; i++) {
             _currentInScope[i] = 0;
-            
-            NamespaceEntry e = _inScopeNamespaces[i];
-            _inScopeNamespaces[i] = null;
-            
-            while (e != null) {
-                final NamespaceEntry next = e.next;
-                
-                e.declarationId = 0;
-                e.prefix = e.namespaceName = null;
-                e.next = _namespacePool;
-                _namespacePool = e;
-                
-                e = next;
-            }
+            _inScopeNamespaces[i] = null;            
         }
         
         for (int i = 0; i < _prefixMap.length; i++) {
-            PrefixEntry e = _prefixMap[i];
             _prefixMap[i] = null;
-            
-            while (e != null) {
-                final PrefixEntry next = e.next;
-                
-                e.next = _prefixPool;
-                _prefixPool = e;
-                
-                e = next;
-            }            
         }
+                
+        increaseNamespacePool(_initialCapacity);
+        increasePrefixPool(_initialCapacity);
         
         initializeEntries();
         
         _declarationId = 0;
         
-        clear();        
+        clear();
     }
     
     public final String[] getArray() {
@@ -238,39 +226,50 @@ public class PrefixArray extends ValueArray {
             _readOnlyArray = readOnlyArray;
             _readOnlyArraySize = readOnlyArray.getSize();
             
+            // Resize according to size of read only arrays
+            _inScopeNamespaces = new NamespaceEntry[_readOnlyArraySize + _inScopeNamespaces.length];
+            _currentInScope = new int[_readOnlyArraySize + _currentInScope.length];
+            // Intialize first two entries
+            initializeEntries();
+            
             if (clear) {
                 clear();
             }
+
+            _array = getCompleteArray();
+            _size = _readOnlyArraySize;
+        }
+    }
+
+    public final String[] getCompleteArray() {
+        if (_readOnlyArray == null) {
+            return _array;
+        } else {
+            final String[] ra = _readOnlyArray.getCompleteArray();
+            final String[] a = new String[_readOnlyArraySize + _array.length];
+            System.arraycopy(ra, 0, a, 0, _readOnlyArraySize);
+            return a;
         }
     }
     
     public final String get(int i) {
-        if (_readOnlyArray == null) {
-            return _array[i];
-        } else {
-            if (i < _readOnlyArraySize) {
-               return _readOnlyArray.get(i); 
-            } else {
-                return _array[i - _readOnlyArraySize];
-            }
-        }
+        return _array[i];
    }
  
     public final int add(String s) {
         if (_size == _array.length) {
-            final int newSize = _size * 3 / 2 + 1;
+            int newSize = _size * 3 / 2 + 1;
             final String[] newArray = new String[newSize];
             System.arraycopy(_array, 0, newArray, 0, _size);
             _array = newArray;
 
-            // Sizes of _inScopeNamespaces and _currentInScope need to be one
-            // greater than _array because 0 represents the empty string
+            newSize += _readOnlyArraySize;
             final NamespaceEntry[] newInScopeNamespaces = new NamespaceEntry[newSize + 2];
-            System.arraycopy(_inScopeNamespaces, 0, newInScopeNamespaces, 0, _size + 2);
+            System.arraycopy(_inScopeNamespaces, 0, newInScopeNamespaces, 0, _readOnlyArraySize + _size + 2);
             _inScopeNamespaces = newInScopeNamespaces;
             
             final int[] newCurrentInScope = new int[newSize + 2];
-            System.arraycopy(_currentInScope, 0, newCurrentInScope, 0, _size + 2);
+            System.arraycopy(_currentInScope, 0, newCurrentInScope, 0, _readOnlyArraySize + _size + 2);
             _currentInScope = newCurrentInScope;            
         }
             
@@ -278,18 +277,15 @@ public class PrefixArray extends ValueArray {
        return _size;
     }
     
-    public final void incrementDeclarationId() {
-        _declarationId++;
-        if (_declarationId == Integer.MAX_VALUE) {
-            for (int i = 0; i < _size; i++) {
-                final NamespaceEntry e = _inScopeNamespaces[i];
-                if (e != null) {
-                    e.declarationId = 0;
-                }
+    public final void clearDeclarationIds() {
+        for (int i = 0; i < _size; i++) {
+            final NamespaceEntry e = _inScopeNamespaces[i];
+            if (e != null) {
+                e.declarationId = 0;
             }
-
-            _declarationId = 1;
         }
+
+        _declarationId = 1;
     }
     
     public final void pushScope(int prefixIndex, int namespaceIndex) throws FastInfosetException {

@@ -48,6 +48,7 @@ import javax.xml.parsers.SAXParserFactory;
 import com.sun.xml.fastinfoset.sax.VocabularyGenerator;
 import com.sun.xml.fastinfoset.util.CharArrayArray;
 import com.sun.xml.fastinfoset.util.ContiguousCharArrayArray;
+import com.sun.xml.fastinfoset.util.PrefixArray;
 import com.sun.xml.fastinfoset.util.QualifiedNameArray;
 import com.sun.xml.fastinfoset.util.StringArray;
 import com.sun.xml.fastinfoset.vocab.ParserVocabulary;
@@ -80,6 +81,14 @@ public class PrintTable {
         }        
     }
 
+    public static void printArray(String title, PrefixArray a) {
+        System.out.println(title);
+
+        for (int i = 0; i < a.getSize(); i++) {
+            System.out.println("" + (i + 1) + ": " + a.getArray()[i]);
+        }        
+    }
+    
     public static void printArray(String title, CharArrayArray a) {
         System.out.println(title);
 

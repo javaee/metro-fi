@@ -43,7 +43,7 @@ import com.sun.xml.fastinfoset.QualifiedName;
 
 public class QualifiedNameArray extends ValueArray {
     
-    private QualifiedName[] _array;
+    public QualifiedName[] _array;
     
     private QualifiedNameArray _readOnlyArray;
         
@@ -56,10 +56,10 @@ public class QualifiedNameArray extends ValueArray {
     }
     
     public final void clear() {
-        for (int i = 0; i < _size; i++) {
+        for (int i = _readOnlyArraySize; i < _size; i++) {
             _array[i] = null;
         }
-        _size = 0;
+        _size = _readOnlyArraySize;
     }
 
     public final QualifiedName[] getArray() {
@@ -83,20 +83,26 @@ public class QualifiedNameArray extends ValueArray {
             if (clear) {
                 clear();
             }
+            
+            _array = getCompleteArray();
+            _size = _readOnlyArraySize;
         }
     }
-    
-    public final QualifiedName get(int i) {
+
+    public final QualifiedName[] getCompleteArray() {
         if (_readOnlyArray == null) {
-            return _array[i];
+            return _array;
         } else {
-            if (i < _readOnlyArraySize) {
-               return _readOnlyArray.get(i); 
-            } else {
-                return _array[i - _readOnlyArraySize];
-            }
+            final QualifiedName[] ra = _readOnlyArray.getCompleteArray();
+            final QualifiedName[] a = new QualifiedName[_readOnlyArraySize + _array.length];
+            System.arraycopy(ra, 0, a, 0, _readOnlyArraySize);
+            return a;
         }
-   }
+    }
+ 
+    public final QualifiedName get(int i) {
+        return _array[i];
+    }
     
     public final void add(QualifiedName s) {
         if (_size == _array.length) {
