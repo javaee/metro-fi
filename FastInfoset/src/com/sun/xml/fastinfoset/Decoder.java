@@ -1252,80 +1252,71 @@ public abstract class Decoder implements FastInfosetParser {
     }
     
     public final void decodeUtf8StringIntoCharBuffer() throws IOException {
-        _charBufferLength = 0;
         if (_charBuffer.length < _octetBufferLength) {
             _charBuffer = new char[_octetBufferLength];
         }
-
-        int b1;
+        
+        _charBufferLength = 0;
         final int end = _octetBufferLength + _octetBufferOffset;
+        int b1;
         while (end != _octetBufferOffset) {
-            b1 = _octetBuffer[_octetBufferOffset++];
-            // Optimal checking for characters in the range 0x20 to 0x7F
-            if (b1 > 0x19) {
+            b1 = _octetBuffer[_octetBufferOffset++] & 0xFF;
+            if (DecoderStateTables.UTF8[b1] == DecoderStateTables.UTF8_ONE_BYTE) {
                 _charBuffer[_charBufferLength++] = (char) b1;
             } else {
-                b1 = (b1 < 0) ? (b1 & 0x7F) | 0x80 : b1;
-                switch(DecoderStateTables.UTF8[b1]) {
-                    // Check for 0x09, 0x0A and 0x0D
-                    case DecoderStateTables.UTF8_ONE_BYTE:
-                    {
-                        _charBuffer[_charBufferLength++] = (char) b1;
-                        break;
-                    }
-                    case DecoderStateTables.UTF8_TWO_BYTES:
-                    {
-                        // Decode byte 2
-                        if (end == _octetBufferOffset) {
-                            decodeUtf8StringLengthTooSmall();
-                        }
-                        final int b2 = _octetBuffer[_octetBufferOffset++] & 0xFF;
-                        if ((b2 & 0xC0) != 0x80) {
-                            decodeUtf8StringIllegalState();
-                        }
-
-                        // Character guaranteed to be in [0x20, 0xD7FF] range
-                        // since a character encoded in two bytes will be in the 
-                        // range [0x80, 0x1FFF]
-                        _charBuffer[_charBufferLength++] = (char) (
-                            ((b1 & 0x1F) << 6)
-                            | (b2 & 0x3F));
-                        break;
-                    }
-                    case DecoderStateTables.UTF8_THREE_BYTES:
-                        final char c = decodeUtf8ThreeByteChar(end, b1);
-                        if (XMLChar.isContent(c)) {
-                            _charBuffer[_charBufferLength++] = c;
-                            break;
-                        } else {
-                            decodeUtf8StringIllegalState();
-                        }
-                    case DecoderStateTables.UTF8_FOUR_BYTES:
-                        decodeUtf8FourByteChar(end, b1);
-                        if (XMLChar.isContent(_utf8_highSurrogate)) {
-                            _charBuffer[_charBufferLength++] = _utf8_highSurrogate;
-                        } else {
-                            decodeUtf8StringIllegalState();
-                        }
-                        
-                        if (XMLChar.isContent(_utf8_lowSurrogate)) {
-                            _charBuffer[_charBufferLength++] = _utf8_lowSurrogate;
-                        } else {
-                            decodeUtf8StringIllegalState();
-                        }
-                        break;
-                    default:
-                        decodeUtf8StringIllegalState();
-                }
+                decodeTwoToFourByteUtf8Character(b1, end);
             }
         }
     }
+
+    public final void decodeTwoToFourByteUtf8Character(int b1, int end) throws IOException {
+        switch(DecoderStateTables.UTF8[b1]) {
+            case DecoderStateTables.UTF8_TWO_BYTES:
+            {
+                // Decode byte 2
+                if (end == _octetBufferOffset) {
+                    decodeUtf8StringLengthTooSmall();
+                }
+                final int b2 = _octetBuffer[_octetBufferOffset++] & 0xFF;
+                if ((b2 & 0xC0) != 0x80) {
+                    decodeUtf8StringIllegalState();
+                }
+
+                // Character guaranteed to be in [0x20, 0xD7FF] range
+                // since a character encoded in two bytes will be in the 
+                // range [0x80, 0x1FFF]
+                _charBuffer[_charBufferLength++] = (char) (
+                    ((b1 & 0x1F) << 6)
+                    | (b2 & 0x3F));
+                break;
+            }
+            case DecoderStateTables.UTF8_THREE_BYTES:
+                final char c = decodeUtf8ThreeByteChar(end, b1);
+                if (XMLChar.isContent(c)) {
+                    _charBuffer[_charBufferLength++] = c;
+                    break;
+                } else {
+                    decodeUtf8StringIllegalState();
+                }
+            case DecoderStateTables.UTF8_FOUR_BYTES:
+                decodeUtf8FourByteChar(end, b1);
+                if (XMLChar.isContent(_utf8_highSurrogate)) {
+                    _charBuffer[_charBufferLength++] = _utf8_highSurrogate;
+                } else {
+                    decodeUtf8StringIllegalState();
+                }
+
+                if (XMLChar.isContent(_utf8_lowSurrogate)) {
+                    _charBuffer[_charBufferLength++] = _utf8_lowSurrogate;
+                } else {
+                    decodeUtf8StringIllegalState();
+                }
+                break;
+            default:
+                decodeUtf8StringIllegalState();
+        }
+    }
     
-    /*
-     * TODO, use the Xerces org.apache.Xerces.util.XMLChar class
-     * to detemine valid NCName characters for characters not in
-     * the Basic Latin range
-     */
     public final void decodeUtf8NCNameIntoCharBuffer() throws IOException {
         _charBufferLength = 0;
         if (_charBuffer.length < _octetBufferLength) {
@@ -1335,117 +1326,124 @@ public abstract class Decoder implements FastInfosetParser {
         final int end = _octetBufferLength + _octetBufferOffset;
 
         int b1 = _octetBuffer[_octetBufferOffset++] & 0xFF;
-        int state = DecoderStateTables.UTF8_NCNAME[b1];
-        if (state == DecoderStateTables.UTF8_NCNAME_NCNAME) {
+        if (DecoderStateTables.UTF8_NCNAME[b1] == DecoderStateTables.UTF8_NCNAME_NCNAME) {
             _charBuffer[_charBufferLength++] = (char) b1;
         } else {
-            switch(state) {
-                case DecoderStateTables.UTF8_TWO_BYTES:
-                {
-                    // Decode byte 2
-                    if (end == _octetBufferOffset) {
-                        decodeUtf8StringLengthTooSmall();
-                    }
-                    final int b2 = _octetBuffer[_octetBufferOffset++] & 0xFF;
-                    if ((b2 & 0xC0) != 0x80) {
-                        decodeUtf8StringIllegalState();
-                    }
-
-                    final char c = (char) (
-                        ((b1 & 0x1F) << 6)
-                        | (b2 & 0x3F));
-                    if (XMLChar.isNCNameStart(c)) {
-                        _charBuffer[_charBufferLength++] = c;
-                        break;
-                    } else {
-                        decodeUtf8NCNameIllegalState();
-                    }
-                }
-                case DecoderStateTables.UTF8_THREE_BYTES:
-                    final char c = decodeUtf8ThreeByteChar(end, b1);
-                    if (XMLChar.isNCNameStart(c)) {
-                        _charBuffer[_charBufferLength++] = c;
-                        break;
-                    } else {
-                        decodeUtf8NCNameIllegalState();
-                    }
-                    break;
-                case DecoderStateTables.UTF8_FOUR_BYTES:
-                    decodeUtf8FourByteChar(end, b1);
-                    if (XMLChar.isNCNameStart(_utf8_highSurrogate)) {
-                        _charBuffer[_charBufferLength++] = _utf8_highSurrogate;
-                    } else {
-                        decodeUtf8NCNameIllegalState();
-                    }
-                    if (XMLChar.isNCName(_utf8_lowSurrogate)) {
-                        _charBuffer[_charBufferLength++] = _utf8_lowSurrogate;
-                    } else {
-                        decodeUtf8NCNameIllegalState();
-                    }
-                    break;
-                case DecoderStateTables.UTF8_NCNAME_NCNAME_CHAR:
-                default:
-                    decodeUtf8NCNameIllegalState();
-            }
+            decodeUtf8NCNameStartTwoToFourByteCharacters(b1, end);
         }
 
         while (end != _octetBufferOffset) {
             b1 = _octetBuffer[_octetBufferOffset++] & 0xFF;
-            state = DecoderStateTables.UTF8_NCNAME[b1];
-            if (state < DecoderStateTables.UTF8_TWO_BYTES) {
+            if (DecoderStateTables.UTF8_NCNAME[b1] < DecoderStateTables.UTF8_TWO_BYTES) {
                 _charBuffer[_charBufferLength++] = (char) b1;
             } else {
-                switch(state) {
-                    case DecoderStateTables.UTF8_TWO_BYTES:
-                    {
-                        // Decode byte 2
-                        if (end == _octetBufferOffset) {
-                            decodeUtf8StringLengthTooSmall();
-                        }
-                        final int b2 = _octetBuffer[_octetBufferOffset++] & 0xFF;
-                        if ((b2 & 0xC0) != 0x80) {
-                            decodeUtf8StringIllegalState();
-                        }
-
-                        final char c = (char) (
-                            ((b1 & 0x1F) << 6)
-                            | (b2 & 0x3F));
-                        if (XMLChar.isNCName(c)) {
-                            _charBuffer[_charBufferLength++] = c;
-                            break;
-                        } else {
-                            decodeUtf8NCNameIllegalState();
-                        }
-                    }
-                    case DecoderStateTables.UTF8_THREE_BYTES:
-                        final char c = decodeUtf8ThreeByteChar(end, b1);
-                        if (XMLChar.isNCName(c)) {
-                            _charBuffer[_charBufferLength++] = c;
-                            break;
-                        } else {
-                            decodeUtf8NCNameIllegalState();
-                        }
-                        break;
-                    case DecoderStateTables.UTF8_FOUR_BYTES:
-                        decodeUtf8FourByteChar(end, b1);
-                        if (XMLChar.isNCName(_utf8_highSurrogate)) {
-                            _charBuffer[_charBufferLength++] = _utf8_highSurrogate;
-                        } else {
-                            decodeUtf8NCNameIllegalState();
-                        }
-                        if (XMLChar.isNCName(_utf8_lowSurrogate)) {
-                            _charBuffer[_charBufferLength++] = _utf8_lowSurrogate;
-                        } else {
-                            decodeUtf8NCNameIllegalState();
-                        }
-                        break;
-                    default:
-                        decodeUtf8NCNameIllegalState();
-                }
+                decodeUtf8NCNameTwoToFourByteCharacters(b1, end);
             }
         }
     }
 
+    public final void decodeUtf8NCNameStartTwoToFourByteCharacters(int b1, int end) throws IOException {
+        switch(DecoderStateTables.UTF8_NCNAME[b1]) {
+            case DecoderStateTables.UTF8_TWO_BYTES:
+            {
+                // Decode byte 2
+                if (end == _octetBufferOffset) {
+                    decodeUtf8StringLengthTooSmall();
+                }
+                final int b2 = _octetBuffer[_octetBufferOffset++] & 0xFF;
+                if ((b2 & 0xC0) != 0x80) {
+                    decodeUtf8StringIllegalState();
+                }
+
+                final char c = (char) (
+                    ((b1 & 0x1F) << 6)
+                    | (b2 & 0x3F));
+                if (XMLChar.isNCNameStart(c)) {
+                    _charBuffer[_charBufferLength++] = c;
+                    break;
+                } else {
+                    decodeUtf8NCNameIllegalState();
+                }
+            }
+            case DecoderStateTables.UTF8_THREE_BYTES:
+                final char c = decodeUtf8ThreeByteChar(end, b1);
+                if (XMLChar.isNCNameStart(c)) {
+                    _charBuffer[_charBufferLength++] = c;
+                    break;
+                } else {
+                    decodeUtf8NCNameIllegalState();
+                }
+                break;
+            case DecoderStateTables.UTF8_FOUR_BYTES:
+                decodeUtf8FourByteChar(end, b1);
+                if (XMLChar.isNCNameStart(_utf8_highSurrogate)) {
+                    _charBuffer[_charBufferLength++] = _utf8_highSurrogate;
+                } else {
+                    decodeUtf8NCNameIllegalState();
+                }
+                if (XMLChar.isNCName(_utf8_lowSurrogate)) {
+                    _charBuffer[_charBufferLength++] = _utf8_lowSurrogate;
+                } else {
+                    decodeUtf8NCNameIllegalState();
+                }
+                break;
+            case DecoderStateTables.UTF8_NCNAME_NCNAME_CHAR:
+            default:
+                decodeUtf8NCNameIllegalState();
+        }
+        
+    }
+
+    public final void decodeUtf8NCNameTwoToFourByteCharacters(int b1, int end) throws IOException {
+        switch(DecoderStateTables.UTF8_NCNAME[b1]) {
+            case DecoderStateTables.UTF8_TWO_BYTES:
+            {
+                // Decode byte 2
+                if (end == _octetBufferOffset) {
+                    decodeUtf8StringLengthTooSmall();
+                }
+                final int b2 = _octetBuffer[_octetBufferOffset++] & 0xFF;
+                if ((b2 & 0xC0) != 0x80) {
+                    decodeUtf8StringIllegalState();
+                }
+
+                final char c = (char) (
+                    ((b1 & 0x1F) << 6)
+                    | (b2 & 0x3F));
+                if (XMLChar.isNCName(c)) {
+                    _charBuffer[_charBufferLength++] = c;
+                    break;
+                } else {
+                    decodeUtf8NCNameIllegalState();
+                }
+            }
+            case DecoderStateTables.UTF8_THREE_BYTES:
+                final char c = decodeUtf8ThreeByteChar(end, b1);
+                if (XMLChar.isNCName(c)) {
+                    _charBuffer[_charBufferLength++] = c;
+                    break;
+                } else {
+                    decodeUtf8NCNameIllegalState();
+                }
+                break;
+            case DecoderStateTables.UTF8_FOUR_BYTES:
+                decodeUtf8FourByteChar(end, b1);
+                if (XMLChar.isNCName(_utf8_highSurrogate)) {
+                    _charBuffer[_charBufferLength++] = _utf8_highSurrogate;
+                } else {
+                    decodeUtf8NCNameIllegalState();
+                }
+                if (XMLChar.isNCName(_utf8_lowSurrogate)) {
+                    _charBuffer[_charBufferLength++] = _utf8_lowSurrogate;
+                } else {
+                    decodeUtf8NCNameIllegalState();
+                }
+                break;
+            default:
+                decodeUtf8NCNameIllegalState();
+        }
+    }
+    
     public final char decodeUtf8ThreeByteChar(int end, int b1) throws IOException {
         // Decode byte 2
         if (end == _octetBufferOffset) {
