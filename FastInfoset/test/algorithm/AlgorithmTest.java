@@ -62,12 +62,12 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLStreamReader;
 import junit.framework.*;
-import org.apache.crimson.tree.TextNode;
 import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
 import org.jvnet.fastinfoset.FastInfosetParser;
 import org.jvnet.fastinfoset.sax.EncodingAlgorithmAttributes;
 import org.jvnet.fastinfoset.sax.FastInfosetDefaultHandler;
 import org.w3c.dom.Document;
+import org.w3c.dom.Text;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -691,7 +691,7 @@ public class AlgorithmTest extends TestCase {
         Document d = db.newDocument();
         dp.parse(d, bais);
         
-        TextNode t = (TextNode)d.getFirstChild().getFirstChild();
+        Text t = (Text)d.getFirstChild().getFirstChild();
         String c = t.getNodeValue();
         assertEquals(_base64String.length(), c.length());
         assertEquals(_base64String, c);
