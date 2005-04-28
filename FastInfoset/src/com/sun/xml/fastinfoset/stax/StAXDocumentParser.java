@@ -133,6 +133,8 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         
     protected NamespaceContextImpl _nsContext = new NamespaceContextImpl();
     
+    protected String _characterEncodingScheme;
+    
     protected StAXManager _manager;
     
     public StAXDocumentParser() {
@@ -169,7 +171,8 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
             _characters = null;
             _algorithmData = null;
         }
-        
+     
+        _characterEncodingScheme = "UTF-8";
         _eventType = START_DOCUMENT;
         _internalState = INTERNAL_STATE_START_DOCUMENT;        
     }
@@ -208,7 +211,8 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 switch (_internalState) {
                     case INTERNAL_STATE_START_DOCUMENT:
                         decodeHeader();
-                        decodeDII();
+                        processDII();
+
                         _internalState = INTERNAL_STATE_VOID;
                         break;
                     case INTERNAL_STATE_START_ELEMENT_TERMINATE:
@@ -220,10 +224,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                         }
                         
                         // Pop information off the stack
-                        _qualifiedName = _qNameStack[_stackCount];
-                        _currentNamespaceAIIsStart = _namespaceAIIsStartStack[_stackCount];
-                        _currentNamespaceAIIsEnd = _namespaceAIIsEndStack[_stackCount];
-                        _qNameStack[_stackCount--] = null;
+                        popStack();
 
                         _internalState = INTERNAL_STATE_VOID;
                         return _eventType = END_ELEMENT;
@@ -250,10 +251,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                         }
                                             
                         // Pop information off the stack
-                        _qualifiedName = _qNameStack[_stackCount];
-                        _currentNamespaceAIIsStart = _namespaceAIIsStartStack[_stackCount];
-                        _currentNamespaceAIIsEnd = _namespaceAIIsEndStack[_stackCount];
-                        _qNameStack[_stackCount--] = null;
+                        popStack();
                         
                         _internalState = (_currentNamespaceAIIsEnd > 0) ? 
                                 INTERNAL_STATE_SINGLE_TERMINATE_ELEMENT_WITH_NAMESPACES :
@@ -474,10 +472,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 case DecoderStateTables.TERMINATOR_DOUBLE:
                     if (_stackCount != -1) {
                         // Pop information off the stack
-                        _qualifiedName = _qNameStack[_stackCount];
-                        _currentNamespaceAIIsStart = _namespaceAIIsStartStack[_stackCount];
-                        _currentNamespaceAIIsEnd = _namespaceAIIsEndStack[_stackCount];
-                        _qNameStack[_stackCount--] = null;
+                        popStack();
 
                         _internalState = INTERNAL_STATE_DOUBLE_TERMINATE_ELEMENT;
                         return _eventType = END_ELEMENT;
@@ -488,11 +483,8 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 case DecoderStateTables.TERMINATOR_SINGLE:
                     if (_stackCount != -1) {
                         // Pop information off the stack
-                        _qualifiedName = _qNameStack[_stackCount];
-                        _currentNamespaceAIIsStart = _namespaceAIIsStartStack[_stackCount];
-                        _currentNamespaceAIIsEnd = _namespaceAIIsEndStack[_stackCount];
-                        _qNameStack[_stackCount--] = null;
-
+                        popStack();
+                        
                         if (_currentNamespaceAIIsEnd > 0) {
                             _internalState = INTERNAL_STATE_SINGLE_TERMINATE_ELEMENT_WITH_NAMESPACES;
                         }
@@ -517,6 +509,14 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
             e.printStackTrace();
             throw e;
         }
+    }
+    
+    private final void popStack() {
+        // Pop information off the stack
+        _qualifiedName = _qNameStack[_stackCount];
+        _currentNamespaceAIIsStart = _namespaceAIIsStartStack[_stackCount];
+        _currentNamespaceAIIsEnd = _namespaceAIIsEndStack[_stackCount];
+        _qNameStack[_stackCount--] = null;
     }
     
     /** Test if the current event is of the given type and if the namespace and name match the current namespace and name of the current event.
@@ -841,7 +841,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     }
     
     public final String getEncoding() {
-        return "UTF-8";     // for now
+        return _characterEncodingScheme;
     }
     
     public final boolean hasText() {
@@ -971,6 +971,76 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     
     //
     
+    protected final void processDII() throws FastInfosetException, IOException {
+        final int b = read();
+        if (b > 0) {
+            processDIIOptionalProperties(b);
+        }
+    }
+    
+    protected final void processDIIOptionalProperties(int b) throws FastInfosetException, IOException {
+        // Optimize for the most common case
+        if (b == EncodingConstants.DOCUMENT_INITIAL_VOCABULARY_FLAG) {
+            decodeInitialVocabulary();
+            return;
+        }
+        
+        if ((b & EncodingConstants.DOCUMENT_ADDITIONAL_DATA_FLAG) > 0) {
+            decodeAdditionalData();
+            /*
+             * TODO
+             * how to report the additional data?
+             */
+        }
+        
+        if ((b & EncodingConstants.DOCUMENT_INITIAL_VOCABULARY_FLAG) > 0) {
+            decodeInitialVocabulary();
+        }
+        
+        if ((b & EncodingConstants.DOCUMENT_NOTATIONS_FLAG) > 0) {
+            decodeNotations();
+            /*
+                try {
+                    _dtdHandler.notationDecl(name, public_identifier, system_identifier);
+                } catch (SAXException e) {
+                    throw new IOException("NotationsDeclarationII");
+                }
+             */
+        }
+        
+        if ((b & EncodingConstants.DOCUMENT_UNPARSED_ENTITIES_FLAG) > 0) {
+            decodeUnparsedEntities();
+            /*
+                try {
+                    _dtdHandler.unparsedEntityDecl(name, public_identifier, system_identifier, notation_name);
+                } catch (SAXException e) {
+                    throw new IOException("UnparsedEntitiesII");
+                }
+             */
+        }
+        
+        if ((b & EncodingConstants.DOCUMENT_CHARACTER_ENCODING_SCHEME) > 0) {
+            _characterEncodingScheme = decodeCharacterEncodingScheme();
+        }
+        
+        if ((b & EncodingConstants.DOCUMENT_STANDALONE_FLAG) > 0) {
+            boolean standalone = (read() > 0) ? true : false ;
+            /*
+             * TODO
+             * how to report the standalone flag?
+             */
+        }
+        
+        if ((b & EncodingConstants.DOCUMENT_VERSION_FLAG) > 0) {
+            String version = decodeVersion();
+            /*
+             * TODO
+             * how to report the standalone flag?
+             */
+        }
+    }
+
+    
     protected final void resizeNamespaceAIIs() {
         final String[] namespaceAIIsPrefix = new String[_namespaceAIIsIndex * 2];
         System.arraycopy(_namespaceAIIsPrefix, 0, namespaceAIIsPrefix, 0, _namespaceAIIsIndex);
@@ -1038,7 +1108,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     _namespaceAIIsPrefixIndex[_namespaceAIIsIndex++] = _prefixIndex;
                     break;
             }
-                        
+            
             // Push namespace declarations onto the stack
             _prefixTable.pushScopeWithPrefixEntry(prefix, namespaceName, _prefixIndex, _namespaceNameIndex);
             

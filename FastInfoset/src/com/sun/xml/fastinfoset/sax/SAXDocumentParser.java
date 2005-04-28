@@ -503,8 +503,18 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
     }
     
     protected final void processDIIOptionalProperties() throws FastInfosetException, IOException {
+        // Optimize for the most common case
+        if (_b == EncodingConstants.DOCUMENT_INITIAL_VOCABULARY_FLAG) {
+            decodeInitialVocabulary();
+            return;
+        }
+        
         if ((_b & EncodingConstants.DOCUMENT_ADDITIONAL_DATA_FLAG) > 0) {
-            // decodeAdditionalData();
+            decodeAdditionalData();
+            /*
+             * TODO
+             * how to report the additional data?
+             */
         }
         
         if ((_b & EncodingConstants.DOCUMENT_INITIAL_VOCABULARY_FLAG) > 0) {
@@ -534,7 +544,11 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         }
         
         if ((_b & EncodingConstants.DOCUMENT_CHARACTER_ENCODING_SCHEME) > 0) {
-            // decodeCharacterEncodingScheme();
+            String characterEncodingScheme = decodeCharacterEncodingScheme();
+            /*
+             * TODO
+             * how to report the character encoding scheme?
+             */
         }
         
         if ((_b & EncodingConstants.DOCUMENT_STANDALONE_FLAG) > 0) {
@@ -546,19 +560,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         }
         
         if ((_b & EncodingConstants.DOCUMENT_VERSION_FLAG) > 0) {
-            switch(decodeNonIdentifyingStringOnFirstBit()) {
-                case NISTRING_STRING:
-                    if (_addToTable) {
-                        _v.otherString.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
-                    }
-                    break;
-                case NISTRING_ENCODING_ALGORITHM:
-                    throw new FastInfosetException("Processing II with encoding algorithm decoding not supported");
-                case NISTRING_INDEX:
-                    break;
-                case NISTRING_EMPTY_STRING:
-                    break;
-            }
+            String version = decodeVersion();
             /*
              * TODO
              * how to report the standalone flag?
@@ -907,7 +909,8 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     _attributes.addAttribute(new QualifiedName(
                             EncodingConstants.XMLNS_NAMESPACE_PREFIX,
                             EncodingConstants.XMLNS_NAMESPACE_NAME,
-                            prefix),
+                            prefix, 
+                            _stringInterning),
                             namespaceName);
                 } else {
                     _attributes.addAttribute(DEFAULT_NAMESPACE_DECLARATION,

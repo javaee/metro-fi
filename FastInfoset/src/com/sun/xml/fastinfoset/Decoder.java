@@ -43,6 +43,7 @@ import com.sun.xml.fastinfoset.alphabet.BuiltInRestrictedAlphabets;
 import com.sun.xml.fastinfoset.org.apache.xerces.util.XMLChar;
 import com.sun.xml.fastinfoset.util.CharArray;
 import com.sun.xml.fastinfoset.util.CharArrayArray;
+import com.sun.xml.fastinfoset.util.CharArrayString;
 import com.sun.xml.fastinfoset.util.ContiguousCharArrayArray;
 import com.sun.xml.fastinfoset.util.DuplicateAttributeVerifier;
 import com.sun.xml.fastinfoset.util.PrefixArray;
@@ -258,6 +259,17 @@ public abstract class Decoder implements FastInfosetParser {
         }
     }
 
+    public final void decodeAdditionalData() throws FastInfosetException, IOException {
+        for (int i = 0; i < decodeNumberOfItemsOfSequence(); i++) {
+            String URI = decodeNonEmptyOctetStringOnSecondBitAsUtf8String();
+            
+            decodeNonEmptyOctetStringLengthOnSecondBit();
+            ensureOctetBufferSize();
+            _octetBufferStart = _octetBufferOffset;
+            _octetBufferOffset += _octetBufferLength;
+        }
+    }
+
     public final void decodeInitialVocabulary() throws FastInfosetException, IOException {
         // First 5 optionals of 13 bit optional field
         int b = read();
@@ -315,11 +327,11 @@ public abstract class Decoder implements FastInfosetParser {
         }
 
         if ((b2 & EncodingConstants.INITIAL_VOCABULARY_ELEMENT_NAME_SURROGATES_FLAG) > 0) {
-            decodeTableItems(_v.elementName);
+            decodeTableItems(_v.elementName, false);
         }
 
         if ((b2 & EncodingConstants.INITIAL_VOCABULARY_ATTRIBUTE_NAME_SURROGATES_FLAG) > 0) {
-            decodeTableItems(_v.attributeName);
+            decodeTableItems(_v.attributeName, true);
         }
     }
 
@@ -343,19 +355,19 @@ public abstract class Decoder implements FastInfosetParser {
     }
 
     public final void decodeTableItems(StringArray array) throws FastInfosetException, IOException {
-        for (int i = 0; i < decodeIntegerTableItems(); i++) {
+        for (int i = 0; i < decodeNumberOfItemsOfSequence(); i++) {
             array.add(decodeNonEmptyOctetStringOnSecondBitAsUtf8String());
         }
     }
 
     public final void decodeTableItems(PrefixArray array) throws FastInfosetException, IOException {
-        for (int i = 0; i < decodeIntegerTableItems(); i++) {
+        for (int i = 0; i < decodeNumberOfItemsOfSequence(); i++) {
             array.add(decodeNonEmptyOctetStringOnSecondBitAsUtf8String());
         }
     }
     
     public final void decodeTableItems(ContiguousCharArrayArray array) throws FastInfosetException, IOException {
-        for (int i = 0; i < decodeIntegerTableItems(); i++) {
+        for (int i = 0; i < decodeNumberOfItemsOfSequence(); i++) {
             switch(decodeNonIdentifyingStringOnFirstBit()) {
                 case NISTRING_STRING:
                     array.add(_charBuffer, _charBufferLength);
@@ -367,7 +379,7 @@ public abstract class Decoder implements FastInfosetParser {
     }
     
     public final void decodeTableItems(CharArrayArray array) throws FastInfosetException, IOException {
-        for (int i = 0; i < decodeIntegerTableItems(); i++) {
+        for (int i = 0; i < decodeNumberOfItemsOfSequence(); i++) {
             switch(decodeNonIdentifyingStringOnFirstBit()) {
                 case NISTRING_STRING:
                     array.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
@@ -378,26 +390,42 @@ public abstract class Decoder implements FastInfosetParser {
         }
     }
 
-    public final void decodeTableItems(QualifiedNameArray array) throws FastInfosetException, IOException {
-        for (int i = 0; i < decodeIntegerTableItems(); i++) {
+    public final void decodeTableItems(QualifiedNameArray array, boolean isAttribute) throws FastInfosetException, IOException {
+        for (int i = 0; i < decodeNumberOfItemsOfSequence(); i++) {
             final int b = read();
 
-            final String prefix = ((b & EncodingConstants.NAME_SURROGATE_PREFIX_FLAG) > 0)
-                        ? _v.prefix.get(decodeIntegerIndexOnSecondBit()) : "";
-            final String namespaceName = ((b & EncodingConstants.NAME_SURROGATE_NAME_FLAG) > 0)
-                        ? _v.namespaceName.get(decodeIntegerIndexOnSecondBit()) : "";
+            String prefix = "";
+            int prefixIndex = -1;
+            if ((b & EncodingConstants.NAME_SURROGATE_PREFIX_FLAG) > 0) {
+                prefixIndex = decodeIntegerIndexOnSecondBit();
+                prefix = _v.prefix.get(prefixIndex);
+            }
+            
+            String namespaceName = "";
+            int namespaceNameIndex = -1;
+            if ((b & EncodingConstants.NAME_SURROGATE_NAME_FLAG) > 0) {
+                namespaceNameIndex = decodeIntegerIndexOnSecondBit();
+                namespaceName = _v.prefix.get(prefixIndex);
+            }
+            
             if (namespaceName == "" && prefix != "") {
                 throw new FastInfosetException("Name surrogate prefix is present when namespace name is absent");
             }
 
-            final String localName = _v.localName.get(decodeIntegerIndexOnSecondBit());
+            final int localNameIndex = decodeIntegerIndexOnSecondBit();
+            final String localName = _v.localName.get(localNameIndex);
 
-            QualifiedName qualifiedName = new QualifiedName(prefix, namespaceName, localName);
+            QualifiedName qualifiedName = new QualifiedName(prefix, namespaceName, localName, 
+                    prefixIndex, namespaceNameIndex, localNameIndex, 
+                    _charBuffer, _stringInterning);
+            if (isAttribute) {
+                qualifiedName.createAttributeValues(_duplicateAttributeVerifier.MAP_SIZE);
+            }
             array.add(qualifiedName);
         }
     }
 
-    public final int decodeIntegerTableItems() throws IOException {
+    public final int decodeNumberOfItemsOfSequence() throws IOException {
         final int b = read();
         if (b < 128) {
             return b;
@@ -459,19 +487,25 @@ public abstract class Decoder implements FastInfosetParser {
         }
     }
 
-    public final void decodeVersion() throws FastInfosetException, IOException {
+    public final String decodeCharacterEncodingScheme() throws FastInfosetException, IOException {
+        return decodeNonEmptyOctetStringOnSecondBitAsUtf8String();
+    }
+    
+    public final String decodeVersion() throws FastInfosetException, IOException {
         switch(decodeNonIdentifyingStringOnFirstBit()) {
-        case NISTRING_STRING:
-            if (_addToTable) {
-                _v.otherString.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
-            }
-            break;
-        case NISTRING_ENCODING_ALGORITHM:
-            throw new IOException("Processing II with encoding algorithm decoding not supported");
-        case NISTRING_INDEX:
-            break;
-        case NISTRING_EMPTY_STRING:
-            break;
+            case NISTRING_STRING:
+                final String data = new String(_charBuffer, 0, _charBufferLength);
+                if (_addToTable) {
+                    _v.otherString.add(new CharArrayString(data));
+                }
+                return data;
+            case NISTRING_ENCODING_ALGORITHM:
+                throw new FastInfosetException("Document version with encoding algorithm decoding not supported");
+            case NISTRING_INDEX:
+                return _v.otherString.get(_integer).toString();
+            case NISTRING_EMPTY_STRING:
+            default:
+                return "";
         }
     }
 
@@ -506,7 +540,8 @@ public abstract class Decoder implements FastInfosetParser {
                         -1,
                         -1,
                         _identifier,
-                        null);
+                        null,
+                        _stringInterning);
             // no prefix, namespace
             case 1:
                 return new QualifiedName(
@@ -516,7 +551,8 @@ public abstract class Decoder implements FastInfosetParser {
                         -1,
                         _namespaceNameIndex,
                         _identifier,
-                        null);
+                        null,
+                        _stringInterning);
             // prefix, no namespace
             case 2:
                 throw new FastInfosetException("Literal qualified name with prefix but no namespace name");
@@ -529,7 +565,8 @@ public abstract class Decoder implements FastInfosetParser {
                         _prefixIndex,
                         _namespaceNameIndex,
                         _identifier,
-                        _charBuffer);
+                        _charBuffer,
+                        _stringInterning);
             default:
                 throw new FastInfosetException("Illegal state when decoding literal qualified name of EII");                
         }        
@@ -1002,6 +1039,14 @@ public abstract class Decoder implements FastInfosetParser {
      * C.22
      */
     public final void decodeNonEmptyOctetStringOnSecondBitAsUtf8CharArray() throws FastInfosetException, IOException {
+        decodeNonEmptyOctetStringLengthOnSecondBit();
+        decodeUtf8StringAsCharBuffer();
+    }
+
+    /*
+     * C.22
+     */
+    public final void decodeNonEmptyOctetStringLengthOnSecondBit() throws FastInfosetException, IOException {
         final int b = read();
         switch(DecoderStateTables.ISTRING[b]) {
             case DecoderStateTables.ISTRING_SMALL_LENGTH:
@@ -1025,9 +1070,8 @@ public abstract class Decoder implements FastInfosetParser {
             default:
                 throw new FastInfosetException("Illegal state when decoding non empty octet string on second bit");
         }
-        decodeUtf8StringAsCharBuffer();
     }
-
+    
     /*
      * C.25
      */

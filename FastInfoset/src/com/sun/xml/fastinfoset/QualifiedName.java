@@ -76,7 +76,8 @@ public class QualifiedName {
         this.localNameIndex = -1;
     }    
     
-    public QualifiedName(String prefix, String namespaceName, String localName, String qName, int index, int prefixIndex, int namespaceNameIndex, int localNameIndex) {
+    public QualifiedName(String prefix, String namespaceName, String localName, String qName, int index, 
+            int prefixIndex, int namespaceNameIndex, int localNameIndex) {
         this.prefix = prefix;
         this.namespaceName = namespaceName;
         this.localName = localName;
@@ -87,7 +88,8 @@ public class QualifiedName {
         this.localNameIndex = localNameIndex;
     }    
     
-    public QualifiedName(String prefix, String namespaceName, String localName) {
+    public QualifiedName(String prefix, String namespaceName, String localName, 
+            boolean intern) {
         this.prefix = prefix;
         this.namespaceName = namespaceName;
         this.localName = localName;
@@ -96,7 +98,7 @@ public class QualifiedName {
             StringBuffer b = new StringBuffer(this.prefix);
             b.append(':');
             b.append(this.localName);
-            this.qName = b.toString();
+            this.qName = (intern) ? b.toString().intern() : b.toString();
         } else {
             this.qName = this.localName;
         }
@@ -107,7 +109,9 @@ public class QualifiedName {
         this.localNameIndex = -1;
     }    
 
-    public QualifiedName(String prefix, String namespaceName, String localName, int prefixIndex, int namespaceNameIndex, int localNameIndex, char[] charBuffer) {
+    public QualifiedName(String prefix, String namespaceName, String localName, 
+            int prefixIndex, int namespaceNameIndex, int localNameIndex, 
+            char[] charBuffer, boolean intern) {
         this.prefix = prefix;
         this.namespaceName = namespaceName;
         this.localName = localName;
@@ -120,12 +124,13 @@ public class QualifiedName {
                 prefix.getChars(0, l1, charBuffer, 0);
                 charBuffer[l1] = ':';
                 localName.getChars(0, l2, charBuffer, l1 + 1);
-                this.qName = new String(charBuffer, 0, total);
+                this.qName = (intern) ? new String(charBuffer, 0, total).intern() 
+                    : new String(charBuffer, 0, total);
             } else {
                 StringBuffer b = new StringBuffer(this.prefix);
                 b.append(':');
                 b.append(this.localName);
-                this.qName = b.toString();
+                this.qName = (intern) ? b.toString().intern() : b.toString();
             }
         } else {
             this.qName = this.localName;
@@ -137,7 +142,7 @@ public class QualifiedName {
         this.index = -1;
     }    
     
-    public QualifiedName(String prefix, String namespaceName, String localName, int index) {
+    public QualifiedName(String prefix, String namespaceName, String localName, int index, boolean intern) {
         this.prefix = prefix;
         this.namespaceName = namespaceName;
         this.localName = localName;
@@ -146,7 +151,7 @@ public class QualifiedName {
             StringBuffer b = new StringBuffer(this.prefix);
             b.append(':');
             b.append(this.localName);
-            this.qName = b.toString();
+            this.qName = (intern) ? b.toString().intern() : b.toString();
         } else {
             this.qName = this.localName;
         }
@@ -157,7 +162,9 @@ public class QualifiedName {
         this.localNameIndex = -1;
     }    
     
-    public QualifiedName(String prefix, String namespaceName, String localName, int index, int prefixIndex, int namespaceNameIndex, int localNameIndex) {
+    public QualifiedName(String prefix, String namespaceName, String localName, int index, 
+            int prefixIndex, int namespaceNameIndex, int localNameIndex, 
+            boolean intern) {
         this.prefix = prefix;
         this.namespaceName = namespaceName;
         this.localName = localName;
@@ -166,7 +173,7 @@ public class QualifiedName {
             StringBuffer b = new StringBuffer(this.prefix);
             b.append(':');
             b.append(this.localName);
-            this.qName = b.toString();
+            this.qName = (intern) ? b.toString().intern() : b.toString();
         } else {
             this.qName = this.localName;
         }

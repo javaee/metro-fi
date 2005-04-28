@@ -234,9 +234,19 @@ public class DOMDocumentParser extends Decoder {
 
     }
 
-    protected final void processDIIOptionalProperties() throws FastInfosetException, IOException {        
+    protected final void processDIIOptionalProperties() throws FastInfosetException, IOException {     
+        // Optimize for the most common case
+        if (_b == EncodingConstants.DOCUMENT_INITIAL_VOCABULARY_FLAG) {
+            decodeInitialVocabulary();
+            return;
+        }
+        
         if ((_b & EncodingConstants.DOCUMENT_ADDITIONAL_DATA_FLAG) > 0) {
-            // decodeAdditionalData();
+            decodeAdditionalData();
+            /*
+             * TODO 
+             * how to report the additional data?
+             */
         }
         
         if ((_b & EncodingConstants.DOCUMENT_INITIAL_VOCABULARY_FLAG) > 0) {
@@ -254,7 +264,11 @@ public class DOMDocumentParser extends Decoder {
         }
 
         if ((_b & EncodingConstants.DOCUMENT_CHARACTER_ENCODING_SCHEME) > 0) {
-            // decodeCharacterEncodingScheme();
+            String version = decodeCharacterEncodingScheme();
+            /*
+             * TODO 
+             * how to report the character encoding scheme?
+             */
         }
         
         if ((_b & EncodingConstants.DOCUMENT_STANDALONE_FLAG) > 0) {
@@ -266,19 +280,7 @@ public class DOMDocumentParser extends Decoder {
         }
 
         if ((_b & EncodingConstants.DOCUMENT_VERSION_FLAG) > 0) {
-            switch(decodeNonIdentifyingStringOnFirstBit()) {
-                case NISTRING_STRING:
-                    if (_addToTable) {
-                        _v.otherString.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
-                    }
-                    break;
-                case NISTRING_ENCODING_ALGORITHM:
-                    throw new FastInfosetException("Processing II with encoding algorithm decoding not supported");                        
-                case NISTRING_INDEX:
-                    break;
-                case NISTRING_EMPTY_STRING:
-                    break;
-            }
+            String version = decodeVersion();
             /*
              * TODO 
              * how to report the document version?
@@ -645,7 +647,8 @@ public class DOMDocumentParser extends Decoder {
                         -1,
                         -1,
                         _identifier,
-                        null);
+                        null,
+                        _stringInterning);
             // no prefix, namespace
             case 1:
                 return new QualifiedName(
@@ -655,7 +658,8 @@ public class DOMDocumentParser extends Decoder {
                         -1,
                         _namespaceNameIndex,
                         _identifier,
-                        null);
+                        null,
+                        _stringInterning);
             // prefix, no namespace
             case 2:
                 throw new FastInfosetException("Literal qualified name with prefix but no namespace name");
@@ -668,7 +672,8 @@ public class DOMDocumentParser extends Decoder {
                         _prefixIndex,
                         _namespaceNameIndex, 
                         _identifier,
-                        _charBuffer);
+                        _charBuffer,
+                        _stringInterning);
             default:
                 throw new FastInfosetException("Illegal state when decoding literal qualified name of EII");                
         }        

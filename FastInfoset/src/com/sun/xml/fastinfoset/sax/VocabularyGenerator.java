@@ -217,7 +217,9 @@ public class VocabularyGenerator extends DefaultHandler implements LexicalHandle
             _parserVocabulary.localName.add(localName);
             localNameIndex = _parserVocabulary.localName.getSize() - 1;
         }
-        QualifiedName name = new QualifiedName(prefix, namespaceURI, localName, m.getNextIndex(), prefixIndex, namespaceURIIndex, localNameIndex);
+        QualifiedName name = new QualifiedName(prefix, namespaceURI, localName, m.getNextIndex(), 
+                prefixIndex, namespaceURIIndex, localNameIndex,
+                true);
         if (isAttribute) {
             name.createAttributeValues(DuplicateAttributeVerifier.MAP_SIZE);
         }
