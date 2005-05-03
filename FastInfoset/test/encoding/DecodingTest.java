@@ -39,11 +39,14 @@
 
 package encoding;
 
+import com.sun.xml.fastinfoset.EncodingConstants;
+import com.sun.xml.fastinfoset.sax.AttributesHolder;
 import com.sun.xml.fastinfoset.sax.SAXDocumentParser;
 import com.sun.xml.fastinfoset.sax.SAXDocumentSerializer;
 import com.sun.xml.fastinfoset.sax.VocabularyGenerator;
 import com.sun.xml.fastinfoset.vocab.ParserVocabulary;
 import com.sun.xml.fastinfoset.vocab.SerializerVocabulary;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URI;
@@ -158,6 +161,31 @@ public class DecodingTest extends TestCase {
             passed);
 
     }
+
+    public void testDecodeWithXMLDeclaration() throws Exception {
+        for (int i = 0; i < EncodingConstants.XML_DECLARATION_VALUES.length; i++) {
+            _testDecodeWithXMLDeclaration(EncodingConstants.XML_DECLARATION_VALUES[i]);
+        }
+    }
+    
+    public void _testDecodeWithXMLDeclaration(byte[] header) throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        baos.write(header);
+        
+        SAXDocumentSerializer sds = new SAXDocumentSerializer();
+        sds.setOutputStream(baos);
+        
+        sds.startDocument();
+            sds.startElement("", "element", "element", new AttributesHolder());
+                sds.characters(new String("foo").toCharArray(), 0, 3);
+            sds.endElement("", "element", "element");
+        sds.endDocument();
+        
+        SAXDocumentParser sdp = new SAXDocumentParser();
+        sdp.setInputStream(new ByteArrayInputStream(baos.toByteArray()));
+        sdp.parse();
+    }
+
     
     static byte[] obtainBytesFromStream(InputStream s) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
