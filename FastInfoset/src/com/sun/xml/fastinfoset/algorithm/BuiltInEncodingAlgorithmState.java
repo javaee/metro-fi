@@ -49,10 +49,8 @@ public class BuiltInEncodingAlgorithmState {
     
     public int[] intArray = new int[INITIAL_LENGTH];
 
-    public long[] long1Array = new long[INITIAL_LENGTH];
-
-    public long[] long2Array = new long[INITIAL_LENGTH];
-    
+    public long[] longArray = new long[INITIAL_LENGTH];
+        
     public float[] floatArray = new float[INITIAL_LENGTH];
 
     public double[] doubleArray = new double[INITIAL_LENGTH];    

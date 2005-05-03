@@ -971,7 +971,7 @@ public class DOMDocumentParser extends Decoder {
 
     protected String convertEncodingAlgorithmDataToCharacters(boolean isAttributeValue) throws FastInfosetException, IOException {
         StringBuffer buffer = new StringBuffer();
-        if (_identifier <= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
+        if (_identifier < EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
             Object array = BuiltInEncodingAlgorithmFactory.table[_identifier].
                 decodeFromBytes(_octetBuffer, _octetBufferStart, _octetBufferLength);
             BuiltInEncodingAlgorithmFactory.table[_identifier].convertToCharacters(array,  buffer);

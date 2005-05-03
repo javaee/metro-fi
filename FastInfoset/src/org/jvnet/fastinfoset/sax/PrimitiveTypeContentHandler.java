@@ -106,7 +106,8 @@ public interface PrimitiveTypeContentHandler {
      *
      * <p>Such notifications will occur for a Fast Infoset SAX parser
      * when processing data encoded using the "base64" encoding
-     * algorithm, see subclause 10.3. 
+     * algorithm, see subclause 10.3, or the "hexadecimal" encoding
+     * algorithm, see subclause 10.2. 
      * 
      * <p>Such a notification may occur for binary data that would
      * normally require base 64 encoding and reported as character data

@@ -51,6 +51,16 @@ import org.jvnet.fastinfoset.EncodingAlgorithmException;
 
 public class UUIDEncodingAlgorithm extends LongEncodingAlgorithm {
     
+    public final int getPrimtiveLengthFromOctetLength(int octetLength) throws EncodingAlgorithmException {
+        if (octetLength % (LONG_SIZE * 2) != 0) {
+            throw new EncodingAlgorithmException("'length' is not a multiple of " +
+                    (LONG_SIZE * 2) +
+                    " bytes correspond to the size of the 'UUID' primitive type");
+        }
+        
+        return octetLength / LONG_SIZE;
+    }
+    
     public final Object convertFromCharacters(char[] ch, int start, int length) {
         final CharBuffer cb = CharBuffer.wrap(ch, start, length);
         final List longList = new ArrayList();
@@ -82,7 +92,6 @@ public class UUIDEncodingAlgorithm extends LongEncodingAlgorithm {
                 s.append(' ');
             }
         }
-        
     }    
 
     

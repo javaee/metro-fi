@@ -358,7 +358,19 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
     }
 
     public final void longs(long[] l, int start, int length) throws SAXException {
-        throw new SAXException("Non Implemented");
+        if (length <= 0) {
+            return;
+        }
+
+        try {
+            encodeTermination();
+
+            encodeCIIBuiltInAlgorithmData(EncodingAlgorithmIndexes.LONG, l, start, length);
+        } catch (IOException e) {
+            throw new SAXException(e);
+        } catch (FastInfosetException e) {
+            throw new SAXException(e);
+        }
     }
 
     public final void floats(float[] f, int start, int length) throws SAXException {
@@ -378,11 +390,35 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
     }
 
     public final void doubles(double[] d, int start, int length) throws SAXException {
-        throw new SAXException("Non Implemented");
+        if (length <= 0) {
+            return;
+        }
+
+        try {
+            encodeTermination();
+
+            encodeCIIBuiltInAlgorithmData(EncodingAlgorithmIndexes.DOUBLE, d, start, length);
+        } catch (IOException e) {
+            throw new SAXException(e);
+        } catch (FastInfosetException e) {
+            throw new SAXException(e);
+        }
     }
 
     public void uuids(long[] msblsb, int start, int length) throws SAXException {
-        throw new SAXException("Non Implemented");
+        if (length <= 0) {
+            return;
+        }
+
+        try {
+            encodeTermination();
+
+            encodeCIIBuiltInAlgorithmData(EncodingAlgorithmIndexes.UUID, msblsb, start, length);
+        } catch (IOException e) {
+            throw new SAXException(e);
+        } catch (FastInfosetException e) {
+            throw new SAXException(e);
+        }
     }
 
 

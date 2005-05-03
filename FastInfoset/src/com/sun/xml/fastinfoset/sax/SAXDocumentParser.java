@@ -1297,7 +1297,8 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             int length;
             switch(_identifier) {
                 case EncodingAlgorithmIndexes.HEXADECIMAL:
-                    throw new UnsupportedOperationException("HEXADECIMAL");
+                    _primitiveHandler.bytes(_octetBuffer, _octetBufferStart, _octetBufferLength);
+                    break;
                 case EncodingAlgorithmIndexes.BASE64:
                     _primitiveHandler.bytes(_octetBuffer, _octetBufferStart, _octetBufferLength);
                     break;
@@ -1332,7 +1333,20 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     _primitiveHandler.ints(builtInAlgorithmState.intArray, 0, length);
                     break;
                 case EncodingAlgorithmIndexes.LONG:
-                    throw new UnsupportedOperationException("LONG");
+                    length = BuiltInEncodingAlgorithmFactory.longEncodingAlgorithm.
+                            getPrimtiveLengthFromOctetLength(_octetBufferLength);
+                    if (length > builtInAlgorithmState.longArray.length) {
+                        final long[] array = new long[length * 3 / 2 + 1];
+                        System.arraycopy(builtInAlgorithmState.longArray, 0,
+                                array, 0, builtInAlgorithmState.longArray.length);
+                        builtInAlgorithmState.longArray = array;
+                    }
+                    
+                    BuiltInEncodingAlgorithmFactory.longEncodingAlgorithm.
+                            decodeFromBytesToLongArray(builtInAlgorithmState.longArray, 0,
+                            _octetBuffer, _octetBufferStart, _octetBufferLength);
+                    _primitiveHandler.ints(builtInAlgorithmState.intArray, 0, length);
+                    break;
                 case EncodingAlgorithmIndexes.BOOLEAN:
                     throw new UnsupportedOperationException("BOOLEAN");
                 case EncodingAlgorithmIndexes.FLOAT:
@@ -1351,9 +1365,35 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     _primitiveHandler.floats(builtInAlgorithmState.floatArray, 0, length);
                     break;
                 case EncodingAlgorithmIndexes.DOUBLE:
-                    throw new UnsupportedOperationException("DOUBLE");
+                    length = BuiltInEncodingAlgorithmFactory.doubleEncodingAlgorithm.
+                            getPrimtiveLengthFromOctetLength(_octetBufferLength);
+                    if (length > builtInAlgorithmState.doubleArray.length) {
+                        final double[] array = new double[length * 3 / 2 + 1];
+                        System.arraycopy(builtInAlgorithmState.doubleArray, 0,
+                                array, 0, builtInAlgorithmState.doubleArray.length);
+                        builtInAlgorithmState.doubleArray = array;
+                    }
+                    
+                    BuiltInEncodingAlgorithmFactory.doubleEncodingAlgorithm.
+                            decodeFromBytesToDoubleArray(builtInAlgorithmState.doubleArray, 0,
+                            _octetBuffer, _octetBufferStart, _octetBufferLength);
+                    _primitiveHandler.doubles(builtInAlgorithmState.doubleArray, 0, length);
+                    break;
                 case EncodingAlgorithmIndexes.UUID:
-                    throw new UnsupportedOperationException("UUID");
+                    length = BuiltInEncodingAlgorithmFactory.uuidEncodingAlgorithm.
+                            getPrimtiveLengthFromOctetLength(_octetBufferLength);
+                    if (length > builtInAlgorithmState.longArray.length) {
+                        final long[] array = new long[length * 3 / 2 + 1];
+                        System.arraycopy(builtInAlgorithmState.longArray, 0,
+                                array, 0, builtInAlgorithmState.longArray.length);
+                        builtInAlgorithmState.longArray = array;
+                    }
+                    
+                    BuiltInEncodingAlgorithmFactory.uuidEncodingAlgorithm.
+                            decodeFromBytesToLongArray(builtInAlgorithmState.longArray, 0,
+                            _octetBuffer, _octetBufferStart, _octetBufferLength);
+                    _primitiveHandler.uuids(builtInAlgorithmState.longArray, 0, length);
+                    break;
                 case EncodingAlgorithmIndexes.CDATA:
                     throw new UnsupportedOperationException("CDATA");
                 default:

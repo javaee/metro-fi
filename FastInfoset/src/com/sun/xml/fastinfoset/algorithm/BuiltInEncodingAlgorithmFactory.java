@@ -47,18 +47,30 @@ public final class BuiltInEncodingAlgorithmFactory {
     public final static BuiltInEncodingAlgorithm[] table =
             new BuiltInEncodingAlgorithm[EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END + 1];
 
+    public final static HexadecimalEncodingAlgorithm hexadecimalEncodingAlgorithm = new HexadecimalEncodingAlgorithm();
+    
     public final static BASE64EncodingAlgorithm base64EncodingAlgorithm = new BASE64EncodingAlgorithm();
-
-    public final static IntEncodingAlgorithm intEncodingAlgorithm = new IntEncodingAlgorithm();
 
     public final static ShortEncodingAlgorithm shortEncodingAlgorithm = new ShortEncodingAlgorithm();
 
+    public final static IntEncodingAlgorithm intEncodingAlgorithm = new IntEncodingAlgorithm();
+
+    public final static LongEncodingAlgorithm longEncodingAlgorithm = new LongEncodingAlgorithm();
+    
     public final static FloatEncodingAlgorithm floatEncodingAlgorithm = new FloatEncodingAlgorithm();
 
+    public final static DoubleEncodingAlgorithm doubleEncodingAlgorithm = new DoubleEncodingAlgorithm();
+    
+    public final static UUIDEncodingAlgorithm uuidEncodingAlgorithm = new UUIDEncodingAlgorithm();
+    
     static {
+        table[EncodingAlgorithmIndexes.HEXADECIMAL] = hexadecimalEncodingAlgorithm;
         table[EncodingAlgorithmIndexes.BASE64] = base64EncodingAlgorithm;
-        table[EncodingAlgorithmIndexes.INT] = intEncodingAlgorithm;
         table[EncodingAlgorithmIndexes.SHORT] = shortEncodingAlgorithm;
+        table[EncodingAlgorithmIndexes.INT] = intEncodingAlgorithm;
+        table[EncodingAlgorithmIndexes.LONG] = longEncodingAlgorithm;
         table[EncodingAlgorithmIndexes.FLOAT] = floatEncodingAlgorithm;
+        table[EncodingAlgorithmIndexes.DOUBLE] = doubleEncodingAlgorithm;
+        table[EncodingAlgorithmIndexes.UUID] = uuidEncodingAlgorithm;
     }
 }

@@ -20,7 +20,8 @@
  * products.
  *
  *    Please note that portions of Software may be provided with notices and
- * open source licenses from such communities and third parties that govern the
+ * open source licenses from su
+ ch communities and third parties that govern the
  * use of those portions, and any licenses granted hereunder do not alter any
  * rights and obligations you may have under such open source licenses,
  * however, the disclaimer of warranty and limitation of liability provisions
@@ -50,76 +51,75 @@ import org.jvnet.fastinfoset.EncodingAlgorithmException;
 
 
 
-public class LongEncodingAlgorithm extends IntegerEncodingAlgorithm {
+public class DoubleEncodingAlgorithm extends IEEE754FloatingPointEncodingAlgorithm {
 
-    public int getPrimtiveLengthFromOctetLength(int octetLength) throws EncodingAlgorithmException {
-        if (octetLength % LONG_SIZE != 0) {
+    public final int getPrimtiveLengthFromOctetLength(int octetLength) throws EncodingAlgorithmException {
+        if (octetLength % DOUBLE_SIZE != 0) {
             throw new EncodingAlgorithmException("'length' is not a multiple of " +
-                    LONG_SIZE +
-                    " bytes correspond to the size of the 'long' primitive type");
+                    DOUBLE_SIZE +
+                    " bytes correspond to the size of the IEEE 754 floating-point \"single format\"");
         }
         
-        return octetLength / LONG_SIZE;
-    }
-
-    public int getOctetLengthFromPrimitiveLength(int primitiveLength) {
-        return primitiveLength * LONG_SIZE;
+        return octetLength / DOUBLE_SIZE;
     }
     
+    public int getOctetLengthFromPrimitiveLength(int primitiveLength) {
+        return primitiveLength * DOUBLE_SIZE;
+    }
+   
     public final Object decodeFromBytes(byte[] b, int start, int length) throws EncodingAlgorithmException {
-        long[] data = new long[getPrimtiveLengthFromOctetLength(length)];
-        decodeFromBytesToLongArray(data, 0, b, start, length);
+        double[] data = new double[getPrimtiveLengthFromOctetLength(length)];
+        decodeFromBytesToDoubleArray(data, 0, b, start, length);
         
         return data;
     }
     
     public final Object decodeFromInputStream(InputStream s) throws IOException {
-        return decodeFromInputStreamToIntArray(s);
+        return decodeFromInputStreamToDoubleArray(s);
     }
     
     
     public void encodeToOutputStream(Object data, OutputStream s) throws IOException {
-        if (!(data instanceof long[])) {
-            throw new IllegalArgumentException("'data' not an instance of int[]");
+        if (!(data instanceof double[])) {
+            throw new IllegalArgumentException("'data' not an instance of double[]");
         }
         
-        final long[] ldata = (long[])data;
+        final double[] fdata = (double[])data;
         
-        encodeToOutputStreamFromLongArray(ldata, s);
+        encodeToOutputStreamFromDoubleArray(fdata, s);
     }
     
-    
-    public Object convertFromCharacters(char[] ch, int start, int length) {
+    public final Object convertFromCharacters(char[] ch, int start, int length) {
         final CharBuffer cb = CharBuffer.wrap(ch, start, length);
-        final List longList = new ArrayList();
+        final List doubleList = new ArrayList();
         
         matchWhiteSpaceDelimnatedWords(cb,
                 new WordListener() {
             public void word(int start, int end) {
-                String lStringValue = cb.subSequence(start, end).toString();
-                longList.add(Long.valueOf(lStringValue));
+                String fStringValue = cb.subSequence(start, end).toString();
+                doubleList.add(Float.valueOf(fStringValue));
             }
         }
         );
         
-        return generateArrayFromList(longList);
+        return generateArrayFromList(doubleList);
     }
     
-    public void convertToCharacters(Object data, StringBuffer s) {
-        if (!(data instanceof long[])) {
-            throw new IllegalArgumentException("'data' not an instance of long[]");
+    public final void convertToCharacters(Object data, StringBuffer s) {
+        if (!(data instanceof double[])) {
+            throw new IllegalArgumentException("'data' not an instance of double[]");
         }
         
-        final long[] ldata = (long[])data;
+        final double[] fdata = (double[])data;
         
-        convertToCharactersFromLongArray(ldata, s);
+        convertToCharactersFromDoubleArray(fdata, s);
     }
     
     
-    public final void decodeFromBytesToLongArray(long[] ldata, int istart, byte[] b, int start, int length) {
-        final int size = length / LONG_SIZE;
+    public final void decodeFromBytesToDoubleArray(double[] data, int fstart, byte[] b, int start, int length) {
+        final int size = length / DOUBLE_SIZE;
         for (int i = 0; i < size; i++) {
-            ldata[istart++] = 
+            final long bits =
                     ((long)(b[start++] & 0xFF) << 56) | 
                     ((long)(b[start++] & 0xFF) << 48) | 
                     ((long)(b[start++] & 0xFF) << 40) | 
@@ -128,22 +128,23 @@ public class LongEncodingAlgorithm extends IntegerEncodingAlgorithm {
                     ((long)(b[start++] & 0xFF) << 16) | 
                     ((long)(b[start++] & 0xFF) << 8) | 
                     (long)(b[start++] & 0xFF);
-        }        
+            data[fstart++] = Double.longBitsToDouble(bits);
+        }
     }
     
-    public final long[] decodeFromInputStreamToIntArray(InputStream s) throws IOException {
-        final List longList = new ArrayList();
-        final byte[] b = new byte[LONG_SIZE];
+    public final double[] decodeFromInputStreamToDoubleArray(InputStream s) throws IOException {
+        final List doubleList = new ArrayList();
+        final byte[] b = new byte[DOUBLE_SIZE];
         
         while (true) {
             int n = s.read(b);
-            if (n != LONG_SIZE) {
+            if (n != DOUBLE_SIZE) {
                 if (n == -1) {
                     break;
                 }
                 
-                while(n != LONG_SIZE) {
-                    final int m = s.read(b, n, LONG_SIZE - n);
+                while(n != DOUBLE_SIZE) {
+                    final int m = s.read(b, n, DOUBLE_SIZE - n);
                     if (m == -1) {
                         throw new EOFException();
                     }
@@ -151,7 +152,7 @@ public class LongEncodingAlgorithm extends IntegerEncodingAlgorithm {
                 }
             }
             
-            final int l = 
+            final int bits = 
                     ((b[0] & 0xFF) << 56) | 
                     ((b[1] & 0xFF) << 48) | 
                     ((b[2] & 0xFF) << 40) | 
@@ -160,35 +161,36 @@ public class LongEncodingAlgorithm extends IntegerEncodingAlgorithm {
                     ((b[5] & 0xFF) << 16) | 
                     ((b[6] & 0xFF) << 8) | 
                     (b[7] & 0xFF);
-            longList.add(new Long(l));
+            
+            doubleList.add(new Double(Double.longBitsToDouble(bits)));
         }
         
-        return generateArrayFromList(longList);
+        return generateArrayFromList(doubleList);
     }
     
     
-    public final void encodeToOutputStreamFromLongArray(long[] ldata, OutputStream s) throws IOException {
-        for (int i = 0; i < ldata.length; i++) {
-            final long bits = ldata[i];
+    public final void encodeToOutputStreamFromDoubleArray(double[] fdata, OutputStream s) throws IOException {
+        for (int i = 0; i < fdata.length; i++) {
+            final long bits = Double.doubleToLongBits(fdata[i]);
             s.write((int)(bits >>> 56));
             s.write((int)((bits >>> 48) & 0xFF));
             s.write((int)((bits >>> 40) & 0xFF));
             s.write((int)((bits >>> 32) & 0xFF));
             s.write((int)((bits >>> 24) & 0xFF));
             s.write((int)((bits >>> 16) & 0xFF));
-            s.write((int)((bits >>> 8) & 0xFF));
+            s.write((int)((bits >>>  8) & 0xFF));
             s.write((int)(bits & 0xFF));
         }
     }
     
     public final void encodeToBytes(Object array, int astart, int alength, byte[] b, int start) {
-        encodeToBytesFromLongArray((long[])array, astart, alength, b, start);
+        encodeToBytesFromDoubleArray((double[])array, astart, alength, b, start);
     }
     
-    public final void encodeToBytesFromLongArray(long[] ldata, int lstart, int llength, byte[] b, int start) {
-        final int lend = lstart + llength;
-        for (int i = lstart; i < lend; i++) {
-            final long bits = ldata[i];
+    public final void encodeToBytesFromDoubleArray(double[] fdata, int fstart, int flength, byte[] b, int start) {
+        final int fend = fstart + flength;
+        for (int i = fstart; i < fend; i++) {
+            final long bits = Double.doubleToLongBits(fdata[i]);
             b[start++] = (byte)(bits >>> 56);
             b[start++] = (byte)((bits >>> 48) & 0xFF);
             b[start++] = (byte)((bits >>> 40) & 0xFF);
@@ -201,22 +203,23 @@ public class LongEncodingAlgorithm extends IntegerEncodingAlgorithm {
     }
     
     
-    public final void convertToCharactersFromLongArray(long[] ldata, StringBuffer s) {
-        for (int i = 0; i < ldata.length; i++) {
-            s.append(Long.toString(ldata[i]));
-            if (i != ldata.length) {
+    public final void convertToCharactersFromDoubleArray(double[] fdata, StringBuffer s) {
+        for (int i = 0; i < fdata.length; i++) {
+            s.append(Double.toString(fdata[i]));
+            if (i != fdata.length) {
                 s.append(' ');
             }
         }
     }
     
     
-    public final long[] generateArrayFromList(List array) {
-        long[] ldata = new long[array.size()];
-        for (int i = 0; i < ldata.length; i++) {
-            ldata[i] = ((Long)array.get(i)).longValue();
+    public final double[] generateArrayFromList(List array) {
+        double[] fdata = new double[array.size()];
+        for (int i = 0; i < fdata.length; i++) {
+            fdata[i] = ((Double)array.get(i)).doubleValue();
         }
         
-        return ldata;
+        return fdata;
     }
+    
 }

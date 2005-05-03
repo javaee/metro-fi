@@ -576,42 +576,39 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
             }
         } else if (id <= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
             BuiltInEncodingAlgorithm a = BuiltInEncodingAlgorithmFactory.table[id];
+            int length = 0;
             switch(id) {
                 case EncodingAlgorithmIndexes.HEXADECIMAL:
                     throw new UnsupportedOperationException("HEXADECIMAL");
                 case EncodingAlgorithmIndexes.BASE64:
-                {
-                    byte[] d = (byte[])data;
-                    encodeAIIOctetAlgorithmData(id, d, 0, d.length);
+                    length = ((byte[])data).length;
                     break;
-                }
                 case EncodingAlgorithmIndexes.SHORT:
-                    short[] sd = (short[])data;
-                    encodeAIIBuiltInAlgorithmData(id, sd, 0, sd.length);
+                    length = ((short[])data).length;
                     break;
                 case EncodingAlgorithmIndexes.INT:
-                {
-                    int[] d = (int[])data;
-                    encodeAIIBuiltInAlgorithmData(id, d, 0, d.length);
+                    length = ((int[])data).length;
                     break;
-                }
                 case EncodingAlgorithmIndexes.LONG:
-                    throw new UnsupportedOperationException("LONG");
+                    length = ((long[])data).length;
+                    break;
                 case EncodingAlgorithmIndexes.BOOLEAN:
                     throw new UnsupportedOperationException("BOOLEAN");
                 case EncodingAlgorithmIndexes.FLOAT:
-                    float[] d = (float[])data;
-                    encodeAIIBuiltInAlgorithmData(id, d, 0, d.length);
+                    length = ((float[])data).length;
                     break;
                 case EncodingAlgorithmIndexes.DOUBLE:
-                    throw new UnsupportedOperationException("DOUBLE");
+                    length = ((double[])data).length;
+                    break;
                 case EncodingAlgorithmIndexes.UUID:
-                    throw new UnsupportedOperationException("UUID");
+                    length = ((long[])data).length;
+                    break;
                 case EncodingAlgorithmIndexes.CDATA:
                     throw new UnsupportedOperationException("CDATA");
                 default:
                     throw new EncodingAlgorithmException("Unsupported built-in encoding algorithm: " + id);
             }
+            encodeAIIBuiltInAlgorithmData(id, data, 0, length);
         } else if (id >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
             if (data instanceof byte[]) {
                 byte[] d = (byte[])data;
@@ -714,42 +711,39 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                 }
             }
         } else if (id <= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
+            int length = 0;
             switch(id) {
                 case EncodingAlgorithmIndexes.HEXADECIMAL:
                     throw new UnsupportedOperationException("HEXADECIMAL");
                 case EncodingAlgorithmIndexes.BASE64:
-                {
-                    byte[] d = (byte[])data;
-                    encodeCIIBuiltInAlgorithmData(id, d, 0, d.length);
+                    length = ((byte[])data).length;
                     break;
-                }
                 case EncodingAlgorithmIndexes.SHORT:
-                    short[] sd = (short[])data;
-                    encodeCIIBuiltInAlgorithmData(id, sd, 0, sd.length);
+                    length = ((short[])data).length;
                     break;
                 case EncodingAlgorithmIndexes.INT:
-                {
-                    int[] d = (int[])data;
-                    encodeCIIBuiltInAlgorithmData(id, d, 0, d.length);
+                    length = ((int[])data).length;
                     break;
-                }
                 case EncodingAlgorithmIndexes.LONG:
-                    throw new UnsupportedOperationException("LONG");
+                    length = ((int[])data).length;
+                    break;
                 case EncodingAlgorithmIndexes.BOOLEAN:
                     throw new UnsupportedOperationException("BOOLEAN");
                 case EncodingAlgorithmIndexes.FLOAT:
-                    float[] d = (float[])data;
-                    encodeCIIBuiltInAlgorithmData(id, d, 0, d.length);
+                    length = ((float[])data).length;
                     break;
                 case EncodingAlgorithmIndexes.DOUBLE:
-                    throw new UnsupportedOperationException("DOUBLE");
+                    length = ((double[])data).length;
+                    break;
                 case EncodingAlgorithmIndexes.UUID:
-                    throw new UnsupportedOperationException("UUID");
+                    length = ((int[])data).length;
+                    break;
                 case EncodingAlgorithmIndexes.CDATA:
                     throw new UnsupportedOperationException("CDATA");
                 default:
                     throw new EncodingAlgorithmException("Unsupported built-in encoding algorithm: " + id);
             }
+            encodeCIIBuiltInAlgorithmData(id, data, 0, length);
         } else if (id >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
             if (data instanceof byte[]) {
                 byte[] d = (byte[])data;
