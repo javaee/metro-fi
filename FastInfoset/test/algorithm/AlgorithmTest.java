@@ -91,6 +91,9 @@ public class AlgorithmTest extends TestCase {
     protected int[] _intArray;
     protected short[] _shortArray;
     protected float[] _floatArray;
+
+    protected String _cdata = new String("CDATA characters");
+    protected String _characters = new String("characters");
     
     public AlgorithmTest(String testName) {
         super(testName);
@@ -281,6 +284,18 @@ public class AlgorithmTest extends TestCase {
         _attributes.clear();
         s.floats(_floatArray, 0, _floatArray.length);
         s.endElement("", "float", "float");
+
+        // CDATA
+        s.startElement("", "cdata", "cdata", _attributes);
+            s.startCDATA();
+            s.characters(_cdata.toCharArray(), 0, _cdata.length());
+            s.endCDATA();
+        s.endElement("", "cdata", "cdata");
+        
+        // Characters
+        s.startElement("", "characters", "characters", _attributes);
+            s.characters(_characters.toCharArray(), 0, _characters.length());
+        s.endElement("", "characters", "characters");
         
         s.endElement("", "e", "e");
         
@@ -292,6 +307,10 @@ public class AlgorithmTest extends TestCase {
     public class BuiltInTestHandler extends FastInfosetDefaultHandler {
         
         protected int _arraySize;
+        
+        protected boolean _charactersAsCDATA;
+        
+        protected boolean _charactersShouldBeAsCDATA;
         
         public BuiltInTestHandler(int arraySize) {
             _arraySize = arraySize;
@@ -343,11 +362,36 @@ public class AlgorithmTest extends TestCase {
                     }
                 }
             } else {
-                assertEquals("e", localName);
+                if (localName.equals("cdata")) {
+                    _charactersShouldBeAsCDATA = true;
+                } else if (localName.equals("characters")) {
+                    _charactersShouldBeAsCDATA = false;
+                } else {
+                    assertEquals("e", localName);
+                }
             }
         }
         
         public final void endElement(String namespaceURI, String localName, String qName) throws SAXException {
+        }
+        
+        public final void characters(char[] c, int start, int length) throws SAXException {
+            String s = new String(c, start, length);
+            if (_charactersShouldBeAsCDATA) {
+                assertEquals(true, _charactersAsCDATA);
+                assertEquals(_cdata, s);
+            } else {
+                assertEquals(false, _charactersAsCDATA);
+                assertEquals(_characters, s);
+            }
+        }
+        
+        public final void startCDATA() throws SAXException {
+            _charactersAsCDATA = true;
+        }
+
+        public final void endCDATA() throws SAXException {
+            _charactersAsCDATA = false;
         }
         
         // PrimitiveTypeContentHandler
