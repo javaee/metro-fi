@@ -41,8 +41,10 @@ package algorithm;
 
 import com.sun.xml.fastinfoset.QualifiedName;
 import com.sun.xml.fastinfoset.algorithm.BASE64EncodingAlgorithm;
+import com.sun.xml.fastinfoset.algorithm.DoubleEncodingAlgorithm;
 import com.sun.xml.fastinfoset.algorithm.FloatEncodingAlgorithm;
 import com.sun.xml.fastinfoset.algorithm.IntEncodingAlgorithm;
+import com.sun.xml.fastinfoset.algorithm.LongEncodingAlgorithm;
 import com.sun.xml.fastinfoset.algorithm.ShortEncodingAlgorithm;
 import com.sun.xml.fastinfoset.dom.DOMDocumentParser;
 import com.sun.xml.fastinfoset.sax.AttributesHolder;
@@ -88,9 +90,12 @@ public class AlgorithmTest extends TestCase {
     protected AttributesHolder _attributes = new AttributesHolder();
     
     protected byte[] _byteArray;
-    protected int[] _intArray;
     protected short[] _shortArray;
+    protected int[] _intArray;
+    protected long[] _longArray;
     protected float[] _floatArray;
+    protected double[] _doubleArray;
+    protected long[] _uuidArray;
 
     protected String _cdata = new String("CDATA characters");
     protected String _characters = new String("characters");
@@ -147,21 +152,21 @@ public class AlgorithmTest extends TestCase {
         assertEquals(base64CharactersNoWS, s.toString());
     }
     
-    public void testFloatAlgorithm() throws Exception {
+    public void testShortAlgorithm() throws Exception {
         createArrayValues(ARRAY_SIZE);
         
-        byte[] b = new byte[ARRAY_SIZE * 4];
+        byte[] b = new byte[ARRAY_SIZE * 2];
         
-        FloatEncodingAlgorithm fea = new FloatEncodingAlgorithm();
-        fea.encodeToBytesFromFloatArray(_floatArray, 0, ARRAY_SIZE, b, 0);
+        ShortEncodingAlgorithm sea = new ShortEncodingAlgorithm();
+        sea.encodeToBytesFromShortArray(_shortArray, 0, ARRAY_SIZE, b, 0);
         
-        float[] f = new float[ARRAY_SIZE];
-        fea.decodeFromBytesToFloatArray(f, 0, b, 0, b.length);
+        short[] i = new short[ARRAY_SIZE];
+        sea.decodeFromBytesToShortArray(i, 0, b, 0, b.length);
         
         for (int is = 0; is < ARRAY_SIZE; is++) {
-            assertEquals(_floatArray[is], f[is], 0.0);
+            assertEquals(_shortArray[is], i[is]);
         }
-    }
+    }    
     
     public void testIntAlgorithm() throws Exception {
         createArrayValues(ARRAY_SIZE);
@@ -178,20 +183,68 @@ public class AlgorithmTest extends TestCase {
             assertEquals(_intArray[is], i[is]);
         }
     }
-    
-    public void testShortAlgorithm() throws Exception {
+
+    public void testLongAlgorithm() throws Exception {
         createArrayValues(ARRAY_SIZE);
         
-        byte[] b = new byte[ARRAY_SIZE * 2];
+        byte[] b = new byte[ARRAY_SIZE * 8];
         
-        ShortEncodingAlgorithm sea = new ShortEncodingAlgorithm();
-        sea.encodeToBytesFromShortArray(_shortArray, 0, ARRAY_SIZE, b, 0);
+        LongEncodingAlgorithm iea = new LongEncodingAlgorithm();
+        iea.encodeToBytesFromLongArray(_longArray, 0, ARRAY_SIZE, b, 0);
         
-        short[] i = new short[ARRAY_SIZE];
-        sea.decodeFromBytesToShortArray(i, 0, b, 0, b.length);
+        long[] i = new long[ARRAY_SIZE];
+        iea.decodeFromBytesToLongArray(i, 0, b, 0, b.length);
         
         for (int is = 0; is < ARRAY_SIZE; is++) {
-            assertEquals(_shortArray[is], i[is]);
+            assertEquals(_longArray[is], i[is]);
+        }
+    }
+    
+    public void testFloatAlgorithm() throws Exception {
+        createArrayValues(ARRAY_SIZE);
+        
+        byte[] b = new byte[ARRAY_SIZE * 4];
+        
+        FloatEncodingAlgorithm fea = new FloatEncodingAlgorithm();
+        fea.encodeToBytesFromFloatArray(_floatArray, 0, ARRAY_SIZE, b, 0);
+        
+        float[] f = new float[ARRAY_SIZE];
+        fea.decodeFromBytesToFloatArray(f, 0, b, 0, b.length);
+        
+        for (int is = 0; is < ARRAY_SIZE; is++) {
+            assertEquals(_floatArray[is], f[is], 0.0);
+        }
+    }
+    
+    public void testDoubleAlgorithm() throws Exception {
+        createArrayValues(ARRAY_SIZE);
+        
+        byte[] b = new byte[ARRAY_SIZE * 8];
+        
+        DoubleEncodingAlgorithm fea = new DoubleEncodingAlgorithm();
+        fea.encodeToBytesFromDoubleArray(_doubleArray, 0, ARRAY_SIZE, b, 0);
+        
+        double[] f = new double[ARRAY_SIZE];
+        fea.decodeFromBytesToDoubleArray(f, 0, b, 0, b.length);
+        
+        for (int is = 0; is < ARRAY_SIZE; is++) {
+            assertEquals(_doubleArray[is], f[is], 0.0);
+        }
+    }
+    
+    public void testUUIDAlgorithm() throws Exception {
+        createArrayValues(ARRAY_SIZE);
+        
+        byte[] b = new byte[ARRAY_SIZE * 16];
+        
+        LongEncodingAlgorithm iea = new LongEncodingAlgorithm();
+        iea.encodeToBytesFromLongArray(_uuidArray, 0, ARRAY_SIZE * 2, b, 0);
+        
+        long[] i = new long[ARRAY_SIZE * 2];
+        iea.decodeFromBytesToLongArray(i, 0, b, 0, b.length);
+        
+        for (int is = 0; is < ARRAY_SIZE * 2; is++) {
+            assertEquals(_uuidArray[is], i[is]);
         }
     }
     
@@ -261,6 +314,14 @@ public class AlgorithmTest extends TestCase {
         s.bytes(_byteArray, 0, _byteArray.length);
         s.endElement("", "byte", "byte");
         
+        // Shorts
+        _attributes.addAttributeWithAlgorithmData(new QualifiedName("", "", "short", "short"),
+                null, EncodingAlgorithmIndexes.SHORT, _shortArray);
+        s.startElement("", "short", "short", _attributes);
+        _attributes.clear();
+        s.shorts(_shortArray, 0, _shortArray.length);
+        s.endElement("", "short", "short");
+        
         // Ints
         _attributes.addAttributeWithAlgorithmData(new QualifiedName("", "", "int", "int"),
                 null, EncodingAlgorithmIndexes.INT, _intArray);
@@ -269,13 +330,13 @@ public class AlgorithmTest extends TestCase {
         s.ints(_intArray, 0, _intArray.length);
         s.endElement("", "int", "int");
         
-        // Shorts
-        _attributes.addAttributeWithAlgorithmData(new QualifiedName("", "", "short", "short"),
-                null, EncodingAlgorithmIndexes.SHORT, _shortArray);
-        s.startElement("", "short", "short", _attributes);
+        // Longs
+        _attributes.addAttributeWithAlgorithmData(new QualifiedName("", "", "long", "long"),
+                null, EncodingAlgorithmIndexes.LONG, _longArray);
+        s.startElement("", "long", "long", _attributes);
         _attributes.clear();
-        s.shorts(_shortArray, 0, _shortArray.length);
-        s.endElement("", "short", "short");
+        s.longs(_longArray, 0, _longArray.length);
+        s.endElement("", "long", "long");
         
         // Floats
         _attributes.addAttributeWithAlgorithmData(new QualifiedName("", "", "float", "float"),
@@ -285,6 +346,22 @@ public class AlgorithmTest extends TestCase {
         s.floats(_floatArray, 0, _floatArray.length);
         s.endElement("", "float", "float");
 
+        // Doubles
+        _attributes.addAttributeWithAlgorithmData(new QualifiedName("", "", "double", "double"),
+                null, EncodingAlgorithmIndexes.DOUBLE, _doubleArray);
+        s.startElement("", "double", "double", _attributes);
+        _attributes.clear();
+        s.doubles(_doubleArray, 0, _doubleArray.length);
+        s.endElement("", "double", "double");
+        
+        // UUIDs
+        _attributes.addAttributeWithAlgorithmData(new QualifiedName("", "", "uuid", "uuid"),
+                null, EncodingAlgorithmIndexes.UUID, _uuidArray);
+        s.startElement("", "uuid", "uuid", _attributes);
+        _attributes.clear();
+        s.uuids(_uuidArray, 0, _uuidArray.length);
+        s.endElement("", "uuid", "uuid");
+        
         // CDATA
         s.startElement("", "cdata", "cdata", _attributes);
             s.startCDATA();
@@ -333,15 +410,6 @@ public class AlgorithmTest extends TestCase {
                     for (int is = 0; is < _byteArray.length; is++) {
                         assertEquals(_byteArray[is], b[is]);
                     }
-                } else if (localName.equals("int")) {
-                    assertEquals("int", eas.getLocalName(0));
-                    assertEquals(EncodingAlgorithmIndexes.INT, eas.getAlgorithmIndex(0));
-                    assertEquals(null, eas.getAlgorithmURI(0));
-                    assertEquals(true, eas.getAlgorithmData(0) instanceof int[]);
-                    int[] i = (int[])eas.getAlgorithmData(0);
-                    for (int is = 0; is < _intArray.length; is++) {
-                        assertEquals(_intArray[is], i[is]);
-                    }
                 } else if (localName.equals("short")) {
                     assertEquals("short", eas.getLocalName(0));
                     assertEquals(EncodingAlgorithmIndexes.SHORT, eas.getAlgorithmIndex(0));
@@ -351,6 +419,24 @@ public class AlgorithmTest extends TestCase {
                     for (int is = 0; is < _shortArray.length; is++) {
                         assertEquals(_shortArray[is], i[is]);
                     }
+                } else if (localName.equals("int")) {
+                    assertEquals("int", eas.getLocalName(0));
+                    assertEquals(EncodingAlgorithmIndexes.INT, eas.getAlgorithmIndex(0));
+                    assertEquals(null, eas.getAlgorithmURI(0));
+                    assertEquals(true, eas.getAlgorithmData(0) instanceof int[]);
+                    int[] i = (int[])eas.getAlgorithmData(0);
+                    for (int is = 0; is < _intArray.length; is++) {
+                        assertEquals(_intArray[is], i[is]);
+                    }
+                } else if (localName.equals("long")) {
+                    assertEquals("long", eas.getLocalName(0));
+                    assertEquals(EncodingAlgorithmIndexes.LONG, eas.getAlgorithmIndex(0));
+                    assertEquals(null, eas.getAlgorithmURI(0));
+                    assertEquals(true, eas.getAlgorithmData(0) instanceof long[]);
+                    long[] i = (long[])eas.getAlgorithmData(0);
+                    for (int is = 0; is < _longArray.length; is++) {
+                        assertEquals(_longArray[is], i[is]);
+                    }
                 } else if (localName.equals("float")) {
                     assertEquals("float", eas.getLocalName(0));
                     assertEquals(EncodingAlgorithmIndexes.FLOAT, eas.getAlgorithmIndex(0));
@@ -359,6 +445,24 @@ public class AlgorithmTest extends TestCase {
                     float[] f = (float[])eas.getAlgorithmData(0);
                     for (int is = 0; is < _floatArray.length; is++) {
                         assertEquals(_floatArray[is], f[is], 0.0);
+                    }
+                } else if (localName.equals("double")) {
+                    assertEquals("double", eas.getLocalName(0));
+                    assertEquals(EncodingAlgorithmIndexes.DOUBLE, eas.getAlgorithmIndex(0));
+                    assertEquals(null, eas.getAlgorithmURI(0));
+                    assertEquals(true, eas.getAlgorithmData(0) instanceof double[]);
+                    double[] f = (double[])eas.getAlgorithmData(0);
+                    for (int is = 0; is < _doubleArray.length; is++) {
+                        assertEquals(_doubleArray[is], f[is], 0.0);
+                    }
+                } else if (localName.equals("uuid")) {
+                    assertEquals("uuid", eas.getLocalName(0));
+                    assertEquals(EncodingAlgorithmIndexes.UUID, eas.getAlgorithmIndex(0));
+                    assertEquals(null, eas.getAlgorithmURI(0));
+                    assertEquals(true, eas.getAlgorithmData(0) instanceof long[]);
+                    long[] i = (long[])eas.getAlgorithmData(0);
+                    for (int is = 0; is < _uuidArray.length; is++) {
+                        assertEquals(_uuidArray[is], i[is]);
                     }
                 }
             } else {
@@ -403,14 +507,6 @@ public class AlgorithmTest extends TestCase {
             }
         }
         
-        public final void ints(int[] i, int start, int length) throws SAXException {
-            assertEquals(_arraySize, length);
-            
-            for (int is = 0; is < _intArray.length; is++) {
-                assertEquals(_intArray[is], i[is + start]);
-            }
-        }
-        
         public final void shorts(short[] i, int start, int length) throws SAXException {
             assertEquals(_arraySize, length);
             
@@ -419,11 +515,35 @@ public class AlgorithmTest extends TestCase {
             }
         }
         
+        public final void ints(int[] i, int start, int length) throws SAXException {
+            assertEquals(_arraySize, length);
+            
+            for (int is = 0; is < _intArray.length; is++) {
+                assertEquals(_intArray[is], i[is + start]);
+            }
+        }
+        
+        public final void longs(long[] i, int start, int length) throws SAXException {
+            assertEquals(_arraySize, length);
+            
+            for (int is = 0; is < _longArray.length; is++) {
+                assertEquals(_longArray[is], i[is + start]);
+            }
+        }
+        
         public final void floats(float[] f, int start, int length) throws SAXException {
             assertEquals(_arraySize, length);
             
             for (int i = 0; i < _floatArray.length; i++) {
                 assertEquals(_floatArray[i], f[i + start], 0.0);
+            }
+        }
+        
+        public final void doubles(double[] f, int start, int length) throws SAXException {
+            assertEquals(_arraySize, length);
+            
+            for (int i = 0; i < _doubleArray.length; i++) {
+                assertEquals(_doubleArray[i], f[i + start], 0.0);
             }
         }
     }
@@ -655,15 +775,22 @@ public class AlgorithmTest extends TestCase {
     
     protected void createArrayValues(int arraySize) {
         _byteArray = new byte[arraySize];
-        _intArray = new int[arraySize];
         _shortArray = new short[arraySize];
+        _intArray = new int[arraySize];
+        _longArray = new long[arraySize];
         _floatArray = new float[arraySize];
+        _doubleArray = new double[arraySize];
+        _uuidArray = new long[arraySize * 2];
         
         for (int i = 0; i < arraySize; i++) {
             _byteArray[i] = (byte)i;
-            _intArray[i] = i * Integer.MAX_VALUE / arraySize;
             _shortArray[i] = (short)(i * Short.MAX_VALUE / arraySize);
+            _intArray[i] = i * (Integer.MAX_VALUE / arraySize);
+            _longArray[i] = i * (Long.MAX_VALUE / arraySize);
             _floatArray[i] = (float)(i * Math.E);
+            _doubleArray[i] = i * Math.E;
+            _uuidArray[i] = i * (Long.MAX_VALUE / arraySize);
+            _uuidArray[i * 2] = i * (Long.MAX_VALUE / arraySize);
         }
     }
     
