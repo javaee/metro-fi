@@ -50,6 +50,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import org.jvnet.fastinfoset.EncodingAlgorithm;
 import org.jvnet.fastinfoset.EncodingAlgorithmException;
+import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
 import org.jvnet.fastinfoset.FastInfosetException;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -444,7 +445,7 @@ public class DOMDocumentParser extends Decoder {
                     _identifier |= (_b & 0xFC) >> 2;
                     
                     decodeOctetsOnSeventhBitOfNonIdentifyingStringOnThirdBit(_b);
-                    final String s = convertEncodingAlgorithmDataToCharacters();
+                    final String s = convertEncodingAlgorithmDataToCharacters(false);
                     _currentNode.appendChild(_document.createTextNode(s));
                     break;
                 }
@@ -856,7 +857,7 @@ public class DOMDocumentParser extends Decoder {
                     _identifier |= (b & 0xF0) >> 4;
 
                     decodeOctetsOnFifthBitOfNonIdentifyingStringOnFirstBit(b);
-                    value = convertEncodingAlgorithmDataToCharacters();
+                    value = convertEncodingAlgorithmDataToCharacters(true);
                     a.setValue(value);                
                     _currentElement.setAttributeNode(a);
                     break;
@@ -968,12 +969,19 @@ public class DOMDocumentParser extends Decoder {
         return _document.createAttributeNS(namespaceName, qName);
     }
 
-    protected String convertEncodingAlgorithmDataToCharacters() throws FastInfosetException, IOException {
+    protected String convertEncodingAlgorithmDataToCharacters(boolean isAttributeValue) throws FastInfosetException, IOException {
         StringBuffer buffer = new StringBuffer();
         if (_identifier <= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
             Object array = BuiltInEncodingAlgorithmFactory.table[_identifier].
                 decodeFromBytes(_octetBuffer, _octetBufferStart, _octetBufferLength);
             BuiltInEncodingAlgorithmFactory.table[_identifier].convertToCharacters(array,  buffer);
+        } else if (_identifier == EncodingAlgorithmIndexes.CDATA) {
+            if (!isAttributeValue) {
+                // Set back buffer position to start of encoded string
+                _octetBufferOffset -= _octetBufferLength;
+                return decodeUtf8StringAsString();                
+            }
+            throw new EncodingAlgorithmException("CDATA encoding algorithm not supported for attribute values");            
         } else if (_identifier >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
             final String URI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
             final EncodingAlgorithm ea = (EncodingAlgorithm)_registeredEncodingAlgorithms.get(URI);

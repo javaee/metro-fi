@@ -51,12 +51,8 @@ import com.sun.xml.fastinfoset.util.XMLChar;
 import com.sun.xml.fastinfoset.util.EventLocation;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.EmptyStackException;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Stack;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
@@ -64,6 +60,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import org.jvnet.fastinfoset.EncodingAlgorithm;
 import org.jvnet.fastinfoset.EncodingAlgorithmException;
+import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
 import org.jvnet.fastinfoset.FastInfosetException;
 
 public class StAXDocumentParser extends Decoder implements XMLStreamReader {
@@ -1509,7 +1506,11 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
             if (URI == null) {
                 throw new EncodingAlgorithmException("URI not present for encoding algorithm identifier " + _identifier);
             }
-        } else if (_identifier > EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
+        } else if (_identifier >= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
+            if (_identifier == EncodingAlgorithmIndexes.CDATA) {
+                throw new EncodingAlgorithmException("CDATA encoding algorithm not supported for attribute values");
+            }
+            
             // Reserved built-in algorithms for future use
             // TODO should use sax property to decide if event will be
             // reported, allows for support through handler if required.
@@ -1523,10 +1524,18 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
 
     protected final void convertEncodingAlgorithmDataToCharacters() throws FastInfosetException, IOException {
         StringBuffer buffer = new StringBuffer();
-        if (_algorithmId <= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
+        if (_algorithmId < EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
             Object array = BuiltInEncodingAlgorithmFactory.table[_algorithmId].
                 decodeFromBytes(_algorithmData, _algorithmDataOffset, _algorithmDataLength);
             BuiltInEncodingAlgorithmFactory.table[_algorithmId].convertToCharacters(array,  buffer);
+        } else if (_algorithmId == EncodingAlgorithmIndexes.CDATA) {
+            _octetBufferOffset -= _octetBufferLength;
+            decodeUtf8StringIntoCharBuffer();
+            
+            _characters = _charBuffer;
+            _charactersOffset = 0;
+            _charactersLength = _charBufferLength;
+            return;
         } else if (_algorithmId >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
             final EncodingAlgorithm ea = (EncodingAlgorithm)_registeredEncodingAlgorithms.get(_algorithmURI);
             if (ea != null) {

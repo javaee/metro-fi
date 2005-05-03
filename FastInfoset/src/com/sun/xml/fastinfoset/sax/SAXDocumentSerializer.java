@@ -56,6 +56,8 @@ import org.xml.sax.SAXException;
 public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter {
     protected boolean _elementHasNamespaces = false;
 
+    protected boolean _charactersAsCDATA = false;
+    
     public SAXDocumentSerializer() {
     }
 
@@ -64,6 +66,7 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
         super.reset();
         
         _elementHasNamespaces = false;
+        _charactersAsCDATA = false;
     }
     
     // ContentHandler
@@ -198,8 +201,14 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
         try {
             encodeTermination();
 
-            encodeCharacters(ch, start, length);
+            if (!_charactersAsCDATA) {
+                encodeCharacters(ch, start, length);
+            } else {
+                encodeCIIBuiltInAlgorithmDataAsCDATA(ch, start, length);
+            }
         } catch (IOException e) {
+            throw new SAXException(e);
+        } catch (FastInfosetException e) {
             throw new SAXException(e);
         }
     }
@@ -245,9 +254,11 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
     }
 
     public final void startCDATA() throws SAXException {
+        _charactersAsCDATA = true;
     }
 
     public final void endCDATA() throws SAXException {
+        _charactersAsCDATA = false;
     }
 
     public final void startDTD(String name, String publicId, String systemId) throws SAXException {

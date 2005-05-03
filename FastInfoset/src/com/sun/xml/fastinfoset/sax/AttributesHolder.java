@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.util.Map;
 import org.jvnet.fastinfoset.EncodingAlgorithm;
 import org.jvnet.fastinfoset.EncodingAlgorithmException;
+import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
 import org.jvnet.fastinfoset.FastInfosetException;
 
 import org.jvnet.fastinfoset.sax.EncodingAlgorithmAttributes;
@@ -268,8 +269,10 @@ public class AttributesHolder implements EncodingAlgorithmAttributes {
     
     private final StringBuffer convertEncodingAlgorithmDataToString(int identifier, String URI, Object data) throws FastInfosetException, IOException {
         EncodingAlgorithm ea = null;
-        if (identifier <= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
+        if (identifier < EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
             ea = BuiltInEncodingAlgorithmFactory.table[identifier];
+        } else if (identifier == EncodingAlgorithmIndexes.CDATA) {
+            throw new EncodingAlgorithmException("CDATA encoding algorithm not supported for attribute values");            
         } else if (identifier >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
             if (URI == null) {
                 throw new EncodingAlgorithmException("URI not present for encoding algorithm identifier " + identifier);

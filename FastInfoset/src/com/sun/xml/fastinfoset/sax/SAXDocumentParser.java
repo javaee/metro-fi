@@ -1226,7 +1226,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
     }
         
     protected final void processCIIEncodingAlgorithm() throws FastInfosetException, IOException {
-        if (_identifier <= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
+        if (_identifier < EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
             if (_primitiveHandler != null) {
                 processCIIBuiltInEncodingAlgorithmAsPrimitive();
             } else if (_algorithmHandler != null) {
@@ -1247,6 +1247,18 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     throw new FastInfosetException(e);
                 }
             }
+        } else if (_identifier == EncodingAlgorithmIndexes.CDATA) {
+                // Set back buffer position to start of encoded string
+                _octetBufferOffset -= _octetBufferLength;
+                decodeUtf8StringIntoCharBuffer();
+                
+                try {
+                    _lexicalHandler.startCDATA();
+                    _contentHandler.characters(_charBuffer, 0, _charBufferLength);
+                    _lexicalHandler.endCDATA();
+                } catch (SAXException e) {
+                    throw new FastInfosetException(e);
+                }
         } else if (_identifier >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START && _algorithmHandler != null) {
             final String URI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
             if (URI == null) {
@@ -1354,7 +1366,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
     
     
     protected final void processAIIEncodingAlgorithm(QualifiedName name) throws FastInfosetException, IOException {
-        if (_identifier <= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
+        if (_identifier < EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
             if (_primitiveHandler != null || _algorithmHandler != null) {
                 Object data = processBuiltInEncodingAlgorithmAsObject();
                 _attributes.addAttributeWithAlgorithmData(name, null, _identifier, data);
@@ -1382,6 +1394,8 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             // TODO should have property to ignore
             throw new EncodingAlgorithmException(
                     "Document contains application-defined encoding algorithm data that cannot be reported");
+        } else if (_identifier == EncodingAlgorithmIndexes.CDATA) {
+            throw new EncodingAlgorithmException("CDATA encoding algorithm not supported for attribute values");
         } else {
             // Reserved built-in algorithms for future use
             // TODO should use sax property to decide if event will be

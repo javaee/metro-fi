@@ -821,6 +821,19 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         _octetBufferIndex += octetLength;
     }
 
+    protected final void encodeCIIBuiltInAlgorithmDataAsCDATA(char[] c, int start, int length) throws FastInfosetException, IOException {
+        // Encode identification and top two bits of encoding algorithm id
+        write (EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_ENCODING_ALGORITHM_FLAG);
+
+        // Encode bottom 6 bits of enoding algorithm id
+        _b = EncodingAlgorithmIndexes.CDATA << 2;
+
+        
+        length = encodeUTF8String(c, start, length);
+        encodeNonZeroOctetStringLengthOnSenventhBit(length);
+        write(_encodingBuffer, length);
+    }
+    
     /*
      * C.13
      */
