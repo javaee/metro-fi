@@ -174,9 +174,9 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
 
     protected final void encodeHeader(boolean encodeXmlDecl) throws IOException {
         if (encodeXmlDecl) {
-            _s.write(EncodingConstants.XML_DECL);
+            _s.write(EncodingConstants.XML_DECLARATION_VALUES[0]);
         }
-        _s.write(EncodingConstants.HEADER);
+        _s.write(EncodingConstants.BINARY_HEADER);
     }
 
     protected final void encodeInitialVocabulary() throws IOException {

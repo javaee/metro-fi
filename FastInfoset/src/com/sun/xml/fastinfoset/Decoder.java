@@ -1266,7 +1266,7 @@ public abstract class Decoder implements FastInfosetParser {
             } else {
                 decodeTwoToFourByteUtf8Character(b1, end);
             }
-        }
+        }        
     }
 
     public final void decodeTwoToFourByteUtf8Character(int b1, int end) throws IOException {
@@ -1627,20 +1627,61 @@ public abstract class Decoder implements FastInfosetParser {
     }
 
     protected final boolean _isFastInfosetDocument() throws IOException {
-        // TODO
-        // Check for <?xml declaration with 'finf' encoding
+        // Fill up the octet buffer
+        peak();
+        
+        _octetBufferLength = EncodingConstants.BINARY_HEADER.length;
+        ensureOctetBufferSize();
+        _octetBufferOffset += _octetBufferLength;
+        
+        // Check for binary header
+        if (_octetBuffer[0] != EncodingConstants.BINARY_HEADER[0] ||
+                _octetBuffer[1] != EncodingConstants.BINARY_HEADER[1] ||
+                _octetBuffer[2] != EncodingConstants.BINARY_HEADER[2] ||
+                _octetBuffer[3] != EncodingConstants.BINARY_HEADER[3]) {
+                     
+            // Check for each form of XML declaration
+            for (int i = 0; i < EncodingConstants.XML_DECLARATION_VALUES.length; i++) {
+                _octetBufferLength = EncodingConstants.XML_DECLARATION_VALUES[i].length - _octetBufferOffset;
+                ensureOctetBufferSize();
+                _octetBufferOffset += _octetBufferLength;
 
-        if (read() != (EncodingConstants.HEADER[0] & 0xFF) ||
-                read() != (EncodingConstants.HEADER[1] & 0xFF) ||
-                read() != (EncodingConstants.HEADER[2] & 0xFF) ||
-                read() != (EncodingConstants.HEADER[3] & 0xFF)) {
+                // Check XML declaration
+                if (arrayEquals(_octetBuffer, 0, 
+                        EncodingConstants.XML_DECLARATION_VALUES[i], 
+                        EncodingConstants.XML_DECLARATION_VALUES[i].length)) {
+                    _octetBufferLength = EncodingConstants.BINARY_HEADER.length;
+                    ensureOctetBufferSize();
+                    
+                    // Check for binary header
+                    if (_octetBuffer[_octetBufferOffset++] != EncodingConstants.BINARY_HEADER[0] ||
+                            _octetBuffer[_octetBufferOffset++] != EncodingConstants.BINARY_HEADER[1] ||
+                            _octetBuffer[_octetBufferOffset++] != EncodingConstants.BINARY_HEADER[2] ||
+                            _octetBuffer[_octetBufferOffset++] != EncodingConstants.BINARY_HEADER[3]) {
+                        return false;
+                    } else {
+                        // Fast Infoset document with XML declaration and binary header
+                        return true;
+                    }
+                }
+            }
+            
             return false;
         }
 
-        // TODO
+        // Fast Infoset document with binary header
         return true;
     }
 
+    protected final boolean arrayEquals(byte[] b1, int offset, byte[] b2, int length) {
+        for (int i = 0; i < length; i++) {
+            if (b1[offset + i] != b2[i]) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
 
     static public boolean isFastInfosetDocument(InputStream s) throws IOException {
         // TODO
@@ -1648,10 +1689,10 @@ public abstract class Decoder implements FastInfosetParser {
 
         final byte[] header = new byte[4];
         s.read(header);
-        if (header[0] != EncodingConstants.HEADER[0] ||
-                header[1] != EncodingConstants.HEADER[1] ||
-                header[2] != EncodingConstants.HEADER[2] ||
-                header[3] != EncodingConstants.HEADER[3]) {
+        if (header[0] != EncodingConstants.BINARY_HEADER[0] ||
+                header[1] != EncodingConstants.BINARY_HEADER[1] ||
+                header[2] != EncodingConstants.BINARY_HEADER[2] ||
+                header[3] != EncodingConstants.BINARY_HEADER[3]) {
             return false;
         }
 

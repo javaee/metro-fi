@@ -43,19 +43,9 @@ import java.io.UnsupportedEncodingException;
 import org.jvnet.fastinfoset.RestrictedAlphabet;
 
 public final class EncodingConstants {
-    public static byte[] XML_DECL = null;
-
     static {
-        try {
-            XML_DECL = "<?xml encoding='finf'?>".getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            XML_DECL = new byte[23];
-            // TODO fill out bytes explicitly
-            // then not necessary to call String.getBytes account
-            // for failure
-        }
-        
         initiateCharacterTables();
+        initiateXMLDeclarationValues();
     }
     
     public static final String XML_NAMESPACE_PREFIX = "xml";
@@ -70,8 +60,6 @@ public final class EncodingConstants {
     public static final String XMLNS_NAMESPACE_NAME = "http://www.w3.org/2000/xmlns/";
     public static final int XMLNS_NAMESPACE_NAME_LENGTH = XMLNS_NAMESPACE_NAME.length();
     public static final char[] XMLNS_NAMESPACE_NAME_CHARS = XMLNS_NAMESPACE_NAME.toCharArray();
-    
-    public static final byte[] HEADER = {(byte)0xE0, 0, 0, 1};
     
     public static final int DOCUMENT_ADDITIONAL_DATA_FLAG = 0x40; // 01000000
     public static final int DOCUMENT_INITIAL_VOCABULARY_FLAG = 0x20; // 00100000
@@ -333,5 +321,27 @@ public final class EncodingConstants {
         }
         
         return c;
+    }
+    
+    public static final byte[] BINARY_HEADER = {(byte)0xE0, 0, 0, 1};
+    
+    public static byte[][] XML_DECLARATION_VALUES;
+    
+    private static void initiateXMLDeclarationValues() {
+        
+        XML_DECLARATION_VALUES = new byte[9][];
+        
+        try {
+            XML_DECLARATION_VALUES[0] = "<?xml encoding='finf'?>".getBytes("UTF-8");
+            XML_DECLARATION_VALUES[1] = "<?xml version='1.0' encoding='finf'?>".getBytes("UTF-8");
+            XML_DECLARATION_VALUES[2] = "<?xml version='1.1' encoding='finf'?>".getBytes("UTF-8");
+            XML_DECLARATION_VALUES[3] = "<?xml encoding='finf' standalone='no'?>".getBytes("UTF-8");
+            XML_DECLARATION_VALUES[4] = "<?xml encoding='finf' standalone='yes'?>".getBytes("UTF-8");
+            XML_DECLARATION_VALUES[5] = "<?xml version='1.0' encoding='finf' standalone='no'?>".getBytes("UTF-8");
+            XML_DECLARATION_VALUES[6] = "<?xml version='1.1' encoding='finf' standalone='no'?>".getBytes("UTF-8");
+            XML_DECLARATION_VALUES[7] = "<?xml version='1.0' encoding='finf' standalone='yes'?>".getBytes("UTF-8");
+            XML_DECLARATION_VALUES[8] = "<?xml version='1.1' encoding='finf' standalone='yes'?>".getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+        }
     }
 }
