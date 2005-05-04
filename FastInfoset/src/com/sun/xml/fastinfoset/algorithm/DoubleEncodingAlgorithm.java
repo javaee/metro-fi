@@ -172,7 +172,7 @@ public class DoubleEncodingAlgorithm extends IEEE754FloatingPointEncodingAlgorit
     public final void encodeToOutputStreamFromDoubleArray(double[] fdata, OutputStream s) throws IOException {
         for (int i = 0; i < fdata.length; i++) {
             final long bits = Double.doubleToLongBits(fdata[i]);
-            s.write((int)(bits >>> 56));
+            s.write((int)((bits >>> 56) & 0xFF));
             s.write((int)((bits >>> 48) & 0xFF));
             s.write((int)((bits >>> 40) & 0xFF));
             s.write((int)((bits >>> 32) & 0xFF));
@@ -191,7 +191,7 @@ public class DoubleEncodingAlgorithm extends IEEE754FloatingPointEncodingAlgorit
         final int fend = fstart + flength;
         for (int i = fstart; i < fend; i++) {
             final long bits = Double.doubleToLongBits(fdata[i]);
-            b[start++] = (byte)(bits >>> 56);
+            b[start++] = (byte)((bits >>> 56) & 0xFF);
             b[start++] = (byte)((bits >>> 48) & 0xFF);
             b[start++] = (byte)((bits >>> 40) & 0xFF);
             b[start++] = (byte)((bits >>> 32) & 0xFF);

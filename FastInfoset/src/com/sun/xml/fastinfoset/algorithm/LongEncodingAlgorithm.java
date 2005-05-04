@@ -170,7 +170,7 @@ public class LongEncodingAlgorithm extends IntegerEncodingAlgorithm {
     public final void encodeToOutputStreamFromLongArray(long[] ldata, OutputStream s) throws IOException {
         for (int i = 0; i < ldata.length; i++) {
             final long bits = ldata[i];
-            s.write((int)(bits >>> 56));
+            s.write((int)((bits >>> 56) & 0xFF));
             s.write((int)((bits >>> 48) & 0xFF));
             s.write((int)((bits >>> 40) & 0xFF));
             s.write((int)((bits >>> 32) & 0xFF));
@@ -189,7 +189,7 @@ public class LongEncodingAlgorithm extends IntegerEncodingAlgorithm {
         final int lend = lstart + llength;
         for (int i = lstart; i < lend; i++) {
             final long bits = ldata[i];
-            b[start++] = (byte)(bits >>> 56);
+            b[start++] = (byte)((bits >>> 56) & 0xFF);
             b[start++] = (byte)((bits >>> 48) & 0xFF);
             b[start++] = (byte)((bits >>> 40) & 0xFF);
             b[start++] = (byte)((bits >>> 32) & 0xFF);

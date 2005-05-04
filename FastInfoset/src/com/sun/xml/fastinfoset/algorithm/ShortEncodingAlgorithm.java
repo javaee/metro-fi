@@ -161,7 +161,7 @@ public class ShortEncodingAlgorithm extends IntegerEncodingAlgorithm {
     public final void encodeToOutputStreamFromShortArray(short[] idata, OutputStream s) throws IOException {
         for (int i = 0; i < idata.length; i++) {
             final int bits = idata[i];
-            s.write((bits >>> 8));
+            s.write((bits >>> 8) & 0xFF);
             s.write(bits & 0xFF);
         }
     }
@@ -174,7 +174,7 @@ public class ShortEncodingAlgorithm extends IntegerEncodingAlgorithm {
         final int iend = istart + ilength;
         for (int i = istart; i < iend; i++) {
             final short bits = sdata[i];
-            b[start++] = (byte)((bits >>>  8));
+            b[start++] = (byte)((bits >>> 8) & 0xFF);
             b[start++] = (byte)(bits & 0xFF);
         }
     }

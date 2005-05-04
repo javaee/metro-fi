@@ -161,7 +161,7 @@ public class FloatEncodingAlgorithm extends IEEE754FloatingPointEncodingAlgorith
     public final void encodeToOutputStreamFromFloatArray(float[] fdata, OutputStream s) throws IOException {
         for (int i = 0; i < fdata.length; i++) {
             final int bits = Float.floatToIntBits(fdata[i]);
-            s.write(bits >>> 24);
+            s.write((bits >>> 24) & 0xFF);
             s.write((bits >>> 16) & 0xFF);
             s.write((bits >>> 8) & 0xFF);
             s.write(bits & 0xFF);
@@ -176,7 +176,7 @@ public class FloatEncodingAlgorithm extends IEEE754FloatingPointEncodingAlgorith
         final int fend = fstart + flength;
         for (int i = fstart; i < fend; i++) {
             final int bits = Float.floatToIntBits(fdata[i]);
-            b[start++] = (byte)(bits >>> 24);
+            b[start++] = (byte)((bits >>> 24) & 0xFF);
             b[start++] = (byte)((bits >>> 16) & 0xFF);
             b[start++] = (byte)((bits >>>  8) & 0xFF);
             b[start++] = (byte)(bits & 0xFF);

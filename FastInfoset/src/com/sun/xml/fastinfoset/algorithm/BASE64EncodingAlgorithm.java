@@ -146,24 +146,6 @@ public class BASE64EncodingAlgorithm extends BuiltInEncodingAlgorithm {
         
         s.write((byte[])data);
     }
-        
-    public StringBuffer removeWhitespace(char[] ch, int start, int length) {
-        StringBuffer buf = new StringBuffer();
-        int firstNonWS = 0;
-        int idx = 0;
-        for (; idx < length; ++idx) {
-            if (Character.isWhitespace(ch[idx])) {
-                if (firstNonWS < idx) {
-                    buf.append(ch, firstNonWS, idx - firstNonWS);
-                }
-                firstNonWS = idx + 1;
-            }
-        }
-        if (firstNonWS < idx) {
-            buf.append(ch, firstNonWS, idx - firstNonWS);
-        }
-        return buf;
-    }
     
     public final Object convertFromCharacters(char[] ch, int start, int length) {
         if (length == 0) {
