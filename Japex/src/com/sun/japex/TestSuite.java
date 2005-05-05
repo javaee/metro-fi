@@ -113,6 +113,12 @@ public class TestSuite extends Params {
         {
             setParam(Constants.RUN_ITERATIONS, 
                      Constants.DEFAULT_RUN_ITERATIONS);    
+        }        
+        
+        // Check output directory
+        if (!hasParam(Constants.REPORTS_DIRECTORY)) {
+            setParam(Constants.REPORTS_DIRECTORY, 
+                     Constants.DEFAULT_REPORTS_DIRECTORY);    
         }
         
         // Check number of threads 

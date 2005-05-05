@@ -93,13 +93,17 @@ public class Japex {
         try {
             System.out.println("Running ...");
             
+            // Create testsuite object from configuration file
+            TestSuite testSuite = new Engine().start(configFile);
+            
             // Create report directory
             String fileSep = System.getProperty("file.separator");
             DateFormat df = new SimpleDateFormat("yyyy_MM_dd_HH_mm");
-            String outputDir = "reports" + fileSep + df.format(TODAY);            
+            String outputDir = testSuite.getParam(Constants.OUTPUT_DIRECTORY) 
+                + fileSep + df.format(TODAY);            
             new File(outputDir).mkdirs();
 
-            TestSuite testSuite = new Engine().start(configFile);
+            // Generate report to string buffer
             StringBuffer report = new StringBuffer();
             testSuite.serialize(report);            
 
