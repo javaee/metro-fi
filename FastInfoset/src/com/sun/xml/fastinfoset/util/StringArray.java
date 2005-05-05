@@ -45,12 +45,13 @@ public class StringArray extends ValueArray {
     
     private StringArray _readOnlyArray;
 
-    public StringArray(int initialCapacity) {
+    public StringArray(int initialCapacity, int maximumCapacity) {
         _array = new String[initialCapacity];
+        _maximumCapacity = maximumCapacity;
     }
 
     public StringArray() {
-        this(DEFAULT_CAPACITY);
+        this(DEFAULT_CAPACITY, MAXIMUM_CAPACITY);
     }
 
     public final void clear() {
@@ -104,12 +105,25 @@ public class StringArray extends ValueArray {
  
     public final int add(String s) {
         if (_size == _array.length) {
-            final String[] newArray = new String[_size * 3 / 2 + 1];
-            System.arraycopy(_array, 0, newArray, 0, _size);
-            _array = newArray;
+            resize();
         }
             
        _array[_size++] = s;
        return _size;
+    }
+    
+    protected final void resize() {
+        if (_size == _maximumCapacity) {
+            throw new ValueArrayResourceException("Array has reached maximum capacity");
+        }
+
+        int newSize = _size * 3 / 2 + 1;
+        if (newSize > _maximumCapacity) {
+            newSize = _maximumCapacity;
+        }
+
+        final String[] newArray = new String[newSize];
+        System.arraycopy(_array, 0, newArray, 0, _size);
+        _array = newArray;
     }
 }

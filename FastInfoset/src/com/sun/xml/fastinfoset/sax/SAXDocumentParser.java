@@ -790,10 +790,11 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                             (read() << 8) |
                             read()) 
                             + EncodingConstants.INTEGER_4TH_BIT_LARGE_LIMIT;
-                    final CharArray ca = _characterContentChunkTable.get(index);
                     
                     try {
-                        _contentHandler.characters(ca.ch, ca.start, ca.length);
+                        _contentHandler.characters(_characterContentChunkTable._array, 
+                                _characterContentChunkTable._offset[index], 
+                                _characterContentChunkTable._length[index]);
                     } catch (SAXException e) {
                         throw new FastInfosetException("processCII", e);
                     }

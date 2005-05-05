@@ -47,12 +47,13 @@ public class QualifiedNameArray extends ValueArray {
     
     private QualifiedNameArray _readOnlyArray;
         
-    public QualifiedNameArray(int initialCapacity) {
+    public QualifiedNameArray(int initialCapacity, int maximumCapacity) {
         _array = new QualifiedName[initialCapacity];
+        _maximumCapacity = maximumCapacity;
     }
 
     public QualifiedNameArray() {
-        this(DEFAULT_CAPACITY);
+        this(DEFAULT_CAPACITY, MAXIMUM_CAPACITY);
     }
     
     public final void clear() {
@@ -106,12 +107,25 @@ public class QualifiedNameArray extends ValueArray {
     
     public final void add(QualifiedName s) {
         if (_size == _array.length) {
-            final QualifiedName[] newArray = new QualifiedName[_size * 3 / 2 + 1];
-            System.arraycopy(_array, 0, newArray, 0, _size);
-            _array = newArray;
+            resize();
         }
             
        _array[_size++] = s;
+    }
+
+    protected final void resize() {
+        if (_size == _maximumCapacity) {
+            throw new ValueArrayResourceException("Array has reached maximum capacity");
+        }
+
+        int newSize = _size * 3 / 2 + 1;
+        if (newSize > _maximumCapacity) {
+            newSize = _maximumCapacity;
+        }
+
+        final QualifiedName[] newArray = new QualifiedName[newSize];
+        System.arraycopy(_array, 0, newArray, 0, _size);
+        _array = newArray;
     }
 
 }

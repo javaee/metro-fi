@@ -39,18 +39,21 @@
 
 package com.sun.xml.fastinfoset.util;
 
+import org.jvnet.fastinfoset.FastInfosetException;
+
 public class CharArrayArray extends ValueArray {
     
     private CharArray[] _array;
     
     private CharArrayArray _readOnlyArray;
     
-    public CharArrayArray(int initialCapacity) {
+    public CharArrayArray(int initialCapacity, int maximumCapacity) {
         _array = new CharArray[initialCapacity];
+        _maximumCapacity = maximumCapacity;
     }
 
     public CharArrayArray() {
-        this(DEFAULT_CAPACITY);
+        this(DEFAULT_CAPACITY, MAXIMUM_CAPACITY);
     }
     
     public final void clear() {
@@ -98,11 +101,24 @@ public class CharArrayArray extends ValueArray {
     
     public final void add(CharArray s) {
         if (_size == _array.length) {
-            final CharArray[] newArray = new CharArray[_size * 3 / 2 + 1];
-            System.arraycopy(_array, 0, newArray, 0, _size);
-            _array = newArray;
+            resize();
         }
             
        _array[_size++] = s;
+    }
+    
+    protected final void resize() {
+        if (_size == _maximumCapacity) {
+            throw new ValueArrayResourceException("Array has reached maximum capacity");
+        }
+
+        int newSize = _size * 3 / 2 + 1;
+        if (newSize > _maximumCapacity) {
+            newSize = _maximumCapacity;
+        }
+
+        final CharArray[] newArray = new CharArray[newSize];
+        System.arraycopy(_array, 0, newArray, 0, _size);
+        _array = newArray;
     }
 }

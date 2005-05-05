@@ -40,6 +40,10 @@
 package com.sun.xml.fastinfoset.util;
 
 public class ContiguousCharArrayArray extends ValueArray {
+    public static final int INITIAL_CHARACTER_SIZE = 512;
+    public static final int MAXIMUM_CHARACTER_SIZE = Integer.MAX_VALUE;
+    
+    protected int _maximumCharacterSize;
     
     public int[] _offset;
     public int[] _length;
@@ -52,15 +56,19 @@ public class ContiguousCharArrayArray extends ValueArray {
     
     private ContiguousCharArrayArray _readOnlyArray;
     
-    public ContiguousCharArrayArray(int initialCapacity) {
+    public ContiguousCharArrayArray(int initialCapacity, int maximumCapacity,
+            int initialCharacterSize, int maximumCharacterSize) {
         _offset = new int[initialCapacity];
         _length = new int[initialCapacity];
-        _array = new char[512];
+        _array = new char[initialCharacterSize];
         _charArray.ch = _array;
+        _maximumCapacity = maximumCapacity;
+        _maximumCharacterSize = maximumCharacterSize;
     }
 
     public ContiguousCharArrayArray() {
-        this(DEFAULT_CAPACITY);
+        this(DEFAULT_CAPACITY, MAXIMUM_CAPACITY, 
+                INITIAL_CHARACTER_SIZE, MAXIMUM_CHARACTER_SIZE);
     }
     
     public final void clear() {
@@ -139,13 +147,7 @@ public class ContiguousCharArrayArray extends ValueArray {
     
     public final void add(int o, int l) {
         if (_size == _offset.length) {
-            final int[] offset = new int[_size * 3 / 2 + 1];
-            System.arraycopy(_offset, 0, offset, 0, _size);
-            _offset = offset;
-            
-            final int[] length = new int[_size * 3 / 2 + 1];
-            System.arraycopy(_length, 0, length, 0, _size);
-            _length = length;
+            resize();
         }
             
        _offset[_size] = o;
@@ -154,13 +156,7 @@ public class ContiguousCharArrayArray extends ValueArray {
     
     public final void add(char[] c, int l) {
         if (_size == _offset.length) {
-            final int[] offset = new int[_size * 3 / 2 + 1];
-            System.arraycopy(_offset, 0, offset, 0, _size);
-            _offset = offset;
-            
-            final int[] length = new int[_size * 3 / 2 + 1];
-            System.arraycopy(_length, 0, length, 0, _size);
-            _length = length;
+            resize();
         }
             
        _offset[_size] = _arrayIndex;
@@ -168,12 +164,44 @@ public class ContiguousCharArrayArray extends ValueArray {
        
        final int arrayIndex = _arrayIndex + l;
        if (arrayIndex >= _array.length) {
-           final char[] array = new char[arrayIndex * 3 / 2 + 1];
-            System.arraycopy(_array, 0, array, 0, _arrayIndex);
-            _charArray.ch = _array = array;
+           resizeArray(arrayIndex);
        }
        
        System.arraycopy(c, 0, _array, _arrayIndex, l);
        _arrayIndex = arrayIndex;
+    }  
+    
+    protected final void resize() {
+        if (_size == _maximumCapacity) {
+            throw new ValueArrayResourceException("Array has reached maximum capacity");
+        }
+
+        int newSize = _size * 3 / 2 + 1;
+        if (newSize > _maximumCapacity) {
+            newSize = _maximumCapacity;
+        }
+
+        final int[] offset = new int[newSize];
+        System.arraycopy(_offset, 0, offset, 0, _size);
+        _offset = offset;
+
+        final int[] length = new int[newSize];
+        System.arraycopy(_length, 0, length, 0, _size);
+        _length = length;
+    }
+
+    protected final void resizeArray(int requestedSize) {
+        if (_arrayIndex == _maximumCharacterSize) {
+            throw new ValueArrayResourceException("Maximum number of characters is reached");
+        }
+
+        int newSize = requestedSize * 3 / 2 + 1;
+        if (newSize > _maximumCharacterSize) {
+            newSize = _maximumCharacterSize;
+        }
+        
+        final char[] array = new char[newSize];
+        System.arraycopy(_array, 0, array, 0, _arrayIndex);
+        _charArray.ch = _array = array;
     }    
 }

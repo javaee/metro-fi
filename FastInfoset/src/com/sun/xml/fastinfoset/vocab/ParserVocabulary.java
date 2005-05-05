@@ -48,21 +48,54 @@ import com.sun.xml.fastinfoset.util.ValueArray;
 import java.net.URI;
 
 public class ParserVocabulary extends Vocabulary {
-    public final CharArrayArray restrictedAlphabet = new CharArrayArray();
-    public final StringArray encodingAlgorithm = new StringArray();
+    public static final String IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS_PEOPERTY = 
+        "com.sun.xml.fastinfoset.vocab.ParserVocabulary.IdentifyingStringTable.maximumItems";
+    public static final String NON_IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS_PEOPERTY = 
+        "com.sun.xml.fastinfoset.vocab.ParserVocabulary.NonIdentifyingStringTable.maximumItems";
+    public static final String NON_IDENTIFYING_STRING_TABLE_MAXIMUM_CHARACTERS_PEOPERTY = 
+        "com.sun.xml.fastinfoset.vocab.ParserVocabulary.NonIdentifyingStringTable.maximumCharacters";
 
-    public final StringArray namespaceName = new StringArray();
-    public final PrefixArray prefix = new PrefixArray();
-    public final StringArray localName = new StringArray();
-    public final StringArray otherNCName = new StringArray();
-    public final StringArray otherURI = new StringArray();
-    public final StringArray attributeValue = new StringArray();
-    public final CharArrayArray otherString = new CharArrayArray();
+    protected static int IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS;
+    protected static int NON_IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS; 
+    protected static int NON_IDENTIFYING_STRING_TABLE_MAXIMUM_CHARACTERS;
+    
+    static {
+        IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS = 
+                getIntegerValueFromProperty(IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS_PEOPERTY);
+        NON_IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS = 
+                getIntegerValueFromProperty(NON_IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS_PEOPERTY);
+        NON_IDENTIFYING_STRING_TABLE_MAXIMUM_CHARACTERS = 
+                getIntegerValueFromProperty(NON_IDENTIFYING_STRING_TABLE_MAXIMUM_CHARACTERS_PEOPERTY);
+    }
+    
+    private static int getIntegerValueFromProperty(String property) {
+        String value = System.getProperty(property);
+        if (value == null) {
+            return Integer.MAX_VALUE;
+        }
+        
+        try {
+            return Math.max(Integer.parseInt(value), ValueArray.DEFAULT_CAPACITY);
+        } catch (NumberFormatException e) {
+            return Integer.MAX_VALUE;
+        }
+    }
+    
+    public final CharArrayArray restrictedAlphabet = new CharArrayArray(ValueArray.DEFAULT_CAPACITY, 256);
+    public final StringArray encodingAlgorithm = new StringArray(ValueArray.DEFAULT_CAPACITY, 256);
 
-    public final ContiguousCharArrayArray characterContentChunk = new ContiguousCharArrayArray();
+    public final StringArray namespaceName;
+    public final PrefixArray prefix;
+    public final StringArray localName;
+    public final StringArray otherNCName ;
+    public final StringArray otherURI;
+    public final StringArray attributeValue;
+    public final CharArrayArray otherString;
 
-    public final QualifiedNameArray elementName = new QualifiedNameArray();
-    public final QualifiedNameArray attributeName = new QualifiedNameArray();
+    public final ContiguousCharArrayArray characterContentChunk;
+
+    public final QualifiedNameArray elementName;
+    public final QualifiedNameArray attributeName;
 
     public final ValueArray[] tables = new ValueArray[12];
     
@@ -70,6 +103,22 @@ public class ParserVocabulary extends Vocabulary {
     
     /** Creates a new instance of ParserVocabulary */
     public ParserVocabulary() {
+        namespaceName = new StringArray(ValueArray.DEFAULT_CAPACITY, IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS);
+        prefix = new PrefixArray(ValueArray.DEFAULT_CAPACITY, IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS);
+        localName = new StringArray(ValueArray.DEFAULT_CAPACITY, IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS);
+        otherNCName = new StringArray(ValueArray.DEFAULT_CAPACITY, IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS);
+        otherURI = new StringArray(ValueArray.DEFAULT_CAPACITY, IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS);
+        attributeValue = new StringArray(ValueArray.DEFAULT_CAPACITY, NON_IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS);
+        otherString = new CharArrayArray(ValueArray.DEFAULT_CAPACITY, NON_IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS);
+
+        characterContentChunk = new ContiguousCharArrayArray(ValueArray.DEFAULT_CAPACITY, 
+                NON_IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS, 
+                ContiguousCharArrayArray.INITIAL_CHARACTER_SIZE, 
+                NON_IDENTIFYING_STRING_TABLE_MAXIMUM_CHARACTERS);
+
+        elementName = new QualifiedNameArray(ValueArray.DEFAULT_CAPACITY, IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS);
+        attributeName = new QualifiedNameArray(ValueArray.DEFAULT_CAPACITY, IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS);
+
         tables[RESTRICTED_ALPHABET] = restrictedAlphabet;
         tables[ENCODING_ALGORITHM] = encodingAlgorithm;
         tables[PREFIX] = prefix;
@@ -84,6 +133,7 @@ public class ParserVocabulary extends Vocabulary {
         tables[ATTRIBUTE_NAME] = attributeName;
     }
 
+    
     public ParserVocabulary(SerializerVocabulary vocab) {
         this();
         

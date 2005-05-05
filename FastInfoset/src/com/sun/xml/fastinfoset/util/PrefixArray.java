@@ -78,8 +78,9 @@ public class PrefixArray extends ValueArray {
     
     public int _declarationId;
     
-    public PrefixArray(int initialCapacity) {
+    public PrefixArray(int initialCapacity, int maximumCapacity) {
         _initialCapacity = initialCapacity;
+        _maximumCapacity = maximumCapacity;
         
         _array = new String[initialCapacity];
         // Sizes of _inScopeNamespaces and _currentInScope need to be two
@@ -95,7 +96,7 @@ public class PrefixArray extends ValueArray {
     }
 
     public PrefixArray() {
-        this(DEFAULT_CAPACITY);
+        this(DEFAULT_CAPACITY, MAXIMUM_CAPACITY);
     }
 
     private final void initializeEntries() {
@@ -258,23 +259,35 @@ public class PrefixArray extends ValueArray {
  
     public final int add(String s) {
         if (_size == _array.length) {
-            int newSize = _size * 3 / 2 + 1;
-            final String[] newArray = new String[newSize];
-            System.arraycopy(_array, 0, newArray, 0, _size);
-            _array = newArray;
-
-            newSize += _readOnlyArraySize;
-            final NamespaceEntry[] newInScopeNamespaces = new NamespaceEntry[newSize + 2];
-            System.arraycopy(_inScopeNamespaces, 0, newInScopeNamespaces, 0, _readOnlyArraySize + _size + 2);
-            _inScopeNamespaces = newInScopeNamespaces;
-            
-            final int[] newCurrentInScope = new int[newSize + 2];
-            System.arraycopy(_currentInScope, 0, newCurrentInScope, 0, _readOnlyArraySize + _size + 2);
-            _currentInScope = newCurrentInScope;            
+            resize();
         }
             
        _array[_size++] = s;
        return _size;
+    }
+    
+    protected final void resize() {
+        if (_size == _maximumCapacity) {
+            throw new ValueArrayResourceException("Array has reached maximum capacity");
+        }
+
+        int newSize = _size * 3 / 2 + 1;
+        if (newSize > _maximumCapacity) {
+            newSize = _maximumCapacity;
+        }
+
+        final String[] newArray = new String[newSize];
+        System.arraycopy(_array, 0, newArray, 0, _size);
+        _array = newArray;
+
+        newSize += _readOnlyArraySize;
+        final NamespaceEntry[] newInScopeNamespaces = new NamespaceEntry[newSize + 2];
+        System.arraycopy(_inScopeNamespaces, 0, newInScopeNamespaces, 0, _readOnlyArraySize + _size + 2);
+        _inScopeNamespaces = newInScopeNamespaces;
+
+        final int[] newCurrentInScope = new int[newSize + 2];
+        System.arraycopy(_currentInScope, 0, newCurrentInScope, 0, _readOnlyArraySize + _size + 2);
+        _currentInScope = newCurrentInScope;            
     }
     
     public final void clearDeclarationIds() {
