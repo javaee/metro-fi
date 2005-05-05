@@ -215,9 +215,16 @@ public class DriverInfo extends Params {
         report.append(Util.getSpaces(spaces) 
             + "<driver name=\"" + _name + "\">\n");
         
+       /*
+         * Calling getAggregateTestCases() forces call to computeMeans(). This
+         * is necessary before serializing driver params.
+         */
+        Iterator tci = getAggregateTestCases().iterator();
+       
+        // Serialize driver params
         super.serialize(report, spaces + 2);
 
-        Iterator tci = getAggregateTestCases().iterator();
+        // Serialize each test case
         while (tci.hasNext()) {
             TestCase tc = (TestCase) tci.next();
             tc.serialize(report, spaces + 2);
