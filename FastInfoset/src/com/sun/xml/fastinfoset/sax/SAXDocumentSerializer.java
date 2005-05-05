@@ -139,26 +139,26 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
                 boolean addToTable;
                 String value;
                 if (atts instanceof EncodingAlgorithmAttributes) {
-                    EncodingAlgorithmAttributes eAtts = (EncodingAlgorithmAttributes)atts;
+                    final EncodingAlgorithmAttributes eAtts = (EncodingAlgorithmAttributes)atts;
                     for (int i = 0; i < eAtts.getLength(); i++) {
-                        encodeAttribute(atts.getURI(i), atts.getQName(i), atts.getLocalName(i));
-
-                        value = eAtts.getValue(i);
-                        if (value != null) {
-                            addToTable = (value.length() < _v.attributeValueSizeConstraint) ? true : false;
-                            encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
-                        } else {
-                            encodeNonIdentifyingStringOnFirstBit(eAtts.getAlgorithmURI(i),
-                                    eAtts.getAlgorithmIndex(i), eAtts.getAlgorithmData(i));
+                        if (encodeAttribute(atts.getURI(i), atts.getQName(i), atts.getLocalName(i))) {
+                            value = eAtts.getValue(i);
+                            if (value != null) {
+                                addToTable = (value.length() < _v.attributeValueSizeConstraint) ? true : false;
+                                encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
+                            } else {
+                                encodeNonIdentifyingStringOnFirstBit(eAtts.getAlgorithmURI(i),
+                                        eAtts.getAlgorithmIndex(i), eAtts.getAlgorithmData(i));
+                            }
                         }
                     }
                 } else {
                     for (int i = 0; i < atts.getLength(); i++) {
-                        encodeAttribute(atts.getURI(i), atts.getQName(i), atts.getLocalName(i));
-
-                        value = atts.getValue(i);
-                        addToTable = (value.length() < _v.attributeValueSizeConstraint) ? true : false;
-                        encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
+                        if (encodeAttribute(atts.getURI(i), atts.getQName(i), atts.getLocalName(i))) {
+                            value = atts.getValue(i);
+                            addToTable = (value.length() < _v.attributeValueSizeConstraint) ? true : false;
+                            encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
+                        }
                     }
                 }
                 _b = EncodingConstants.TERMINATOR;
@@ -490,19 +490,19 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
                 localName, entry);
     }
 
-    protected final void encodeAttribute(String namespaceURI, String qName, String localName) throws IOException {
+    protected final boolean encodeAttribute(String namespaceURI, String qName, String localName) throws IOException {
         LocalNameQualifiedNamesMap.Entry entry = _v.attributeName.obtainEntry(qName);
         if (entry._valueIndex > 0) {
             QualifiedName[] names = entry._value;
             for (int i = 0; i < entry._valueIndex; i++) {
                 if ((namespaceURI == names[i].namespaceName || namespaceURI.equals(names[i].namespaceName))) {
                     encodeNonZeroIntegerOnSecondBitFirstBitZero(names[i].index);
-                    return;
+                    return true;
                 }
             }
         }
 
-        encodeLiteralAttributeQualifiedNameOnSecondBit(namespaceURI, getPrefixFromQualifiedName(qName),
+        return encodeLiteralAttributeQualifiedNameOnSecondBit(namespaceURI, getPrefixFromQualifiedName(qName),
                 localName, entry);
     }
 }

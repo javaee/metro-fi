@@ -429,14 +429,19 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     /*
      * C.17
      */
-    protected final void encodeLiteralAttributeQualifiedNameOnSecondBit(String namespaceURI, String prefix, String localName,
+    protected final boolean encodeLiteralAttributeQualifiedNameOnSecondBit(String namespaceURI, String prefix, String localName,
                 LocalNameQualifiedNamesMap.Entry entry) throws IOException {
         int namespaceURIIndex = KeyIntMap.NOT_PRESENT;
         int prefixIndex = KeyIntMap.NOT_PRESENT;
         if (namespaceURI != "") {
             namespaceURIIndex = _v.namespaceName.get(namespaceURI);
             if (namespaceURIIndex == KeyIntMap.NOT_PRESENT) {
-                throw new IOException("namespace URI of local name not indexed: " + namespaceURI);
+                if (namespaceURI == EncodingConstants.XMLNS_NAMESPACE_NAME || 
+                        namespaceURI.equals(EncodingConstants.XMLNS_NAMESPACE_NAME)) {
+                    return false;
+                } else {
+                    throw new IOException("namespace URI of local name not indexed: " + namespaceURI);
+                }
             }
             
             if (prefix != "") {
@@ -478,6 +483,8 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         } else {
             encodeNonEmptyOctetStringOnSecondBit(localName);
         }
+        
+        return true;
     }
 
     /*
