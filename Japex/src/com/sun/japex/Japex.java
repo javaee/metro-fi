@@ -99,7 +99,7 @@ public class Japex {
             // Create report directory
             String fileSep = System.getProperty("file.separator");
             DateFormat df = new SimpleDateFormat("yyyy_MM_dd_HH_mm");
-            String outputDir = testSuite.getParam(Constants.OUTPUT_DIRECTORY) 
+            String outputDir = testSuite.getParam(Constants.REPORTS_DIRECTORY) 
                 + fileSep + df.format(TODAY);            
             new File(outputDir).mkdirs();
 
