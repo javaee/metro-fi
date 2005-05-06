@@ -204,9 +204,10 @@ public class DoubleEncodingAlgorithm extends IEEE754FloatingPointEncodingAlgorit
     
     
     public final void convertToCharactersFromDoubleArray(double[] fdata, StringBuffer s) {
-        for (int i = 0; i < fdata.length; i++) {
+        final int end = fdata.length - 1;
+        for (int i = 0; i <= end; i++) {
             s.append(Double.toString(fdata[i]));
-            if (i != fdata.length) {
+            if (i != end) {
                 s.append(' ');
             }
         }

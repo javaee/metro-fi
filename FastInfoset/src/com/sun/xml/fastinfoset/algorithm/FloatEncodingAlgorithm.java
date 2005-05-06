@@ -185,9 +185,10 @@ public class FloatEncodingAlgorithm extends IEEE754FloatingPointEncodingAlgorith
     
     
     public final void convertToCharactersFromFloatArray(float[] fdata, StringBuffer s) {
-        for (int i = 0; i < fdata.length; i++) {
+        final int end = fdata.length - 1;
+        for (int i = 0; i <= end; i++) {
             s.append(Float.toString(fdata[i]));
-            if (i != fdata.length) {
+            if (i != end) {
                 s.append(' ');
             }
         }

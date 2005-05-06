@@ -181,9 +181,10 @@ public class ShortEncodingAlgorithm extends IntegerEncodingAlgorithm {
 
 
     public final void convertToCharactersFromShortArray(short[] sdata, StringBuffer s) {
-        for (int i = 0; i < sdata.length; i++) {
+        final int end = sdata.length - 1;
+        for (int i = 0; i <= end; i++) {
             s.append(Short.toString(sdata[i]));
-            if (i != sdata.length) {
+            if (i != end) {
                 s.append(' ');
             }
         }

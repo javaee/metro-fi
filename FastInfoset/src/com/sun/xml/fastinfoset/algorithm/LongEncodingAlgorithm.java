@@ -202,9 +202,10 @@ public class LongEncodingAlgorithm extends IntegerEncodingAlgorithm {
     
     
     public final void convertToCharactersFromLongArray(long[] ldata, StringBuffer s) {
-        for (int i = 0; i < ldata.length; i++) {
+        final int end = ldata.length - 1;        
+        for (int i = 0; i <= end; i++) {
             s.append(Long.toString(ldata[i]));
-            if (i != ldata.length) {
+            if (i != end) {
                 s.append(' ');
             }
         }

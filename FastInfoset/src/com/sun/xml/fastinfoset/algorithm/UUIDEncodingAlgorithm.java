@@ -86,9 +86,10 @@ public class UUIDEncodingAlgorithm extends LongEncodingAlgorithm {
         
         final long[] ldata = (long[])data;
 
-        for (int i = 0; i < ldata.length; i += 2) {
+        final int end = ldata.length - 1;
+        for (int i = 0; i <= end; i += 2) {
             s.append(toUUIDString(ldata[i], ldata[i + 1]));
-            if (i != ldata.length) {
+            if (i != end) {
                 s.append(' ');
             }
         }

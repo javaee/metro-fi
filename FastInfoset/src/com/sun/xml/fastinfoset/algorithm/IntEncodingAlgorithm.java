@@ -184,9 +184,10 @@ public class IntEncodingAlgorithm extends IntegerEncodingAlgorithm {
     
     
     public final void convertToCharactersFromIntArray(int[] idata, StringBuffer s) {
-        for (int i = 0; i < idata.length; i++) {
+        final int end = idata.length - 1;
+        for (int i = 0; i <= end; i++) {
             s.append(Integer.toString(idata[i]));
-            if (i != idata.length) {
+            if (i != end) {
                 s.append(' ');
             }
         }
