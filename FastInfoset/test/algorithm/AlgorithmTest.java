@@ -170,22 +170,75 @@ public class AlgorithmTest extends TestCase {
         }
     }
 
-    public void testBooleanAlgorithm() throws Exception {
-        createArrayValues(ARRAY_SIZE);
+    public void testBooleanAlgorithm1() throws Exception {
+        _testBooleanAlgorithm(1);
+    }
+    
+    public void testBooleanAlgorithm2() throws Exception {
+        _testBooleanAlgorithm(2);
+    }
+    
+    public void testBooleanAlgorithm3() throws Exception {
+        _testBooleanAlgorithm(3);
+    }
+    
+    public void testBooleanAlgorithm4() throws Exception {
+        _testBooleanAlgorithm(4);
+    }
+    
+    public void testBooleanAlgorithm5() throws Exception {
+        _testBooleanAlgorithm(5);
+    }
+    
+    public void testBooleanAlgorithm6() throws Exception {
+        _testBooleanAlgorithm(6);
+    }
+    
+    public void testBooleanAlgorithm7() throws Exception {
+        _testBooleanAlgorithm(7);
+    }
+    
+    public void testBooleanAlgorithm8() throws Exception {
+        _testBooleanAlgorithm(8);
+    }
 
-        byte[] b = new byte[ARRAY_SIZE / 8];
+    public void testBooleanAlgorithm9() throws Exception {
+        _testBooleanAlgorithm(9);
+    }
+    
+    public void testBooleanAlgorithm10() throws Exception {
+        _testBooleanAlgorithm(10);
+    }
+    
+    public void testBooleanAlgorithm11() throws Exception {
+        _testBooleanAlgorithm(11);
+    }
+    
+    public void testBooleanAlgorithm12() throws Exception {
+        _testBooleanAlgorithm(12);
+    }
+    
+    public void testBooleanAlgorithm32() throws Exception {
+        _testBooleanAlgorithm(32);
+    }
+    
+    public void _testBooleanAlgorithm(int size) throws Exception {
+        createArrayValues(size);
 
         BooleanEncodingAlgorithm bea = new BooleanEncodingAlgorithm();
-        bea.encodeToBytesFromBooleanArray(_booleanArray, 0, ARRAY_SIZE / 8, b, 0);
+        byte[] b = new byte[bea.getOctetLengthFromPrimitiveLength(size)];
+        bea.encodeToBytesFromBooleanArray(_booleanArray, 0, size, b, 0);
 
-        boolean[] i = new boolean[ARRAY_SIZE];
-        bea.decodeFromBytesToBooleanArray(i, 0, b, 0, b.length);
+        int bsize = bea.getPrimtiveLengthFromOctetLength(b.length, b[0]);
+        assertEquals(size, bsize);
+        boolean[] i = new boolean[bsize];
+        bea.decodeFromBytesToBooleanArray(i, 0, bsize, b, 0, b.length);
 
-        for (int is = 0; is < ARRAY_SIZE; is++) {
+        for (int is = 0; is < size; is++) {
             assertEquals(_booleanArray[is], i[is]);
         }
     }
-
+    
     public void testIntAlgorithm() throws Exception {
         createArrayValues(ARRAY_SIZE);
 
@@ -324,6 +377,14 @@ public class AlgorithmTest extends TestCase {
 
         s.startElement("", "e", "e", _attributes);
 
+        // Booleans
+        _attributes.addAttributeWithAlgorithmData(new QualifiedName("", "", "boolean", "boolean"),
+                null, EncodingAlgorithmIndexes.BOOLEAN, _booleanArray);
+        s.startElement("", "boolean", "boolean", _attributes);
+        _attributes.clear();
+        s.booleans(_booleanArray, 0, _booleanArray.length);
+        s.endElement("", "boolean", "boolean");
+        
         // Bytes
         _attributes.addAttributeWithAlgorithmData(new QualifiedName("", "", "byte", "byte"),
                 null, EncodingAlgorithmIndexes.BASE64, _byteArray);
@@ -419,7 +480,16 @@ public class AlgorithmTest extends TestCase {
 
                 assertEquals(1, atts.getLength());
 
-                if (localName.equals("byte")) {
+                if (localName.equals("boolean")) {
+                    assertEquals("boolean", eas.getLocalName(0));
+                    assertEquals(EncodingAlgorithmIndexes.BOOLEAN, eas.getAlgorithmIndex(0));
+                    assertEquals(null, eas.getAlgorithmURI(0));
+                    assertEquals(true, eas.getAlgorithmData(0) instanceof boolean[]);
+                    boolean[] b = (boolean[])eas.getAlgorithmData(0);
+                    for (int is = 0; is < _booleanArray.length; is++) {
+                        assertEquals(_booleanArray[is], b[is]);
+                    }
+                } else if (localName.equals("byte")) {
                     assertEquals("byte", eas.getLocalName(0));
                     assertEquals(EncodingAlgorithmIndexes.BASE64, eas.getAlgorithmIndex(0));
                     assertEquals(null, eas.getAlgorithmURI(0));
@@ -518,6 +588,13 @@ public class AlgorithmTest extends TestCase {
 
         // PrimitiveTypeContentHandler
 
+        public final void booleans(boolean[] b, int start, int length) throws SAXException {
+            assertEquals(_arraySize, length);
+            for (int i = 0; i < _booleanArray.length; i++) {
+                assertEquals(_booleanArray[i], b[i + start]);
+            }
+        }
+        
         public final void bytes(byte[] b, int start, int length) throws SAXException {
             assertEquals(_arraySize, length);
             for (int i = 0; i < _byteArray.length; i++) {
