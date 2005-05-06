@@ -1349,7 +1349,21 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     _primitiveHandler.ints(builtInAlgorithmState.intArray, 0, length);
                     break;
                 case EncodingAlgorithmIndexes.BOOLEAN:
-                    throw new UnsupportedOperationException("BOOLEAN");
+                    length = BuiltInEncodingAlgorithmFactory.booleanEncodingAlgorithm.
+                            getPrimtiveLengthFromOctetLength(_octetBufferLength, _octetBuffer[_octetBufferStart] & 0xFF);
+                    if (length > builtInAlgorithmState.booleanArray.length) {
+                        final boolean[] array = new boolean[length * 3 / 2 + 1];
+                        System.arraycopy(builtInAlgorithmState.booleanArray, 0,
+                                array, 0, builtInAlgorithmState.booleanArray.length);
+                        builtInAlgorithmState.booleanArray = array;
+                    }
+                    
+                    BuiltInEncodingAlgorithmFactory.booleanEncodingAlgorithm.
+                            decodeFromBytesToBooleanArray(
+                            builtInAlgorithmState.booleanArray, 0, length,
+                            _octetBuffer, _octetBufferStart, _octetBufferLength);
+                    _primitiveHandler.booleans(builtInAlgorithmState.booleanArray, 0, length);
+                    break;
                 case EncodingAlgorithmIndexes.FLOAT:
                     length = BuiltInEncodingAlgorithmFactory.floatEncodingAlgorithm.
                             getPrimtiveLengthFromOctetLength(_octetBufferLength);

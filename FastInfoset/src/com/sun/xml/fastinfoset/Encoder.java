@@ -600,7 +600,8 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                     length = ((long[])data).length;
                     break;
                 case EncodingAlgorithmIndexes.BOOLEAN:
-                    throw new UnsupportedOperationException("BOOLEAN");
+                    length = ((boolean[])data).length;
+                    break;
                 case EncodingAlgorithmIndexes.FLOAT:
                     length = ((float[])data).length;
                     break;

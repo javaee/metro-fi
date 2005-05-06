@@ -51,6 +51,8 @@ public final class BuiltInEncodingAlgorithmFactory {
     
     public final static BASE64EncodingAlgorithm base64EncodingAlgorithm = new BASE64EncodingAlgorithm();
 
+    public final static BooleanEncodingAlgorithm booleanEncodingAlgorithm = new BooleanEncodingAlgorithm();
+    
     public final static ShortEncodingAlgorithm shortEncodingAlgorithm = new ShortEncodingAlgorithm();
 
     public final static IntEncodingAlgorithm intEncodingAlgorithm = new IntEncodingAlgorithm();
@@ -69,6 +71,7 @@ public final class BuiltInEncodingAlgorithmFactory {
         table[EncodingAlgorithmIndexes.SHORT] = shortEncodingAlgorithm;
         table[EncodingAlgorithmIndexes.INT] = intEncodingAlgorithm;
         table[EncodingAlgorithmIndexes.LONG] = longEncodingAlgorithm;
+        table[EncodingAlgorithmIndexes.BOOLEAN] = booleanEncodingAlgorithm;
         table[EncodingAlgorithmIndexes.FLOAT] = floatEncodingAlgorithm;
         table[EncodingAlgorithmIndexes.DOUBLE] = doubleEncodingAlgorithm;
         table[EncodingAlgorithmIndexes.UUID] = uuidEncodingAlgorithm;

@@ -307,10 +307,6 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
 
     // PrimitiveTypeContentHandler
 
-    public final void booleans(boolean[] b, int start, int length) throws SAXException {
-        throw new SAXException("Non Implemented");
-    }
-
     public final void bytes(byte[] b, int start, int length) throws SAXException {
         if (length <= 0) {
             return;
@@ -373,6 +369,22 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
         }
     }
 
+    public final void booleans(boolean[] b, int start, int length) throws SAXException {
+        if (length <= 0) {
+            return;
+        }
+
+        try {
+            encodeTermination();
+
+            encodeCIIBuiltInAlgorithmData(EncodingAlgorithmIndexes.BOOLEAN, b, start, length);
+        } catch (IOException e) {
+            throw new SAXException(e);
+        } catch (FastInfosetException e) {
+            throw new SAXException(e);
+        }
+    }
+    
     public final void floats(float[] f, int start, int length) throws SAXException {
         if (length <= 0) {
             return;
