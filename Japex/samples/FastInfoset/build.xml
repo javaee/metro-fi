@@ -57,4 +57,19 @@
             <arg line="${config}/"/>
         </java>
     </target>
+    
+    <target name="debug-nb" depends="compile" description="Debug using Netbeans">
+        <fail unless="netbeans.home">This target can only run inside the NetBeans IDE.</fail>
+        <nbjpdastart name="My App" addressproperty="jpda.address" transport="dt_socket">
+            <classpath path="run.classpath"/>
+       </nbjpdastart>
+       <java fork="true" classname="com.sun.japex.Japex">
+           <jvmarg value="-Xdebug"/>
+           <jvmarg value="-Xnoagent"/>
+           <jvmarg value="-Djava.compiler=none"/>
+           <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
+           <classpath refid="class.path"/>
+           <arg line="${config}/"/>
+       </java>
+    </target>
 </project>
