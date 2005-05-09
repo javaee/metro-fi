@@ -213,6 +213,9 @@ public class BooleanEncodingAlgorithm extends BuiltInEncodingAlgorithm {
            }
            return 4 - unusedBits;
         } else {
+           if (unusedBits > 7) {
+               throw new EncodingAlgorithmException("The number of unused bits is too large (should be < 4)");
+           }
            return octetLength * 8 - 4 - unusedBits;
         } 
     }
