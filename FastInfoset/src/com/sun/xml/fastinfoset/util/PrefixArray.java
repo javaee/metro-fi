@@ -40,6 +40,8 @@
 package com.sun.xml.fastinfoset.util;
 
 import com.sun.xml.fastinfoset.EncodingConstants;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import org.jvnet.fastinfoset.FastInfosetException;
 
 public class PrefixArray extends ValueArray {
@@ -423,5 +425,93 @@ public class PrefixArray extends ValueArray {
         }
         
         return null;
+    }
+    
+    public final String getPrefixFromNamespace(String namespaceName) {
+        int position = 0;
+        while (++position < _size + 2) {
+            final NamespaceEntry ne = _inScopeNamespaces[position];
+            if (ne != null && namespaceName.equals(ne.namespaceName)) {
+                return ne.prefix;
+            }
+        }
+        
+        return null;
+    }
+    
+    public final Iterator getPrefixes() {
+        return new Iterator() {
+            int _position = 1;
+            NamespaceEntry _ne = _inScopeNamespaces[_position];
+            
+            public boolean hasNext() {
+                return _ne != null;
+            }
+            
+            public Object next() {
+                if (_position == _size + 2) {
+                    throw new NoSuchElementException();
+                }
+                
+                final String prefix = _ne.prefix;
+                moveToNext();                
+                return prefix;
+            }
+            
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+            
+            private final void moveToNext() {
+                while (++_position < _size + 2) {
+                    _ne = _inScopeNamespaces[_position];
+                    if (_ne != null) {
+                        return;
+                    }
+                }
+                _ne = null;
+            }
+            
+        };        
+    }
+    
+    public final Iterator getPrefixesFromNamespace(final String namespaceName) {
+        return new Iterator() {
+            String _namespaceName = namespaceName;
+            int _position = 0;
+            NamespaceEntry _ne;
+            
+            {
+                moveToNext();
+            }
+            
+            public boolean hasNext() {
+                return _ne != null;
+            }
+            
+            public Object next() {
+                if (_position == _size + 2) {
+                    throw new NoSuchElementException();
+                }
+                                
+                final String prefix = _ne.prefix;
+                moveToNext();
+                return prefix;
+            }
+            
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+            
+            private final void moveToNext() {
+                while (++_position < _size + 2) {
+                    _ne = _inScopeNamespaces[_position];
+                    if (_ne != null && _namespaceName.equals(_ne.namespaceName)) {
+                        return;
+                    }
+                }
+                _ne = null;
+            }
+        };        
     }
 }

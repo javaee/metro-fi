@@ -1555,15 +1555,15 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     
     protected class NamespaceContextImpl implements NamespaceContext {
         public final String getNamespaceURI(String prefix) {
-            return getNamespaceDecl(prefix);
+            return _prefixTable.getNamespaceFromPrefix(prefix);
         }
         
         public final String getPrefix(String namespaceURI) {
-            throw new UnsupportedOperationException("getPrefix");
+            return _prefixTable.getPrefixFromNamespace(namespaceURI);
         }
         
         public final Iterator getPrefixes(String namespaceURI) {
-            throw new UnsupportedOperationException("getPrefixes");
+            return _prefixTable.getPrefixesFromNamespace(namespaceURI);
         }
     }
     
@@ -1571,16 +1571,16 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         return _prefixTable.getNamespaceFromPrefix(prefix);
     }
         
-    public final AttributesHolder getAttributesHolder() {
-        return _attributes;
-    }
-    
     public final String getURI(String prefix) {
         return getNamespaceDecl(prefix);
     }
     
     public final Iterator getPrefixes() {
-        throw new UnsupportedOperationException("getPrefixes");
+        return _prefixTable.getPrefixes();
+    }
+    
+    public final AttributesHolder getAttributesHolder() {
+        return _attributes;
     }
     
     public final void setManager(StAXManager manager) {
