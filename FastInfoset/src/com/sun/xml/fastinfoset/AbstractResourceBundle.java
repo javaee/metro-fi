@@ -5,7 +5,7 @@
  *
  * Copyright (c) 2001 - 2005 freebxml.org.  All rights reserved.
  *
- * $Header: /zpool01/javanet/scm/svn/tmp/cvs2svn/fi/FastInfoset/src/com/sun/xml/fastinfoset/AbstractResourceBundle.java,v 1.1 2005-05-17 04:43:33 joehw Exp $
+ * $Header: /zpool01/javanet/scm/svn/tmp/cvs2svn/fi/FastInfoset/src/com/sun/xml/fastinfoset/AbstractResourceBundle.java,v 1.2 2005-05-17 20:53:19 joehw Exp $
  * ====================================================================
  */
 package com.sun.xml.fastinfoset;

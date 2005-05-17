@@ -9,7 +9,7 @@ import java.util.ResourceBundle;
 
 public class CommonResourceBundle extends AbstractResourceBundle {
 
-    public static final String BASE_NAME = "com.sun.xml.fastinfoset.ResourceBundle";
+    public static final String BASE_NAME = "com.sun.xml.fastinfoset.resources.ResourceBundle";
     private static CommonResourceBundle instance = null;
     private static Locale locale = null;
     private ResourceBundle bundle = null;
