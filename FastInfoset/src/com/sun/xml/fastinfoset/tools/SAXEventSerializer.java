@@ -198,7 +198,7 @@ public class SAXEventSerializer extends DefaultHandler
                     "  <attribute qName=\"" + attrsHolder[i].qName +
                     "\" localName=\"" + attrsHolder[i].localName +
                     "\" uri=\"" + attrsHolder[i].uri +
-                    "\" type=\"" + attrsHolder[i].type +
+                    // "\" type=\"" + attrsHolder[i].type +
                     "\" value=\"" + attrsHolder[i].value +
                     "\"/>\n");
             }
