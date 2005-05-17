@@ -214,6 +214,7 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
     }
 
     public final void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
+        characters(ch, start, length);
     }
 
     public final void processingInstruction(String target, String data) throws SAXException {
