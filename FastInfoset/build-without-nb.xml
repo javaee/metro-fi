@@ -35,6 +35,12 @@
 			debug="on" optimize="on" deprecation="on">
 			<classpath refid="compile.class.path"/>
 		</javac>
+		<mkdir dir="${build.dir}/classes/com/sun/xml/fastinfoset/resources"/>
+                <copy todir="${build.dir}/classes/com/sun/xml/fastinfoset/resources">
+                    <fileset dir="src/com/sun/xml/fastinfoset/resources">
+                        <include name="*.properties"/>
+                    </fileset>
+                </copy>
 	</target>
 
 	<target name="dist" depends="compile">
@@ -101,7 +107,6 @@
                 </fileset>
                 <fileset dir="${basedir}">
                     <include name="README-PACKAGE.txt"/>
-                    <include name="XERCES-APACHE-1.1-license.txt"/>
                     <include name="bin/*"/>
                     <include name="lib/*.jar"/>
                     <include name="${dist.dir}/${app.jar}"/>
