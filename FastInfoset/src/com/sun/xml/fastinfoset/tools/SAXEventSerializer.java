@@ -51,6 +51,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.DefaultHandler;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class SAXEventSerializer extends DefaultHandler
         implements LexicalHandler {
@@ -410,7 +411,7 @@ public class SAXEventSerializer extends DefaultHandler
                 return qName.compareTo(((AttributeValueHolder) o).qName);
             }
             catch (Exception e) {
-                throw new RuntimeException("Object o is not an AttributeValueHolder");
+                throw new RuntimeException(CommonResourceBundle.getInstance().getString("message.AttributeValueHolderExpected"));
             }
         }                                                                            
     }

@@ -40,6 +40,7 @@
 package com.sun.xml.fastinfoset.util;
 
 import com.sun.xml.fastinfoset.QualifiedName;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -106,8 +107,8 @@ public class LocalNameQualifiedNamesMap extends KeyIntMap {
 
     public final void setReadOnlyMap(KeyIntMap readOnlyMap, boolean clear) {
         if (!(readOnlyMap instanceof LocalNameQualifiedNamesMap)) {
-            throw new IllegalArgumentException("Illegal class: "
-                + readOnlyMap);
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().
+                    getString("message.illegalClass", new Object[]{readOnlyMap}));
         }       
         
         setReadOnlyMap((LocalNameQualifiedNamesMap)readOnlyMap, clear);

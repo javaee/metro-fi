@@ -56,6 +56,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 
 public class DOMDocumentParser extends Decoder {
@@ -155,7 +156,7 @@ public class DOMDocumentParser extends Decoder {
                 case DecoderStateTables.DOCUMENT_TYPE_DECLARATION_II:
                 {
                     if (documentTypeDeclarationOccured) {
-                        throw new FastInfosetException("A second occurence of a Document Type Declaration II is present");
+                        throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.secondOccurenceOfDTDII"));
                     }
                     documentTypeDeclarationOccured = true;
 
@@ -174,7 +175,7 @@ public class DOMDocumentParser extends Decoder {
                                 }
                                 break;
                             case NISTRING_ENCODING_ALGORITHM:
-                                throw new FastInfosetException("Processing II with encoding algorithm decoding not supported");                        
+                                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.processingIIWithEncodingAlgorithm"));                        
                             case NISTRING_INDEX:
                                 break;
                             case NISTRING_EMPTY_STRING:
@@ -183,7 +184,7 @@ public class DOMDocumentParser extends Decoder {
                         _b = read();
                     }
                     if ((_b & EncodingConstants.TERMINATOR) != EncodingConstants.TERMINATOR) {
-                        throw new FastInfosetException("Processing instruction IIs of Document Type Declaraion II not terminated correctly");
+                        throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.processingInstructionIIsNotTerminatedCorrectly"));
                     }
                     if (_b == EncodingConstants.DOUBLE_TERMINATOR) {
                         _terminate = true;
@@ -209,7 +210,7 @@ public class DOMDocumentParser extends Decoder {
                     _terminate = true;
                     break;
                 default:
-                    throw new FastInfosetException("Illegal state when decoding a child of a DII");
+                    throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.IllegalStateDecodingDII"));
             }
         }
 
@@ -229,7 +230,7 @@ public class DOMDocumentParser extends Decoder {
                     _terminate = true;
                     break;
                 default:
-                    throw new FastInfosetException("Illegal state when decoding a child of an DII");
+                    throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.IllegalStateDecodingDII"));
             }
         }
 
@@ -291,7 +292,7 @@ public class DOMDocumentParser extends Decoder {
 
     protected final void processEII(QualifiedName name, boolean hasAttributes) throws FastInfosetException, IOException {
         if (_prefixTable._currentInScope[name.prefixIndex] != name.namespaceNameIndex) {
-            throw new FastInfosetException("Qualified name of EII not in scope");
+            throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.qnameOfEIINotInScope"));
         }
         
         final Node parentCurrentNode = _currentNode;
@@ -436,7 +437,7 @@ public class DOMDocumentParser extends Decoder {
                 case DecoderStateTables.CII_EA:
                 {
                     if ((_b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0) {
-                        throw new EncodingAlgorithmException("Add to table not supported for Encoding algorithms");
+                        throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.addToTableNotSupported"));
                     }
 
                     // Decode encoding algorithm integer
@@ -511,7 +512,7 @@ public class DOMDocumentParser extends Decoder {
                     _terminate = true;
                     break;
                 default:
-                    throw new FastInfosetException("Illegal state when decoding a child of an EII");
+                    throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.IllegalStateDecodingEII"));
             }
         }
 
@@ -603,7 +604,7 @@ public class DOMDocumentParser extends Decoder {
             b = read();
         }
         if (b != EncodingConstants.TERMINATOR) {
-            throw new IOException("Namespace names of EII not terminated correctly");
+            throw new IOException(CommonResourceBundle.getInstance().getString("message.EIInamespaceNameNotTerminatedCorrectly"));
         }
         final int end = _namespacePrefixesIndex;
 
@@ -627,7 +628,7 @@ public class DOMDocumentParser extends Decoder {
                 break;
             }
             default:
-                throw new IOException("Illegal state when decoding EII after the namespace AIIs");
+                throw new IOException(CommonResourceBundle.getInstance().getString("message.IllegalStateDecodingEIIAfterAIIs"));
         }
         
         for (int i = start; i < end; i++) {
@@ -663,7 +664,7 @@ public class DOMDocumentParser extends Decoder {
                         _stringInterning);
             // prefix, no namespace
             case 2:
-                throw new FastInfosetException("Literal qualified name with prefix but no namespace name");
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.qNameMissingNamespaceName"));
             // prefix, namespace
             case 3:
                 return new QualifiedName(
@@ -676,7 +677,7 @@ public class DOMDocumentParser extends Decoder {
                         _charBuffer,
                         _stringInterning);
             default:
-                throw new FastInfosetException("Illegal state when decoding literal qualified name of EII");                
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.decodingEII"));                
         }        
     }
 
@@ -723,11 +724,11 @@ public class DOMDocumentParser extends Decoder {
                     // AIIs have finished break out of loop
                     continue;
                 default:
-                    throw new IOException("Illegal state when decoding AIIs");
+                    throw new IOException(CommonResourceBundle.getInstance().getString("message.decodingAIIs"));
             }
 
             if (name.prefixIndex > 0 && _prefixTable._currentInScope[name.prefixIndex] != name.namespaceNameIndex) {
-                throw new FastInfosetException("Qualified name of AII not in scope");
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.AIIqNameNotInScope"));
             }
 
             _duplicateAttributeVerifier.checkForDuplicateAttribute(name.attributeHash, name.attributeId);
@@ -849,7 +850,7 @@ public class DOMDocumentParser extends Decoder {
                 case DecoderStateTables.NISTRING_EA:
                 {
                     if ((b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0) {
-                        throw new EncodingAlgorithmException("Add to table not supported for Encoding algorithms");
+                        throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.addToTableNotSupported"));
                     }
 
                     _identifier = (b & 0x0F) << 4;
@@ -893,7 +894,7 @@ public class DOMDocumentParser extends Decoder {
                     _currentElement.setAttributeNode(a);
                     break;
                 default:
-                    throw new IOException("Illegal state when decoding AII value");
+                    throw new IOException(CommonResourceBundle.getInstance().getString("message.decodingAIIValue"));
             }
             
         } while (!_terminate);
@@ -918,7 +919,7 @@ public class DOMDocumentParser extends Decoder {
                 break;
             }
             case NISTRING_ENCODING_ALGORITHM:
-                throw new IOException("Comment II with encoding algorithm decoding not supported");                        
+                throw new IOException(CommonResourceBundle.getInstance().getString("message.commentIIAlgorithmNotSupported"));                        
             case NISTRING_INDEX:
             {
                 final String s = _v.otherString.get(_integer).toString();
@@ -947,7 +948,7 @@ public class DOMDocumentParser extends Decoder {
                 break;
             }
             case NISTRING_ENCODING_ALGORITHM:
-                throw new IOException("Processing II with encoding algorithm decoding not supported");                        
+                throw new IOException(CommonResourceBundle.getInstance().getString("message.processingIIWithEncodingAlgorithm"));                        
             case NISTRING_INDEX:
             {
                 final String data = _v.otherString.get(_integer).toString();
@@ -981,7 +982,7 @@ public class DOMDocumentParser extends Decoder {
                 _octetBufferOffset -= _octetBufferLength;
                 return decodeUtf8StringAsString();                
             }
-            throw new EncodingAlgorithmException("CDATA encoding algorithm not supported for attribute values");            
+            throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.CDATAAlgorithmNotSupported"));            
         } else if (_identifier >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
             final String URI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
             final EncodingAlgorithm ea = (EncodingAlgorithm)_registeredEncodingAlgorithms.get(URI);
@@ -990,7 +991,7 @@ public class DOMDocumentParser extends Decoder {
                 ea.convertToCharacters(data, buffer);
             } else {
                 throw new EncodingAlgorithmException(
-                        "Document contains application-defined encoding algorithm data that cannot be reported");
+                        CommonResourceBundle.getInstance().getString("message.algorithmDataCannotBeReported"));
             }
         }
         return buffer.toString();

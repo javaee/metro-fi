@@ -42,6 +42,7 @@ import java.util.HashMap;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLResolver;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class StAXManager {
     protected static final String STAX_NOTATIONS = "javax.xml.stream.notations";
@@ -116,12 +117,12 @@ public class StAXManager {
         checkProperty(name);
         if (name.equals(XMLInputFactory.IS_VALIDATING) &&
                 Boolean.TRUE.equals(value)){
-            throw new IllegalArgumentException("This implementation does not " +
-                    "support validation");
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.validationNotSupported") +
+                    CommonResourceBundle.getInstance().getString("support_validation"));
         } else if (name.equals(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES) &&
                 Boolean.TRUE.equals(value)) {
-            throw new IllegalArgumentException("This implementation does not " +
-                    "resolve external entities ");
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.externalEntities") +
+                    CommonResourceBundle.getInstance().getString("resolve_external_entities_"));
         }
         features.put(name,value);
 
@@ -129,7 +130,7 @@ public class StAXManager {
     
     public void checkProperty(String name) {
         if (!features.containsKey(name))
-            throw new IllegalArgumentException("Property "+name+" is not supported");
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.propertyNotSupported", new Object[]{name}));
     }
 
     public String toString(){

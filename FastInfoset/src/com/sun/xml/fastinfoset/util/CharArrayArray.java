@@ -40,6 +40,7 @@
 package com.sun.xml.fastinfoset.util;
 
 import org.jvnet.fastinfoset.FastInfosetException;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class CharArrayArray extends ValueArray {
     
@@ -69,8 +70,7 @@ public class CharArrayArray extends ValueArray {
     
     public final void setReadOnlyArray(ValueArray readOnlyArray, boolean clear) {
         if (!(readOnlyArray instanceof CharArrayArray)) {
-            throw new IllegalArgumentException("Illegal class: "
-                + readOnlyArray);
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.illegalClass", new Object[]{readOnlyArray}));
         }       
         
         setReadOnlyArray((CharArrayArray)readOnlyArray, clear);
@@ -109,7 +109,7 @@ public class CharArrayArray extends ValueArray {
     
     protected final void resize() {
         if (_size == _maximumCapacity) {
-            throw new ValueArrayResourceException("Array has reached maximum capacity");
+            throw new ValueArrayResourceException(CommonResourceBundle.getInstance().getString("message.arrayMaxCapacity"));
         }
 
         int newSize = _size * 3 / 2 + 1;

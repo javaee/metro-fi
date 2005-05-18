@@ -47,6 +47,7 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.AttributesImpl;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class StAX2SAXReader {
     
@@ -167,7 +168,7 @@ public class StAX2SAXReader {
                 case XMLStreamConstants.END_DOCUMENT:
                     break;
                 default:
-                    throw new RuntimeException("StAX2SAXReader does not support event " + event);
+                    throw new RuntimeException(CommonResourceBundle.getInstance().getString("message.StAX2SAXReader", new Object[]{new Integer(event)}));
                 } // switch
             }
         }

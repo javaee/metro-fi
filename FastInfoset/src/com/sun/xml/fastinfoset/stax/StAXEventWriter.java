@@ -48,6 +48,7 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.*;
 import com.sun.xml.fastinfoset.util.Util;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class StAXEventWriter implements XMLEventWriter {
     
@@ -81,7 +82,7 @@ public class StAXEventWriter implements XMLEventWriter {
      * @throws XMLStreamException
      */
     public void add(XMLEventReader eventReader) throws XMLStreamException {
-        if(eventReader == null) throw new XMLStreamException("Event reader can not be null");
+        if(eventReader == null) throw new XMLStreamException(CommonResourceBundle.getInstance().getString("message.nullEventReader"));
         while(eventReader.hasNext()){
             add(eventReader.nextEvent());
         }
@@ -184,7 +185,7 @@ public class StAXEventWriter implements XMLEventWriter {
                 break;
             }
             default:
-                throw new XMLStreamException("Event type: " + Util.getEventTypeString(type) + " not supported.");
+                throw new XMLStreamException(CommonResourceBundle.getInstance().getString("message.eventTypeNotSupported", new Object[]{Util.getEventTypeString(type)}));
             //throw new XMLStreamException("Unknown Event type = " + type);
         };
         

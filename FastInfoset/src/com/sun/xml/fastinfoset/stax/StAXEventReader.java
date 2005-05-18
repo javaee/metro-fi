@@ -48,6 +48,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.EntityReference;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.util.XMLEventAllocator;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 
 
@@ -76,7 +77,7 @@ public class StAXEventReader implements javax.xml.stream.XMLEventReader{
             System.out.println("current event:" + _currentEvent);
             hasEvent = true;
         } else {
-            throw new XMLStreamException("No element.");
+            throw new XMLStreamException(CommonResourceBundle.getInstance().getString("message.noElement"));
         }
     }
         
@@ -177,14 +178,14 @@ public class StAXEventReader implements javax.xml.stream.XMLEventReader{
     
     public XMLEvent peek() throws XMLStreamException{
         if (!hasEvent)
-             throw new XMLStreamException("No element.");
+             throw new XMLStreamException(CommonResourceBundle.getInstance().getString("message.noElement"));
         _currentEvent = events[currentIndex];
         return _currentEvent;
     }
 
     public void setAllocator(XMLEventAllocator allocator) {
         if (allocator == null)
-            throw new IllegalArgumentException("XMLEvent Allocator may not be null");
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.nullXMLEventAllocator"));
 
         _eventAllocator = allocator;
     }

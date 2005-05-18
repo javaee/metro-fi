@@ -50,6 +50,7 @@ import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
 import org.jvnet.fastinfoset.FastInfosetException;
 
 import org.jvnet.fastinfoset.sax.EncodingAlgorithmAttributes;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class AttributesHolder implements EncodingAlgorithmAttributes {
     private static final int DEFAULT_CAPACITY = 8;
@@ -272,21 +273,21 @@ public class AttributesHolder implements EncodingAlgorithmAttributes {
         if (identifier < EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
             ea = BuiltInEncodingAlgorithmFactory.table[identifier];
         } else if (identifier == EncodingAlgorithmIndexes.CDATA) {
-            throw new EncodingAlgorithmException("CDATA encoding algorithm not supported for attribute values");            
+            throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.CDATAAlgorithmNotSupported"));            
         } else if (identifier >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
             if (URI == null) {
-                throw new EncodingAlgorithmException("URI not present for encoding algorithm identifier " + identifier);
+                throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.URINotPresent") + identifier);
             }
             
             ea = (EncodingAlgorithm)_registeredEncodingAlgorithms.get(URI);
             if (ea == null) {
-                throw new EncodingAlgorithmException("Encoding algorithm not registered for URI " + URI);
+                throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.algorithmNotRegistered") + URI);
             }
         } else {
             // Reserved built-in algorithms for future use
             // TODO should use sax property to decide if event will be
             // reported, allows for support through handler if required.
-            throw new EncodingAlgorithmException("Encoding algorithm identifiers 10 up to and including 31 are reserved for future use");
+            throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.identifiers10to31Reserved"));
         }
 
         final StringBuffer sb = new StringBuffer();

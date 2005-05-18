@@ -51,6 +51,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
 import org.xml.sax.helpers.NamespaceSupport;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
     protected StAXManager _manager;
@@ -302,8 +303,7 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
                     // writeNamespace method
                     return;
                 }
-                throw new XMLStreamException("URI '" + namespaceURI 
-                    + "' is unbound for this attribute");
+                throw new XMLStreamException(CommonResourceBundle.getInstance().getString("message.URIUnbound", new Object[]{namespaceURI}));
             }
         }
         writeAttribute(prefix, namespaceURI, localName, value);
@@ -313,7 +313,7 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         String localName, String value) throws XMLStreamException
     {
         if (!_inStartElement) {
-            throw new IllegalStateException("Current state does not allow attribute writing");
+            throw new IllegalStateException(CommonResourceBundle.getInstance().getString("message.attributeWritingNotAllowed"));
         }
 
         // TODO
@@ -346,7 +346,7 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         }
         else {
             if (!_inStartElement) {
-                throw new IllegalStateException("Current state does not allow attribute writing");
+                throw new IllegalStateException(CommonResourceBundle.getInstance().getString("message.attributeWritingNotAllowed"));
             }
             
             if (_namespacesArrayIndex == _namespacesArray.length) {
@@ -364,7 +364,7 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         throws XMLStreamException
     {
         if (!_inStartElement) {
-            throw new IllegalStateException("Current state does not allow attribute writing");
+            throw new IllegalStateException(CommonResourceBundle.getInstance().getString("message.attributeWritingNotAllowed"));
         }
         
         if (_namespacesArrayIndex == _namespacesArray.length) {
@@ -413,15 +413,15 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
     }
     
     public void writeCData(String data) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not implemented");
+        throw new UnsupportedOperationException(CommonResourceBundle.getInstance().getString("message.notImplemented"));
    }
     
     public void writeDTD(String dtd) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not implemented");
+        throw new UnsupportedOperationException(CommonResourceBundle.getInstance().getString("message.notImplemented"));
     }
     
     public void writeEntityRef(String name) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not implemented");
+        throw new UnsupportedOperationException(CommonResourceBundle.getInstance().getString("message.notImplemented"));
     }
         
     public void writeCharacters(String text) throws XMLStreamException {

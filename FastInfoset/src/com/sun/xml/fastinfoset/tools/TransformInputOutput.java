@@ -45,6 +45,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public abstract class TransformInputOutput {
     
@@ -65,7 +66,7 @@ public abstract class TransformInputOutput {
             in = new BufferedInputStream(new FileInputStream(args[0]));
             out = new BufferedOutputStream(new FileOutputStream(args[1]));
         } else {
-            throw new IllegalArgumentException("An optional input file and optional output file must be specified");
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.optinalFileNotSpecified"));
         }
         
         parse(in, out);

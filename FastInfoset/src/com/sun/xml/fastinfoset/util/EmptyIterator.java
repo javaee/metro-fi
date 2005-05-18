@@ -38,6 +38,7 @@
 
 package com.sun.xml.fastinfoset.util;
 import java.util.Iterator;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 
 public class EmptyIterator implements Iterator {
@@ -55,6 +56,6 @@ public class EmptyIterator implements Iterator {
         return null;
     }
     public void remove() {
-         throw new  UnsupportedOperationException("The Iterator is empty.");
+         throw new  UnsupportedOperationException(CommonResourceBundle.getInstance().getString("message.emptyIterator"));
     }
 }

@@ -47,6 +47,7 @@ import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import org.jvnet.fastinfoset.EncodingAlgorithmException;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 
 
@@ -54,9 +55,8 @@ public class IntEncodingAlgorithm extends IntegerEncodingAlgorithm {
 
     public final int getPrimtiveLengthFromOctetLength(int octetLength) throws EncodingAlgorithmException {
         if (octetLength % INT_SIZE != 0) {
-            throw new EncodingAlgorithmException("'length' is not a multiple of " +
-                    INT_SIZE +
-                    " bytes correspond to the size of the 'int' primitive type");
+            throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().
+                    getString("message.lengthNotMultipleOfInt", new Object[]{new Integer(INT_SIZE)}));
         }
         
         return octetLength / INT_SIZE;
@@ -80,7 +80,7 @@ public class IntEncodingAlgorithm extends IntegerEncodingAlgorithm {
     
     public void encodeToOutputStream(Object data, OutputStream s) throws IOException {
         if (!(data instanceof int[])) {
-            throw new IllegalArgumentException("'data' not an instance of int[]");
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.dataNotIntArray"));
         }
         
         final int[] idata = (int[])data;
@@ -107,7 +107,7 @@ public class IntEncodingAlgorithm extends IntegerEncodingAlgorithm {
     
     public final void convertToCharacters(Object data, StringBuffer s) {
         if (!(data instanceof int[])) {
-            throw new IllegalArgumentException("'data' not an instance of int[]");
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.dataNotIntArray"));
         }
         
         final int[] idata = (int[])data;

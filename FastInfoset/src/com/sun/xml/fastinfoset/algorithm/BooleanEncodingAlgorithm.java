@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jvnet.fastinfoset.EncodingAlgorithmException;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 
 /**
@@ -128,7 +129,7 @@ public class BooleanEncodingAlgorithm extends BuiltInEncodingAlgorithm {
                 
     public void encodeToOutputStream(Object data, OutputStream s) throws IOException {
         if (!(data instanceof boolean[])) {
-            throw new IllegalArgumentException("'data' not an instance of boolean[]");
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.dataNotBoolean"));
         }
 
         boolean array[] = (boolean[])data;
@@ -209,12 +210,12 @@ public class BooleanEncodingAlgorithm extends BuiltInEncodingAlgorithm {
         final int unusedBits = (firstOctet >> 4) & 0xFF;
         if (octetLength == 1) {
            if (unusedBits > 3) {
-               throw new EncodingAlgorithmException("The number of unused bits is too large (should be < 4)");
+               throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.unusedBits4"));
            }
            return 4 - unusedBits;
         } else {
            if (unusedBits > 7) {
-               throw new EncodingAlgorithmException("The number of unused bits is too large (should be < 8)");
+               throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.unusedBits8"));
            }
            return octetLength * 8 - 4 - unusedBits;
         } 
@@ -236,7 +237,7 @@ public class BooleanEncodingAlgorithm extends BuiltInEncodingAlgorithm {
                 
     public void encodeToBytes(Object array, int astart, int alength, byte[] b, int start) {
         if (!(array instanceof boolean[])) {
-            throw new IllegalArgumentException("'data' not an instance of boolean[]");
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.dataNotBoolean"));
         }
 
         encodeToBytesFromBooleanArray((boolean[])array, astart, alength, b, start);

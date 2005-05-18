@@ -47,6 +47,7 @@ import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import org.jvnet.fastinfoset.EncodingAlgorithmException;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class BASE64EncodingAlgorithm extends BuiltInEncodingAlgorithm {
     
@@ -135,13 +136,13 @@ public class BASE64EncodingAlgorithm extends BuiltInEncodingAlgorithm {
     }
     
     public final Object decodeFromInputStream(InputStream s) throws IOException {
-        throw new UnsupportedOperationException("Not implemented");
+        throw new UnsupportedOperationException(CommonResourceBundle.getInstance().getString("message.notImplemented"));
     }
     
     
     public void encodeToOutputStream(Object data, OutputStream s) throws IOException {
         if (!(data instanceof byte[])) {
-            throw new IllegalArgumentException("'data' not an instance of byte[]");
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.dataNotByteArray"));
         }
         
         s.write((byte[])data);

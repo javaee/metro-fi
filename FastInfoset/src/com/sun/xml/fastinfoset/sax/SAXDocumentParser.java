@@ -70,6 +70,7 @@ import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.DefaultHandler;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class SAXDocumentParser extends Decoder implements FastInfosetReader {
     
@@ -155,7 +156,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             return getStringInterning();
         } else {
             throw new SAXNotRecognizedException(
-                    "Feature not supported: " + name);
+                    CommonResourceBundle.getInstance().getString("message.featureNotSupported") + name);
         }
     }
     
@@ -171,7 +172,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             setStringInterning(value);
         } else {
             throw new SAXNotRecognizedException(
-                    "Feature not supported: " + name);
+                    CommonResourceBundle.getInstance().getString("message.featureNotSupported") + name);
         }
     }
     
@@ -188,8 +189,8 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         } else if (name.equals(FastInfosetReader.PRIMITIVE_TYPE_CONTENT_HANDLER_PROPERTY)) {
             return getPrimitiveTypeContentHandler();
         } else {
-            throw new SAXNotRecognizedException("Property not recognized: " +
-                    name);
+            throw new SAXNotRecognizedException(CommonResourceBundle.getInstance().
+                    getString("message.propertyNotRecognized", new Object[]{name}));
         }
     }
     
@@ -232,8 +233,8 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 throw new SAXNotSupportedException(FastInfosetReader.BUFFER_SIZE_PROPERTY);
             }
         } else {
-            throw new SAXNotRecognizedException("Property not recognized: " +
-                    name);
+            throw new SAXNotRecognizedException(CommonResourceBundle.getInstance().
+                    getString("message.propertyNotRecognized", new Object[]{name}));
         }
     }
     
@@ -274,7 +275,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             if (s == null) {
                 String systemId = input.getSystemId();
                 if (systemId == null) {
-                    throw new SAXException("InputSource must include a byte stream or a system ID");
+                    throw new SAXException(CommonResourceBundle.getInstance().getString("message.inputSource"));
                 }
                 parse(systemId);
             } else {
@@ -417,7 +418,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 case DecoderStateTables.DOCUMENT_TYPE_DECLARATION_II:
                 {
                     if (documentTypeDeclarationOccured) {
-                        throw new FastInfosetException("A second occurence of a Document Type Declaration II is present");
+                        throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.secondOccurenceOfDTDII"));
                     }
                     documentTypeDeclarationOccured = true;
                     
@@ -436,7 +437,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                                 }
                                 break;
                             case NISTRING_ENCODING_ALGORITHM:
-                                throw new FastInfosetException("Processing II with encoding algorithm decoding not supported");
+                                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.processingIIWithEncodingAlgorithm"));
                             case NISTRING_INDEX:
                                 break;
                             case NISTRING_EMPTY_STRING:
@@ -445,7 +446,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                         _b = read();
                     }
                     if ((_b & EncodingConstants.TERMINATOR) != EncodingConstants.TERMINATOR) {
-                        throw new FastInfosetException("Processing instruction IIs of Document Type Declaraion II not terminated correctly");
+                        throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.processingInstructionIIsNotTerminatedCorrectly"));
                     }
                     if (_b == EncodingConstants.DOUBLE_TERMINATOR) {
                         _terminate = true;
@@ -471,7 +472,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     _terminate = true;
                     break;
                 default:
-                    throw new FastInfosetException("Illegal state when decoding a child of a DII");
+                    throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.IllegalStateDecodingDII"));
             }
         }
         
@@ -491,7 +492,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     _terminate = true;
                     break;
                 default:
-                    throw new FastInfosetException("Illegal state when decoding a child of an DII");
+                    throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.IllegalStateDecodingDII"));
             }
         }
         
@@ -570,7 +571,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
     
     protected final void processEII(QualifiedName name, boolean hasAttributes) throws FastInfosetException, IOException {
         if (_prefixTable._currentInScope[name.prefixIndex] != name.namespaceNameIndex) {
-            throw new FastInfosetException("Qualified name of EII not in scope");
+            throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.qNameOfEIINotInScope"));
         }
         
         if (hasAttributes) {
@@ -730,7 +731,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 case DecoderStateTables.CII_EA:
                 {
                     if ((_b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0) {
-                        throw new EncodingAlgorithmException("Add to table not supported for Encoding algorithms");
+                        throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.addToTableNotSupported"));
                     }
                     
                     // Decode encoding algorithm integer
@@ -835,7 +836,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     _terminate = true;
                     break;
                 default:
-                    throw new FastInfosetException("Illegal state when decoding a child of an EII");
+                    throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.IllegalStateDecodingEII"));
             }
         }
         
@@ -928,7 +929,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             b = read();
         }
         if (b != EncodingConstants.TERMINATOR) {
-            throw new IOException("Namespace names of EII not terminated correctly");
+            throw new IOException(CommonResourceBundle.getInstance().getString("message.EIInamespaceNameNotTerminatedCorrectly"));
         }
         final int end = _namespacePrefixesIndex;
                 
@@ -952,7 +953,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 break;
             }
             default:
-                throw new IOException("Illegal state when decoding EII after the namespace AIIs");
+                throw new IOException(CommonResourceBundle.getInstance().getString("message.IllegalStateDecodingEIIAfterAIIs"));
         }
         
         try {
@@ -1012,11 +1013,11 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     // AIIs have finished break out of loop
                     continue;
                 default:
-                    throw new IOException("Illegal state when decoding AIIs");
+                    throw new IOException(CommonResourceBundle.getInstance().getString("message.decodingAIIs"));
             }
 
             if (name.prefixIndex > 0 && _prefixTable._currentInScope[name.prefixIndex] != name.namespaceNameIndex) {
-                throw new FastInfosetException("Qualified name of AII not in scope");
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.AIIqNameNotInScope"));
             }
 
             _duplicateAttributeVerifier.checkForDuplicateAttribute(name.attributeHash, name.attributeId);
@@ -1108,7 +1109,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 case DecoderStateTables.NISTRING_EA:
                 {
                     if ((b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0) {
-                        throw new EncodingAlgorithmException("Add to table not supported for Encoding algorithms");
+                        throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.addToTableNotSupported"));
                     }
                     
                     _identifier = (b & 0x0F) << 4;
@@ -1146,7 +1147,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     _attributes.addAttribute(name, "");
                     break;
                 default:
-                    throw new IOException("Illegal state when decoding AII value");
+                    throw new IOException(CommonResourceBundle.getInstance().getString("message.decodingAIIValue"));
             }
             
         } while (!_terminate);
@@ -1172,7 +1173,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 }
                 break;
             case NISTRING_ENCODING_ALGORITHM:
-                throw new IOException("Comment II with encoding algorithm decoding not supported");
+                throw new IOException(CommonResourceBundle.getInstance().getString("message.commentIIAlgorithmNotSupported"));
             case NISTRING_INDEX:
                 final CharArray ca = _v.otherString.get(_integer);
                 
@@ -1208,7 +1209,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 }
                 break;
             case NISTRING_ENCODING_ALGORITHM:
-                throw new IOException("Processing II with encoding algorithm decoding not supported");
+                throw new IOException(CommonResourceBundle.getInstance().getString("message.processingIIWithEncodingAlgorithm"));
             case NISTRING_INDEX:
                 try {
                     _contentHandler.processingInstruction(target, _v.otherString.get(_integer).toString());
@@ -1263,7 +1264,8 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         } else if (_identifier >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START && _algorithmHandler != null) {
             final String URI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
             if (URI == null) {
-                throw new EncodingAlgorithmException("URI not present for encoding algorithm identifier " + _identifier);
+                throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().
+                        getString("message.URINotPresent", new Object[]{new Integer(_identifier)}));
             }
             
             final EncodingAlgorithm ea = (EncodingAlgorithm)_registeredEncodingAlgorithms.get(URI);
@@ -1284,12 +1286,12 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         } else if (_identifier >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
             // TODO should have property to ignore
             throw new EncodingAlgorithmException(
-                    "Document contains application-defined encoding algorithm data that cannot be reported");
+                    CommonResourceBundle.getInstance().getString("message.algorithmDataCannotBeReported"));
         } else {
             // Reserved built-in algorithms for future use
             // TODO should use sax property to decide if event will be
             // reported, allows for support through handler if required.
-            throw new EncodingAlgorithmException("Encoding algorithm identifiers 10 up to and including 31 are reserved for future use");
+            throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.identifiers10to31Reserved"));
         }
     }
     
@@ -1412,7 +1414,8 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 case EncodingAlgorithmIndexes.CDATA:
                     throw new UnsupportedOperationException("CDATA");
                 default:
-                    throw new FastInfosetException("Unsupported built-in encoding algorithm: " + _identifier);
+                    throw new FastInfosetException(CommonResourceBundle.getInstance().
+                            getString("message.unsupportedAlgorithm", new Object[]{new Integer(_identifier)}));
             }
         } catch (SAXException e) {
             throw new FastInfosetException(e);
@@ -1433,7 +1436,8 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         } else if (_identifier >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START && _algorithmHandler != null) {
             final String URI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
             if (URI == null) {
-                throw new EncodingAlgorithmException("URI not present for encoding algorithm identifier " + _identifier);
+                throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().
+                        getString("message.URINotPresent", new Object[]{new Integer(_identifier)}));
             }
             
             final EncodingAlgorithm ea = (EncodingAlgorithm)_registeredEncodingAlgorithms.get(URI);
@@ -1448,14 +1452,14 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         } else if (_identifier >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
             // TODO should have property to ignore
             throw new EncodingAlgorithmException(
-                    "Document contains application-defined encoding algorithm data that cannot be reported");
+                    CommonResourceBundle.getInstance().getString("message.algorithmDataCannotBeReported"));
         } else if (_identifier == EncodingAlgorithmIndexes.CDATA) {
-            throw new EncodingAlgorithmException("CDATA encoding algorithm not supported for attribute values");
+            throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.CDATAAlgorithmNotSupported"));
         } else {
             // Reserved built-in algorithms for future use
             // TODO should use sax property to decide if event will be
             // reported, allows for support through handler if required.
-            throw new EncodingAlgorithmException("Encoding algorithm identifiers 10 up to and including 31 are reserved for future use");
+            throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.identifiers10to31Reserved"));
         }
     }
     

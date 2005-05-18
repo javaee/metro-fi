@@ -15,6 +15,7 @@ import javax.xml.stream.events.Characters;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class StAXFilteredEvent implements XMLEventReader {
     private XMLEventReader eventReader;
@@ -59,19 +60,19 @@ public class StAXFilteredEvent implements XMLEventReader {
         XMLEvent e = nextEvent();
         if (!e.isStartElement())
             throw new XMLStreamException(
-            "parser must be on START_ELEMENT to read next text.");            
+            CommonResourceBundle.getInstance().getString("message.mustBeOnSTART_ELEMENT"));            
 
         while(hasNext()) {
             e = nextEvent();
             if(e.isStartElement())
                 throw new XMLStreamException(
-                "getElementText() function expects text only elment but START_ELEMENT was encountered.");
+                CommonResourceBundle.getInstance().getString("message.getElementTextExpectTextOnly"));
             if(e.isCharacters())
                 buffer.append(((Characters) e).getData());
             if(e.isEndElement())
                 return buffer.toString();
         } 
-        throw new XMLStreamException("Can not find END_ELEMENT.");
+        throw new XMLStreamException(CommonResourceBundle.getInstance().getString("message.END_ELEMENTnotFound"));
     }
 
     public XMLEvent nextTag() throws XMLStreamException {
@@ -80,7 +81,7 @@ public class StAXFilteredEvent implements XMLEventReader {
             if (e.isStartElement() || e.isEndElement())
                 return e;
         }
-        throw new XMLStreamException("Can not find start or end element.");
+        throw new XMLStreamException(CommonResourceBundle.getInstance().getString("message.startOrEndNotFound"));
     }
 
 

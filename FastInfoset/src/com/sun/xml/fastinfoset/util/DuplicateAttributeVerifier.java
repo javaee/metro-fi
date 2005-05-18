@@ -2,6 +2,7 @@
 package com.sun.xml.fastinfoset.util;
 
 import org.jvnet.fastinfoset.FastInfosetException;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 
 public class DuplicateAttributeVerifier {
@@ -81,7 +82,7 @@ public class DuplicateAttributeVerifier {
             do {
                 if (e.value == value) {
                     reset();
-                    throw new FastInfosetException("Duplicate attribute present");
+                    throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.duplicateAttribute"));
                 }
             } while ((e = e.hashNext) != null);
             

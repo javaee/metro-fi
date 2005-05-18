@@ -38,6 +38,7 @@
 
 
 package com.sun.xml.fastinfoset.util;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public abstract class KeyIntMap {
     public static final int NOT_PRESENT = -1;
@@ -90,13 +91,13 @@ public abstract class KeyIntMap {
  
     public KeyIntMap(int initialCapacity, float loadFactor) {
         if (initialCapacity < 0)
-            throw new IllegalArgumentException("Illegal initial capacity: " +
-                                               initialCapacity);
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().
+                    getString("message.illegalInitialCapacity", new Object[]{new Integer(initialCapacity)}));
         if (initialCapacity > MAXIMUM_CAPACITY)
             initialCapacity = MAXIMUM_CAPACITY;
         if (loadFactor <= 0 || Float.isNaN(loadFactor))
-            throw new IllegalArgumentException("Illegal load factor: " +
-                                               loadFactor);
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().
+                    getString("message.illegalLoadFactor", new Object[]{new Float(loadFactor)}));
 
         // Find a power of 2 >= initialCapacity
         if (initialCapacity != DEFAULT_INITIAL_CAPACITY) {

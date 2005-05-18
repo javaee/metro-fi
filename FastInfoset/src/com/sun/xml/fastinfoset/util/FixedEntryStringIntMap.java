@@ -41,6 +41,7 @@ package com.sun.xml.fastinfoset.util;
 
 import java.util.HashMap;
 import java.util.Map;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class FixedEntryStringIntMap extends StringIntMap {
     
@@ -80,8 +81,8 @@ public class FixedEntryStringIntMap extends StringIntMap {
 
     public final void setReadOnlyMap(KeyIntMap readOnlyMap, boolean clear) {
         if (!(readOnlyMap instanceof FixedEntryStringIntMap)) {
-            throw new IllegalArgumentException("Illegal class: "
-                + readOnlyMap);
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().
+                    getString("message.illegalClass", new Object[]{readOnlyMap}));
         }       
         
         setReadOnlyMap((FixedEntryStringIntMap)readOnlyMap, clear);

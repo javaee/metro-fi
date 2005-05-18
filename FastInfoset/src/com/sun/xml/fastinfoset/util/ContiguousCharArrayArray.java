@@ -38,6 +38,7 @@
 
 
 package com.sun.xml.fastinfoset.util;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class ContiguousCharArrayArray extends ValueArray {
     public static final int INITIAL_CHARACTER_SIZE = 512;
@@ -82,8 +83,7 @@ public class ContiguousCharArrayArray extends ValueArray {
     
     public final void setReadOnlyArray(ValueArray readOnlyArray, boolean clear) {
         if (!(readOnlyArray instanceof ContiguousCharArrayArray)) {
-            throw new IllegalArgumentException("Illegal class: "
-                + readOnlyArray);
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.illegalClass", new Object[]{readOnlyArray}));
         }       
         
         setReadOnlyArray((ContiguousCharArrayArray)readOnlyArray, clear);
@@ -173,7 +173,7 @@ public class ContiguousCharArrayArray extends ValueArray {
     
     protected final void resize() {
         if (_size == _maximumCapacity) {
-            throw new ValueArrayResourceException("Array has reached maximum capacity");
+            throw new ValueArrayResourceException(CommonResourceBundle.getInstance().getString("message.arrayMaxCapacity"));
         }
 
         int newSize = _size * 3 / 2 + 1;
@@ -192,7 +192,7 @@ public class ContiguousCharArrayArray extends ValueArray {
 
     protected final void resizeArray(int requestedSize) {
         if (_arrayIndex == _maximumCharacterSize) {
-            throw new ValueArrayResourceException("Maximum number of characters is reached");
+            throw new ValueArrayResourceException(CommonResourceBundle.getInstance().getString("message.maxNumberOfCharacters"));
         }
 
         int newSize = requestedSize * 3 / 2 + 1;

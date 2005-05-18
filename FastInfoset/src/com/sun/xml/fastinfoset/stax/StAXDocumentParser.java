@@ -62,6 +62,7 @@ import org.jvnet.fastinfoset.EncodingAlgorithm;
 import org.jvnet.fastinfoset.EncodingAlgorithmException;
 import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
 import org.jvnet.fastinfoset.FastInfosetException;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     protected static final int INTERNAL_STATE_START_DOCUMENT = 0;
@@ -255,7 +256,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                                 INTERNAL_STATE_VOID;                        
                         return _eventType = END_ELEMENT;
                     case INTERNAL_STATE_END_DOCUMENT:
-                        throw new NoSuchElementException("No more events to report (EOF).");
+                        throw new NoSuchElementException(CommonResourceBundle.getInstance().getString("message.noMoreEvents"));
                 }
             }
                         
@@ -390,7 +391,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 case DecoderStateTables.CII_EA:
                 {
                     if ((b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0) {
-                        throw new EncodingAlgorithmException("Add to table not supported for Encoding algorithms");
+                        throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.addToTableNotSupported"));
                     }
                     
                     // Decode encoding algorithm integer
@@ -491,7 +492,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     _internalState = INTERNAL_STATE_END_DOCUMENT;
                     return _eventType = END_DOCUMENT;
                 default:
-                    throw new FastInfosetException("Illegal state when decoding a child of an EII");
+                    throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.IllegalStateDecodingEII"));
             }
         } catch (IOException e) {
             resetOnError();
@@ -526,11 +527,11 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     public final void require(int type, String namespaceURI, String localName)
     throws XMLStreamException {
         if( type != _eventType)
-            throw new XMLStreamException("Event type " +getEventTypeString(type)+" specified did not match with current parser event");
+            throw new XMLStreamException(CommonResourceBundle.getInstance().getString("message.eventTypeNotMatch", new Object[]{getEventTypeString(type)}));
         if( namespaceURI != null && !namespaceURI.equals(getNamespaceURI()) )
-            throw new XMLStreamException("Namespace URI " +namespaceURI+" specified did not match with current namespace URI");
+            throw new XMLStreamException(CommonResourceBundle.getInstance().getString("message.namespaceURINotMatch", new Object[]{namespaceURI}));
         if(localName != null && !localName.equals(getLocalName()))
-            throw new XMLStreamException("LocalName " +localName+" specified did not match with current local name");
+            throw new XMLStreamException(CommonResourceBundle.getInstance().getString("message.localNameNotMatch", new Object[]{localName}));
         
         return;
     }
@@ -545,7 +546,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         
         if(getEventType() != START_ELEMENT) {
             throw new XMLStreamException(
-                    "parser must be on START_ELEMENT to read next text", getLocation());
+                    CommonResourceBundle.getInstance().getString("message.mustBeOnSTARTELEMENT"), getLocation());
         }
         //current is StartElement, move to the next
         int eventType = next();
@@ -557,7 +558,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     public final String getElementText(boolean startElementRead) throws XMLStreamException {
         if (!startElementRead) {
             throw new XMLStreamException(
-                    "parser must be on START_ELEMENT to read next text", getLocation());
+                    CommonResourceBundle.getInstance().getString("message.mustBeOnSTARTELEMENT"), getLocation());
         }
         int eventType = getEventType();
         StringBuffer content = new StringBuffer();
@@ -571,13 +572,13 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     || eventType == COMMENT) {
                 // skipping
             } else if(eventType == END_DOCUMENT) {
-                throw new XMLStreamException("unexpected end of document when reading element text content");
+                throw new XMLStreamException(CommonResourceBundle.getInstance().getString("message.unexpectedEOF"));
             } else if(eventType == START_ELEMENT) {
                 throw new XMLStreamException(
-                        "getElementText() function expects text only elment but START_ELEMENT was encountered.", getLocation());
+                        CommonResourceBundle.getInstance().getString("message.getElementTextExpectTextOnly"), getLocation());
             } else {
                 throw new XMLStreamException(
-                        "Unexpected event type "+ getEventTypeString(eventType), getLocation());
+                        CommonResourceBundle.getInstance().getString("message.unexpectedEventType")+ getEventTypeString(eventType), getLocation());
             }
             eventType = next();
         }
@@ -617,7 +618,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
             eventType = next();
         }
         if (eventType != START_ELEMENT && eventType != END_ELEMENT) {
-            throw new XMLStreamException("expected start or end tag", getLocation());
+            throw new XMLStreamException(CommonResourceBundle.getInstance().getString("message.expectedStartOrEnd"), getLocation());
         }
         return eventType;
     }
@@ -633,7 +634,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         String namespace = getNamespaceDecl(prefix);
         if (namespace == null) {
             if (prefix == null) {
-                throw new IllegalArgumentException("Prefix cannot be null.");
+                throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.nullPrefix"));
             }
             return null;  // unbound
         }
@@ -676,7 +677,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     
     public final String getAttributeValue(String namespaceURI, String localName) {
         if (_eventType != START_ELEMENT) {
-            throw new IllegalStateException("Method getAttributeValue() called in invalid state");
+            throw new IllegalStateException(CommonResourceBundle.getInstance().getString("message.invalidCallingGetAttributeValue"));
         }
         
         // Search for the attributes in _attributes
@@ -691,7 +692,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     
     public final int getAttributeCount() {
         if (_eventType != START_ELEMENT) {
-            throw new IllegalStateException("Method getAttributeValue() called in invalid state");
+            throw new IllegalStateException(CommonResourceBundle.getInstance().getString("message.invalidCallingGetAttributeValue"));
         }
         
         return _attributes.getLength();
@@ -699,14 +700,14 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     
     public final javax.xml.namespace.QName getAttributeName(int index) {
         if (_eventType != START_ELEMENT) {
-            throw new IllegalStateException("Method getAttributeValue() called in invalid state");
+            throw new IllegalStateException(CommonResourceBundle.getInstance().getString("message.invalidCallingGetAttributeValue"));
         }
         return _attributes.getQualifiedName(index).getQName();
     }
     
     public final String getAttributeNamespace(int index) {
         if (_eventType != START_ELEMENT) {
-            throw new IllegalStateException("Method getAttributeValue() called in invalid state");
+            throw new IllegalStateException(CommonResourceBundle.getInstance().getString("message.invalidCallingGetAttributeValue"));
         }
         
         return _attributes.getURI(index);
@@ -714,28 +715,28 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     
     public final String getAttributeLocalName(int index) {
         if (_eventType != START_ELEMENT) {
-            throw new IllegalStateException("Method getAttributeValue() called in invalid state");
+            throw new IllegalStateException(CommonResourceBundle.getInstance().getString("message.invalidCallingGetAttributeValue"));
         }
         return _attributes.getLocalName(index);
     }
     
     public final String getAttributePrefix(int index) {
         if (_eventType != START_ELEMENT) {
-            throw new IllegalStateException("Method getAttributeValue() called in invalid state");
+            throw new IllegalStateException(CommonResourceBundle.getInstance().getString("message.invalidCallingGetAttributeValue"));
         }
         return _attributes.getPrefix(index);
     }
     
     public final String getAttributeType(int index) {
         if (_eventType != START_ELEMENT) {
-            throw new IllegalStateException("Method getAttributeValue() called in invalid state");
+            throw new IllegalStateException(CommonResourceBundle.getInstance().getString("message.invalidCallingGetAttributeValue"));
         }
         return _attributes.getType(index);
     }
     
     public final String getAttributeValue(int index) {
         if (_eventType != START_ELEMENT) {
-            throw new IllegalStateException("Method getAttributeValue() called in invalid state");
+            throw new IllegalStateException(CommonResourceBundle.getInstance().getString("message.invalidCallingGetAttributeValue"));
         }
         return _attributes.getValue(index);
     }
@@ -748,7 +749,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         if (_eventType == START_ELEMENT || _eventType == END_ELEMENT) {
             return (_currentNamespaceAIIsEnd > 0) ? (_currentNamespaceAIIsEnd - _currentNamespaceAIIsStart) : 0;
         } else {
-            throw new IllegalStateException("Method getNamespaceCount() called in invalid state");
+            throw new IllegalStateException(CommonResourceBundle.getInstance().getString("message.invalidCallingGetNamespaceCount"));
         }
     }
     
@@ -756,7 +757,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         if (_eventType == START_ELEMENT || _eventType == END_ELEMENT) {
             return _namespaceAIIsPrefix[_currentNamespaceAIIsStart + index];
         } else {
-            throw new IllegalStateException("Method getNamespacePrefix() called in invalid state");
+            throw new IllegalStateException(CommonResourceBundle.getInstance().getString("message.invalidCallingGetNamespacePrefix"));
         }
     }
     
@@ -764,7 +765,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         if (_eventType == START_ELEMENT || _eventType == END_ELEMENT) {
             return _namespaceAIIsNamespaceName[_currentNamespaceAIIsStart + index];
         } else {
-            throw new IllegalStateException("Method getNamespacePrefix() called in invalid state");
+            throw new IllegalStateException(CommonResourceBundle.getInstance().getString("message.invalidCallingGetNamespacePrefix"));
         }
     }
     
@@ -827,13 +828,13 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     
     protected final void checkTextState() {
         if (_algorithmData == null) {
-            throw new IllegalStateException("Invalid state for text");
+            throw new IllegalStateException(CommonResourceBundle.getInstance().getString("message.InvalidStateForText"));
         }
         
         try {
             convertEncodingAlgorithmDataToCharacters();
         } catch (Exception e) {
-            throw new IllegalStateException("Invalid state for text");
+            throw new IllegalStateException(CommonResourceBundle.getInstance().getString("message.InvalidStateForText"));
         }
     }
     
@@ -855,7 +856,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         if (_eventType == START_ELEMENT || _eventType == END_ELEMENT) {
             return _qualifiedName.getQName();
         } else {
-            throw new IllegalStateException("Method getName() called in invalid state");
+            throw new IllegalStateException(CommonResourceBundle.getInstance().getString("message.invalidCallingGetName"));
         }
     }
     
@@ -863,7 +864,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         if (_eventType == START_ELEMENT || _eventType == END_ELEMENT) {
             return _qualifiedName.localName;
         } else {
-            throw new IllegalStateException("Method getLocalName() called in invalid state");
+            throw new IllegalStateException(CommonResourceBundle.getInstance().getString("message.invalidCallingGetLocalName"));
         }
     }
     
@@ -875,7 +876,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         if (_eventType == START_ELEMENT || _eventType == END_ELEMENT) {
             return _qualifiedName.namespaceName;
         } else {
-            throw new IllegalStateException("Method getNamespaceURI() called in invalid state");
+            throw new IllegalStateException(CommonResourceBundle.getInstance().getString("message.invalidCallingGetNamespaceURI"));
         }
     }
     
@@ -883,7 +884,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         if (_eventType == START_ELEMENT || _eventType == END_ELEMENT) {
             return _qualifiedName.prefix;
         } else {
-            throw new IllegalStateException("Method getPrefix() called in invalid state");
+            throw new IllegalStateException(CommonResourceBundle.getInstance().getString("message.invalidCallingGetPrefix"));
         }
     }
     
@@ -905,7 +906,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     
     public final String getPITarget() {
         if (_eventType != PROCESSING_INSTRUCTION) {
-            throw new IllegalStateException("Method getPITarget() called in invalid state");
+            throw new IllegalStateException(CommonResourceBundle.getInstance().getString("message.invalidCallingGetPITarget"));
         }
         
         return _piTarget;
@@ -913,7 +914,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     
     public final String getPIData() {
         if (_eventType != PROCESSING_INSTRUCTION) {
-            throw new IllegalStateException("Method getPIData() called in invalid state");
+            throw new IllegalStateException(CommonResourceBundle.getInstance().getString("message.invalidCallingGetPIData"));
         }
         
         return _piData;
@@ -1112,7 +1113,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
             b = read();
         }
         if (b != EncodingConstants.TERMINATOR) {
-            throw new FastInfosetException("Namespace names of EII not terminated correctly");
+            throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.EIInamespaceNameNotTerminatedCorrectly"));
         }
         _currentNamespaceAIIsEnd = _namespaceAIIsIndex;
         
@@ -1136,13 +1137,13 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 break;
             }
             default:
-                throw new FastInfosetException("Illegal state when decoding EII after the namespace AIIs");
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.IllegalStateDecodingEIIAfterAIIs"));
         }
     }
     
     protected final void processEII(QualifiedName name, boolean hasAttributes) throws FastInfosetException, IOException {
         if (_prefixTable._currentInScope[name.prefixIndex] != name.namespaceNameIndex) {
-            throw new FastInfosetException("Qualified name of EII not in scope");
+            throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.qnameOfEIINotInScope"));
         }
 
         _eventType = START_ELEMENT;
@@ -1222,13 +1223,13 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     // AIIs have finished break out of loop
                     continue;
                 default:
-                    throw new FastInfosetException("Illegal state when decoding AIIs");
+                    throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.decodingAIIs"));
             }
             
             // [normalized value] of AII
  
             if (name.prefixIndex > 0 && _prefixTable._currentInScope[name.prefixIndex] != name.namespaceNameIndex) {
-                throw new FastInfosetException("Qualified name of AII not in scope");
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.AIIqNameNotInScope"));
             }
 
             _duplicateAttributeVerifier.checkForDuplicateAttribute(name.attributeHash, name.attributeId);
@@ -1318,7 +1319,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 case DecoderStateTables.NISTRING_EA:
                 {
                     if ((b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0) {
-                        throw new EncodingAlgorithmException("Add to table not supported for Encoding algorithms");
+                        throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.addToTableNotSupported"));
                     }
                     
                     // Decode encoding algorithm integer
@@ -1356,7 +1357,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     _attributes.addAttribute(name, "");
                     break;
                 default:
-                    throw new FastInfosetException("Illegal state when decoding AII value");
+                    throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.decodingAIIValue"));
             }
             
         } while (!terminate);
@@ -1411,7 +1412,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                         _identifier);
             // prefix, no namespace
             case 2:
-                throw new FastInfosetException("Literal qualified name with prefix but no namespace name");
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.qNameMissingNamespaceName"));
             // prefix, namespace
             case 3:
                 return new QualifiedName(
@@ -1424,7 +1425,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                         _namespaceNameIndex,
                         _identifier);
             default:
-                throw new FastInfosetException("Illegal state when decoding literal qualified name of EII");                
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.decodingEII"));                
         }        
     }
     
@@ -1442,7 +1443,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 _charactersLength = _charBufferLength;
                 break;
             case NISTRING_ENCODING_ALGORITHM:
-                throw new FastInfosetException("Comment II with encoding algorithm decoding not supported");
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.commentIIAlgorithmNotSupported"));
             case NISTRING_INDEX:
                 final CharArray ca = _v.otherString.get(_integer);
                 
@@ -1471,7 +1472,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 }
                 break;
             case NISTRING_ENCODING_ALGORITHM:
-                throw new FastInfosetException("Processing II with encoding algorithm decoding not supported");
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.processingIIWithEncodingAlgorithm"));
             case NISTRING_INDEX:
                 _piData = _v.otherString.get(_integer).toString();
                 break;
@@ -1489,13 +1490,13 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         if (_algorithmId >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
             _algorithmURI = _v.encodingAlgorithm.get(_algorithmId - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
             if (_algorithmURI == null) {
-                throw new EncodingAlgorithmException("URI not present for encoding algorithm identifier " + _identifier);
+                throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.URINotPresent", new Object[]{new Integer(_identifier)}));
             }
         } else if (_algorithmId > EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
             // Reserved built-in algorithms for future use
             // TODO should use sax property to decide if event will be
             // reported, allows for support through handler if required.
-            throw new EncodingAlgorithmException("Encoding algorithm identifiers 10 up to and including 31 are reserved for future use");
+            throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.identifiers10to31Reserved"));
         }
     }
     
@@ -1504,17 +1505,17 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         if (_identifier >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
             URI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
             if (URI == null) {
-                throw new EncodingAlgorithmException("URI not present for encoding algorithm identifier " + _identifier);
+                throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.URINotPresent", new Object[]{new Integer(_identifier)}));
             }
         } else if (_identifier >= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
             if (_identifier == EncodingAlgorithmIndexes.CDATA) {
-                throw new EncodingAlgorithmException("CDATA encoding algorithm not supported for attribute values");
+                throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.CDATAAlgorithmNotSupported"));
             }
             
             // Reserved built-in algorithms for future use
             // TODO should use sax property to decide if event will be
             // reported, allows for support through handler if required.
-            throw new EncodingAlgorithmException("Encoding algorithm identifiers 10 up to and including 31 are reserved for future use");
+            throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.identifiers10to31Reserved"));
         }
         
         final byte[] data = new byte[_octetBufferLength];
@@ -1543,7 +1544,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 ea.convertToCharacters(data, buffer);
             } else {
                 throw new EncodingAlgorithmException(
-                        "Document contains application-defined encoding algorithm data that cannot be reported");
+                        CommonResourceBundle.getInstance().getString("message.algorithmDataCannotBeReported"));
             }
         }
         

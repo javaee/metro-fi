@@ -41,6 +41,7 @@ package com.sun.xml.fastinfoset.util;
 
 import java.util.HashMap;
 import java.util.Map;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class StringIntMap extends KeyIntMap {
 
@@ -82,8 +83,8 @@ public class StringIntMap extends KeyIntMap {
 
     public void setReadOnlyMap(KeyIntMap readOnlyMap, boolean clear) {
         if (!(readOnlyMap instanceof StringIntMap)) {
-            throw new IllegalArgumentException("Illegal class: "
-                + readOnlyMap);
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().
+                    getString("message.illegalClass", new Object[]{readOnlyMap}));
         }       
         
         setReadOnlyMap((StringIntMap)readOnlyMap, clear);

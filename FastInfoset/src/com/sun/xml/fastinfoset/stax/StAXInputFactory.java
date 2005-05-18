@@ -53,6 +53,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.util.XMLEventAllocator ;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class StAXInputFactory extends XMLInputFactory {    
     //List of supported properties and default values.
@@ -224,11 +225,11 @@ public class StAXInputFactory extends XMLInputFactory {
      */
     public Object getProperty(String name) throws IllegalArgumentException {
         if(name == null){
-            throw new IllegalArgumentException("Property name can not be null.");
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.nullPropertyName"));
         }
         if(_manager.containsProperty(name))
             return _manager.getProperty(name);
-        throw new IllegalArgumentException("Property not supported");
+        throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.propertyNotSupported", new Object[]{name}));
     }
     
     /** Query the set of Properties that this factory supports.

@@ -40,6 +40,7 @@
 package com.sun.xml.fastinfoset.util;
 
 import com.sun.xml.fastinfoset.QualifiedName;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class QualifiedNameArray extends ValueArray {
     
@@ -69,8 +70,8 @@ public class QualifiedNameArray extends ValueArray {
     
     public final void setReadOnlyArray(ValueArray readOnlyArray, boolean clear) {
         if (!(readOnlyArray instanceof QualifiedNameArray)) {
-            throw new IllegalArgumentException("Illegal class: "
-                + readOnlyArray);
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().
+                    getString("message.illegalClass", new Object[]{readOnlyArray}));
         }       
         
         setReadOnlyArray((QualifiedNameArray)readOnlyArray, clear);
@@ -115,7 +116,7 @@ public class QualifiedNameArray extends ValueArray {
 
     protected final void resize() {
         if (_size == _maximumCapacity) {
-            throw new ValueArrayResourceException("Array has reached maximum capacity");
+            throw new ValueArrayResourceException(CommonResourceBundle.getInstance().getString("message.arrayMaxCapacity"));
         }
 
         int newSize = _size * 3 / 2 + 1;

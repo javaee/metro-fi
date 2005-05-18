@@ -40,6 +40,7 @@
 package com.sun.xml.fastinfoset.util;
 
 import java.util.Iterator;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class ReadIterator implements Iterator {
     
@@ -63,7 +64,7 @@ public class ReadIterator implements Iterator {
     }
     
     public void remove() {
-        throw new  UnsupportedOperationException("The list is read-only. Content can not be changed.");
+        throw new  UnsupportedOperationException(CommonResourceBundle.getInstance().getString("message.readonlyList"));
     }
     
 

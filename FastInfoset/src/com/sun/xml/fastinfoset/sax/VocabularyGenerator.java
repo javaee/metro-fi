@@ -55,6 +55,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.DefaultHandler;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class VocabularyGenerator extends DefaultHandler implements LexicalHandler {
     
@@ -201,13 +202,15 @@ public class VocabularyGenerator extends DefaultHandler implements LexicalHandle
         if (namespaceURI != "") {
             namespaceURIIndex = _serializerVocabulary.namespaceName.get(namespaceURI);
             if (namespaceURIIndex == KeyIntMap.NOT_PRESENT) {
-                throw new SAXException("namespace URI of local name not indexed");
+                throw new SAXException(CommonResourceBundle.getInstance().
+                        getString("message.namespaceURINotIndexed", new Object[]{new Integer(namespaceURIIndex)}));
             }
             
             if (prefix != "") {
                 prefixIndex = _serializerVocabulary.prefix.get(prefix);
                 if (prefixIndex == KeyIntMap.NOT_PRESENT) {
-                    throw new SAXException("prefix of local name not indexed");
+                    throw new SAXException(CommonResourceBundle.getInstance().
+                            getString("message.prefixNotIndexed", new Object[]{new Integer(prefixIndex)}));
                 }
             }
         }

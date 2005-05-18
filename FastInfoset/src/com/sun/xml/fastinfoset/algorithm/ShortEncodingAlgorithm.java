@@ -47,6 +47,7 @@ import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import org.jvnet.fastinfoset.EncodingAlgorithmException;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 
 /**
@@ -59,9 +60,8 @@ public class ShortEncodingAlgorithm extends IntegerEncodingAlgorithm {
 
     public final int getPrimtiveLengthFromOctetLength(int octetLength) throws EncodingAlgorithmException {
         if (octetLength % SHORT_SIZE != 0) {
-            throw new EncodingAlgorithmException("'length' is not a multiple of " +
-                    SHORT_SIZE +
-                    " bytes correspond to the size of the 'short' primitive type");
+            throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().
+                    getString("message.lengthNotMultipleOfShort", new Object[]{new Integer(SHORT_SIZE)}));
         }
 
         return octetLength / SHORT_SIZE;
@@ -85,7 +85,7 @@ public class ShortEncodingAlgorithm extends IntegerEncodingAlgorithm {
 
     public void encodeToOutputStream(Object data, OutputStream s) throws IOException {
         if (!(data instanceof short[])) {
-            throw new IllegalArgumentException("'data' not an instance of short[]");
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.dataNotShortArray"));
         }
 
         final short[] idata = (short[])data;
@@ -112,7 +112,7 @@ public class ShortEncodingAlgorithm extends IntegerEncodingAlgorithm {
 
     public final void convertToCharacters(Object data, StringBuffer s) {
         if (!(data instanceof short[])) {
-            throw new IllegalArgumentException("'data' not an instance of short[]");
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.dataNotShortArray"));
         }
 
         final short[] idata = (short[])data;

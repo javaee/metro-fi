@@ -50,6 +50,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class StAXOutputFactory extends XMLOutputFactory {
         
@@ -124,11 +125,11 @@ public class StAXOutputFactory extends XMLOutputFactory {
     
     public Object getProperty(String name) throws java.lang.IllegalArgumentException {
         if(name == null){
-            throw new IllegalArgumentException("Property not supported");
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.propertyNotSupported", new Object[]{name}));
         }
         if(_manager.containsProperty(name))
             return _manager.getProperty(name);
-        throw new IllegalArgumentException("Property not supported");
+        throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.propertyNotSupported", new Object[]{name}));
     }
     
     public boolean isPropertySupported(String name) {

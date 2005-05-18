@@ -255,7 +255,8 @@ public abstract class Decoder implements FastInfosetParser {
         if (b == EncodingConstants.DOCUMENT_INITIAL_VOCABULARY_FLAG) {
             decodeInitialVocabulary();
         } else if (b != 0) {
-            throw new IOException("Optional values (other than initial vocabulary) of DII not supported");
+            throw new IOException(CommonResourceBundle.getInstance().
+                getString("message.optinalValues"));
         }
     }
 
@@ -337,14 +338,14 @@ public abstract class Decoder implements FastInfosetParser {
 
     public void decodeExternalVocabularyURI() throws FastInfosetException, IOException {
         if (_externalVocabularies == null) {
-            throw new IOException("No external vocabularies registered");
+            throw new IOException(CommonResourceBundle.getInstance().getString("message.noExternalVocabularies"));
         }
 
         String externalVocabularyURI = decodeNonEmptyOctetStringOnSecondBitAsUtf8String();
         ParserVocabulary externalVocabulary =
             (ParserVocabulary) _externalVocabularies.get(externalVocabularyURI);
         if (externalVocabulary == null) {
-            throw new FastInfosetException("External vocabulary referenced by \"" + externalVocabularyURI + "\" is not registered");
+            throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.externalVocabularyNotRegistered", new Object[]{externalVocabularyURI}));
         }
 
         try {
@@ -373,7 +374,7 @@ public abstract class Decoder implements FastInfosetParser {
                     array.add(_charBuffer, _charBufferLength);
                     break;
                 default:
-                    throw new FastInfosetException("Illegal state for decoding of EncodedCharacterString");
+                    throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.illegalState"));
             }
         }
     }
@@ -385,7 +386,7 @@ public abstract class Decoder implements FastInfosetParser {
                     array.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
                     break;
                 default:
-                    throw new FastInfosetException("Illegal state for decoding of EncodedCharacterString");
+                    throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.illegalState"));
             }
         }
     }
@@ -409,7 +410,7 @@ public abstract class Decoder implements FastInfosetParser {
             }
             
             if (namespaceName == "" && prefix != "") {
-                throw new FastInfosetException("Name surrogate prefix is present when namespace name is absent");
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.missingNamespace"));
             }
 
             final int localNameIndex = decodeIntegerIndexOnSecondBit();
@@ -456,7 +457,7 @@ public abstract class Decoder implements FastInfosetParser {
             b = read();
         }
         if (b != EncodingConstants.TERMINATOR) {
-            throw new FastInfosetException("Notation IIs not terminated correctly");
+            throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.IIsNotTerminatedCorrectly"));
         }
     }
 
@@ -483,7 +484,7 @@ public abstract class Decoder implements FastInfosetParser {
             b = read();
         }
         if (b != EncodingConstants.TERMINATOR) {
-            throw new FastInfosetException("Unparsed entities not terminated correctly");
+            throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.unparsedEntities"));
         }
     }
 
@@ -500,7 +501,7 @@ public abstract class Decoder implements FastInfosetParser {
                 }
                 return data;
             case NISTRING_ENCODING_ALGORITHM:
-                throw new FastInfosetException("Document version with encoding algorithm decoding not supported");
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.decodingNotSupported"));
             case NISTRING_INDEX:
                 return _v.otherString.get(_integer).toString();
             case NISTRING_EMPTY_STRING:
@@ -555,7 +556,7 @@ public abstract class Decoder implements FastInfosetParser {
                         _stringInterning);
             // prefix, no namespace
             case 2:
-                throw new FastInfosetException("Literal qualified name with prefix but no namespace name");
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.qNameMissingNamespaceName"));
             // prefix, namespace
             case 3:
                 return new QualifiedName(
@@ -568,7 +569,7 @@ public abstract class Decoder implements FastInfosetParser {
                         _charBuffer,
                         _stringInterning);
             default:
-                throw new FastInfosetException("Illegal state when decoding literal qualified name of EII");                
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.decodingEII"));                
         }        
     }
 
@@ -664,7 +665,7 @@ public abstract class Decoder implements FastInfosetParser {
             case DecoderStateTables.NISTRING_EMPTY:
                 return NISTRING_EMPTY_STRING;
             default:
-                throw new FastInfosetException("Illegal state when decoding non identifying string");
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.decodingNonIdentifyingString"));
         }
     }
 
@@ -687,7 +688,7 @@ public abstract class Decoder implements FastInfosetParser {
                 _octetBufferLength = length + EncodingConstants.OCTET_STRING_LENGTH_5TH_BIT_MEDIUM_LIMIT;
                 break;
             default:
-                throw new FastInfosetException("Illegal state when decoding octets");
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.decodingOctets"));
         }
         ensureOctetBufferSize();
         _octetBufferStart = _octetBufferOffset;
@@ -767,7 +768,7 @@ public abstract class Decoder implements FastInfosetParser {
                     + EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT;
                 return table._array[_identifier];
             default:
-                throw new FastInfosetException("Illegal state when decoding identifying string on first bit");
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.decodingIdentifyingString"));
         }
     }
 
@@ -787,7 +788,7 @@ public abstract class Decoder implements FastInfosetParser {
                 if (_charBuffer[0] == 'x' &&
                         _charBuffer[1] == 'm' &&
                         _charBuffer[2] == 'l') {
-                    throw new FastInfosetException("The literal identifying string for the \"xml\" prefix is illegal");
+                    throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.prefixIllegal"));
                 }
                 
                 final String s = (_stringInterning) ? new String(_charBuffer, 0, _charBufferLength).intern() :
@@ -805,7 +806,7 @@ public abstract class Decoder implements FastInfosetParser {
                         _charBuffer[2] == 'l' &&
                         _charBuffer[3] == 'n' &&
                         _charBuffer[4] == 's') {
-                    throw new FastInfosetException("The prefix \"xmlns\" cannot be bound to any namespace explicitly");
+                    throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.xmlns"));
                 }
                 
                 final String s = (_stringInterning) ? new String(_charBuffer, 0, _charBufferLength).intern() :
@@ -846,11 +847,11 @@ public abstract class Decoder implements FastInfosetParser {
                     // Peak at next byte and check the index of the XML namespace name
                     if (DecoderStateTables.ISTRING_PREFIX_NAMESPACE[peak()] 
                             != DecoderStateTables.ISTRING_PREFIX_NAMESPACE_INDEX_ZERO) {
-                        throw new FastInfosetException("\"xml\" prefix  with a namespace name other than XML namespace name");
+                        throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.wrongNamespaceName"));
                     }
                     return EncodingConstants.XML_NAMESPACE_PREFIX;
                 } else {                    
-                    throw new FastInfosetException("\"xml\" prefix without an XML namespace name");
+                    throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.missingNamespaceName"));
                 }
             case DecoderStateTables.ISTRING_INDEX_SMALL:
                 _prefixIndex = b & EncodingConstants.INTEGER_2ND_BIT_SMALL_MASK;
@@ -864,7 +865,7 @@ public abstract class Decoder implements FastInfosetParser {
                     + EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT;
                 return _v.prefix._array[_prefixIndex - 1];
             default:
-                throw new FastInfosetException("Illegal state when decoding identifying string for prefix on first bit");
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.decodingIdentifyingStringForPrefix"));
         }
     }
     
@@ -880,11 +881,11 @@ public abstract class Decoder implements FastInfosetParser {
                     // Peak at next byte and check the index of the XML namespace name
                     if (DecoderStateTables.ISTRING_PREFIX_NAMESPACE[peak()] 
                             != DecoderStateTables.ISTRING_PREFIX_NAMESPACE_INDEX_ZERO) {
-                        throw new FastInfosetException("\"xml\" prefix  with a namespace name other than XML namespace name");
+                        throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.wrongNamespaceName"));
                     }
                     return EncodingConstants.XML_NAMESPACE_PREFIX;
                 } else {                    
-                    throw new FastInfosetException("\"xml\" prefix without an XML namespace name");
+                    throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.missingNamespaceName"));
                 }
             case DecoderStateTables.ISTRING_INDEX_SMALL:
                 _prefixIndex = b & EncodingConstants.INTEGER_2ND_BIT_SMALL_MASK;
@@ -898,7 +899,7 @@ public abstract class Decoder implements FastInfosetParser {
                     + EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT;
                 return _v.prefix._array[_prefixIndex - 1];
             default:
-                throw new FastInfosetException("Illegal state when decoding identifying string for prefix on first bit");
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.decodingIdentifyingStringForPrefix"));
         }
     }
     
@@ -925,7 +926,7 @@ public abstract class Decoder implements FastInfosetParser {
                 decodeUtf8StringAsCharBuffer();
                 
                 if (compareCharsWithCharBufferFromEndToStart(EncodingConstants.XMLNS_NAMESPACE_NAME_CHARS)) {
-                    throw new FastInfosetException("The namespace \"http://www.w3.org/2000/xmlns/\" cannot be bound to any prfix explicitly");
+                    throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.xmlnsConnotBeBoundToPrefix"));
                 }
                 
                 final String s = (_stringInterning) ? new String(_charBuffer, 0, _charBufferLength).intern() :
@@ -939,7 +940,7 @@ public abstract class Decoder implements FastInfosetParser {
                 decodeUtf8StringAsCharBuffer();
                 
                 if (compareCharsWithCharBufferFromEndToStart(EncodingConstants.XML_NAMESPACE_NAME_CHARS)) {
-                    throw new FastInfosetException("The literal identifying string for the \"http://www.w3.org/XML/1998/namespace\" namespace name is illegal");
+                    throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.illegalNamespaceName"));
                 }
                 
                 final String s = (_stringInterning) ? new String(_charBuffer, 0, _charBufferLength).intern() :
@@ -970,7 +971,7 @@ public abstract class Decoder implements FastInfosetParser {
                     _namespaceNameIndex = 0;
                     return EncodingConstants.XML_NAMESPACE_NAME;
                 } else {
-                    throw new FastInfosetException("The XML namespace is not allowed without the XML prefix");
+                    throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.namespaceWithoutPrefix"));
                 }
             case DecoderStateTables.ISTRING_INDEX_SMALL: 
                 _namespaceNameIndex = b & EncodingConstants.INTEGER_2ND_BIT_SMALL_MASK;
@@ -984,7 +985,7 @@ public abstract class Decoder implements FastInfosetParser {
                     + EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT;
                 return _v.namespaceName._array[_namespaceNameIndex - 1];
             default:
-                throw new FastInfosetException("Illegal state when decoding identifying string for namespace name on first bit");
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.decodingForNamespaceName"));
         }
     }
     
@@ -999,7 +1000,7 @@ public abstract class Decoder implements FastInfosetParser {
                     _namespaceNameIndex = 0;
                     return EncodingConstants.XML_NAMESPACE_NAME;
                 } else {
-                    throw new FastInfosetException("The XML namespace is not allowed without the XML prefix");
+                    throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.namespaceWithoutPrefix"));
                 }
             case DecoderStateTables.ISTRING_INDEX_SMALL: 
                 _namespaceNameIndex = b & EncodingConstants.INTEGER_2ND_BIT_SMALL_MASK;
@@ -1013,7 +1014,7 @@ public abstract class Decoder implements FastInfosetParser {
                     + EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT;
                 return _v.namespaceName._array[_namespaceNameIndex - 1];
             default:
-                throw new FastInfosetException("Illegal state when decoding identifying string for namespace name on first bit");
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.decodingForNamespaceName"));
         }
     }
     
@@ -1068,7 +1069,7 @@ public abstract class Decoder implements FastInfosetParser {
             case DecoderStateTables.ISTRING_INDEX_MEDIUM:
             case DecoderStateTables.ISTRING_INDEX_LARGE:
             default:
-                throw new FastInfosetException("Illegal state when decoding non empty octet string on second bit");
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.decodingNonEmptyOctet"));
         }
     }
     
@@ -1090,13 +1091,13 @@ public abstract class Decoder implements FastInfosetParser {
             case DecoderStateTables.ISTRING_MEDIUM_LENGTH:
             case DecoderStateTables.ISTRING_LARGE_LENGTH:
             default:
-                throw new FastInfosetException("Illegal state when decoding index on second bit");
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.decodingIndexOnSecondBit"));
         }
     }
 
     public final void decodeHeader() throws FastInfosetException, IOException {
         if (!_isFastInfosetDocument()) {
-            throw new FastInfosetException("Input stream is not a fast infoset document");
+            throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.notFIDocument"));
         }
     }
 
@@ -1107,14 +1108,14 @@ public abstract class Decoder implements FastInfosetParser {
         } else if (_identifier >= EncodingConstants.RESTRICTED_ALPHABET_APPLICATION_START) {
             CharArray ca = _v.restrictedAlphabet.get(_identifier - EncodingConstants.RESTRICTED_ALPHABET_APPLICATION_START);
             if (ca == null) {
-                throw new FastInfosetException("Restricted alphabet not present for identifier " + _identifier);
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.alphabetNotPresent", new Object[]{new Integer(_identifier)}));
             }
             decodeAlphabetOctetsAsCharBuffer(ca.ch);            
         } else {
             // Reserved built-in algorithms for future use
             // TODO should use sax property to decide if event will be
             // reported, allows for support through handler if required.
-            throw new FastInfosetException("Restricted alphabet identifiers 2 up to and including 31 are reserved for future use");
+            throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.alphabetIdentifiersReserved"));
         }
     }
     
@@ -1151,7 +1152,7 @@ public abstract class Decoder implements FastInfosetParser {
     
     public final void decodeAlphabetOctetsAsCharBuffer(char[] restrictedAlphabet) throws FastInfosetException, IOException {
         if (restrictedAlphabet.length < 2) {
-            throw new IllegalArgumentException("Restricted Alphabet must contain 2 or more characters");
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.alphabetMustContain2orMoreChars"));
         }
 
         int bitsPerCharacter = 1;
@@ -1176,7 +1177,7 @@ public abstract class Decoder implements FastInfosetParser {
             if (bitsPerCharacter < 8 && value == terminatingValue) {
                 int octetPosition = (i * bitsPerCharacter) >>> 3;
                 if (octetPosition != _octetBufferLength - 1) {
-                    throw new FastInfosetException("Restricted alphabet incorrectly terminated");
+                    throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.alphabetIncorrectlyTerminated"));
                 }
                 break;
             }
@@ -1244,7 +1245,7 @@ public abstract class Decoder implements FastInfosetParser {
 
             if (bytesRead < _octetBufferLength - bytesRemaining) {
                 // TODO keep reading until require bytes have been obtained
-                throw new IOException("Full bytes not read");
+                throw new IOException(CommonResourceBundle.getInstance().getString("message.fullBytesNotRead"));
             }
 
             _octetBufferEnd = bytesRemaining + bytesRead;
@@ -1516,15 +1517,15 @@ public abstract class Decoder implements FastInfosetParser {
     }
 
     public final void decodeUtf8StringLengthTooSmall() throws IOException {
-        throw new IOException("Length deliminator too small");
+        throw new IOException(CommonResourceBundle.getInstance().getString("message.deliminatorTooSmall"));
     }
 
     public final void decodeUtf8StringIllegalState() throws IOException {
-        throw new IOException("Illegal state for UTF-8 encoded string");
+        throw new IOException(CommonResourceBundle.getInstance().getString("message.UTF8Encoded"));
     }
 
     public final void decodeUtf8NCNameIllegalState() throws IOException {
-        throw new IOException("Illegal state for UTF-8 encoded NCName");
+        throw new IOException(CommonResourceBundle.getInstance().getString("message.UTF8EncodedNCName"));
     }
 
     public final void decodeUtf16StringIntoCharBuffer() throws IOException {
@@ -1564,7 +1565,7 @@ public abstract class Decoder implements FastInfosetParser {
         } else {
             _octetBufferEnd = _s.read(_octetBuffer);
             if (_octetBufferEnd < 0) {
-                throw new EOFException("Unexpeceted EOF");
+                throw new EOFException(CommonResourceBundle.getInstance().getString("message.EOF"));
             }
 
             _octetBufferOffset = 1;
@@ -1578,7 +1579,7 @@ public abstract class Decoder implements FastInfosetParser {
         } else {
             _octetBufferEnd = _s.read(_octetBuffer);
             if (_octetBufferEnd < 0) {
-                throw new EOFException("Unexpeceted EOF");
+                throw new EOFException(CommonResourceBundle.getInstance().getString("message.EOF"));
             }
 
             _octetBufferOffset = 0;

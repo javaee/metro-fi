@@ -47,6 +47,7 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.namespace.QName;
 import java.io.Writer;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 
 public abstract class EventBase implements XMLEvent {
@@ -126,7 +127,7 @@ public abstract class EventBase implements XMLEvent {
         if (isCharacters()) {
             return (Characters)this;
         } else
-            throw new ClassCastException("cannnot cast " + getEventTypeString() + " to Characters");
+            throw new ClassCastException(CommonResourceBundle.getInstance().getString("message.charactersCast", new Object[]{getEventTypeString()}));
     }
     
     /** Returns this event as an end  element event, may result in
@@ -136,7 +137,7 @@ public abstract class EventBase implements XMLEvent {
         if (isEndElement()) {
             return (EndElement)this;
         } else
-            throw new ClassCastException("cannnot cast " + getEventTypeString() + " to EndElement");
+            throw new ClassCastException(CommonResourceBundle.getInstance().getString("message.endElementCase", new Object[]{getEventTypeString()}));
     }
     
   /**
@@ -147,7 +148,7 @@ public abstract class EventBase implements XMLEvent {
         if (isStartElement()) {
             return (StartElement)this;
         } else
-            throw new ClassCastException("cannnot cast " + getEventTypeString() + " to StartElement");
+            throw new ClassCastException(CommonResourceBundle.getInstance().getString("message.startElementCase", new Object[]{getEventTypeString()}));
     }
     
     /**

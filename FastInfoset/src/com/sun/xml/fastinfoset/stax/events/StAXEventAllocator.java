@@ -48,6 +48,7 @@ import javax.xml.stream.util.XMLEventAllocator;
 import javax.xml.stream.util.XMLEventConsumer;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 /**
  * This class provides the same functionality as StAXEventAllocatorBase, but without
@@ -86,7 +87,7 @@ public class StAXEventAllocator implements XMLEventAllocator {
    */
     public XMLEvent allocate(XMLStreamReader streamReader) throws XMLStreamException {
         if(streamReader == null )
-            throw new XMLStreamException("Reader cannot be null");
+            throw new XMLStreamException(CommonResourceBundle.getInstance().getString("message.nullReader"));
         return getXMLEvent(streamReader);
     }
     

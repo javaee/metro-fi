@@ -48,6 +48,7 @@ import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import org.jvnet.fastinfoset.EncodingAlgorithmException;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 
 
@@ -55,9 +56,8 @@ public class DoubleEncodingAlgorithm extends IEEE754FloatingPointEncodingAlgorit
 
     public final int getPrimtiveLengthFromOctetLength(int octetLength) throws EncodingAlgorithmException {
         if (octetLength % DOUBLE_SIZE != 0) {
-            throw new EncodingAlgorithmException("'length' is not a multiple of " +
-                    DOUBLE_SIZE +
-                    " bytes correspond to the size of the IEEE 754 floating-point \"single format\"");
+            throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().
+                    getString("message.lengthIsNotMultipleOfDouble", new Object[]{new Integer(DOUBLE_SIZE)}));
         }
         
         return octetLength / DOUBLE_SIZE;
@@ -81,7 +81,7 @@ public class DoubleEncodingAlgorithm extends IEEE754FloatingPointEncodingAlgorit
     
     public void encodeToOutputStream(Object data, OutputStream s) throws IOException {
         if (!(data instanceof double[])) {
-            throw new IllegalArgumentException("'data' not an instance of double[]");
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.dataNotDouble"));
         }
         
         final double[] fdata = (double[])data;
@@ -107,7 +107,7 @@ public class DoubleEncodingAlgorithm extends IEEE754FloatingPointEncodingAlgorit
     
     public final void convertToCharacters(Object data, StringBuffer s) {
         if (!(data instanceof double[])) {
-            throw new IllegalArgumentException("'data' not an instance of double[]");
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.dataNotDouble"));
         }
         
         final double[] fdata = (double[])data;

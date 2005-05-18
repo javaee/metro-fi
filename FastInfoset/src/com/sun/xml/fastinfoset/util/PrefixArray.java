@@ -40,6 +40,7 @@
 package com.sun.xml.fastinfoset.util;
 
 import com.sun.xml.fastinfoset.EncodingConstants;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import org.jvnet.fastinfoset.FastInfosetException;
@@ -217,8 +218,8 @@ public class PrefixArray extends ValueArray {
     
     public final void setReadOnlyArray(ValueArray readOnlyArray, boolean clear) {
         if (!(readOnlyArray instanceof PrefixArray)) {
-            throw new IllegalArgumentException("Illegal class: "
-                + readOnlyArray);
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().
+                    getString("message.illegalClass", new Object[]{readOnlyArray}));
         }       
         
         setReadOnlyArray((PrefixArray)readOnlyArray, clear);
@@ -270,7 +271,7 @@ public class PrefixArray extends ValueArray {
     
     protected final void resize() {
         if (_size == _maximumCapacity) {
-            throw new ValueArrayResourceException("Array has reached maximum capacity");
+            throw new ValueArrayResourceException(CommonResourceBundle.getInstance().getString("message.arrayMaxCapacity"));
         }
 
         int newSize = _size * 3 / 2 + 1;
@@ -326,7 +327,7 @@ public class PrefixArray extends ValueArray {
             current.declarationId = 0;
             _inScopeNamespaces[prefixIndex] = e;
         } else {
-            throw new FastInfosetException("Duplicate namespace attribute entry");
+            throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.duplicateNamespaceAttribute"));
         }
     }
     
@@ -357,7 +358,7 @@ public class PrefixArray extends ValueArray {
             current.declarationId = 0;
             _inScopeNamespaces[prefixIndex] = e;
         } else {
-            throw new FastInfosetException("Duplicate namespace attribute entry");
+            throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.duplicateNamespaceAttribute"));
         }
  
         final PrefixEntry p = _prefixPool;

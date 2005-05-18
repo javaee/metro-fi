@@ -51,6 +51,7 @@ import org.jvnet.fastinfoset.RestrictedAlphabet;
 import org.jvnet.fastinfoset.sax.EncodingAlgorithmAttributes;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 
 public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter {
@@ -220,7 +221,7 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
     public final void processingInstruction(String target, String data) throws SAXException {
         try {
             if (target == "") {
-                throw new SAXException("processingInstruction: Target is empty");
+                throw new SAXException(CommonResourceBundle.getInstance().getString("message.processingInstructionTargetIsEmpty"));
             }
             encodeTermination();
 

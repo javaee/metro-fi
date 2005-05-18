@@ -48,14 +48,14 @@ import java.io.OutputStream;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
 import org.jvnet.fastinfoset.EncodingAlgorithmException;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class UUIDEncodingAlgorithm extends LongEncodingAlgorithm {
     
     public final int getPrimtiveLengthFromOctetLength(int octetLength) throws EncodingAlgorithmException {
         if (octetLength % (LONG_SIZE * 2) != 0) {
-            throw new EncodingAlgorithmException("'length' is not a multiple of " +
-                    (LONG_SIZE * 2) +
-                    " bytes correspond to the size of the 'UUID' primitive type");
+            throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().
+                    getString("message.lengthNotMultipleOfUUID",new Object[]{new Integer(LONG_SIZE * 2)}));
         }
         
         return octetLength / LONG_SIZE;
@@ -81,7 +81,7 @@ public class UUIDEncodingAlgorithm extends LongEncodingAlgorithm {
     
     public final void convertToCharacters(Object data, StringBuffer s) {
         if (!(data instanceof long[])) {
-            throw new IllegalArgumentException("'data' not an instance of int[]");
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.dataNotLongArray"));
         }
         
         final long[] ldata = (long[])data;
@@ -102,7 +102,9 @@ public class UUIDEncodingAlgorithm extends LongEncodingAlgorithm {
     final void fromUUIDString(String name) {
         String[] components = name.split("-");
         if (components.length != 5)
-            throw new IllegalArgumentException("Invalid UUID string: "+name);
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().
+                    getString("message.invalidUUID", new Object[]{name}));
+                    
         for (int i=0; i<5; i++)
             components[i] = "0x"+components[i];
 

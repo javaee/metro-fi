@@ -38,6 +38,7 @@
 
 
 package com.sun.xml.fastinfoset.util;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class CharArrayIntMap extends KeyIntMap {
 
@@ -99,8 +100,8 @@ public class CharArrayIntMap extends KeyIntMap {
 
     public final void setReadOnlyMap(KeyIntMap readOnlyMap, boolean clear) {
         if (!(readOnlyMap instanceof CharArrayIntMap)) {
-            throw new IllegalArgumentException("Illegal class: "
-                + readOnlyMap);
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().
+                    getString("message.illegalClass", new Object[]{readOnlyMap}));
         }       
         
         setReadOnlyMap((CharArrayIntMap)readOnlyMap, clear);

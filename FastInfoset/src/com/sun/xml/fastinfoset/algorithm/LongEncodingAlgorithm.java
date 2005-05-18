@@ -47,16 +47,15 @@ import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import org.jvnet.fastinfoset.EncodingAlgorithmException;
-
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 
 public class LongEncodingAlgorithm extends IntegerEncodingAlgorithm {
 
     public int getPrimtiveLengthFromOctetLength(int octetLength) throws EncodingAlgorithmException {
         if (octetLength % LONG_SIZE != 0) {
-            throw new EncodingAlgorithmException("'length' is not a multiple of " +
-                    LONG_SIZE +
-                    " bytes correspond to the size of the 'long' primitive type");
+            throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().
+                    getString("message.lengthNotMultipleOfLong", new Object[]{new Integer(LONG_SIZE)}));
         }
         
         return octetLength / LONG_SIZE;
@@ -80,7 +79,7 @@ public class LongEncodingAlgorithm extends IntegerEncodingAlgorithm {
     
     public void encodeToOutputStream(Object data, OutputStream s) throws IOException {
         if (!(data instanceof long[])) {
-            throw new IllegalArgumentException("'data' not an instance of int[]");
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.dataNotLongArray"));
         }
         
         final long[] ldata = (long[])data;
@@ -107,7 +106,7 @@ public class LongEncodingAlgorithm extends IntegerEncodingAlgorithm {
     
     public void convertToCharacters(Object data, StringBuffer s) {
         if (!(data instanceof long[])) {
-            throw new IllegalArgumentException("'data' not an instance of long[]");
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.dataNotLongArray"));
         }
         
         final long[] ldata = (long[])data;

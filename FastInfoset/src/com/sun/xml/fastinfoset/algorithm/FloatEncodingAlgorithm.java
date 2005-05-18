@@ -48,6 +48,7 @@ import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import org.jvnet.fastinfoset.EncodingAlgorithmException;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 
 
@@ -55,9 +56,8 @@ public class FloatEncodingAlgorithm extends IEEE754FloatingPointEncodingAlgorith
 
     public final int getPrimtiveLengthFromOctetLength(int octetLength) throws EncodingAlgorithmException {
         if (octetLength % FLOAT_SIZE != 0) {
-            throw new EncodingAlgorithmException("'length' is not a multiple of " +
-                    FLOAT_SIZE +
-                    " bytes correspond to the size of the IEEE 754 floating-point \"single format\"");
+            throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().
+                    getString("message.lengthNotMultipleOfFloat", new Object[]{new Integer(FLOAT_SIZE)}));
         }
         
         return octetLength / FLOAT_SIZE;
@@ -81,7 +81,7 @@ public class FloatEncodingAlgorithm extends IEEE754FloatingPointEncodingAlgorith
     
     public void encodeToOutputStream(Object data, OutputStream s) throws IOException {
         if (!(data instanceof float[])) {
-            throw new IllegalArgumentException("'data' not an instance of float[]");
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.dataNotFloat"));
         }
         
         final float[] fdata = (float[])data;
@@ -107,7 +107,7 @@ public class FloatEncodingAlgorithm extends IEEE754FloatingPointEncodingAlgorith
     
     public final void convertToCharacters(Object data, StringBuffer s) {
         if (!(data instanceof float[])) {
-            throw new IllegalArgumentException("'data' not an instance of float[]");
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.dataNotFloat"));
         }
         
         final float[] fdata = (float[])data;

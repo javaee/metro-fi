@@ -45,6 +45,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.StreamFilter;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.StreamFilter;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 
 public class StAXFilteredParser extends StAXParserWrapper {
@@ -66,7 +67,7 @@ public class StAXFilteredParser extends StAXParserWrapper {
     {
         if (hasNext())
             return super.next();
-        throw new IllegalStateException("no more items to return");
+        throw new IllegalStateException(CommonResourceBundle.getInstance().getString("message.noMoreItems"));
     }
 
     public boolean hasNext() throws XMLStreamException

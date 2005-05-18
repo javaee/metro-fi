@@ -296,7 +296,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     protected final void encodeAlphabetCharacters(String alphabet, char[] ch, int start, int length) throws FastInfosetException, IOException {
         int id = _v.restrictedAlphabet.get(alphabet);
         if (id == KeyIntMap.NOT_PRESENT) {
-            throw new FastInfosetException("Restricted alphabet not present in restricted alphabet table");
+            throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.restrictedAlphabetNotPresent"));
         }
         id += EncodingConstants.RESTRICTED_ALPHABET_APPLICATION_START;
         
@@ -370,13 +370,13 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         if (namespaceURI != "") {
             namespaceURIIndex = _v.namespaceName.get(namespaceURI);
             if (namespaceURIIndex == KeyIntMap.NOT_PRESENT) {
-                throw new IOException("namespace URI of local name not indexed: " + namespaceURI);
+                throw new IOException(CommonResourceBundle.getInstance().getString("message.namespaceURINotIndexed", new Object[]{namespaceURI}));
             }
 
             if (prefix != "") {
                 prefixIndex = _v.prefix.get(prefix);
                 if (prefixIndex == KeyIntMap.NOT_PRESENT) {
-                    throw new IOException("prefix of local name not indexed: " + prefix);
+                    throw new IOException(CommonResourceBundle.getInstance().getString("message.prefixNotIndexed", new Object[]{prefix}));
                 }
             }
         }
@@ -440,14 +440,14 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                         namespaceURI.equals(EncodingConstants.XMLNS_NAMESPACE_NAME)) {
                     return false;
                 } else {
-                    throw new IOException("namespace URI of local name not indexed: " + namespaceURI);
+                    throw new IOException(CommonResourceBundle.getInstance().getString("message.namespaceURINotIndexed", new Object[]{namespaceURI}));
                 }
             }
             
             if (prefix != "") {
                 prefixIndex = _v.prefix.get(prefix);
                 if (prefixIndex == KeyIntMap.NOT_PRESENT) {
-                    throw new IOException("prefix of local name not indexed: " + prefix);
+                    throw new IOException(CommonResourceBundle.getInstance().getString("message.prefixNotIndexed", new Object[]{prefix}));
                 }
             }
         }
@@ -566,7 +566,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         if (URI != null) {
             id = _v.encodingAlgorithm.get(URI);
             if (id == KeyIntMap.NOT_PRESENT) {
-                throw new EncodingAlgorithmException("Encoding algorithm URI '" + URI + "' not a member of the encoding algorithm table");
+                throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.EncodingAlgorithmURI", new Object[]{URI}));
             }
             id += EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START;
 
@@ -578,7 +578,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                     byte[] d = (byte[])data;
                     encodeAIIOctetAlgorithmData(id, d, 0, d.length);
                 } else {
-                    throw new EncodingAlgorithmException("Null encoding algorithm URI present with data that is not byte[]");
+                    throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.nullEncodingAlgorithmURI"));
                 }
             }
         } else if (id <= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
@@ -586,7 +586,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
             int length = 0;
             switch(id) {
                 case EncodingAlgorithmIndexes.HEXADECIMAL:
-                    throw new UnsupportedOperationException("HEXADECIMAL");
+                    throw new UnsupportedOperationException(CommonResourceBundle.getInstance().getString("message.HEXADECIMAL"));
                 case EncodingAlgorithmIndexes.BASE64:
                     length = ((byte[])data).length;
                     break;
@@ -612,9 +612,9 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                     length = ((long[])data).length;
                     break;
                 case EncodingAlgorithmIndexes.CDATA:
-                    throw new UnsupportedOperationException("CDATA");
+                    throw new UnsupportedOperationException(CommonResourceBundle.getInstance().getString("message.CDATA"));
                 default:
-                    throw new EncodingAlgorithmException("Unsupported built-in encoding algorithm: " + id);
+                    throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.UnsupportedBuiltInAlgorithm", new Object[]{new Integer(id)}));
             }
             encodeAIIBuiltInAlgorithmData(id, data, 0, length);
         } else if (id >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
@@ -622,10 +622,10 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                 byte[] d = (byte[])data;
                 encodeAIIOctetAlgorithmData(id, d, 0, d.length);
             } else {
-                throw new EncodingAlgorithmException("Null encoding algorithm URI present with data that is not byte[]");
+                throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.nullEncodingAlgorithmURI"));
             }
         } else {
-            throw new EncodingAlgorithmException("Encoding algorithm identifiers 10 up to and including 31 are reserved for future use");
+            throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.identifiers10to31Reserved"));
         }
     }
 
@@ -703,7 +703,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         if (URI != null) {
             id = _v.encodingAlgorithm.get(URI);
             if (id == KeyIntMap.NOT_PRESENT) {
-                throw new EncodingAlgorithmException("Encoding algorithm URI '" + URI + "' not a member of the encoding algorithm table");
+                throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.EncodingAlgorithmURI", new Object[]{URI}));
             }
             id += EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START;
 
@@ -715,14 +715,14 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                     byte[] d = (byte[])data;
                     encodeCIIOctetAlgorithmData(id, d, 0, d.length);
                 } else {
-                    throw new EncodingAlgorithmException("Null encoding algorithm URI present with data that is not byte[]");
+                    throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.nullEncodingAlgorithmURI"));
                 }
             }
         } else if (id <= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
             int length = 0;
             switch(id) {
                 case EncodingAlgorithmIndexes.HEXADECIMAL:
-                    throw new UnsupportedOperationException("HEXADECIMAL");
+                    throw new UnsupportedOperationException(CommonResourceBundle.getInstance().getString("message.HEXADECIMAL"));
                 case EncodingAlgorithmIndexes.BASE64:
                     length = ((byte[])data).length;
                     break;
@@ -736,7 +736,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                     length = ((int[])data).length;
                     break;
                 case EncodingAlgorithmIndexes.BOOLEAN:
-                    throw new UnsupportedOperationException("BOOLEAN");
+                    throw new UnsupportedOperationException(CommonResourceBundle.getInstance().getString("message.BOOLEAN"));
                 case EncodingAlgorithmIndexes.FLOAT:
                     length = ((float[])data).length;
                     break;
@@ -747,9 +747,9 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                     length = ((int[])data).length;
                     break;
                 case EncodingAlgorithmIndexes.CDATA:
-                    throw new UnsupportedOperationException("CDATA");
+                    throw new UnsupportedOperationException(CommonResourceBundle.getInstance().getString("message.CDATA"));
                 default:
-                    throw new EncodingAlgorithmException("Unsupported built-in encoding algorithm: " + id);
+                    throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.UnsupportedBuiltInAlgorithm", new Object[]{new Integer(id)}));
             }
             encodeCIIBuiltInAlgorithmData(id, data, 0, length);
         } else if (id >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
@@ -757,10 +757,10 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                 byte[] d = (byte[])data;
                 encodeCIIOctetAlgorithmData(id, d, 0, d.length);
             } else {
-                throw new EncodingAlgorithmException("Null encoding algorithm URI present with data that is not byte[]");
+                throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.nullEncodingAlgorithmURI"));
             }
         } else {
-            throw new EncodingAlgorithmException("Encoding algorithm identifiers 10 up to and including 31 are reserved for future use");
+            throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.identifiers10to31Reserved"));
         }
     }
 
@@ -768,7 +768,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         if (URI != null) {
             id = _v.encodingAlgorithm.get(URI);
             if (id == KeyIntMap.NOT_PRESENT) {
-                throw new EncodingAlgorithmException("Encoding algorithm URI '" + URI + "' not a member of the encoding algorithm table");
+                throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.EncodingAlgorithmURI", new Object[]{URI}));
             }
             id += EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START;
         }
@@ -947,7 +947,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         for (int i = 0; i < octetPairLength; i++) {
             v = (table[ch[start++]] << 4) | table[ch[start++]];
             if (v < 0) {
-                throw new FastInfosetException("Character(s) not in restricted alphabet range");
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.characterOutofAlphabetRange"));
             }
             _octetBuffer[_octetBufferIndex++] = (byte)v;
         }
@@ -955,7 +955,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         if (octetSingleLength == 1) {
             v = (table[ch[start]] << 4) | 0x0F;
             if (v < 0) {
-                throw new FastInfosetException("Character(s) not in restricted alphabet range");
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.characterOutofAlphabetRange"));
             }
             _octetBuffer[_octetBufferIndex++] = (byte)v;
         }        
@@ -991,7 +991,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                 }
             }
             if (v == alphabet.length()) {
-                throw new FastInfosetException("Character(s) not in restricted alphabet range");
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.characterOutofAlphabetRange"));
             }
             writeBits(bitsPerCharacter, v);            
         }        
@@ -1220,7 +1220,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
             write((i >> 8) & 0xFF);
             write(i & 0xFF);
         } else {
-            throw new IOException("Integer > " + EncodingConstants.INTEGER_MAXIMUM_SIZE);
+            throw new IOException(CommonResourceBundle.getInstance().getString("message.integerMaxSize", new Object[]{new Integer(EncodingConstants.INTEGER_MAXIMUM_SIZE)}));
         }
     }
 
