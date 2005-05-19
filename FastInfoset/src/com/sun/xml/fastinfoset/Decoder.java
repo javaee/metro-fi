@@ -518,7 +518,7 @@ public abstract class Decoder implements FastInfosetParser {
 
     protected final QualifiedName decodeEIIIndexLarge() throws FastInfosetException, IOException {
         int i;
-        if ((_b & 0x10) > 0) {
+        if ((_b & EncodingConstants.INTEGER_3RD_BIT_LARGE_LARGE_FLAG) == 0x20) {
             // EII large index
             i = (((_b & EncodingConstants.INTEGER_3RD_BIT_LARGE_MASK) << 16) | (read() << 8) | read())
                 + EncodingConstants.INTEGER_3RD_BIT_MEDIUM_LIMIT;

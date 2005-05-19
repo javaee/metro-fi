@@ -1374,7 +1374,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
 
     protected final QualifiedName processEIIIndexLarge(int b) throws FastInfosetException, IOException {
         int i;
-        if ((b & 0x10) > 0) {
+        if ((b & EncodingConstants.INTEGER_3RD_BIT_LARGE_LARGE_FLAG) == 0x20) {
             // EII large index
             i = (((b & EncodingConstants.INTEGER_3RD_BIT_LARGE_MASK) << 16) | (read() << 8) | read())
                 + EncodingConstants.INTEGER_3RD_BIT_MEDIUM_LIMIT;
