@@ -49,7 +49,6 @@ import com.sun.xml.fastinfoset.util.StringIntMap;
 import com.sun.xml.fastinfoset.vocab.SerializerVocabulary;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.CoderResult;
 import java.util.HashMap;
 import java.util.Map;
 import org.jvnet.fastinfoset.EncodingAlgorithm;
