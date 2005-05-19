@@ -41,6 +41,7 @@ package com.sun.xml.fastinfoset;
 
 import com.sun.xml.fastinfoset.algorithm.BuiltInEncodingAlgorithm;
 import com.sun.xml.fastinfoset.algorithm.BuiltInEncodingAlgorithmFactory;
+import com.sun.xml.fastinfoset.org.apache.xerces.util.XMLChar;
 import com.sun.xml.fastinfoset.util.CharArrayIntMap;
 import com.sun.xml.fastinfoset.util.KeyIntMap;
 import com.sun.xml.fastinfoset.util.LocalNameQualifiedNamesMap;
@@ -48,6 +49,7 @@ import com.sun.xml.fastinfoset.util.StringIntMap;
 import com.sun.xml.fastinfoset.vocab.SerializerVocabulary;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.CoderResult;
 import java.util.HashMap;
 import java.util.Map;
 import org.jvnet.fastinfoset.EncodingAlgorithm;
@@ -586,7 +588,8 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
             int length = 0;
             switch(id) {
                 case EncodingAlgorithmIndexes.HEXADECIMAL:
-                    throw new UnsupportedOperationException(CommonResourceBundle.getInstance().getString("message.HEXADECIMAL"));
+                    length = ((byte[])data).length;
+                    break;
                 case EncodingAlgorithmIndexes.BASE64:
                     length = ((byte[])data).length;
                     break;
@@ -722,7 +725,8 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
             int length = 0;
             switch(id) {
                 case EncodingAlgorithmIndexes.HEXADECIMAL:
-                    throw new UnsupportedOperationException(CommonResourceBundle.getInstance().getString("message.HEXADECIMAL"));
+                    length = ((byte[])data).length;
+                    break;
                 case EncodingAlgorithmIndexes.BASE64:
                     length = ((byte[])data).length;
                     break;
@@ -736,7 +740,8 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                     length = ((int[])data).length;
                     break;
                 case EncodingAlgorithmIndexes.BOOLEAN:
-                    throw new UnsupportedOperationException(CommonResourceBundle.getInstance().getString("message.BOOLEAN"));
+                    length = ((boolean[])data).length;
+                    break;
                 case EncodingAlgorithmIndexes.FLOAT:
                     length = ((float[])data).length;
                     break;
@@ -1369,44 +1374,73 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     protected int _encodingBufferIndex;
 
     protected final void ensureEncodingBufferSizeForUtf8String(int length) {
-        final int newLength = 3 * length;
+        final int newLength = 4 * length;
         if (_encodingBuffer.length < newLength) {
             _encodingBuffer = new byte[newLength];
         }
     }
-
+    
     protected final int encodeUTF8String(char[] ch, int start, int length) throws IOException {
-        int byteLength = 0;
+        int bpos = 0;
 
         // Make sure buffer is large enough
         ensureEncodingBufferSizeForUtf8String(length);
 
-        final int n = start + length;
-        for (int i = start; i < n; i++) {
-            final int c = (int) ch[i];
-            if (c <= 0x7F) {         // up to 7 bits
-                _encodingBuffer[byteLength++] = (byte) c;
-            }
-            else if (c <= 0x7FF) {   // up to 11 bits
-                _encodingBuffer[byteLength++] =
+        final int end = start + length;
+        int c;
+        while (end != start) {
+            c = ch[start++];
+            if (c < 0x80) {
+                // 1 byte, 7 bits
+                _encodingBuffer[bpos++] = (byte) c;
+            } else if (c < 0x800) {
+                // 2 bytes, 11 bits
+                _encodingBuffer[bpos++] =
                     (byte) (0xC0 | (c >> 6));    // first 5
-                _encodingBuffer[byteLength++] =
+                _encodingBuffer[bpos++] =
                     (byte) (0x80 | (c & 0x3F));  // second 6
+            } else if (c <= '\uFFFF') { 
+                if (!XMLChar.isHighSurrogate(c) && !XMLChar.isLowSurrogate(c)) {
+                    // 3 bytes, 16 bits
+                    _encodingBuffer[bpos++] =
+                        (byte) (0xE0 | (c >> 12));   // first 4
+                    _encodingBuffer[bpos++] =
+                        (byte) (0x80 | ((c >> 6) & 0x3F));  // second 6
+                    _encodingBuffer[bpos++] =
+                        (byte) (0x80 | (c & 0x3F));  // third 6
+                } else {
+                    // 4 bytes, high and low surrogate
+                    encodeCharacterAsUtf8FourByte(c, ch, start, end, bpos);
+                    bpos += 4;
+                    start++;
+                }
             }
-            else {                   // up to 16 bits
-                _encodingBuffer[byteLength++] =
-                    (byte) (0xE0 | (c >> 12));   // first 4
-                _encodingBuffer[byteLength++] =
-                    (byte) (0x80 | ((c >> 6) & 0x3F));  // second 6
-                _encodingBuffer[byteLength++] =
-                    (byte) (0x80 | (c & 0x3F));  // third 6
-            }
-            // TODO High and low surrogates
         }
 
-        return byteLength;
+        return bpos;
     }
+    
+    protected final void encodeCharacterAsUtf8FourByte(int c, char[] ch, int chpos, int chend, int bpos) throws IOException {
+        if (chpos == chend) {
+            throw new IOException("");
+        }
+        
+        final char d = ch[chpos];
+        if (!XMLChar.isLowSurrogate(d)) {
+            throw new IOException("");
+        }
+        
+        final int uc = (((c & 0x3ff) << 10) | (d & 0x3ff)) + 0x10000;
+        if (uc < 0 || uc >= 0x200000) {
+            throw new IOException("");
+        }
 
+        _encodingBuffer[bpos++] = (byte)(0xF0 | ((uc >> 18)));
+        _encodingBuffer[bpos++] = (byte)(0x80 | ((uc >> 12) & 0x3F));
+        _encodingBuffer[bpos++] = (byte)(0x80 | ((uc >> 6) & 0x3F));
+        _encodingBuffer[bpos++] = (byte)(0x80 | (uc & 0x3F));
+    }
+        
     protected final void ensureEncodingBufferSizeForUtf16String(int length) {
         final int newLength = 2 * length;
         if (_encodingBuffer.length < newLength) {

@@ -242,10 +242,6 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
     // LexicalHandler
 
     public final void comment(char[] ch, int start, int length) throws SAXException {
-        if (length <= 0) {
-            return;
-        }
-
         try {
             encodeTermination();
 
