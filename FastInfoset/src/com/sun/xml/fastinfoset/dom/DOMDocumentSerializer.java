@@ -76,8 +76,6 @@ public class DOMDocumentSerializer extends Encoder {
         
         final NodeList nl = d.getChildNodes();
         for (int i = 0; i < nl.getLength(); i++) {
-            encodeTermination();
-            
             final Node n = nl.item(i);
             switch (n.getNodeType()) {
                 case Node.ELEMENT_NODE:
@@ -95,6 +93,7 @@ public class DOMDocumentSerializer extends Encoder {
     }
 
     protected final void serializeElementAsDocument(Node e) throws IOException {
+        reset();
         encodeHeader(false);
         encodeInitialVocabulary();
 
@@ -108,6 +107,8 @@ public class DOMDocumentSerializer extends Encoder {
     protected Node[] _attributes = new Node[32];
     
     protected final void serializeElement(Node e) throws IOException {
+        encodeTermination();
+        
         int namespaceAttributesSize = 0;
         int attributesSize = 0;
         if (e.hasAttributes()) {
@@ -193,19 +194,15 @@ public class DOMDocumentSerializer extends Encoder {
                 final Node n = nl.item(i);                
                 switch (n.getNodeType()) {
                     case Node.ELEMENT_NODE:
-                        encodeTermination();
                         serializeElement(n);
                         break;
                     case Node.TEXT_NODE:
-                        encodeTermination();
                         serializeText(n);
                         break;
                     case Node.COMMENT_NODE:
-                        encodeTermination();
                         serializeComment(n);
                         break;
                     case Node.PROCESSING_INSTRUCTION_NODE:
-                        encodeTermination();
                         serializeProcessingInstruction(n);
                         break;
                 }
@@ -217,24 +214,28 @@ public class DOMDocumentSerializer extends Encoder {
     protected final void serializeText(Node t) throws IOException {
         final String text = t.getNodeValue();
         
-        final int length = text.length();
+        final int length = (text != null) ? text.length() : 0;
         if (length == 0) {
             return;
         } else if (length < _charBuffer.length) {
+            encodeTermination();
             text.getChars(0, length, _charBuffer, 0);
             encodeCharacters(_charBuffer, 0, length);
         } else {
+            encodeTermination();
             final char ch[] = text.toCharArray();
             encodeCharactersNoClone(ch, 0, length);
         }
     }
 
     protected final void serializeComment(Node c) throws IOException {
+        encodeTermination();
+        
         final String comment = c.getNodeValue();
         
-        final int length = comment.length();
-        if (length == 0) {
-            return;
+        final int length = (comment != null) ? comment.length() : 0;
+        if (length == 0) {            
+            encodeComment(_charBuffer, 0, 0);
         } else if (length < _charBuffer.length) {
             comment.getChars(0, length, _charBuffer, 0);
             encodeComment(_charBuffer, 0, length);
@@ -245,6 +246,8 @@ public class DOMDocumentSerializer extends Encoder {
     }
     
     protected final void serializeProcessingInstruction(Node pi) throws IOException {
+        encodeTermination();
+        
         final String target = pi.getNodeName();
         final String data = pi.getNodeValue();
         encodeProcessingInstruction(target, data);
