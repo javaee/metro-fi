@@ -190,20 +190,22 @@ public class DOMDocumentSerializer extends Encoder {
             // Serialize the children
             final NodeList nl = e.getChildNodes();
             for (int i = 0; i < nl.getLength(); i++) {
-                encodeTermination();
-    
                 final Node n = nl.item(i);                
                 switch (n.getNodeType()) {
                     case Node.ELEMENT_NODE:
+                        encodeTermination();
                         serializeElement(n);
                         break;
                     case Node.TEXT_NODE:
+                        encodeTermination();
                         serializeText(n);
                         break;
                     case Node.COMMENT_NODE:
+                        encodeTermination();
                         serializeComment(n);
                         break;
                     case Node.PROCESSING_INSTRUCTION_NODE:
+                        encodeTermination();
                         serializeProcessingInstruction(n);
                         break;
                 }
