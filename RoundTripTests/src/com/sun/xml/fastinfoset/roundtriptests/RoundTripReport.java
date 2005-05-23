@@ -16,11 +16,12 @@ import java.io.OutputStreamWriter;
  * @author hw123265
  */
 public class RoundTripReport {
-    static final int INDEX_TYPE = 0;
-    static final int INDEX_PATH = 1;
-    static final int INDEX_TESTCASE = 2;
-    static final int INDEX_TESTNAME = 3;  //e.g. saxroundtrip
-    static final int INDEX_RESULT = 4;
+    static final int INDEX_HOME = 0;    //e.g. /projects/RountTripTests
+    static final int INDEX_REPORTPATH = 1;    //e.g.   report/report.html
+    static final int INDEX_TESTCASE = 2;    //e.g 011.xml
+    static final int INDEX_TESTCASEPATH = 3;  //e.g. /projects/RountTripTests/data/xmlconf/xmltest
+    static final int INDEX_TESTNAME = 4;  //e.g. saxroundtrip
+    static final int INDEX_RESULT = 5;
     static final String COUNT_DEFAULT = "N/A";
     static final String COUNT_SAXPASSED = "<!--saxroundtrip_passed-->";
     static final String COUNT_SAXFAILED = "<!--saxroundtrip_failed-->";
@@ -50,8 +51,8 @@ public class RoundTripReport {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        if(args.length != 5) {
-            displayUsageAndExit();
+        if(args.length != 6) {
+            displayUsageAndExit(args);
         }
         new RoundTripReport().report(args);
             
@@ -59,7 +60,8 @@ public class RoundTripReport {
     }
     public void report(String[] args) {
         try {
-            String filename = args[INDEX_PATH];    
+            //String filename = args[INDEX_REPORTPATH];    
+            String filename = args[INDEX_HOME]+"/data/report.html"; 
             String content = reportContent(args);
             OutputStreamWriter osr = new OutputStreamWriter(
                 new FileOutputStream(
@@ -71,7 +73,7 @@ public class RoundTripReport {
         }        
     }
     public String reportContent(String[] args) {
-        File file = new File(args[INDEX_PATH]);
+        File file = new File(args[INDEX_REPORTPATH]);
         StringBuffer content = new StringBuffer();
         if (file.exists()) {
             content.append(readFromFile(file));
@@ -91,8 +93,7 @@ public class RoundTripReport {
         String newrow = null;
         if (args[INDEX_RESULT].equals(RESULT_FAILED)) {
             if (testcaseStart < 0) {
-    //            newrow = "<tr><td><a href="+args[INDEX_TYPE]+"/"+args[INDEX_TESTCASE]+">"+
-                newrow = "<tr><td><a href="+args[INDEX_TESTCASE]+">"+
+                newrow = "<tr><td><a href="+args[INDEX_TESTCASEPATH].substring(args[INDEX_HOME].length()+1)+"/"+args[INDEX_TESTCASE]+">"+
                         args[INDEX_TESTCASE]+"</a></td>\n"+
                         "<td><!--"+TEST_SAX+"--></td>\n"+
                         "<td><!--"+TEST_STAX+"--></td>\n"+
@@ -190,9 +191,15 @@ public class RoundTripReport {
         template.append("</body>\n</html>");
         return template.toString();
     }
-    private static void displayUsageAndExit() {
-        System.err.println("Usage: RoundTripReport TYPE reportPath testcase_filename testname testresult");
-        System.err.println("Example: RoundTripReport valid /projects/fws/FITest/report.html 011.xml saxroundtrip failed");
+
+    private static void displayUsageAndExit(String[] args) {
+        System.err.println("Usage: RoundTripReport HOME reportPath testcase_filename testcase_path testname testresult");
+        System.err.println("Your input:");
+        System.err.println("Number of arguments: "+args.length);
+        for(int i=0; i<args.length; i++) {
+            System.err.println("args["+i+"]="+args[i]);
+        }
+        System.err.println("Example: RoundTripReport /projects/fi/RoundTripTests report/report.html 011.xml /projects/fi/RoundTripTests/xmltest/valid saxroundtrip failed");
         System.exit(1);        
     }
     

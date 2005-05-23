@@ -28,7 +28,7 @@ handle_file() {
     ext=${file##*.}
     if [ $ext = "xml" ]; then
         #echo $file is an xml file
-        $cmd $file
+        $cmd $file $(pwd)
     #else
         #echo $file is not an xml file
     fi
