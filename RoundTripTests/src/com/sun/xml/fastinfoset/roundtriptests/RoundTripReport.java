@@ -62,7 +62,7 @@ public class RoundTripReport {
         try {
             //String filename = args[INDEX_REPORTPATH];    
             String filename = args[INDEX_HOME]+"/data/report.html"; 
-            String content = reportContent(args);
+            String content = reportContent(filename, args);
             OutputStreamWriter osr = new OutputStreamWriter(
                 new FileOutputStream(
                     new File(filename)));
@@ -72,8 +72,8 @@ public class RoundTripReport {
             e.printStackTrace();
         }        
     }
-    public String reportContent(String[] args) {
-        File file = new File(args[INDEX_REPORTPATH]);
+    public String reportContent(String filename, String[] args) {
+        File file = new File(filename);
         StringBuffer content = new StringBuffer();
         if (file.exists()) {
             content.append(readFromFile(file));
