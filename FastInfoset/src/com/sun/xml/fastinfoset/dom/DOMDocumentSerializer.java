@@ -43,6 +43,7 @@ import com.sun.xml.fastinfoset.EncodingConstants;
 import com.sun.xml.fastinfoset.QualifiedName;
 import com.sun.xml.fastinfoset.util.LocalNameQualifiedNamesMap;
 import java.io.IOException;
+import org.jvnet.fastinfoset.FastInfosetException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -199,6 +200,9 @@ public class DOMDocumentSerializer extends Encoder {
                     case Node.TEXT_NODE:
                         serializeText(n);
                         break;
+                    case Node.CDATA_SECTION_NODE:
+                        serializeCDATA(n);
+                        break;
                     case Node.COMMENT_NODE:
                         serializeComment(n);
                         break;
@@ -228,6 +232,23 @@ public class DOMDocumentSerializer extends Encoder {
         }
     }
 
+    protected final void serializeCDATA(Node t) throws IOException {
+        final String text = t.getNodeValue();
+        
+        final int length = (text != null) ? text.length() : 0;
+        if (length == 0) {
+            return;
+        } else {
+            encodeTermination();
+            final char ch[] = text.toCharArray();
+            try {
+                encodeCIIBuiltInAlgorithmDataAsCDATA(ch, 0, length);
+            } catch (FastInfosetException e) {
+                throw new IOException("");
+            }
+        }    
+    }
+    
     protected final void serializeComment(Node c) throws IOException {
         encodeTermination();
         
