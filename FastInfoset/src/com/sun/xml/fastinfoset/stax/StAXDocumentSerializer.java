@@ -379,10 +379,6 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
     
     public void writeComment(String data) throws XMLStreamException {
         try {
-            if (data.length() == 0) {
-                return;
-            }
-
             encodeTerminationAndCurrentElement(true);
 
             // TODO: avoid array copy here
