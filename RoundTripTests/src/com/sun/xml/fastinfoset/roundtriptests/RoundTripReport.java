@@ -16,8 +16,8 @@ import java.io.OutputStreamWriter;
  * @author hw123265
  */
 public class RoundTripReport {
-    static final int INDEX_HOME = 0;    //e.g. /projects/RountTripTests
-    static final int INDEX_REPORTPATH = 1;    //e.g.   report/report.html
+    static final int INDEX_HOME = 0;    //e.g. /projects/RountTripTests/data
+    static final int INDEX_REPORT = 1;    //e.g.   report/report.html
     static final int INDEX_TESTCASE = 2;    //e.g 011.xml
     static final int INDEX_TESTCASEPATH = 3;  //e.g. /projects/RountTripTests/data/xmlconf/xmltest
     static final int INDEX_TESTNAME = 4;  //e.g. saxroundtrip
@@ -60,8 +60,8 @@ public class RoundTripReport {
     }
     public void report(String[] args) {
         try {
-            //String filename = args[INDEX_REPORTPATH];    
-            String filename = args[INDEX_HOME]+"/data/report.html"; 
+            //String filename = args[INDEX_REPORT];    
+            String filename = args[INDEX_HOME]+"/"+args[INDEX_REPORT]; 
             String content = reportContent(filename, args);
             OutputStreamWriter osr = new OutputStreamWriter(
                 new FileOutputStream(
@@ -193,13 +193,13 @@ public class RoundTripReport {
     }
 
     private static void displayUsageAndExit(String[] args) {
-        System.err.println("Usage: RoundTripReport HOME reportPath testcase_filename testcase_path testname testresult");
+        System.err.println("Usage: RoundTripReport TS_HOME reportPath testcase_filename testcase_path testname testresult");
         System.err.println("Your input:");
         System.err.println("Number of arguments: "+args.length);
         for(int i=0; i<args.length; i++) {
             System.err.println("args["+i+"]="+args[i]);
         }
-        System.err.println("Example: RoundTripReport /projects/fi/RoundTripTests report/report.html 011.xml /projects/fi/RoundTripTests/xmltest/valid saxroundtrip failed");
+        System.err.println("Example: RoundTripReport /projects/fi/RoundTripTests/data xmlts_report.html 011.xml /projects/fi/RoundTripTests/xmltest/valid saxroundtrip failed");
         System.exit(1);        
     }
     

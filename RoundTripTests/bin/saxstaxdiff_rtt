@@ -5,8 +5,8 @@ xmltosaxtostaxtofi $1 > $1.stax.finf
 diff $1.sax.finf $1.stax.finf > $1.sax.stax.diff
 if [ -s $1.sax.stax.diff ]; then
 	echo : FAILED
-        report ${FIRTT_HOME} ${FIRTT_HOME}/report/report.html $1 $2 saxstaxdiff failed
+        report ${FIRTT_DATA} $3 $1 $2 saxstaxdiff failed
 else
 	echo : PASSED
-        report ${FIRTT_HOME} ${FIRTT_HOME}/report/report.html $1 $2 saxstaxdiff passed
+        report ${FIRTT_DATA} $3 $1 $2 saxstaxdiff passed
 fi

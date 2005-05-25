@@ -1,7 +1,8 @@
 #!/bin/sh
 
-if [ $# != 1 ]; then
-    echo Usage: trountripTest [roundtrip test name]
+if [ $# != 2 ]; then
+    echo Usage: roundtripTest [roundtrip test name] [report name]
+    echo Usage example: roundtripTest saxstaxdiff_rtt xmlts_report.html
     exit
 fi
 
@@ -13,10 +14,10 @@ handle_dir() {
     do
         if [ -d "$file" ]; then
             #echo $file is directory
-            handle_dir "$file" $2
+            handle_dir "$file"
         else
             #echo $file is file
-            handle_file "$file" $2
+            handle_file "$file"
         fi
     done 
     cd ".."
@@ -24,11 +25,10 @@ handle_dir() {
 
 handle_file() {
     file=$1
-    cmd=$2
     ext=${file##*.}
     if [ $ext = "xml" ]; then
         #echo $file is an xml file
-        $cmd $file $(pwd)
+        $cmd $file $(pwd) $reportname
     #else
         #echo $file is not an xml file
     fi
@@ -36,15 +36,16 @@ handle_file() {
 
 
 cmd=$1
+reportname=$2
 
 for file in *
 do
     if [ -d "$file" ]; then
         #echo $file is directory
-        handle_dir "$file" $cmd
+        handle_dir "$file"
     else
         #echo $file is file, perform Xerces test
-        handle_file "$file" $cmd
+        handle_file "$file"
     fi
 done 
 

@@ -6,8 +6,8 @@ saxtodomtosaxevent $1.dom.sax.finf > $1.dom.sax.finf.sax-event
 diff $1.dom.sax-event $1.dom.sax.finf.sax-event > $1.dom.sax.sax-event.diff
 if [ -s $1.dom.sax.sax-event.diff ]; then
 	echo : FAILED, see $1.dom.sax.sax-event.diff
-        report ${FIRTT_HOME} ${FIRTT_HOME}/report/report.html $1 $2 domsaxroundtrip failed
+        report ${FIRTT_DATA} $3 $1 $2 domsaxroundtrip failed
 else
 	echo : PASSED
-        report ${FIRTT_HOME} ${FIRTT_HOME}/report/report.html $1 $2 domsaxroundtrip passed
+        report ${FIRTT_DATA} $3 $1 $2 domsaxroundtrip passed
 fi
