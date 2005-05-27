@@ -1,0 +1,283 @@
+<sax xmlns="http://www.sun.com/xml/sax-events">
+<startDocument/>
+<startPrefixMapping prefix="" uri="urn:oasis:names:tc:entity:xmlns:xml:catalog"/>
+<startElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="catalog" qName="catalog"/>
+<characters>
+
+</characters>
+<comment> ...................................................................... </comment>
+<characters>
+</characters>
+<comment> XML Catalog data for DocBook XML V4.3 ................................ </comment>
+<characters>
+</characters>
+<comment> File catalog.xml ..................................................... </comment>
+<characters>
+
+</characters>
+<comment> Please direct all questions, bug reports, or suggestions for
+     changes to the docbook@lists.oasis-open.org mailing list. For more
+     information, see http://www.oasis-open.org/.
+  </comment>
+<characters>
+
+</characters>
+<comment> This is the catalog data file for DocBook V4.3. It is provided as
+     a convenience in building your own catalog files. You need not use
+     the filenames listed here, and need not use the filename method of
+     identifying storage objects at all.  See the documentation for
+     detailed information on the files associated with the DocBook DTD.
+     See XML Catalogs at http://www.oasis-open.org/committees/entity/ for
+     detailed information on supplying and using catalog data.
+  </comment>
+<characters>
+
+</characters>
+<comment> ...................................................................... </comment>
+<characters>
+</characters>
+<comment> DocBook driver file .................................................. </comment>
+<characters>
+
+</characters>
+<startElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public">
+  <attribute qName="publicId" localName="publicId" uri="" value="-//OASIS//DTD DocBook XML V4.3//EN"/>
+  <attribute qName="uri" localName="uri" uri="" value="docbookx.dtd"/>
+</startElement>
+<endElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public"/>
+<characters>
+
+</characters>
+<comment> ...................................................................... </comment>
+<characters>
+</characters>
+<comment> DocBook modules ...................................................... </comment>
+<characters>
+
+</characters>
+<startElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public">
+  <attribute qName="publicId" localName="publicId" uri="" value="-//OASIS//DTD DocBook CALS Table Model V4.3//EN"/>
+  <attribute qName="uri" localName="uri" uri="" value="calstblx.dtd"/>
+</startElement>
+<endElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public"/>
+<characters>
+
+</characters>
+<startElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public">
+  <attribute qName="publicId" localName="publicId" uri="" value="-//OASIS//DTD XML Exchange Table Model 19990315//EN"/>
+  <attribute qName="uri" localName="uri" uri="" value="soextblx.dtd"/>
+</startElement>
+<endElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public"/>
+<characters>
+
+</characters>
+<startElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public">
+  <attribute qName="publicId" localName="publicId" uri="" value="-//OASIS//ELEMENTS DocBook Information Pool V4.3//EN"/>
+  <attribute qName="uri" localName="uri" uri="" value="dbpoolx.mod"/>
+</startElement>
+<endElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public"/>
+<characters>
+
+</characters>
+<startElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public">
+  <attribute qName="publicId" localName="publicId" uri="" value="-//OASIS//ELEMENTS DocBook Document Hierarchy V4.3//EN"/>
+  <attribute qName="uri" localName="uri" uri="" value="dbhierx.mod"/>
+</startElement>
+<endElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public"/>
+<characters>
+
+</characters>
+<startElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public">
+  <attribute qName="publicId" localName="publicId" uri="" value="-//OASIS//ENTITIES DocBook Additional General Entities V4.3//EN"/>
+  <attribute qName="uri" localName="uri" uri="" value="dbgenent.mod"/>
+</startElement>
+<endElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public"/>
+<characters>
+
+</characters>
+<startElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public">
+  <attribute qName="publicId" localName="publicId" uri="" value="-//OASIS//ENTITIES DocBook Notations V4.3//EN"/>
+  <attribute qName="uri" localName="uri" uri="" value="dbnotnx.mod"/>
+</startElement>
+<endElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public"/>
+<characters>
+
+</characters>
+<startElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public">
+  <attribute qName="publicId" localName="publicId" uri="" value="-//OASIS//ENTITIES DocBook Character Entities V4.3//EN"/>
+  <attribute qName="uri" localName="uri" uri="" value="dbcentx.mod"/>
+</startElement>
+<endElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public"/>
+<characters>
+
+</characters>
+<comment> ...................................................................... </comment>
+<characters>
+</characters>
+<comment> ISO entity sets ...................................................... </comment>
+<characters>
+
+</characters>
+<startElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public">
+  <attribute qName="publicId" localName="publicId" uri="" value="ISO 8879:1986//ENTITIES Diacritical Marks//EN//XML"/>
+  <attribute qName="uri" localName="uri" uri="" value="ent/iso-dia.ent"/>
+</startElement>
+<endElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public"/>
+<characters>
+
+</characters>
+<startElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public">
+  <attribute qName="publicId" localName="publicId" uri="" value="ISO 8879:1986//ENTITIES Numeric and Special Graphic//EN//XML"/>
+  <attribute qName="uri" localName="uri" uri="" value="ent/iso-num.ent"/>
+</startElement>
+<endElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public"/>
+<characters>
+
+</characters>
+<startElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public">
+  <attribute qName="publicId" localName="publicId" uri="" value="ISO 8879:1986//ENTITIES Publishing//EN//XML"/>
+  <attribute qName="uri" localName="uri" uri="" value="ent/iso-pub.ent"/>
+</startElement>
+<endElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public"/>
+<characters>
+
+</characters>
+<startElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public">
+  <attribute qName="publicId" localName="publicId" uri="" value="ISO 8879:1986//ENTITIES General Technical//EN//XML"/>
+  <attribute qName="uri" localName="uri" uri="" value="ent/iso-tech.ent"/>
+</startElement>
+<endElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public"/>
+<characters>
+
+</characters>
+<startElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public">
+  <attribute qName="publicId" localName="publicId" uri="" value="ISO 8879:1986//ENTITIES Added Latin 1//EN//XML"/>
+  <attribute qName="uri" localName="uri" uri="" value="ent/iso-lat1.ent"/>
+</startElement>
+<endElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public"/>
+<characters>
+
+</characters>
+<startElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public">
+  <attribute qName="publicId" localName="publicId" uri="" value="ISO 8879:1986//ENTITIES Added Latin 2//EN//XML"/>
+  <attribute qName="uri" localName="uri" uri="" value="ent/iso-lat2.ent"/>
+</startElement>
+<endElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public"/>
+<characters>
+
+</characters>
+<startElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public">
+  <attribute qName="publicId" localName="publicId" uri="" value="ISO 8879:1986//ENTITIES Greek Letters//EN//XML"/>
+  <attribute qName="uri" localName="uri" uri="" value="ent/iso-grk1.ent"/>
+</startElement>
+<endElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public"/>
+<characters>
+
+</characters>
+<startElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public">
+  <attribute qName="publicId" localName="publicId" uri="" value="ISO 8879:1986//ENTITIES Monotoniko Greek//EN//XML"/>
+  <attribute qName="uri" localName="uri" uri="" value="ent/iso-grk2.ent"/>
+</startElement>
+<endElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public"/>
+<characters>
+
+</characters>
+<startElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public">
+  <attribute qName="publicId" localName="publicId" uri="" value="ISO 8879:1986//ENTITIES Greek Symbols//EN//XML"/>
+  <attribute qName="uri" localName="uri" uri="" value="ent/iso-grk3.ent"/>
+</startElement>
+<endElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public"/>
+<characters>
+
+</characters>
+<startElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public">
+  <attribute qName="publicId" localName="publicId" uri="" value="ISO 8879:1986//ENTITIES Alternative Greek Symbols//EN//XML"/>
+  <attribute qName="uri" localName="uri" uri="" value="ent/iso-grk4.ent"/>
+</startElement>
+<endElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public"/>
+<characters>
+
+</characters>
+<startElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public">
+  <attribute qName="publicId" localName="publicId" uri="" value="ISO 8879:1986//ENTITIES Added Math Symbols: Arrow Relations//EN//XML"/>
+  <attribute qName="uri" localName="uri" uri="" value="ent/iso-amsa.ent"/>
+</startElement>
+<endElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public"/>
+<characters>
+
+</characters>
+<startElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public">
+  <attribute qName="publicId" localName="publicId" uri="" value="ISO 8879:1986//ENTITIES Added Math Symbols: Binary Operators//EN//XML"/>
+  <attribute qName="uri" localName="uri" uri="" value="ent/iso-amsb.ent"/>
+</startElement>
+<endElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public"/>
+<characters>
+
+</characters>
+<startElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public">
+  <attribute qName="publicId" localName="publicId" uri="" value="ISO 8879:1986//ENTITIES Added Math Symbols: Delimiters//EN//XML"/>
+  <attribute qName="uri" localName="uri" uri="" value="ent/iso-amsc.ent"/>
+</startElement>
+<endElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public"/>
+<characters>
+
+</characters>
+<startElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public">
+  <attribute qName="publicId" localName="publicId" uri="" value="ISO 8879:1986//ENTITIES Added Math Symbols: Negated Relations//EN//XML"/>
+  <attribute qName="uri" localName="uri" uri="" value="ent/iso-amsn.ent"/>
+</startElement>
+<endElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public"/>
+<characters>
+
+</characters>
+<startElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public">
+  <attribute qName="publicId" localName="publicId" uri="" value="ISO 8879:1986//ENTITIES Added Math Symbols: Ordinary//EN//XML"/>
+  <attribute qName="uri" localName="uri" uri="" value="ent/iso-amso.ent"/>
+</startElement>
+<endElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public"/>
+<characters>
+
+</characters>
+<startElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public">
+  <attribute qName="publicId" localName="publicId" uri="" value="ISO 8879:1986//ENTITIES Added Math Symbols: Relations//EN//XML"/>
+  <attribute qName="uri" localName="uri" uri="" value="ent/iso-amsr.ent"/>
+</startElement>
+<endElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public"/>
+<characters>
+
+</characters>
+<startElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public">
+  <attribute qName="publicId" localName="publicId" uri="" value="ISO 8879:1986//ENTITIES Box and Line Drawing//EN//XML"/>
+  <attribute qName="uri" localName="uri" uri="" value="ent/iso-box.ent"/>
+</startElement>
+<endElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public"/>
+<characters>
+
+</characters>
+<startElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public">
+  <attribute qName="publicId" localName="publicId" uri="" value="ISO 8879:1986//ENTITIES Russian Cyrillic//EN//XML"/>
+  <attribute qName="uri" localName="uri" uri="" value="ent/iso-cyr1.ent"/>
+</startElement>
+<endElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public"/>
+<characters>
+
+</characters>
+<startElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public">
+  <attribute qName="publicId" localName="publicId" uri="" value="ISO 8879:1986//ENTITIES Non-Russian Cyrillic//EN//XML"/>
+  <attribute qName="uri" localName="uri" uri="" value="ent/iso-cyr2.ent"/>
+</startElement>
+<endElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="public" qName="public"/>
+<characters>
+
+</characters>
+<comment> End of catalog data for DocBook XML V4.3 ............................. </comment>
+<characters>
+</characters>
+<comment> ...................................................................... </comment>
+<characters>
+
+</characters>
+<endElement uri="urn:oasis:names:tc:entity:xmlns:xml:catalog" localName="catalog" qName="catalog"/>
+<endPrefixMapping prefix=""/>
+<endDocument/>
+</sax>

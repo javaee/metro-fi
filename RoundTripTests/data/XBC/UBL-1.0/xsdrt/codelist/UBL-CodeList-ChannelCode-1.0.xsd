@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Universal Business Language (UBL) Schema 1.0
+
+  Copyright (C) OASIS Open (2004). All Rights Reserved.
+
+  This document and translations of it may be copied and furnished to others, and
+  derivative works that comment on or otherwise explain it or assist in its
+  implementation may be prepared, copied, published and distributed, in whole or
+  in part, without restriction of any kind, provided that the above copyright
+  notice and this paragraph are included on all such copies and derivative works.
+  However, this document itself may not be modified in any way, such as by
+  removing the copyright notice or references to OASIS, except as needed for the
+  purpose of developing OASIS specifications, in which case the procedures for
+  copyrights defined in the OASIS Intellectual Property Rights document must be
+  followed, or as required to translate it into languages other than English.
+
+  The limited permissions granted above are perpetual and will not be revoked by
+  OASIS or its successors or assigns.
+
+  This document and the information contained herein is provided on an "AS IS"
+  basis and OASIS DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+  LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT
+  INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR
+  A PARTICULAR PURPOSE.
+
+  ===============================================================================
+
+  For our absent friend, Michael J. Adcock  - il miglior fabbro
+
+  ===============================================================================
+
+  Universal Business Language Specification
+      (http://www.oasis-open.org/committees/tc_home.php?wg_abbrev=ubl)
+  OASIS Open (http://www.oasis-open.org/)
+
+
+  Document Type:     ChannelCode
+  Generated On:      Mon Aug 16 15:12:35 2004
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns="urn:oasis:names:specification:ubl:schema:xsd:ChannelCode-1.0"
+    xmlns:ccts="urn:oasis:names:specification:ubl:schema:xsd:CoreComponentParameters-1.0"
+    targetNamespace="urn:oasis:names:specification:ubl:schema:xsd:ChannelCode-1.0"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified"
+    version="1.0">
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:CoreComponentParameters-1.0" schemaLocation="../common/UBL-CoreComponentParameters-1.0.xsd"/>
+  <xsd:simpleType name="ChannelCodeContentType">
+    <xsd:restriction base="xsd:normalizedString">
+      <xsd:enumeration value="AA"/>
+      <xsd:enumeration value="AB"/>
+      <xsd:enumeration value="AC"/>
+      <xsd:enumeration value="AD"/>
+      <xsd:enumeration value="AE"/>
+      <xsd:enumeration value="AF"/>
+      <xsd:enumeration value="AG"/>
+      <xsd:enumeration value="AH"/>
+      <xsd:enumeration value="AI"/>
+      <xsd:enumeration value="AJ"/>
+      <xsd:enumeration value="AK"/>
+      <xsd:enumeration value="AL"/>
+      <xsd:enumeration value="AM"/>
+      <xsd:enumeration value="AN"/>
+      <xsd:enumeration value="AO"/>
+      <xsd:enumeration value="AP"/>
+      <xsd:enumeration value="CA"/>
+      <xsd:enumeration value="EI"/>
+      <xsd:enumeration value="EM"/>
+      <xsd:enumeration value="EX"/>
+      <xsd:enumeration value="FT"/>
+      <xsd:enumeration value="FX"/>
+      <xsd:enumeration value="GM"/>
+      <xsd:enumeration value="IE"/>
+      <xsd:enumeration value="IM"/>
+      <xsd:enumeration value="MA"/>
+      <xsd:enumeration value="PB"/>
+      <xsd:enumeration value="PS"/>
+      <xsd:enumeration value="SW"/>
+      <xsd:enumeration value="TE"/>
+      <xsd:enumeration value="TG"/>
+      <xsd:enumeration value="TL"/>
+      <xsd:enumeration value="TM"/>
+      <xsd:enumeration value="TT"/>
+      <xsd:enumeration value="TX"/>
+      <xsd:enumeration value="XF"/>
+      <xsd:enumeration value="XG"/>
+      <xsd:enumeration value="XH"/>
+      <xsd:enumeration value="XI"/>
+      <xsd:enumeration value="XJ"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:complexType name="ChannelCodeType">
+    <xsd:simpleContent>
+      <xsd:extension base="ChannelCodeContentType">
+        <xsd:attribute name="codeListID" type="xsd:normalizedString" fixed="UN/ECE 3155" use="optional"/>
+        <xsd:attribute name="codeListAgencyID" type="xsd:normalizedString" fixed="6" use="optional"/>
+        <xsd:attribute name="codeListAgencyName" type="xsd:string" fixed="United Nations Economic Commission for Europe" use="optional"/>
+        <xsd:attribute name="codeListName" type="xsd:string" fixed="Communication Address Code Qualifier" use="optional"/>
+        <xsd:attribute name="codeListVersionID" type="xsd:normalizedString" fixed="D03A" use="optional"/>
+        <xsd:attribute name="name" type="xsd:string" use="optional"/>
+        <xsd:attribute name="languageID" type="xsd:language" use="optional"/>
+        <xsd:attribute name="codeListURI" type="xsd:anyURI" fixed="http://www.unece.org/trade/untdid/d03a/tred/tred3155.htm" use="optional"/>
+        <xsd:attribute name="codeListSchemeURI" type="xsd:anyURI" fixed="urn:oasis:names:specification:ubl:schema:xsd:ChannelCode-1.0" use="optional"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,108 @@
+<sax xmlns="http://www.sun.com/xml/sax-events">
+<startDocument/>
+<startPrefixMapping prefix="" uri="urn:oasis:names:specification:ubl:schema:xsd:OrderCancellation-1.0"/>
+<startPrefixMapping prefix="cac" uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0"/>
+<startPrefixMapping prefix="cbc" uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0"/>
+<startPrefixMapping prefix="stat" uri="urn:oasis:names:specification:ubl:schema:xsd:DocumentStatusCode-1.0"/>
+<startPrefixMapping prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:OrderCancellation-1.0" localName="OrderCancellation" qName="OrderCancellation">
+  <attribute qName="xsi:schemaLocation" localName="schemaLocation" uri="http://www.w3.org/2001/XMLSchema-instance" value="urn:oasis:names:specification:ubl:schema:xsd:OrderCancellation-1.0 ../../xsd/maindoc/UBL-OrderCancellation-1.0.xsd"/>
+</startElement>
+<characters>
+	</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:OrderCancellation-1.0" localName="ID" qName="ID"/>
+<characters>20031654-X</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:OrderCancellation-1.0" localName="ID" qName="ID"/>
+<characters>
+	</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:OrderCancellation-1.0" localName="IssueDateTime" qName="IssueDateTime"/>
+<characters>2003-03-09T09:30:47</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:OrderCancellation-1.0" localName="IssueDateTime" qName="IssueDateTime"/>
+<characters>
+	</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:OrderCancellation-1.0" localName="CancellationNote" qName="CancellationNote"/>
+<characters>order replaced</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:OrderCancellation-1.0" localName="CancellationNote" qName="CancellationNote"/>
+<characters>
+	</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="OrderReference" qName="cac:OrderReference"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BuyersID" qName="cac:BuyersID"/>
+<characters>20031654-1</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BuyersID" qName="cac:BuyersID"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="IssueDate" qName="cbc:IssueDate"/>
+<characters>2003-03-07</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="IssueDate" qName="cbc:IssueDate"/>
+<characters>
+	</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="OrderReference" qName="cac:OrderReference"/>
+<characters>
+	</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BuyerParty" qName="cac:BuyerParty"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="Party" qName="cac:Party"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PartyName" qName="cac:PartyName"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Name" qName="cbc:Name"/>
+<characters>Bills Microdevices</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Name" qName="cbc:Name"/>
+<characters>
+			</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PartyName" qName="cac:PartyName"/>
+<characters>
+		</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="Party" qName="cac:Party"/>
+<characters>
+	</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BuyerParty" qName="cac:BuyerParty"/>
+<characters>
+	</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="SellerParty" qName="cac:SellerParty"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="Party" qName="cac:Party"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PartyName" qName="cac:PartyName"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Name" qName="cbc:Name"/>
+<characters>Joes Office Supply</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Name" qName="cbc:Name"/>
+<characters>
+			</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PartyName" qName="cac:PartyName"/>
+<characters>
+		</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="Party" qName="cac:Party"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="OrderContact" qName="cac:OrderContact"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Name" qName="cbc:Name"/>
+<characters>Betty Jo Beoloski</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Name" qName="cbc:Name"/>
+<characters>
+		</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="OrderContact" qName="cac:OrderContact"/>
+<characters>
+	</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="SellerParty" qName="cac:SellerParty"/>
+<characters>
+</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:OrderCancellation-1.0" localName="OrderCancellation" qName="OrderCancellation"/>
+<endPrefixMapping prefix=""/>
+<endPrefixMapping prefix="cac"/>
+<endPrefixMapping prefix="cbc"/>
+<endPrefixMapping prefix="stat"/>
+<endPrefixMapping prefix="xsi"/>
+<endDocument/>
+</sax>

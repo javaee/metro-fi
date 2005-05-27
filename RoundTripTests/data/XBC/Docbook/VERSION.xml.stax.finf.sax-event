@@ -1,0 +1,732 @@
+<sax xmlns="http://www.sun.com/xml/sax-events">
+<startDocument/>
+<comment> -*- nxml -*- </comment>
+<comment> This file should be changed EVERY TIME a new draft is published! </comment>
+<startPrefixMapping prefix="fm" uri="http://freshmeat.net/projects/freshmeat-submit/"/>
+<startPrefixMapping prefix="sf" uri="http://sourceforge.net/"/>
+<startPrefixMapping prefix="xsl" uri="http://www.w3.org/1999/XSL/Transform"/>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="stylesheet" qName="xsl:stylesheet">
+  <attribute qName="exclude-result-prefixes" localName="exclude-result-prefixes" uri="" value="fm sf"/>
+  <attribute qName="version" localName="version" uri="" value="1.0"/>
+</startElement>
+<characters>
+
+</characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="param" qName="xsl:param">
+  <attribute qName="name" localName="name" uri="" value="freshmeat"/>
+  <attribute qName="select" localName="select" uri="" value="0"/>
+</startElement>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="param" qName="xsl:param"/>
+<characters>
+
+</characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="param" qName="xsl:param">
+  <attribute qName="name" localName="name" uri="" value="VERSION"/>
+  <attribute qName="select" localName="select" uri="" value="string(document('')//fm:Version[1])"/>
+</startElement>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="param" qName="xsl:param"/>
+<characters>
+</characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="strip-space" qName="xsl:strip-space">
+  <attribute qName="elements" localName="elements" uri="" value="fm:*"/>
+</startElement>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="strip-space" qName="xsl:strip-space"/>
+<characters>
+
+</characters>
+<startElement uri="http://freshmeat.net/projects/freshmeat-submit/" localName="project" qName="fm:project"/>
+<characters>
+  </characters>
+<startElement uri="http://freshmeat.net/projects/freshmeat-submit/" localName="Project" qName="fm:Project"/>
+<characters>DocBook</characters>
+<endElement uri="http://freshmeat.net/projects/freshmeat-submit/" localName="Project" qName="fm:Project"/>
+<characters>
+  </characters>
+<startElement uri="http://freshmeat.net/projects/freshmeat-submit/" localName="Branch" qName="fm:Branch"/>
+<characters>The Definitive Guide</characters>
+<endElement uri="http://freshmeat.net/projects/freshmeat-submit/" localName="Branch" qName="fm:Branch"/>
+<characters>
+  </characters>
+<startElement uri="http://freshmeat.net/projects/freshmeat-submit/" localName="Version" qName="fm:Version"/>
+<characters>2.0.10+</characters>
+<endElement uri="http://freshmeat.net/projects/freshmeat-submit/" localName="Version" qName="fm:Version"/>
+<characters>
+  </characters>
+<startElement uri="http://freshmeat.net/projects/freshmeat-submit/" localName="Release-Focus" qName="fm:Release-Focus"/>
+<characters>
+  </characters>
+<comment> Initial freshmeat announcement </comment>
+<characters>
+  Documentation
+  </characters>
+<comment> Code cleanup </comment>
+<characters>
+  </characters>
+<comment> Minor feature enhancements </comment>
+<characters>
+  </characters>
+<comment> Major feature enhancements </comment>
+<characters>
+  </characters>
+<comment> Minor bugfixes </comment>
+<characters>
+  </characters>
+<comment> Major bugfixes </comment>
+<characters>
+  </characters>
+<comment> Minor security fixes </comment>
+<characters>
+  </characters>
+<comment> Major security fixes </comment>
+<characters>
+  </characters>
+<endElement uri="http://freshmeat.net/projects/freshmeat-submit/" localName="Release-Focus" qName="fm:Release-Focus"/>
+<characters>
+  </characters>
+<startElement uri="http://freshmeat.net/projects/freshmeat-submit/" localName="Home-Page-URL" qName="fm:Home-Page-URL"/>
+<characters>http://docbook.org/tdg/en/</characters>
+<endElement uri="http://freshmeat.net/projects/freshmeat-submit/" localName="Home-Page-URL" qName="fm:Home-Page-URL"/>
+<characters>
+  </characters>
+<startElement uri="http://freshmeat.net/projects/freshmeat-submit/" localName="Zipped-Tar-URL" qName="fm:Zipped-Tar-URL"/>
+<characters>http://docbook.org/tdg/en/tdg-en-html-{VERSION}.zip</characters>
+<endElement uri="http://freshmeat.net/projects/freshmeat-submit/" localName="Zipped-Tar-URL" qName="fm:Zipped-Tar-URL"/>
+<characters>
+  </characters>
+<startElement uri="http://freshmeat.net/projects/freshmeat-submit/" localName="Changelog-URL" qName="fm:Changelog-URL"/>
+<characters>http://docbook.org/tdg/en/html/appi.html</characters>
+<endElement uri="http://freshmeat.net/projects/freshmeat-submit/" localName="Changelog-URL" qName="fm:Changelog-URL"/>
+<characters>
+  </characters>
+<startElement uri="http://freshmeat.net/projects/freshmeat-submit/" localName="CVS-URL" qName="fm:CVS-URL"/>
+<characters>http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/docbook/defguide/</characters>
+<endElement uri="http://freshmeat.net/projects/freshmeat-submit/" localName="CVS-URL" qName="fm:CVS-URL"/>
+<characters>
+  </characters>
+<startElement uri="http://freshmeat.net/projects/freshmeat-submit/" localName="Mailing-List-URL" qName="fm:Mailing-List-URL"/>
+<characters>http://lists.oasis-open.org/archives/docbook/</characters>
+<endElement uri="http://freshmeat.net/projects/freshmeat-submit/" localName="Mailing-List-URL" qName="fm:Mailing-List-URL"/>
+<characters>
+  </characters>
+<startElement uri="http://freshmeat.net/projects/freshmeat-submit/" localName="Changes" qName="fm:Changes"/>
+<characters>Updated for DocBook V4.3. See ChangeLog for details.</characters>
+<endElement uri="http://freshmeat.net/projects/freshmeat-submit/" localName="Changes" qName="fm:Changes"/>
+<characters>
+</characters>
+<endElement uri="http://freshmeat.net/projects/freshmeat-submit/" localName="project" qName="fm:project"/>
+<characters>
+
+</characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="template" qName="xsl:template">
+  <attribute qName="name" localName="name" uri="" value="bookinfo"/>
+</startElement>
+<characters>
+  </characters>
+<startElement uri="" localName="bookinfo" qName="bookinfo"/>
+<characters>
+    </characters>
+<startElement uri="" localName="mediaobject" qName="mediaobject">
+  <attribute qName="role" localName="role" uri="" value="online"/>
+</startElement>
+<characters>
+      </characters>
+<startElement uri="" localName="imageobject" qName="imageobject"/>
+<characters>
+	</characters>
+<startElement uri="" localName="imagedata" qName="imagedata">
+  <attribute qName="align" localName="align" uri="" value="left"/>
+  <attribute qName="fileref" localName="fileref" uri="" value="figures/cover.png"/>
+</startElement>
+<endElement uri="" localName="imagedata" qName="imagedata"/>
+<characters>
+      </characters>
+<endElement uri="" localName="imageobject" qName="imageobject"/>
+<characters>
+    </characters>
+<endElement uri="" localName="mediaobject" qName="mediaobject"/>
+<characters>
+    </characters>
+<startElement uri="" localName="title" qName="title"/>
+<characters>DocBook</characters>
+<endElement uri="" localName="title" qName="title"/>
+<characters>
+    </characters>
+<startElement uri="" localName="subtitle" qName="subtitle"/>
+<characters>The Definitive Guide</characters>
+<endElement uri="" localName="subtitle" qName="subtitle"/>
+<characters>
+    </characters>
+<startElement uri="" localName="authorgroup" qName="authorgroup"/>
+<characters>
+      </characters>
+<startElement uri="" localName="author" qName="author"/>
+<startElement uri="" localName="firstname" qName="firstname"/>
+<characters>Norman</characters>
+<endElement uri="" localName="firstname" qName="firstname"/>
+<startElement uri="" localName="surname" qName="surname"/>
+<characters>Walsh</characters>
+<endElement uri="" localName="surname" qName="surname"/>
+<endElement uri="" localName="author" qName="author"/>
+<characters>
+      </characters>
+<startElement uri="" localName="author" qName="author"/>
+<startElement uri="" localName="firstname" qName="firstname"/>
+<characters>Leonard</characters>
+<endElement uri="" localName="firstname" qName="firstname"/>
+<startElement uri="" localName="surname" qName="surname"/>
+<characters>Muellner</characters>
+<endElement uri="" localName="surname" qName="surname"/>
+<endElement uri="" localName="author" qName="author"/>
+<characters>
+      </characters>
+<startElement uri="" localName="othercredit" qName="othercredit"/>
+<startElement uri="" localName="firstname" qName="firstname"/>
+<characters>Bob</characters>
+<endElement uri="" localName="firstname" qName="firstname"/>
+<startElement uri="" localName="surname" qName="surname"/>
+<characters>Stayton</characters>
+<endElement uri="" localName="surname" qName="surname"/>
+<endElement uri="" localName="othercredit" qName="othercredit"/>
+<characters>
+    </characters>
+<endElement uri="" localName="authorgroup" qName="authorgroup"/>
+<characters>
+    </characters>
+<startElement uri="" localName="editor" qName="editor"/>
+<startElement uri="" localName="firstname" qName="firstname"/>
+<characters>Frank</characters>
+<endElement uri="" localName="firstname" qName="firstname"/>
+<startElement uri="" localName="surname" qName="surname"/>
+<characters>Willison</characters>
+<endElement uri="" localName="surname" qName="surname"/>
+<endElement uri="" localName="editor" qName="editor"/>
+<characters>
+    </characters>
+<startElement uri="" localName="editor" qName="editor">
+  <attribute qName="role" localName="role" uri="" value="production"/>
+</startElement>
+<startElement uri="" localName="firstname" qName="firstname"/>
+<characters>David</characters>
+<endElement uri="" localName="firstname" qName="firstname"/>
+<startElement uri="" localName="surname" qName="surname"/>
+<characters>Futato</characters>
+<endElement uri="" localName="surname" qName="surname"/>
+<endElement uri="" localName="editor" qName="editor"/>
+<characters>
+    </characters>
+<startElement uri="" localName="publisher" qName="publisher"/>
+<characters>
+      </characters>
+<startElement uri="" localName="publishername" qName="publishername"/>
+<characters>O'Reilly & Associates, Inc.</characters>
+<endElement uri="" localName="publishername" qName="publishername"/>
+<characters>
+      </characters>
+<startElement uri="" localName="address" qName="address"/>
+<startElement uri="" localName="city" qName="city"/>
+<characters>Beijing</characters>
+<endElement uri="" localName="city" qName="city"/>
+<endElement uri="" localName="address" qName="address"/>
+<characters>
+      </characters>
+<startElement uri="" localName="address" qName="address"/>
+<startElement uri="" localName="city" qName="city"/>
+<characters>Cambridge</characters>
+<endElement uri="" localName="city" qName="city"/>
+<endElement uri="" localName="address" qName="address"/>
+<characters>
+      </characters>
+<startElement uri="" localName="address" qName="address"/>
+<startElement uri="" localName="city" qName="city"/>
+<characters>Farnham</characters>
+<endElement uri="" localName="city" qName="city"/>
+<endElement uri="" localName="address" qName="address"/>
+<characters>
+      </characters>
+<startElement uri="" localName="address" qName="address"/>
+<startElement uri="" localName="city" qName="city"/>
+<characters>Köln</characters>
+<endElement uri="" localName="city" qName="city"/>
+<endElement uri="" localName="address" qName="address"/>
+<characters>
+      </characters>
+<startElement uri="" localName="address" qName="address"/>
+<startElement uri="" localName="city" qName="city"/>
+<characters>Paris</characters>
+<endElement uri="" localName="city" qName="city"/>
+<endElement uri="" localName="address" qName="address"/>
+<characters>
+      </characters>
+<startElement uri="" localName="address" qName="address"/>
+<startElement uri="" localName="city" qName="city"/>
+<characters>Sebastopol</characters>
+<endElement uri="" localName="city" qName="city"/>
+<endElement uri="" localName="address" qName="address"/>
+<characters>
+      </characters>
+<startElement uri="" localName="address" qName="address"/>
+<startElement uri="" localName="city" qName="city"/>
+<characters>Taipei</characters>
+<endElement uri="" localName="city" qName="city"/>
+<endElement uri="" localName="address" qName="address"/>
+<characters>
+      </characters>
+<startElement uri="" localName="address" qName="address"/>
+<startElement uri="" localName="city" qName="city"/>
+<characters>Tokyo</characters>
+<endElement uri="" localName="city" qName="city"/>
+<endElement uri="" localName="address" qName="address"/>
+<characters>
+    </characters>
+<endElement uri="" localName="publisher" qName="publisher"/>
+<characters>
+    </characters>
+<startElement uri="" localName="printhistory" qName="printhistory"/>
+<characters>
+      </characters>
+<startElement uri="" localName="para" qName="para"/>
+<characters>October 1999: First Edition.</characters>
+<endElement uri="" localName="para" qName="para"/>
+<characters>
+    </characters>
+<endElement uri="" localName="printhistory" qName="printhistory"/>
+<characters>
+    </characters>
+<startElement uri="" localName="isbn" qName="isbn"/>
+<characters>156592-580-7</characters>
+<endElement uri="" localName="isbn" qName="isbn"/>
+<characters>
+    </characters>
+<startElement uri="" localName="releaseinfo" qName="releaseinfo"/>
+<characters>
+      </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="value-of" qName="xsl:value-of">
+  <attribute qName="select" localName="select" uri="" value="$VERSION"/>
+</startElement>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="value-of" qName="xsl:value-of"/>
+<characters>
+    </characters>
+<endElement uri="" localName="releaseinfo" qName="releaseinfo"/>
+<characters>
+    </characters>
+<startElement uri="" localName="pubdate" qName="pubdate"/>
+<characters>$Date: 2005-05-27 20:49:13 $</characters>
+<endElement uri="" localName="pubdate" qName="pubdate"/>
+<characters>
+
+    </characters>
+<startElement uri="" localName="legalnotice" qName="legalnotice"/>
+<characters>
+      </characters>
+<startElement uri="" localName="para" qName="para">
+  <attribute qName="condition" localName="condition" uri="" value="online"/>
+</startElement>
+<characters>
+	</characters>
+<startElement uri="" localName="citetitle" qName="citetitle"/>
+<characters>DocBook: The Definitive Guide</characters>
+<endElement uri="" localName="citetitle" qName="citetitle"/>
+<characters> Copyright
+© 1999, 2000, 2001, 2002, 2003 O'Reilly & Associates, Inc.</characters>
+<endElement uri="" localName="para" qName="para"/>
+<characters>
+
+</characters>
+<startElement uri="" localName="para" qName="para"/>
+<characters>Permission is granted to copy, distribute and/or modify this
+document under the terms of the GNU Free Documentation License,
+Version 1.1 or any later version published by the Free Software
+Foundation; with the Back-Cover Texts being
+</characters>
+<comment> ulink hack because this legal notice gets diverted </comment>
+<characters>
+</characters>
+<startElement uri="" localName="ulink" qName="ulink">
+  <attribute qName="url" localName="url" uri="" value="#backcover"/>
+</startElement>
+<characters>Back Cover Text</characters>
+<endElement uri="" localName="ulink" qName="ulink"/>
+<characters>.
+A copy of the license is included in </characters>
+<startElement uri="" localName="xref" qName="xref">
+  <attribute qName="linkend" localName="linkend" uri="" value="gfdl"/>
+</startElement>
+<endElement uri="" localName="xref" qName="xref"/>
+<characters>.</characters>
+<endElement uri="" localName="para" qName="para"/>
+<characters>
+
+</characters>
+<startElement uri="" localName="para" qName="para"/>
+<characters>Nutshell Handbook, the Nutshell Handbook logo, and the O'Reilly
+logo are registered trademarks of O'Reilly & Associates, Inc. The
+association between the image of a duck and the topic of DocBook is a
+trademark of O'Reilly & Associates, Inc. Java and all Java-based
+trademarks and logos are trademarks or registered trademarks of Sun
+Microsystems, Inc., in the United States and other countries. O'Reilly
+& Associates, Inc. is independent of Sun Microsystems.
+</characters>
+<endElement uri="" localName="para" qName="para"/>
+<characters>
+
+</characters>
+<startElement uri="" localName="para" qName="para"/>
+<characters>Many of the designations used by manufacturers and sellers to
+distinguish their products are claimed as trademarks. Where those
+designations appear in this book, and O'Reilly & Associates, Inc.
+was aware of a trademark claim, the designations have been printed in
+caps or initial caps. While every precaution has been taken in the
+preparation of this book, the publisher assumes no responsibility for
+errors or omissions, or for damages resulting from the use of the
+information contained herein.
+</characters>
+<endElement uri="" localName="para" qName="para"/>
+<characters>
+
+</characters>
+<startElement uri="" localName="formalpara" qName="formalpara">
+  <attribute qName="id" localName="id" uri="" value="backcover"/>
+</startElement>
+<startElement uri="" localName="title" qName="title"/>
+<characters>Back Cover Text:</characters>
+<endElement uri="" localName="title" qName="title"/>
+<characters>
+</characters>
+<startElement uri="" localName="para" qName="para"/>
+<characters>Visit O'Reilly on the Web at
+</characters>
+<startElement uri="" localName="ulink" qName="ulink">
+  <attribute qName="url" localName="url" uri="" value="http://www.oreilly.com/"/>
+</startElement>
+<characters>www.oreilly.com</characters>
+<endElement uri="" localName="ulink" qName="ulink"/>
+<characters>.</characters>
+<endElement uri="" localName="para" qName="para"/>
+<characters>
+</characters>
+<endElement uri="" localName="formalpara" qName="formalpara"/>
+<characters>
+</characters>
+<endElement uri="" localName="legalnotice" qName="legalnotice"/>
+<characters>
+
+</characters>
+<startElement uri="" localName="copyright" qName="copyright"/>
+<characters>
+</characters>
+<startElement uri="" localName="year" qName="year"/>
+<characters>1999</characters>
+<endElement uri="" localName="year" qName="year"/>
+<characters>
+</characters>
+<startElement uri="" localName="year" qName="year"/>
+<characters>2000</characters>
+<endElement uri="" localName="year" qName="year"/>
+<characters>
+</characters>
+<startElement uri="" localName="year" qName="year"/>
+<characters>2001</characters>
+<endElement uri="" localName="year" qName="year"/>
+<characters>
+</characters>
+<startElement uri="" localName="year" qName="year"/>
+<characters>2002</characters>
+<endElement uri="" localName="year" qName="year"/>
+<characters>
+</characters>
+<startElement uri="" localName="year" qName="year"/>
+<characters>2003</characters>
+<endElement uri="" localName="year" qName="year"/>
+<characters>
+</characters>
+<startElement uri="" localName="holder" qName="holder"/>
+<characters>O'Reilly & Associates, Inc. All rights reserved.</characters>
+<endElement uri="" localName="holder" qName="holder"/>
+<characters>
+</characters>
+<endElement uri="" localName="copyright" qName="copyright"/>
+<characters>
+</characters>
+<endElement uri="" localName="bookinfo" qName="bookinfo"/>
+<characters>
+</characters>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="template" qName="xsl:template"/>
+<characters>
+
+</characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="template" qName="xsl:template">
+  <attribute qName="match" localName="match" uri="" value="/"/>
+</startElement>
+<characters>
+  </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="choose" qName="xsl:choose"/>
+<characters>
+    </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="when" qName="xsl:when">
+  <attribute qName="test" localName="test" uri="" value="$freshmeat != 0"/>
+</startElement>
+<characters>
+      </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="apply-templates" qName="xsl:apply-templates">
+  <attribute qName="select" localName="select" uri="" value="//fm:project"/>
+</startElement>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="apply-templates" qName="xsl:apply-templates"/>
+<characters>
+    </characters>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="when" qName="xsl:when"/>
+<characters>
+    </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="otherwise" qName="xsl:otherwise"/>
+<characters>
+      </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="call-template" qName="xsl:call-template">
+  <attribute qName="name" localName="name" uri="" value="bookinfo"/>
+</startElement>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="call-template" qName="xsl:call-template"/>
+<characters>
+    </characters>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="otherwise" qName="xsl:otherwise"/>
+<characters>
+  </characters>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="choose" qName="xsl:choose"/>
+<characters>
+</characters>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="template" qName="xsl:template"/>
+<characters>
+
+</characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="template" qName="xsl:template">
+  <attribute qName="match" localName="match" uri="" value="fm:project"/>
+</startElement>
+<characters>
+  </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="text" qName="xsl:text"/>
+<characters>
+</characters>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="text" qName="xsl:text"/>
+<characters>
+  </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="apply-templates" qName="xsl:apply-templates"/>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="apply-templates" qName="xsl:apply-templates"/>
+<characters>
+  </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="text" qName="xsl:text"/>
+<characters>
+</characters>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="text" qName="xsl:text"/>
+<characters>
+  </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="apply-templates" qName="xsl:apply-templates">
+  <attribute qName="mode" localName="mode" uri="" value="text"/>
+  <attribute qName="select" localName="select" uri="" value="fm:Changes"/>
+</startElement>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="apply-templates" qName="xsl:apply-templates"/>
+<characters>
+  </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="text" qName="xsl:text"/>
+<characters>
+</characters>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="text" qName="xsl:text"/>
+<characters>
+</characters>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="template" qName="xsl:template"/>
+<characters>
+
+</characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="template" qName="xsl:template">
+  <attribute qName="match" localName="match" uri="" value="fm:Changes"/>
+</startElement>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="template" qName="xsl:template"/>
+<characters>
+
+</characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="template" qName="xsl:template">
+  <attribute qName="match" localName="match" uri="" value="fm:*"/>
+</startElement>
+<characters>
+  </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="value-of" qName="xsl:value-of">
+  <attribute qName="select" localName="select" uri="" value="local-name(.)"/>
+</startElement>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="value-of" qName="xsl:value-of"/>
+<characters>
+  </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="text" qName="xsl:text"/>
+<characters>: </characters>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="text" qName="xsl:text"/>
+<characters>
+
+  </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="call-template" qName="xsl:call-template">
+  <attribute qName="name" localName="name" uri="" value="value"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="with-param" qName="xsl:with-param">
+  <attribute qName="name" localName="name" uri="" value="text"/>
+  <attribute qName="select" localName="select" uri="" value="normalize-space(.)"/>
+</startElement>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="with-param" qName="xsl:with-param"/>
+<characters>
+  </characters>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="call-template" qName="xsl:call-template"/>
+<characters>
+  </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="text" qName="xsl:text"/>
+<characters>
+</characters>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="text" qName="xsl:text"/>
+<characters>
+</characters>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="template" qName="xsl:template"/>
+<characters>
+
+</characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="template" qName="xsl:template">
+  <attribute qName="name" localName="name" uri="" value="value"/>
+</startElement>
+<characters>
+  </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="param" qName="xsl:param">
+  <attribute qName="name" localName="name" uri="" value="text"/>
+</startElement>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="param" qName="xsl:param"/>
+<characters>
+
+  </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="call-template" qName="xsl:call-template">
+  <attribute qName="name" localName="name" uri="" value="string.subst"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="with-param" qName="xsl:with-param">
+  <attribute qName="name" localName="name" uri="" value="string"/>
+  <attribute qName="select" localName="select" uri="" value="$text"/>
+</startElement>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="with-param" qName="xsl:with-param"/>
+<characters>
+    </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="with-param" qName="xsl:with-param">
+  <attribute qName="name" localName="name" uri="" value="target"/>
+  <attribute qName="select" localName="select" uri="" value="'{VERSION}'"/>
+</startElement>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="with-param" qName="xsl:with-param"/>
+<characters>
+    </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="with-param" qName="xsl:with-param">
+  <attribute qName="name" localName="name" uri="" value="replacement"/>
+  <attribute qName="select" localName="select" uri="" value="$VERSION"/>
+</startElement>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="with-param" qName="xsl:with-param"/>
+<characters>
+  </characters>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="call-template" qName="xsl:call-template"/>
+<characters>
+</characters>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="template" qName="xsl:template"/>
+<characters>
+
+</characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="template" qName="xsl:template">
+  <attribute qName="name" localName="name" uri="" value="string.subst"/>
+</startElement>
+<characters>
+  </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="param" qName="xsl:param">
+  <attribute qName="name" localName="name" uri="" value="string"/>
+</startElement>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="param" qName="xsl:param"/>
+<characters>
+  </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="param" qName="xsl:param">
+  <attribute qName="name" localName="name" uri="" value="target"/>
+</startElement>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="param" qName="xsl:param"/>
+<characters>
+  </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="param" qName="xsl:param">
+  <attribute qName="name" localName="name" uri="" value="replacement"/>
+</startElement>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="param" qName="xsl:param"/>
+<characters>
+
+  </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="choose" qName="xsl:choose"/>
+<characters>
+    </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="when" qName="xsl:when">
+  <attribute qName="test" localName="test" uri="" value="contains($string, $target)"/>
+</startElement>
+<characters>
+      </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="variable" qName="xsl:variable">
+  <attribute qName="name" localName="name" uri="" value="rest"/>
+</startElement>
+<characters>
+        </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="call-template" qName="xsl:call-template">
+  <attribute qName="name" localName="name" uri="" value="string.subst"/>
+</startElement>
+<characters>
+          </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="with-param" qName="xsl:with-param">
+  <attribute qName="name" localName="name" uri="" value="string"/>
+  <attribute qName="select" localName="select" uri="" value="substring-after($string, $target)"/>
+</startElement>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="with-param" qName="xsl:with-param"/>
+<characters>
+          </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="with-param" qName="xsl:with-param">
+  <attribute qName="name" localName="name" uri="" value="target"/>
+  <attribute qName="select" localName="select" uri="" value="$target"/>
+</startElement>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="with-param" qName="xsl:with-param"/>
+<characters>
+          </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="with-param" qName="xsl:with-param">
+  <attribute qName="name" localName="name" uri="" value="replacement"/>
+  <attribute qName="select" localName="select" uri="" value="$replacement"/>
+</startElement>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="with-param" qName="xsl:with-param"/>
+<characters>
+        </characters>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="call-template" qName="xsl:call-template"/>
+<characters>
+      </characters>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="variable" qName="xsl:variable"/>
+<characters>
+      </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="value-of" qName="xsl:value-of">
+  <attribute qName="select" localName="select" uri="" value="concat(substring-before($string, $target),                                    $replacement,                                    $rest)"/>
+</startElement>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="value-of" qName="xsl:value-of"/>
+<characters>
+    </characters>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="when" qName="xsl:when"/>
+<characters>
+    </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="otherwise" qName="xsl:otherwise"/>
+<characters>
+      </characters>
+<startElement uri="http://www.w3.org/1999/XSL/Transform" localName="value-of" qName="xsl:value-of">
+  <attribute qName="select" localName="select" uri="" value="$string"/>
+</startElement>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="value-of" qName="xsl:value-of"/>
+<characters>
+    </characters>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="otherwise" qName="xsl:otherwise"/>
+<characters>
+  </characters>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="choose" qName="xsl:choose"/>
+<characters>
+</characters>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="template" qName="xsl:template"/>
+<characters>
+
+</characters>
+<endElement uri="http://www.w3.org/1999/XSL/Transform" localName="stylesheet" qName="xsl:stylesheet"/>
+<endPrefixMapping prefix="fm"/>
+<endPrefixMapping prefix="sf"/>
+<endPrefixMapping prefix="xsl"/>
+<endDocument/>
+</sax>

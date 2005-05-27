@@ -1,0 +1,927 @@
+<sax xmlns="http://www.sun.com/xml/sax-events">
+<startDocument/>
+<comment> ANT Build Script for the JAKARTA-TAGLIBS Project </comment>
+<comment> $Id: build-build.xml.sax-event,v 1.1 2005-05-27 20:47:43 joehw Exp $ </comment>
+<startElement uri="" localName="project" qName="project">
+  <attribute qName="basedir" localName="basedir" uri="" value="."/>
+  <attribute qName="default" localName="default" uri="" value="dist"/>
+  <attribute qName="name" localName="name" uri="" value="jakarta-taglibs"/>
+</startElement>
+<characters>
+
+  </characters>
+<comment> ****************** Project Standard Properties ******************* </comment>
+<characters>
+
+  </characters>
+<comment> cp build.properties.sample build.properties,
+       then set the base.dir property and any needed *.jar properties
+       in build.properties.
+  </comment>
+<characters>
+
+  </characters>
+<startElement uri="" localName="property" qName="property">
+  <attribute qName="file" localName="file" uri="" value="build.properties"/>
+</startElement>
+<endElement uri="" localName="property" qName="property"/>
+<characters>
+
+  </characters>
+<comment> ********************** Destination Preparation ********************* </comment>
+<characters>
+
+  </characters>
+<comment> Create the destination directories </comment>
+<characters>
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="prepare"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${build.dir}"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${dist.dir}"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<startElement uri="" localName="available" qName="available">
+  <attribute qName="classname" localName="classname" uri="" value="com.ibm.bsf.BSFManager"/>
+  <attribute qName="property" localName="property" uri="" value="bsf.present"/>
+</startElement>
+<endElement uri="" localName="available" qName="available"/>
+<characters>
+    </characters>
+<startElement uri="" localName="available" qName="available">
+  <attribute qName="classname" localName="classname" uri="" value="org.apache.xalan.xslt.XSLTProcessor"/>
+  <attribute qName="classpath" localName="classpath" uri="" value="${xalan1.jar}"/>
+  <attribute qName="property" localName="property" uri="" value="xslt.present"/>
+</startElement>
+<endElement uri="" localName="available" qName="available"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<comment> Copy the static files that describe the entire project </comment>
+<characters>
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="static"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="copy" qName="copy">
+  <attribute qName="file" localName="file" uri="" value="LICENSE"/>
+  <attribute qName="tofile" localName="tofile" uri="" value="${build.dir}/LICENSE"/>
+</startElement>
+<endElement uri="" localName="copy" qName="copy"/>
+<characters>
+    </characters>
+<startElement uri="" localName="copy" qName="copy">
+  <attribute qName="file" localName="file" uri="" value="README"/>
+  <attribute qName="tofile" localName="tofile" uri="" value="${build.dir}/README"/>
+</startElement>
+<endElement uri="" localName="copy" qName="copy"/>
+<characters>
+    </characters>
+<startElement uri="" localName="copy" qName="copy">
+  <attribute qName="file" localName="file" uri="" value="HOWTO-RELEASE"/>
+  <attribute qName="tofile" localName="tofile" uri="" value="${build.dir}/HOWTO-RELEASE"/>
+</startElement>
+<endElement uri="" localName="copy" qName="copy"/>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${build.dir}/doc"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<comment> BUILD:  Compile documentation application components </comment>
+<characters>
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="depends" localName="depends" uri="" value="prepare,static"/>
+  <attribute qName="name" localName="name" uri="" value="compile.documentation"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="copy" qName="copy">
+  <attribute qName="todir" localName="todir" uri="" value="${build.dir}/doc"/>
+</startElement>
+<characters>
+      </characters>
+<startElement uri="" localName="fileset" qName="fileset">
+  <attribute qName="dir" localName="dir" uri="" value="src/doc"/>
+</startElement>
+<characters>
+        </characters>
+<startElement uri="" localName="include" qName="include">
+  <attribute qName="name" localName="name" uri="" value="**/*.css"/>
+</startElement>
+<endElement uri="" localName="include" qName="include"/>
+<characters>
+        </characters>
+<startElement uri="" localName="include" qName="include">
+  <attribute qName="name" localName="name" uri="" value="**/*.gif"/>
+</startElement>
+<endElement uri="" localName="include" qName="include"/>
+<characters>
+        </characters>
+<startElement uri="" localName="include" qName="include">
+  <attribute qName="name" localName="name" uri="" value="**/*.html"/>
+</startElement>
+<endElement uri="" localName="include" qName="include"/>
+<characters>
+        </characters>
+<startElement uri="" localName="include" qName="include">
+  <attribute qName="name" localName="name" uri="" value="**/*.jpg"/>
+</startElement>
+<endElement uri="" localName="include" qName="include"/>
+<characters>
+        </characters>
+<startElement uri="" localName="include" qName="include">
+  <attribute qName="name" localName="name" uri="" value="**/*.js"/>
+</startElement>
+<endElement uri="" localName="include" qName="include"/>
+<characters>
+      </characters>
+<endElement uri="" localName="fileset" qName="fileset"/>
+<characters>
+    </characters>
+<endElement uri="" localName="copy" qName="copy"/>
+<characters>
+    </characters>
+<comment> Create dynamically generated documentation </comment>
+<characters>
+    </characters>
+<startElement uri="" localName="style" qName="style">
+  <attribute qName="basedir" localName="basedir" uri="" value="src/doc"/>
+  <attribute qName="destdir" localName="destdir" uri="" value="${build.dir}/doc"/>
+  <attribute qName="excludes" localName="excludes" uri="" value="project.xml"/>
+  <attribute qName="extension" localName="extension" uri="" value=".html"/>
+  <attribute qName="includes" localName="includes" uri="" value="*.xml"/>
+  <attribute qName="style" localName="style" uri="" value="src/doc/stylesheets/taglibs.xsl"/>
+</startElement>
+<endElement uri="" localName="style" qName="style"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<comment> Create documentation distribution </comment>
+<characters>
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="depends" localName="depends" uri="" value="compile.documentation"/>
+  <attribute qName="name" localName="name" uri="" value="dist.documentation"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${dist.dir}/doc"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<startElement uri="" localName="copy" qName="copy">
+  <attribute qName="todir" localName="todir" uri="" value="${dist.dir}/doc"/>
+</startElement>
+<characters>
+      </characters>
+<startElement uri="" localName="fileset" qName="fileset">
+  <attribute qName="dir" localName="dir" uri="" value="${build.dir}/doc"/>
+</startElement>
+<endElement uri="" localName="fileset" qName="fileset"/>
+<characters>
+    </characters>
+<endElement uri="" localName="copy" qName="copy"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<comment> ************************* Subproject Execution ********************* </comment>
+<characters>
+
+  </characters>
+<comment>
+        Add a new target for each defined custom tag library subproject.
+        Be sure you also add each target to the "depends" list for the
+        "dist" target at the bottom of this file.
+
+  </comment>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="if" localName="if" uri="" value="bsf.present"/>
+  <attribute qName="name" localName="name" uri="" value="bsf"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="ant" qName="ant">
+  <attribute qName="dir" localName="dir" uri="" value="./bsf"/>
+  <attribute qName="target" localName="target" uri="" value="dist"/>
+</startElement>
+<endElement uri="" localName="ant" qName="ant"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+   </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="depends" localName="depends" uri="" value="prepare"/>
+  <attribute qName="name" localName="name" uri="" value="input"/>
+</startElement>
+<characters>
+     </characters>
+<startElement uri="" localName="ant" qName="ant">
+  <attribute qName="dir" localName="dir" uri="" value="./input"/>
+  <attribute qName="target" localName="target" uri="" value="dist"/>
+</startElement>
+<endElement uri="" localName="ant" qName="ant"/>
+<characters>
+   </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="utility"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="ant" qName="ant">
+  <attribute qName="dir" localName="dir" uri="" value="./utility"/>
+  <attribute qName="target" localName="target" uri="" value="dist"/>
+</startElement>
+<endElement uri="" localName="ant" qName="ant"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="if" localName="if" uri="" value="xslt.present"/>
+  <attribute qName="name" localName="name" uri="" value="xsl"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="ant" qName="ant">
+  <attribute qName="dir" localName="dir" uri="" value="./xsl"/>
+  <attribute qName="target" localName="target" uri="" value="dist"/>
+</startElement>
+<endElement uri="" localName="ant" qName="ant"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="request"/>
+</startElement>
+<characters>               
+    </characters>
+<startElement uri="" localName="ant" qName="ant">
+  <attribute qName="dir" localName="dir" uri="" value="./request"/>
+  <attribute qName="target" localName="target" uri="" value="dist"/>
+</startElement>
+<endElement uri="" localName="ant" qName="ant"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="session"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="ant" qName="ant">
+  <attribute qName="dir" localName="dir" uri="" value="./session"/>
+  <attribute qName="target" localName="target" uri="" value="dist"/>
+</startElement>
+<endElement uri="" localName="ant" qName="ant"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="response"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="ant" qName="ant">
+  <attribute qName="dir" localName="dir" uri="" value="./response"/>
+  <attribute qName="target" localName="target" uri="" value="dist"/>
+</startElement>
+<endElement uri="" localName="ant" qName="ant"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="application"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="ant" qName="ant">
+  <attribute qName="dir" localName="dir" uri="" value="./application"/>
+  <attribute qName="target" localName="target" uri="" value="dist"/>
+</startElement>
+<endElement uri="" localName="ant" qName="ant"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="page"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="ant" qName="ant">
+  <attribute qName="dir" localName="dir" uri="" value="./page"/>
+  <attribute qName="target" localName="target" uri="" value="dist"/>
+</startElement>
+<endElement uri="" localName="ant" qName="ant"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="datetime"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="ant" qName="ant">
+  <attribute qName="dir" localName="dir" uri="" value="./datetime"/>
+  <attribute qName="target" localName="target" uri="" value="dist"/>
+</startElement>
+<endElement uri="" localName="ant" qName="ant"/>
+<characters> 
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="regexp"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="ant" qName="ant">
+  <attribute qName="dir" localName="dir" uri="" value="./regexp"/>
+  <attribute qName="target" localName="target" uri="" value="dist"/>
+</startElement>
+<endElement uri="" localName="ant" qName="ant"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="jndi"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="ant" qName="ant">
+  <attribute qName="dir" localName="dir" uri="" value="./jndi"/>
+  <attribute qName="target" localName="target" uri="" value="dist"/>
+</startElement>
+<endElement uri="" localName="ant" qName="ant"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="dbtags"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="ant" qName="ant">
+  <attribute qName="dir" localName="dir" uri="" value="./dbtags"/>
+  <attribute qName="target" localName="target" uri="" value="dist"/>
+</startElement>
+<endElement uri="" localName="ant" qName="ant"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="scrape"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="ant" qName="ant">
+  <attribute qName="dir" localName="dir" uri="" value="./scrape"/>
+  <attribute qName="target" localName="target" uri="" value="dist"/>
+</startElement>
+<endElement uri="" localName="ant" qName="ant"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="mailer"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="ant" qName="ant">
+  <attribute qName="dir" localName="dir" uri="" value="./mailer"/>
+  <attribute qName="target" localName="target" uri="" value="dist"/>
+</startElement>
+<endElement uri="" localName="ant" qName="ant"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="i18n"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="ant" qName="ant">
+  <attribute qName="dir" localName="dir" uri="" value="./i18n"/>
+  <attribute qName="target" localName="target" uri="" value="dist"/>
+</startElement>
+<endElement uri="" localName="ant" qName="ant"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="io"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="ant" qName="ant">
+  <attribute qName="dir" localName="dir" uri="" value="./io"/>
+  <attribute qName="target" localName="target" uri="" value="dist"/>
+</startElement>
+<endElement uri="" localName="ant" qName="ant"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="xtags"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="ant" qName="ant">
+  <attribute qName="dir" localName="dir" uri="" value="./xtags"/>
+  <attribute qName="target" localName="target" uri="" value="dist"/>
+</startElement>
+<endElement uri="" localName="ant" qName="ant"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="log"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="ant" qName="ant">
+  <attribute qName="dir" localName="dir" uri="" value="./log"/>
+  <attribute qName="target" localName="target" uri="" value="dist"/>
+</startElement>
+<endElement uri="" localName="ant" qName="ant"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="random"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="ant" qName="ant">
+  <attribute qName="dir" localName="dir" uri="" value="./random"/>
+  <attribute qName="target" localName="target" uri="" value="dist"/>
+</startElement>
+<endElement uri="" localName="ant" qName="ant"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="jsptl"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="ant" qName="ant">
+  <attribute qName="dir" localName="dir" uri="" value="./jsptl"/>
+  <attribute qName="target" localName="target" uri="" value="dist"/>
+</startElement>
+<endElement uri="" localName="ant" qName="ant"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="benchmark"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="ant" qName="ant">
+  <attribute qName="dir" localName="dir" uri="" value="./benchmark"/>
+  <attribute qName="target" localName="target" uri="" value="dist"/>
+</startElement>
+<endElement uri="" localName="ant" qName="ant"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="ultradev4"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="ant" qName="ant">
+  <attribute qName="dir" localName="dir" uri="" value="./tools/UltraDev/4.0/ctlx"/>
+  <attribute qName="target" localName="target" uri="" value="dist"/>
+</startElement>
+<endElement uri="" localName="ant" qName="ant"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="string"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="ant" qName="ant">
+  <attribute qName="dir" localName="dir" uri="" value="./string"/>
+  <attribute qName="target" localName="target" uri="" value="dist"/>
+</startElement>
+<endElement uri="" localName="ant" qName="ant"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+
+  </characters>
+<comment> *********************** Overall Build Command ********************** </comment>
+<characters>
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="depends" localName="depends" uri="" value="prepare,dist.documentation,bsf,input,utility,xsl,request,session,response,application,page,datetime,regexp,jndi,dbtags,scrape,mailer,i18n,io,xtags,log,ultradev4,random,benchmark,jsptl,string"/>
+  <attribute qName="name" localName="name" uri="" value="dist"/>
+</startElement>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<comment> *********************** Clean Command ****************************** </comment>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="clean"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="delete" qName="delete">
+  <attribute qName="dir" localName="dir" uri="" value="${build.dir}"/>
+</startElement>
+<endElement uri="" localName="delete" qName="delete"/>
+<characters>
+    </characters>
+<startElement uri="" localName="delete" qName="delete">
+  <attribute qName="dir" localName="dir" uri="" value="${dist.dir}"/>
+</startElement>
+<endElement uri="" localName="delete" qName="delete"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<comment> *********************** Create Taglib ****************************** </comment>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="depends" localName="depends" uri="" value="create.taglib"/>
+  <attribute qName="name" localName="name" uri="" value="new.taglib"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${build.dir}"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${dist.dir}"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="doc"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<startElement uri="" localName="available" qName="available">
+  <attribute qName="file" localName="file" uri="" value="${taglib.name}"/>
+  <attribute qName="property" localName="property" uri="" value="taglib.present"/>
+</startElement>
+<endElement uri="" localName="available" qName="available"/>
+<characters>
+    </characters>
+<startElement uri="" localName="antcall" qName="antcall">
+  <attribute qName="target" localName="target" uri="" value="create.taglib.exists"/>
+</startElement>
+<endElement uri="" localName="antcall" qName="antcall"/>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${taglib.name}"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${taglib.name}/doc/web"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${taglib.name}/examples/web"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${taglib.name}/src/org/apache/taglibs/${taglib.name}"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<startElement uri="" localName="copy" qName="copy">
+  <attribute qName="todir" localName="todir" uri="" value="${taglib.name}"/>
+</startElement>
+<characters>
+      </characters>
+<startElement uri="" localName="fileset" qName="fileset">
+  <attribute qName="dir" localName="dir" uri="" value="./src/taglib-template"/>
+  <attribute qName="excludes" localName="excludes" uri="" value="CVS"/>
+</startElement>
+<endElement uri="" localName="fileset" qName="fileset"/>
+<characters>
+    </characters>
+<endElement uri="" localName="copy" qName="copy"/>
+<characters>
+    </characters>
+<startElement uri="" localName="move" qName="move">
+  <attribute qName="file" localName="file" uri="" value="${taglib.name}/xml/taglib-template.xml"/>
+  <attribute qName="tofile" localName="tofile" uri="" value="${taglib.name}/xml/${taglib.name}.xml"/>
+</startElement>
+<endElement uri="" localName="move" qName="move"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="if" localName="if" uri="" value="taglib.present"/>
+  <attribute qName="name" localName="name" uri="" value="create.taglib.exists"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="fail" qName="fail">
+  <attribute qName="message" localName="message" uri="" value="The taglib or directory '${taglib.name}' already exists."/>
+</startElement>
+<endElement uri="" localName="fail" qName="fail"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="create.taglib"/>
+  <attribute qName="unless" localName="unless" uri="" value="taglib.name"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="fail" qName="fail">
+  <attribute qName="message" localName="message" uri="" value="Specify the name of the new taglib using the property -Dtaglib.name={taglib-name}."/>
+</startElement>
+<endElement uri="" localName="fail" qName="fail"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<comment> *********************** Create CTLX ****************************** </comment>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="depends" localName="depends" uri="" value="create.ctlx.name,create.ctlx.path"/>
+  <attribute qName="name" localName="name" uri="" value="new.ctlx"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${build.dir}"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${dist.dir}"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="doc"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<startElement uri="" localName="available" qName="available">
+  <attribute qName="file" localName="file" uri="" value="${ctlx.name}"/>
+  <attribute qName="property" localName="property" uri="" value="ctlx.present"/>
+</startElement>
+<endElement uri="" localName="available" qName="available"/>
+<characters>
+    </characters>
+<startElement uri="" localName="available" qName="available">
+  <attribute qName="file" localName="file" uri="" value="${ctlx.path}/${ctlx.name}"/>
+  <attribute qName="property" localName="property" uri="" value="ctlx.present"/>
+</startElement>
+<endElement uri="" localName="available" qName="available"/>
+<characters>
+    </characters>
+<startElement uri="" localName="antcall" qName="antcall">
+  <attribute qName="target" localName="target" uri="" value="create.ctlx.exists"/>
+</startElement>
+<endElement uri="" localName="antcall" qName="antcall"/>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${ctlx.path}/${ctlx.name}"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${ctlx.path}/${ctlx.name}/doc/web"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${ctlx.path}/${ctlx.name}/examples/web"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${ctlx.path}/${ctlx.name}/src/org/apache/taglibs/${taglib.name}"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<startElement uri="" localName="copy" qName="copy">
+  <attribute qName="todir" localName="todir" uri="" value="${ctlx.path}/${ctlx.name}"/>
+</startElement>
+<characters>
+      </characters>
+<startElement uri="" localName="fileset" qName="fileset">
+  <attribute qName="dir" localName="dir" uri="" value="./src/taglib-template"/>
+  <attribute qName="excludes" localName="excludes" uri="" value="CVS"/>
+</startElement>
+<endElement uri="" localName="fileset" qName="fileset"/>
+<characters>
+    </characters>
+<endElement uri="" localName="copy" qName="copy"/>
+<characters>
+    </characters>
+<startElement uri="" localName="move" qName="move">
+  <attribute qName="file" localName="file" uri="" value="${ctlx.path}/${ctlx.name}/xml/taglib-template.xml"/>
+  <attribute qName="tofile" localName="tofile" uri="" value="${ctlx.path}/${ctlx.name}/xml/${ctlx.name}.xml"/>
+</startElement>
+<endElement uri="" localName="move" qName="move"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="if" localName="if" uri="" value="ctlx.present"/>
+  <attribute qName="name" localName="name" uri="" value="create.ctlx.exists"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="fail" qName="fail">
+  <attribute qName="message" localName="message" uri="" value="A taglib or ctlx named ${ctlx.name} alread exists or the ctlx directory and name '${ctlx.path}/${taglib.name}' already exists."/>
+</startElement>
+<endElement uri="" localName="fail" qName="fail"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="create.ctlx.name"/>
+  <attribute qName="unless" localName="unless" uri="" value="ctlx.name"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="fail" qName="fail">
+  <attribute qName="message" localName="message" uri="" value="Specify the name of the new CTLX using the property -Dctlx.name={ctlx-name}."/>
+</startElement>
+<endElement uri="" localName="fail" qName="fail"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="create.ctlx.path"/>
+  <attribute qName="unless" localName="unless" uri="" value="ctlx.path"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="fail" qName="fail">
+  <attribute qName="message" localName="message" uri="" value="Specify the path of the new CTLX using the property -Dctlx.name={ctlx-name}."/>
+</startElement>
+<endElement uri="" localName="fail" qName="fail"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+</characters>
+<endElement uri="" localName="project" qName="project"/>
+<endDocument/>
+</sax>

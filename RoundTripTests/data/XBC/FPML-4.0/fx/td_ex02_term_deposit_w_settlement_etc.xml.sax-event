@@ -1,0 +1,395 @@
+<sax xmlns="http://www.sun.com/xml/sax-events">
+<startDocument/>
+<comment>
+  == Copyright (c) 2002-2003. All rights reserved.
+  == Financial Products Markup Language is subject to the FpML public license.
+  == A copy of this license is available at http://www.fpml.org/documents/license
+  </comment>
+<comment> 
+  == ABN Amro pays 4% CHF fixed rate on a ACT/360 basis for a 25 million deposit from Midland starting
+  == February 14, 2002 and maturing February 15, 2002.
+  </comment>
+<startPrefixMapping prefix="" uri="http://www.fpml.org/2003/FpML-4-0"/>
+<startPrefixMapping prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="FpML" qName="FpML">
+  <attribute qName="version" localName="version" uri="" value="4-0"/>
+  <attribute qName="xsi:schemaLocation" localName="schemaLocation" uri="http://www.w3.org/2001/XMLSchema-instance" value="http://www.fpml.org/2003/FpML-4-0 ../fpml-main-4-0.xsd"/>
+  <attribute qName="xsi:type" localName="type" uri="http://www.w3.org/2001/XMLSchema-instance" value="DataDocument"/>
+</startElement>
+<characters>
+  </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="trade" qName="trade"/>
+<characters>
+    </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="tradeHeader" qName="tradeHeader"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="partyTradeIdentifier" qName="partyTradeIdentifier"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="partyReference" qName="partyReference">
+  <attribute qName="href" localName="href" uri="" value="MIDLAND"/>
+</startElement>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="partyReference" qName="partyReference"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="tradeId" qName="tradeId">
+  <attribute qName="tradeIdScheme" localName="tradeIdScheme" uri="" value="http://www.hsbc.com/swaps/trade-id"/>
+</startElement>
+<characters>MB87623</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="tradeId" qName="tradeId"/>
+<characters>
+      </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="partyTradeIdentifier" qName="partyTradeIdentifier"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="partyTradeIdentifier" qName="partyTradeIdentifier"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="partyReference" qName="partyReference">
+  <attribute qName="href" localName="href" uri="" value="ABNAMRO"/>
+</startElement>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="partyReference" qName="partyReference"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="tradeId" qName="tradeId">
+  <attribute qName="tradeIdScheme" localName="tradeIdScheme" uri="" value="http://www.abnamro.com/swaps/trade-id"/>
+</startElement>
+<characters>AA9876</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="tradeId" qName="tradeId"/>
+<characters>
+      </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="partyTradeIdentifier" qName="partyTradeIdentifier"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="tradeDate" qName="tradeDate"/>
+<characters>2002-02-14</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="tradeDate" qName="tradeDate"/>
+<characters>
+    </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="tradeHeader" qName="tradeHeader"/>
+<characters>
+    </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="termDeposit" qName="termDeposit"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="productType" qName="productType"/>
+<characters>Overnight Deposit</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="productType" qName="productType"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="initialPayerReference" qName="initialPayerReference">
+  <attribute qName="href" localName="href" uri="" value="MIDLAND"/>
+</startElement>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="initialPayerReference" qName="initialPayerReference"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="initialReceiverReference" qName="initialReceiverReference">
+  <attribute qName="href" localName="href" uri="" value="ABNAMRO"/>
+</startElement>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="initialReceiverReference" qName="initialReceiverReference"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="startDate" qName="startDate"/>
+<characters>2002-02-14</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="startDate" qName="startDate"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="maturityDate" qName="maturityDate"/>
+<characters>2002-02-15</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="maturityDate" qName="maturityDate"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="dayCountFraction" qName="dayCountFraction"/>
+<characters>ACT/360</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="dayCountFraction" qName="dayCountFraction"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="principal" qName="principal"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="currency" qName="currency"/>
+<characters>CHF</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="currency" qName="currency"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="amount" qName="amount"/>
+<characters>25000000.00</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="amount" qName="amount"/>
+<characters>
+      </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="principal" qName="principal"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="fixedRate" qName="fixedRate"/>
+<characters>0.04</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="fixedRate" qName="fixedRate"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="interest" qName="interest"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="currency" qName="currency"/>
+<characters>CHF</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="currency" qName="currency"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="amount" qName="amount"/>
+<characters>2777.77</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="amount" qName="amount"/>
+<characters>
+      </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="interest" qName="interest"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="payment" qName="payment"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="payerPartyReference" qName="payerPartyReference">
+  <attribute qName="href" localName="href" uri="" value="MIDLAND"/>
+</startElement>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="payerPartyReference" qName="payerPartyReference"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="receiverPartyReference" qName="receiverPartyReference">
+  <attribute qName="href" localName="href" uri="" value="ABNAMRO"/>
+</startElement>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="receiverPartyReference" qName="receiverPartyReference"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="paymentAmount" qName="paymentAmount"/>
+<characters>
+          </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="currency" qName="currency"/>
+<characters>CHF</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="currency" qName="currency"/>
+<characters>
+          </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="amount" qName="amount"/>
+<characters>25000000</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="amount" qName="amount"/>
+<characters>
+        </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="paymentAmount" qName="paymentAmount"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="paymentType" qName="paymentType"/>
+<characters>Initial Principal Payment</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="paymentType" qName="paymentType"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="settlementInformation" qName="settlementInformation"/>
+<characters>
+          </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="settlementInstruction" qName="settlementInstruction"/>
+<characters>
+            </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="beneficiary" qName="beneficiary"/>
+<characters>
+              </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="routingIds" qName="routingIds"/>
+<characters>
+                </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="routingId" qName="routingId"/>
+<characters>ABNANL2A</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="routingId" qName="routingId"/>
+<characters>
+              </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="routingIds" qName="routingIds"/>
+<characters>
+            </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="beneficiary" qName="beneficiary"/>
+<characters>
+          </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="settlementInstruction" qName="settlementInstruction"/>
+<characters>
+        </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="settlementInformation" qName="settlementInformation"/>
+<characters>
+      </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="payment" qName="payment"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="payment" qName="payment"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="payerPartyReference" qName="payerPartyReference">
+  <attribute qName="href" localName="href" uri="" value="ABNAMRO"/>
+</startElement>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="payerPartyReference" qName="payerPartyReference"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="receiverPartyReference" qName="receiverPartyReference">
+  <attribute qName="href" localName="href" uri="" value="MIDLAND"/>
+</startElement>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="receiverPartyReference" qName="receiverPartyReference"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="paymentAmount" qName="paymentAmount"/>
+<characters>
+          </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="currency" qName="currency"/>
+<characters>CHF</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="currency" qName="currency"/>
+<characters>
+          </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="amount" qName="amount"/>
+<characters>2777.77</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="amount" qName="amount"/>
+<characters>
+        </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="paymentAmount" qName="paymentAmount"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="paymentType" qName="paymentType"/>
+<characters>Interest Payment</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="paymentType" qName="paymentType"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="settlementInformation" qName="settlementInformation"/>
+<characters>
+          </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="settlementInstruction" qName="settlementInstruction"/>
+<characters>
+            </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="beneficiary" qName="beneficiary"/>
+<characters>
+              </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="routingIds" qName="routingIds"/>
+<characters>
+                </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="routingId" qName="routingId"/>
+<characters>MIDLAND</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="routingId" qName="routingId"/>
+<characters>
+              </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="routingIds" qName="routingIds"/>
+<characters>
+            </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="beneficiary" qName="beneficiary"/>
+<characters>
+          </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="settlementInstruction" qName="settlementInstruction"/>
+<characters>
+        </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="settlementInformation" qName="settlementInformation"/>
+<characters>
+      </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="payment" qName="payment"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="payment" qName="payment"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="payerPartyReference" qName="payerPartyReference">
+  <attribute qName="href" localName="href" uri="" value="ABNAMRO"/>
+</startElement>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="payerPartyReference" qName="payerPartyReference"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="receiverPartyReference" qName="receiverPartyReference">
+  <attribute qName="href" localName="href" uri="" value="MIDLAND"/>
+</startElement>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="receiverPartyReference" qName="receiverPartyReference"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="paymentAmount" qName="paymentAmount"/>
+<characters>
+          </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="currency" qName="currency"/>
+<characters>CHF</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="currency" qName="currency"/>
+<characters>
+          </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="amount" qName="amount"/>
+<characters>25000000</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="amount" qName="amount"/>
+<characters>
+        </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="paymentAmount" qName="paymentAmount"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="paymentType" qName="paymentType"/>
+<characters>Final Principal Payment</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="paymentType" qName="paymentType"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="settlementInformation" qName="settlementInformation"/>
+<characters>
+          </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="settlementInstruction" qName="settlementInstruction"/>
+<characters>
+            </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="beneficiary" qName="beneficiary"/>
+<characters>
+              </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="routingIds" qName="routingIds"/>
+<characters>
+                </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="routingId" qName="routingId"/>
+<characters>MIDLGB22</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="routingId" qName="routingId"/>
+<characters>
+              </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="routingIds" qName="routingIds"/>
+<characters>
+            </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="beneficiary" qName="beneficiary"/>
+<characters>
+          </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="settlementInstruction" qName="settlementInstruction"/>
+<characters>
+        </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="settlementInformation" qName="settlementInformation"/>
+<characters>
+      </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="payment" qName="payment"/>
+<characters>
+    </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="termDeposit" qName="termDeposit"/>
+<characters>
+  </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="trade" qName="trade"/>
+<characters>
+  </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="party" qName="party">
+  <attribute qName="id" localName="id" uri="" value="MIDLAND"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="partyId" qName="partyId"/>
+<characters>MIDLGB22</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="partyId" qName="partyId"/>
+<characters>
+    </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="partyName" qName="partyName"/>
+<characters>MIDLAND</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="partyName" qName="partyName"/>
+<characters>
+  </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="party" qName="party"/>
+<characters>
+  </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="party" qName="party">
+  <attribute qName="id" localName="id" uri="" value="ABNAMRO"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="partyId" qName="partyId"/>
+<characters>ABNANL2A</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="partyId" qName="partyId"/>
+<characters>
+    </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="partyName" qName="partyName"/>
+<characters>ABN AMRO</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="partyName" qName="partyName"/>
+<characters>
+  </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="party" qName="party"/>
+<characters>
+</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="FpML" qName="FpML"/>
+<endPrefixMapping prefix=""/>
+<endPrefixMapping prefix="xsi"/>
+<endDocument/>
+</sax>

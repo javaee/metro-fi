@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Universal Business Language (UBL) Schema 1.0
+
+  Copyright (C) OASIS Open (2004). All Rights Reserved.
+
+  This document and translations of it may be copied and furnished to others, and
+  derivative works that comment on or otherwise explain it or assist in its
+  implementation may be prepared, copied, published and distributed, in whole or
+  in part, without restriction of any kind, provided that the above copyright
+  notice and this paragraph are included on all such copies and derivative works.
+  However, this document itself may not be modified in any way, such as by
+  removing the copyright notice or references to OASIS, except as needed for the
+  purpose of developing OASIS specifications, in which case the procedures for
+  copyrights defined in the OASIS Intellectual Property Rights document must be
+  followed, or as required to translate it into languages other than English.
+
+  The limited permissions granted above are perpetual and will not be revoked by
+  OASIS or its successors or assigns.
+
+  This document and the information contained herein is provided on an "AS IS"
+  basis and OASIS DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+  LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT
+  INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR
+  A PARTICULAR PURPOSE.
+
+  ===============================================================================
+
+  For our absent friend, Michael J. Adcock  - il miglior fabbro
+
+  ===============================================================================
+
+  Universal Business Language Specification
+      (http://www.oasis-open.org/committees/tc_home.php?wg_abbrev=ubl)
+  OASIS Open (http://www.oasis-open.org/)
+
+
+  Document Type:     Invoice
+  Generated On:      Mon Aug 16 15:17:33 2004
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-1.0"
+    xmlns:ccts="urn:oasis:names:specification:ubl:schema:xsd:CoreComponentParameters-1.0"
+    xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0"
+    xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0"
+    xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnspecializedDatatypes-1.0"
+    xmlns:sdt="urn:oasis:names:specification:ubl:schema:xsd:SpecializedDatatypes-1.0"
+    xmlns:cur="urn:oasis:names:specification:ubl:schema:xsd:CurrencyCode-1.0"
+    targetNamespace="urn:oasis:names:specification:ubl:schema:xsd:Invoice-1.0"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified"
+    version="1.0">
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:CoreComponentParameters-1.0" schemaLocation="../common/UBL-CoreComponentParameters-1.0.xsd"/>
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" schemaLocation="../common/UBL-CommonBasicComponents-1.0.xsd"/>
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" schemaLocation="../common/UBL-CommonAggregateComponents-1.0.xsd"/>
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:UnspecializedDatatypes-1.0" schemaLocation="../common/UBL-UnspecializedDatatypes-1.0.xsd"/>
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:SpecializedDatatypes-1.0" schemaLocation="../common/UBL-SpecializedDatatypes-1.0.xsd"/>
+  <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:CurrencyCode-1.0" schemaLocation="../codelist/UBL-CodeList-CurrencyCode-1.0.xsd"/>
+  <xsd:element name="Invoice" type="InvoiceType"/>
+  <xsd:complexType name="InvoiceType">
+    <xsd:sequence>
+      <xsd:element name="ID" type="udt:IdentifierType" minOccurs="1" maxOccurs="1"/>
+      <xsd:element ref="cbc:CopyIndicator" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="GUID" type="udt:IdentifierType" minOccurs="0" maxOccurs="1"/>
+      <xsd:element ref="cbc:IssueDate" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="InvoiceTypeCode" type="udt:CodeType" minOccurs="0" maxOccurs="1"/>
+      <xsd:element ref="cbc:Note" minOccurs="0" maxOccurs="1"/>
+      <xsd:element ref="TaxPointDate" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="InvoiceCurrencyCode" type="cur:CurrencyCodeType" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="TaxCurrencyCode" type="cur:CurrencyCodeType" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="PricingCurrencyCode" type="cur:CurrencyCodeType" minOccurs="0" maxOccurs="1"/>
+      <xsd:element ref="LineItemCountNumeric" minOccurs="0" maxOccurs="1"/>
+      <xsd:element ref="cac:OrderReference" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element ref="DespatchDocumentReference" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element ref="ReceiptDocumentReference" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element ref="AdditionalDocumentReference" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element ref="cac:BuyerParty" minOccurs="1" maxOccurs="1"/>
+      <xsd:element ref="cac:SellerParty" minOccurs="1" maxOccurs="1"/>
+      <xsd:element ref="cac:Delivery" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element ref="cac:PaymentMeans" minOccurs="0" maxOccurs="1"/>
+      <xsd:element ref="cac:PaymentTerms" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element ref="cac:AllowanceCharge" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element ref="cac:ExchangeRate" minOccurs="0" maxOccurs="1"/>
+      <xsd:element ref="cac:TaxTotal" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element ref="cac:LegalTotal" minOccurs="1" maxOccurs="1"/>
+      <xsd:element ref="cac:InvoiceLine" minOccurs="1" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="AdditionalDocumentReference" type="cac:DocumentReferenceType"/>
+  <xsd:element name="DespatchDocumentReference" type="cac:DocumentReferenceType"/>
+  <xsd:element name="LineItemCountNumeric" type="LineItemCountNumericType"/>
+  <xsd:element name="ReceiptDocumentReference" type="cac:DocumentReferenceType"/>
+  <xsd:element name="TaxPointDate" type="TaxPointDateType"/>
+  <xsd:complexType name="LineItemCountNumericType">
+    <xsd:simpleContent>
+      <xsd:extension base="udt:NumericType"/>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <xsd:complexType name="TaxPointDateType">
+    <xsd:simpleContent>
+      <xsd:extension base="udt:DateType"/>
+    </xsd:simpleContent>
+  </xsd:complexType>
+</xsd:schema>

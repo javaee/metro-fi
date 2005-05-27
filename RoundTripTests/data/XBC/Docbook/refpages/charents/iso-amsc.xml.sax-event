@@ -1,0 +1,137 @@
+<sax xmlns="http://www.sun.com/xml/sax-events">
+<startDocument/>
+<startElement uri="" localName="refentry" qName="refentry">
+  <attribute qName="id" localName="id" uri="" value="pent.isoamsc"/>
+</startElement>
+<characters>
+</characters>
+<processingInstruction target="dbhtml" data="filename="iso-amsc.html""/>
+<characters>
+
+</characters>
+<startElement uri="" localName="refmeta" qName="refmeta"/>
+<characters>
+</characters>
+<startElement uri="" localName="indexterm" qName="indexterm"/>
+<characters>
+  </characters>
+<startElement uri="" localName="primary" qName="primary"/>
+<startElement uri="" localName="acronym" qName="acronym"/>
+<characters>ISO</characters>
+<endElement uri="" localName="acronym" qName="acronym"/>
+<characters> Entity Sets</characters>
+<endElement uri="" localName="primary" qName="primary"/>
+<startElement uri="" localName="secondary" qName="secondary"/>
+<characters>Added Math Symbols: Delimiters</characters>
+<endElement uri="" localName="secondary" qName="secondary"/>
+<characters>
+</characters>
+<endElement uri="" localName="indexterm" qName="indexterm"/>
+<characters>
+</characters>
+<startElement uri="" localName="indexterm" qName="indexterm"/>
+<characters>
+  </characters>
+<startElement uri="" localName="primary" qName="primary"/>
+<characters>%isoamsc;</characters>
+<endElement uri="" localName="primary" qName="primary"/>
+<startElement uri="" localName="see" qName="see"/>
+<startElement uri="" localName="acronym" qName="acronym"/>
+<characters>ISO</characters>
+<endElement uri="" localName="acronym" qName="acronym"/>
+<characters> Entity Sets, Added Math Symbols: Delimiters</characters>
+<endElement uri="" localName="see" qName="see"/>
+<characters>
+</characters>
+<endElement uri="" localName="indexterm" qName="indexterm"/>
+<characters>
+
+</characters>
+<startElement uri="" localName="refentrytitle" qName="refentrytitle"/>
+<characters>Added Math Symbols: Delimiters Character Entities (%isoamsc;)</characters>
+<endElement uri="" localName="refentrytitle" qName="refentrytitle"/>
+<characters>
+
+</characters>
+<endElement uri="" localName="refmeta" qName="refmeta"/>
+<characters>
+
+</characters>
+<startElement uri="" localName="refnamediv" qName="refnamediv"/>
+<characters>
+</characters>
+<startElement uri="" localName="refname" qName="refname"/>
+<characters>%isoamsc;</characters>
+<endElement uri="" localName="refname" qName="refname"/>
+<characters>
+</characters>
+<startElement uri="" localName="refpurpose" qName="refpurpose"/>
+<characters>Added Math Symbols: Delimiters Character Entities
+</characters>
+<endElement uri="" localName="refpurpose" qName="refpurpose"/>
+<characters>
+</characters>
+<endElement uri="" localName="refnamediv" qName="refnamediv"/>
+<characters>
+
+</characters>
+<startElement uri="" localName="refsynopsisdiv" qName="refsynopsisdiv"/>
+<characters>
+</characters>
+<startElement uri="" localName="para" qName="para"/>
+<characters>
+The </characters>
+<startElement uri="" localName="literal" qName="literal"/>
+<characters>%isoamsc;</characters>
+<endElement uri="" localName="literal" qName="literal"/>
+<characters> parameter entity includes the </characters>
+<startElement uri="" localName="acronym" qName="acronym"/>
+<characters>ISO</characters>
+<endElement uri="" localName="acronym" qName="acronym"/>
+<characters> 
+character entities with the public identifier:
+
+</characters>
+<startElement uri="" localName="screen" qName="screen"/>
+<characters>
+  ISO 8879:1986//ENTITIES Added Math Symbols: Delimiters//EN
+</characters>
+<endElement uri="" localName="screen" qName="screen"/>
+<characters>
+</characters>
+<endElement uri="" localName="para" qName="para"/>
+<characters>
+</characters>
+<endElement uri="" localName="refsynopsisdiv" qName="refsynopsisdiv"/>
+<characters>
+
+</characters>
+<startElement uri="" localName="refsect1" qName="refsect1"/>
+<startElement uri="" localName="title" qName="title"/>
+<characters>Description</characters>
+<endElement uri="" localName="title" qName="title"/>
+<characters>
+
+</characters>
+<startElement uri="" localName="para" qName="para"/>
+<characters>ISO and the W3C are cooperating to provide an official set
+of character entity references for XML. A description of this set
+is available at
+</characters>
+<startElement uri="" localName="ulink" qName="ulink">
+  <attribute qName="url" localName="url" uri="" value="http://www.w3.org/2003/entities/iso8879doc/isoamsc.html"/>
+</startElement>
+<endElement uri="" localName="ulink" qName="ulink"/>
+<characters>
+</characters>
+<endElement uri="" localName="para" qName="para"/>
+<characters>
+
+</characters>
+<endElement uri="" localName="refsect1" qName="refsect1"/>
+<characters>
+
+</characters>
+<endElement uri="" localName="refentry" qName="refentry"/>
+<endDocument/>
+</sax>

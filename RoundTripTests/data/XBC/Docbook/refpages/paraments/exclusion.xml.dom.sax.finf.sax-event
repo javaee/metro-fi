@@ -1,0 +1,122 @@
+<sax xmlns="http://www.sun.com/xml/sax-events">
+<startDocument/>
+<startElement uri="" localName="refentry" qName="refentry">
+  <attribute qName="id" localName="id" uri="" value="pe-exclusion"/>
+</startElement>
+<characters>
+</characters>
+<processingInstruction target="dbhtml" data="filename="pe-exclusion.html""/>
+<characters>
+
+</characters>
+<startElement uri="" localName="refmeta" qName="refmeta"/>
+<characters>
+</characters>
+<startElement uri="" localName="indexterm" qName="indexterm"/>
+<startElement uri="" localName="primary" qName="primary"/>
+<characters>Parameter Entities</characters>
+<endElement uri="" localName="primary" qName="primary"/>
+<characters>
+</characters>
+<startElement uri="" localName="secondary" qName="secondary"/>
+<startElement uri="" localName="sgmltag" qName="sgmltag">
+  <attribute qName="class" localName="class" uri="" value="paramentity"/>
+</startElement>
+<characters>*.exclusion</characters>
+<endElement uri="" localName="sgmltag" qName="sgmltag"/>
+<endElement uri="" localName="secondary" qName="secondary"/>
+<endElement uri="" localName="indexterm" qName="indexterm"/>
+<characters>
+</characters>
+<startElement uri="" localName="refentrytitle" qName="refentrytitle"/>
+<startElement uri="" localName="sgmltag" qName="sgmltag">
+  <attribute qName="class" localName="class" uri="" value="paramentity"/>
+</startElement>
+<characters>*.exclusion</characters>
+<endElement uri="" localName="sgmltag" qName="sgmltag"/>
+<characters> Parameter Entities</characters>
+<endElement uri="" localName="refentrytitle" qName="refentrytitle"/>
+<characters>
+</characters>
+<endElement uri="" localName="refmeta" qName="refmeta"/>
+<characters>
+
+</characters>
+<startElement uri="" localName="refnamediv" qName="refnamediv"/>
+<characters>
+</characters>
+<startElement uri="" localName="refname" qName="refname"/>
+<startElement uri="" localName="sgmltag" qName="sgmltag">
+  <attribute qName="class" localName="class" uri="" value="paramentity"/>
+</startElement>
+<characters>*.exclusion</characters>
+<endElement uri="" localName="sgmltag" qName="sgmltag"/>
+<characters> Parameter Entities</characters>
+<endElement uri="" localName="refname" qName="refname"/>
+<characters>
+</characters>
+<startElement uri="" localName="refpurpose" qName="refpurpose"/>
+<characters>Control SGML exclusions
+</characters>
+<endElement uri="" localName="refpurpose" qName="refpurpose"/>
+<characters>
+</characters>
+<endElement uri="" localName="refnamediv" qName="refnamediv"/>
+<characters>
+
+</characters>
+<startElement uri="" localName="refsynopsisdiv" qName="refsynopsisdiv"/>
+<startElement uri="" localName="title" qName="title"/>
+<characters>Synopsis</characters>
+<endElement uri="" localName="title" qName="title"/>
+<characters>
+</characters>
+<startElement uri="" localName="para" qName="para"/>
+<characters>
+Used to control the exclusion declarations on elements with exclusions.
+</characters>
+<endElement uri="" localName="para" qName="para"/>
+<characters>
+</characters>
+<endElement uri="" localName="refsynopsisdiv" qName="refsynopsisdiv"/>
+<characters>
+
+</characters>
+<startElement uri="" localName="refsect1" qName="refsect1"/>
+<startElement uri="" localName="title" qName="title"/>
+<characters>Description</characters>
+<endElement uri="" localName="title" qName="title"/>
+<characters>
+
+</characters>
+<startElement uri="" localName="para" qName="para"/>
+<characters>
+The </characters>
+<startElement uri="" localName="sgmltag" qName="sgmltag">
+  <attribute qName="class" localName="class" uri="" value="paramentity"/>
+</startElement>
+<characters>*.exclusion</characters>
+<endElement uri="" localName="sgmltag" qName="sgmltag"/>
+<characters> parameter entities
+parameterize element exclusions.
+You can selectively include or remove elements from the exclusion
+by changing the appropriate parameter entity.
+</characters>
+<endElement uri="" localName="para" qName="para"/>
+<characters>
+
+</characters>
+<startElement uri="" localName="para" qName="para"/>
+<characters>In the XML version of DocBook V4, there are no inclusion entities
+because inclusions are not part of XML.</characters>
+<endElement uri="" localName="para" qName="para"/>
+<characters>
+
+</characters>
+<endElement uri="" localName="refsect1" qName="refsect1"/>
+<characters>
+
+</characters>
+<endElement uri="" localName="refentry" qName="refentry"/>
+<endDocument/>
+</sax>

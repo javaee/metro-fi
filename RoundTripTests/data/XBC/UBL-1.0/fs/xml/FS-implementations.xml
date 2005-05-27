@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?><article>
+  <title>Known UBL formatting implementations</title>
+<articleinfo>
+
+<copyright><year>2004</year><holder>OASIS</holder></copyright>
+<pubdate>$Date: 2005-05-27 22:23:14 $(UTC)</pubdate>
+</articleinfo>
+
+<section>
+<title>
+Known implementations of UBL formatting specifications
+</title>
+
+<para>
+This document records pointers to implementations of UBL formatting specifications that were made known to the UBL Forms Processing Subcommittee at the time of publishing (noted above).</para>
+
+<para>None of these implementations may be considered as reference implementations of UBL formatting specifications or as normative components of the UBL delivery; they are merely examples from what will probably be many available UBL stylesheet libraries.</para>
+
+</section>
+
+<section>
+<title>
+Reported implementations or intentions of implementing 1.0 specifications</title>
+
+<para>
+The following are announced packages that now support or have been announced to support the 1.0 release of the UBL package.</para>
+
+<itemizedlist>
+<listitem><para>
+XSLT and XSL-FO stylesheets in clear text from Crane Softwrights Ltd.:</para>
+<itemizedlist>
+<listitem><para>
+<ulink url="http://www.CraneSoftwrights.com/links/res-ublo.htm"><literal>http://www.CraneSoftwrights.com/links/res-ublo.htm</literal></ulink></para>
+</listitem>
+</itemizedlist>
+</listitem>
+<listitem><para>
+Java JAR standalone implementation of Crane's XSLT and XSL-FO stylesheets from <?nospell-start?>Ambrosoft<?nospell-end?>, Inc.:</para>
+<itemizedlist>
+<listitem><para>
+<ulink url="http://www.ambrosoft.com"><literal>http://www.ambrosoft.com</literal></ulink></para>
+</listitem>
+</itemizedlist>
+</listitem>
+<listitem><para>
+<?nospell-start?>XForms<?nospell-end?> implementations from Micah <?nospell-start?>Dubinko<?nospell-end?>:</para>
+<itemizedlist>
+<listitem><para>
+<ulink url="http://dubinko.info/writing/xforms/ubl/"><literal>http://dubinko.info/writing/xforms/ubl/</literal></ulink></para>
+</listitem>
+</itemizedlist>
+</listitem>
+<listitem><para>
+XSLT and ZPT to HTML/PDF implementations from Accountis plc:</para>
+<itemizedlist>
+<listitem><para>
+<ulink url="http://www.accountis.org/"><literal>http://www.accountis.org/</literal></ulink></para>
+</listitem>
+</itemizedlist>
+</listitem>
+</itemizedlist>
+</section>
+
+<section>
+<title>
+Web site record</title>
+
+<para>
+As part of the FPSC mandate, a record of known implementations of UBL Formatting Specifications will be made public and maintained on the OASIS web site.</para>
+
+</section>
+
+</article>

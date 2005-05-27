@@ -1,0 +1,68 @@
+<sax xmlns="http://www.sun.com/xml/sax-events">
+<startDocument/>
+<startElement uri="" localName="project" qName="project">
+  <attribute qName="default" localName="default" uri="" value="main"/>
+  <attribute qName="name" localName="name" uri="" value="dbtags"/>
+</startElement>
+<characters>
+
+  </characters>
+<comment> create this file to store the locations of your dependant jars </comment>
+<characters>
+  </characters>
+<startElement uri="" localName="property" qName="property">
+  <attribute qName="file" localName="file" uri="" value="../build.properties"/>
+</startElement>
+<endElement uri="" localName="property" qName="property"/>
+<characters>
+  </characters>
+<startElement uri="" localName="property" qName="property">
+  <attribute qName="name" localName="name" uri="" value="classpath"/>
+  <attribute qName="value" localName="value" uri="" value="${servlet.jar}:${jdbc2_0-stdext.jar}"/>
+</startElement>
+<endElement uri="" localName="property" qName="property"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="property" qName="property">
+  <attribute qName="name" localName="name" uri="" value="checkRequirements.pre"/>
+  <attribute qName="value" localName="value" uri="" value="checkRequirements.pre"/>
+</startElement>
+<endElement uri="" localName="property" qName="property"/>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="checkRequirements.pre"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="antcall" qName="antcall">
+  <attribute qName="target" localName="target" uri="" value="checkRequiredFile"/>
+</startElement>
+<characters>
+       </characters>
+<startElement uri="" localName="param" qName="param">
+  <attribute qName="name" localName="name" uri="" value="file"/>
+  <attribute qName="value" localName="value" uri="" value="${jdbc2_0-stdext.jar}"/>
+</startElement>
+<endElement uri="" localName="param" qName="param"/>
+<characters>
+       </characters>
+<startElement uri="" localName="param" qName="param">
+  <attribute qName="name" localName="name" uri="" value="fail.message"/>
+  <attribute qName="value" localName="value" uri="" value="a jar file containing the jdbc2_0-stdext classes is required to compile the dbtags taglib. please define the property jdbc2_0-stdext.jar in your build.properties file and ensure that the file exists"/>
+</startElement>
+<endElement uri="" localName="param" qName="param"/>
+<characters>
+    </characters>
+<endElement uri="" localName="antcall" qName="antcall"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+</characters>
+<endElement uri="" localName="project" qName="project"/>
+<endDocument/>
+</sax>

@@ -1,0 +1,501 @@
+<sax xmlns="http://www.sun.com/xml/sax-events">
+<startDocument/>
+<comment>
+  == Copyright (c) 2002-2003. All rights reserved.
+  == Financial Products Markup Language is subject to the FpML public license.
+  == A copy of this license is available at http://www.fpml.org/documents/license
+  </comment>
+<startPrefixMapping prefix="" uri="http://www.fpml.org/2003/FpML-4-0"/>
+<startPrefixMapping prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="FpML" qName="FpML">
+  <attribute qName="version" localName="version" uri="" value="4-0"/>
+  <attribute qName="xsi:schemaLocation" localName="schemaLocation" uri="http://www.w3.org/2001/XMLSchema-instance" value="http://www.fpml.org/2003/FpML-4-0 ../fpml-main-4-0.xsd http://www.w3.org/2000/09/xmldsig# xmldsig-core-schema.xsd"/>
+  <attribute qName="xsi:type" localName="type" uri="http://www.w3.org/2001/XMLSchema-instance" value="DataDocument"/>
+</startElement>
+<characters>
+</characters>
+<comment> Version 0.12, 24 Jan 2002 </comment>
+<characters>
+</characters>
+<comment> fpml-4-0-eqd-gs-european-call-index.xml </comment>
+<characters>
+</characters>
+<comment> Version 0.13, 28 Jan 2002 </comment>
+<characters>
+</characters>
+<comment> 1. revised following updates to eqd DTD on 24 Jan 2002 </comment>
+<characters>
+</characters>
+<comment> 2. update using FpML 2.0 LCWD samples as a template </comment>
+<characters>
+</characters>
+<comment> Version 0.14, 29 Jan 2002 </comment>
+<characters>
+</characters>
+<comment> 1. Confirm data population prior to distribution </comment>
+<characters>
+</characters>
+<comment> MSDW confirm </comment>
+<characters>
+</characters>
+<comment> AP Version 0.30 30 October 2002 </comment>
+<characters>
+</characters>
+<comment> AP Version 0.31 01 November 2002 </comment>
+<characters>
+  </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="trade" qName="trade"/>
+<characters>
+    </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="tradeHeader" qName="tradeHeader"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="partyTradeIdentifier" qName="partyTradeIdentifier"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="partyReference" qName="partyReference">
+  <attribute qName="href" localName="href" uri="" value="partyA"/>
+</startElement>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="partyReference" qName="partyReference"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="tradeId" qName="tradeId">
+  <attribute qName="tradeIdScheme" localName="tradeIdScheme" uri="" value="http://www.partyA.com/eqd-trade-id"/>
+</startElement>
+<characters>1234</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="tradeId" qName="tradeId"/>
+<characters>
+      </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="partyTradeIdentifier" qName="partyTradeIdentifier"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="tradeDate" qName="tradeDate"/>
+<characters>2000-06-28</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="tradeDate" qName="tradeDate"/>
+<characters>
+    </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="tradeHeader" qName="tradeHeader"/>
+<characters>
+    </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="equityOption" qName="equityOption"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="productType" qName="productType"/>
+<characters>europeanCallIndex</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="productType" qName="productType"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="buyerPartyReference" qName="buyerPartyReference">
+  <attribute qName="href" localName="href" uri="" value="partyB"/>
+</startElement>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="buyerPartyReference" qName="buyerPartyReference"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="sellerPartyReference" qName="sellerPartyReference">
+  <attribute qName="href" localName="href" uri="" value="partyA"/>
+</startElement>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="sellerPartyReference" qName="sellerPartyReference"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="optionType" qName="optionType"/>
+<characters>Call</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="optionType" qName="optionType"/>
+<characters>
+</characters>
+<comment> AP 18 Nov 02 move to underlyer
+                        <underlying>
+                                <description>NIKKEI 225 INDEX</description>
+                                <instrumentId instrumentIdScheme="">.N225</instrumentId>
+                                <exchangeId exchangeIdScheme="http://www.fpml.org/schemes/4.0/ExchangeID">Tokyo Stock Exchange</exchangeId>
+                                <relatedExchangeId exchangeIdScheme="http://www.fpml.org/schemes/4.0/ExchangeID">Osaka Securities Exchange</relatedExchangeId>
+                        </underlying>
+                        </comment>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="underlyer" qName="underlyer"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="singleUnderlyer" qName="singleUnderlyer"/>
+<characters>
+          </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="index" qName="index"/>
+<characters>
+            </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="instrumentId" qName="instrumentId">
+  <attribute qName="instrumentIdScheme" localName="instrumentIdScheme" uri="" value="http://www.fpml.org/schemes/4.0/instrumentId"/>
+</startElement>
+<characters>.N225</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="instrumentId" qName="instrumentId"/>
+<characters>
+            </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="description" qName="description"/>
+<characters>NIKKEI 225 INDEX</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="description" qName="description"/>
+<characters>
+            </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="exchangeId" qName="exchangeId">
+  <attribute qName="exchangeIdScheme" localName="exchangeIdScheme" uri="" value="http://www.fpml.org/schemes/4.0/exchangeId"/>
+</startElement>
+<characters>TSE</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="exchangeId" qName="exchangeId"/>
+<characters>
+            </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="relatedExchangeId" qName="relatedExchangeId">
+  <attribute qName="exchangeIdScheme" localName="exchangeIdScheme" uri="" value="http://www.fpml.org/schemes/4.0/exchangeId"/>
+</startElement>
+<characters>OSE</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="relatedExchangeId" qName="relatedExchangeId"/>
+<characters>
+          </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="index" qName="index"/>
+<characters>
+          </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="openUnits" qName="openUnits"/>
+<characters>1</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="openUnits" qName="openUnits"/>
+<characters>
+        </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="singleUnderlyer" qName="singleUnderlyer"/>
+<characters>
+      </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="underlyer" qName="underlyer"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="strike" qName="strike"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="strikePrice" qName="strikePrice"/>
+<characters>17475.90</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="strikePrice" qName="strikePrice"/>
+<characters>
+      </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="strike" qName="strike"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="numberOfOptions" qName="numberOfOptions"/>
+<characters>79.099093</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="numberOfOptions" qName="numberOfOptions"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="optionEntitlement" qName="optionEntitlement"/>
+<characters>1.00</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="optionEntitlement" qName="optionEntitlement"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="equityExercise" qName="equityExercise"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="equityEuropeanExercise" qName="equityEuropeanExercise"/>
+<characters>
+          </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="expirationDate" qName="expirationDate"/>
+<characters>
+            </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="adjustableDate" qName="adjustableDate"/>
+<characters>
+              </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="unadjustedDate" qName="unadjustedDate"/>
+<characters>2002-07-01</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="unadjustedDate" qName="unadjustedDate"/>
+<characters>
+              </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="dateAdjustments" qName="dateAdjustments"/>
+<characters>
+                </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="businessDayConvention" qName="businessDayConvention"/>
+<characters>NONE</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="businessDayConvention" qName="businessDayConvention"/>
+<characters>
+              </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="dateAdjustments" qName="dateAdjustments"/>
+<characters>
+            </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="adjustableDate" qName="adjustableDate"/>
+<characters>
+          </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="expirationDate" qName="expirationDate"/>
+<characters>
+          </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="equityExpirationTimeType" qName="equityExpirationTimeType"/>
+<characters>Close</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="equityExpirationTimeType" qName="equityExpirationTimeType"/>
+<characters>
+        </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="equityEuropeanExercise" qName="equityEuropeanExercise"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="automaticExerciseApplicable" qName="automaticExerciseApplicable"/>
+<characters>true</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="automaticExerciseApplicable" qName="automaticExerciseApplicable"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="equityValuation" qName="equityValuation"/>
+<characters>
+          </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="valuationTimeType" qName="valuationTimeType"/>
+<characters>Close</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="valuationTimeType" qName="valuationTimeType"/>
+<characters>
+        </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="equityValuation" qName="equityValuation"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="settlementCurrency" qName="settlementCurrency"/>
+<characters>EUR</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="settlementCurrency" qName="settlementCurrency"/>
+<characters>
+</characters>
+<comment> settlementPriceSource made optional in the case of Asians. JS. 17/5/02 SCB+++ </comment>
+<characters>
+</characters>
+<comment> Verify scheme name JS 17/5/02 </comment>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="settlementType" qName="settlementType"/>
+<characters>Cash</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="settlementType" qName="settlementType"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="failureToDeliverApplicable" qName="failureToDeliverApplicable"/>
+<characters>true</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="failureToDeliverApplicable" qName="failureToDeliverApplicable"/>
+<characters>
+      </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="equityExercise" qName="equityExercise"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="fxFeature" qName="fxFeature"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="fxFeatureType" qName="fxFeatureType"/>
+<characters>Composite</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="fxFeatureType" qName="fxFeatureType"/>
+<characters>
+      </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="fxFeature" qName="fxFeature"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="equityOptionFeatures" qName="equityOptionFeatures"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="asian" qName="asian"/>
+<characters>
+</characters>
+<comment> Scheme name needs verification JS 17/5/02 SCB+++ </comment>
+<characters>
+          </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="averagingInOut" qName="averagingInOut"/>
+<characters>In</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="averagingInOut" qName="averagingInOut"/>
+<characters>
+          </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="averagingPeriodIn" qName="averagingPeriodIn"/>
+<characters>
+            </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="averagingDateTimes" qName="averagingDateTimes"/>
+<characters>
+              </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="dateTime" qName="dateTime"/>
+<characters>2000-08-01T08:57:00-00:00</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="dateTime" qName="dateTime"/>
+<characters>
+              </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="dateTime" qName="dateTime"/>
+<characters>2000-09-01T08:57:00-00:00</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="dateTime" qName="dateTime"/>
+<characters>
+              </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="dateTime" qName="dateTime"/>
+<characters>2000-10-01T08:57:00-00:00</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="dateTime" qName="dateTime"/>
+<characters>
+              </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="dateTime" qName="dateTime"/>
+<characters>2000-11-01T08:57:00-00:00</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="dateTime" qName="dateTime"/>
+<characters>
+              </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="dateTime" qName="dateTime"/>
+<characters>2000-12-01T08:57:00-00:00</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="dateTime" qName="dateTime"/>
+<characters>
+              </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="dateTime" qName="dateTime"/>
+<characters>2001-01-04T08:57:00-00:00</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="dateTime" qName="dateTime"/>
+<characters>
+              </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="dateTime" qName="dateTime"/>
+<characters>2001-02-01T08:57:00-00:00</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="dateTime" qName="dateTime"/>
+<characters>
+              </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="dateTime" qName="dateTime"/>
+<characters>2001-03-01T08:57:00-00:00</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="dateTime" qName="dateTime"/>
+<characters>
+            </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="averagingDateTimes" qName="averagingDateTimes"/>
+<characters>
+            </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="marketDisruption" qName="marketDisruption"/>
+<characters>ModifiedPostponement</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="marketDisruption" qName="marketDisruption"/>
+<characters>
+          </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="averagingPeriodIn" qName="averagingPeriodIn"/>
+<characters>
+        </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="asian" qName="asian"/>
+<characters>
+      </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="equityOptionFeatures" qName="equityOptionFeatures"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="equityPremium" qName="equityPremium"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="payerPartyReference" qName="payerPartyReference">
+  <attribute qName="href" localName="href" uri="" value="partyB"/>
+</startElement>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="payerPartyReference" qName="payerPartyReference"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="receiverPartyReference" qName="receiverPartyReference">
+  <attribute qName="href" localName="href" uri="" value="partyA"/>
+</startElement>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="receiverPartyReference" qName="receiverPartyReference"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="paymentAmount" qName="paymentAmount"/>
+<characters>
+          </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="currency" qName="currency"/>
+<characters>EUR</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="currency" qName="currency"/>
+<characters>
+          </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="amount" qName="amount"/>
+<characters>107821.57</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="amount" qName="amount"/>
+<characters>
+        </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="paymentAmount" qName="paymentAmount"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="paymentDate" qName="paymentDate"/>
+<characters>
+          </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="unadjustedDate" qName="unadjustedDate"/>
+<characters>2000-07-03</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="unadjustedDate" qName="unadjustedDate"/>
+<characters>
+          </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="dateAdjustments" qName="dateAdjustments"/>
+<characters>
+            </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="businessDayConvention" qName="businessDayConvention"/>
+<characters>NONE</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="businessDayConvention" qName="businessDayConvention"/>
+<characters>
+          </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="dateAdjustments" qName="dateAdjustments"/>
+<characters>
+        </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="paymentDate" qName="paymentDate"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="pricePerOption" qName="pricePerOption"/>
+<characters>1363.1202</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="pricePerOption" qName="pricePerOption"/>
+<characters>
+      </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="equityPremium" qName="equityPremium"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="methodOfAdjustment" qName="methodOfAdjustment"/>
+<characters>CalculationAgent</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="methodOfAdjustment" qName="methodOfAdjustment"/>
+<characters>
+    </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="equityOption" qName="equityOption"/>
+<characters>
+    </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="calculationAgent" qName="calculationAgent"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="calculationAgentPartyReference" qName="calculationAgentPartyReference">
+  <attribute qName="href" localName="href" uri="" value="partyA"/>
+</startElement>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="calculationAgentPartyReference" qName="calculationAgentPartyReference"/>
+<characters>
+    </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="calculationAgent" qName="calculationAgent"/>
+<characters>
+    </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="documentation" qName="documentation"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="masterAgreement" qName="masterAgreement"/>
+<characters>
+        </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="masterAgreementType" qName="masterAgreementType"/>
+<characters>ISDA2002</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="masterAgreementType" qName="masterAgreementType"/>
+<characters>
+      </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="masterAgreement" qName="masterAgreement"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="contractualDefinitions" qName="contractualDefinitions"/>
+<characters>ISDA2000</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="contractualDefinitions" qName="contractualDefinitions"/>
+<characters>
+      </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="contractualDefinitions" qName="contractualDefinitions"/>
+<characters>ISDA1996Equity</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="contractualDefinitions" qName="contractualDefinitions"/>
+<characters>
+    </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="documentation" qName="documentation"/>
+<characters>
+    </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="governingLaw" qName="governingLaw"/>
+<characters>GBEN</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="governingLaw" qName="governingLaw"/>
+<characters>
+  </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="trade" qName="trade"/>
+<characters>
+  </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="party" qName="party">
+  <attribute qName="id" localName="id" uri="" value="partyA"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="partyId" qName="partyId"/>
+<characters>Party A</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="partyId" qName="partyId"/>
+<characters>
+  </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="party" qName="party"/>
+<characters>
+  </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="party" qName="party">
+  <attribute qName="id" localName="id" uri="" value="partyB"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="http://www.fpml.org/2003/FpML-4-0" localName="partyId" qName="partyId"/>
+<characters>Party B</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="partyId" qName="partyId"/>
+<characters>
+  </characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="party" qName="party"/>
+<characters>
+</characters>
+<endElement uri="http://www.fpml.org/2003/FpML-4-0" localName="FpML" qName="FpML"/>
+<endPrefixMapping prefix=""/>
+<endPrefixMapping prefix="xsi"/>
+<endDocument/>
+</sax>

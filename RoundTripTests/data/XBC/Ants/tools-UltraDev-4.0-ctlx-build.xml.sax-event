@@ -1,0 +1,596 @@
+<sax xmlns="http://www.sun.com/xml/sax-events">
+<startDocument/>
+<comment> ANT Build Script for the CTLX </comment>
+<comment> $Id: tools-UltraDev-4.0-ctlx-build.xml.sax-event,v 1.1 2005-05-27 20:48:29 joehw Exp $ </comment>
+<startElement uri="" localName="project" qName="project">
+  <attribute qName="basedir" localName="basedir" uri="" value="."/>
+  <attribute qName="default" localName="default" uri="" value="main"/>
+  <attribute qName="name" localName="name" uri="" value="ultradev4"/>
+</startElement>
+<characters>
+
+    </characters>
+<comment> ******************** Adjustable Properties *********************** </comment>
+<characters>
+
+    </characters>
+<comment>
+
+        The following property values should be examined and customized
+	for each custom tag library subproject.
+
+	ant.home                    Home directory for the ANT build tool
+	                            This is normally defaulted from the
+				    ANT_HOME environment variable in the
+				    build script.
+
+	servlet.jar		    Pathname to the "servlet.jar" file
+	                            from the Servletapi distribution.
+
+        taglib.name		    Base name of this tag library subproject.
+
+	xalan.jar                   Pathname to the "xalan.jar" file from the
+	                            Xalan distribution.
+
+	xerces.jar		    Pathname to the "xerces.jar" file from the
+	                            Xerces or Xalan distribution.
+
+    </comment>
+<characters>
+
+    </characters>
+<startElement uri="" localName="property" qName="property">
+  <attribute qName="name" localName="name" uri="" value="taglib.name"/>
+  <attribute qName="value" localName="value" uri="" value="ultradev4"/>
+</startElement>
+<endElement uri="" localName="property" qName="property"/>
+<characters>
+    </characters>
+<startElement uri="" localName="property" qName="property">
+  <attribute qName="name" localName="name" uri="" value="ant.home"/>
+  <attribute qName="value" localName="value" uri="" value="../../../../../jakarta-ant"/>
+</startElement>
+<endElement uri="" localName="property" qName="property"/>
+<characters>
+    </characters>
+<startElement uri="" localName="property" qName="property">
+  <attribute qName="name" localName="name" uri="" value="servlet.jar"/>
+  <attribute qName="value" localName="value" uri="" value="../../../../../jakarta-servletapi/lib/servlet.jar"/>
+</startElement>
+<endElement uri="" localName="property" qName="property"/>
+<characters>
+    </characters>
+<startElement uri="" localName="property" qName="property">
+  <attribute qName="name" localName="name" uri="" value="xerces.jar"/>
+  <attribute qName="value" localName="value" uri="" value="../../../../../xml-xalan/xerces.jar"/>
+</startElement>
+<endElement uri="" localName="property" qName="property"/>
+<characters>
+
+
+    </characters>
+<comment> ****************** Project Standard Properties ******************* </comment>
+<characters>
+
+    </characters>
+<comment>
+	build.dir                   Base directory for build targets
+	dist.dir                    Base directory for distribution targets
+    </comment>
+<characters>
+
+    </characters>
+<startElement uri="" localName="property" qName="property">
+  <attribute qName="name" localName="name" uri="" value="build.dir"/>
+  <attribute qName="value" localName="value" uri="" value="../../../../build"/>
+</startElement>
+<endElement uri="" localName="property" qName="property"/>
+<characters>
+    </characters>
+<startElement uri="" localName="property" qName="property">
+  <attribute qName="name" localName="name" uri="" value="dist.dir"/>
+  <attribute qName="value" localName="value" uri="" value="../../../../dist"/>
+</startElement>
+<endElement uri="" localName="property" qName="property"/>
+<characters>
+    </characters>
+<startElement uri="" localName="property" qName="property">
+  <attribute qName="name" localName="name" uri="" value="taglibs.xsl"/>
+  <attribute qName="value" localName="value" uri="" value="../../../../src/doc/stylesheets/taglibs.xsl"/>
+</startElement>
+<endElement uri="" localName="property" qName="property"/>
+<characters>
+
+    </characters>
+<comment> *********************** Default Properties ********************** </comment>
+<characters>
+
+    </characters>
+<comment>
+
+	conf.src                    TLDParser configuration source directory
+        doc.src                     Documentation source directory
+        tutorial.src		    ultradev4-tutorial application
+        library.src                 Library Java source directory
+	lib.src			    Directory for Xerces XML processor
+	ext.src			    UltraDev extension files source directory
+
+    </comment>
+<characters>
+
+    </characters>
+<startElement uri="" localName="property" qName="property">
+  <attribute qName="name" localName="name" uri="" value="conf.src"/>
+  <attribute qName="value" localName="value" uri="" value="conf"/>
+</startElement>
+<endElement uri="" localName="property" qName="property"/>
+<characters>
+    </characters>
+<startElement uri="" localName="property" qName="property">
+  <attribute qName="name" localName="name" uri="" value="doc.src"/>
+  <attribute qName="value" localName="value" uri="" value="doc"/>
+</startElement>
+<endElement uri="" localName="property" qName="property"/>
+<characters>
+    </characters>
+<startElement uri="" localName="property" qName="property">
+  <attribute qName="name" localName="name" uri="" value="tutorial.src"/>
+  <attribute qName="value" localName="value" uri="" value="examples/ctlx-tutorial.war"/>
+</startElement>
+<endElement uri="" localName="property" qName="property"/>
+<characters>
+    </characters>
+<startElement uri="" localName="property" qName="property">
+  <attribute qName="name" localName="name" uri="" value="library.src"/>
+  <attribute qName="value" localName="value" uri="" value="src"/>
+</startElement>
+<endElement uri="" localName="property" qName="property"/>
+<characters>
+    </characters>
+<startElement uri="" localName="property" qName="property">
+  <attribute qName="name" localName="name" uri="" value="lib.src"/>
+  <attribute qName="value" localName="value" uri="" value="lib"/>
+</startElement>
+<endElement uri="" localName="property" qName="property"/>
+<characters>
+    </characters>
+<startElement uri="" localName="property" qName="property">
+  <attribute qName="name" localName="name" uri="" value="ext.src"/>
+  <attribute qName="value" localName="value" uri="" value="ext/ctlx.mxp"/>
+</startElement>
+<endElement uri="" localName="property" qName="property"/>
+<characters>
+
+    </characters>
+<comment> ********************* Derived Properties ************************* </comment>
+<characters>
+
+    </characters>
+<comment>
+
+        These property values are derived from the previously defined values,
+	and should not normally be overridden from the command line.
+
+        build.doc                   Target directory for documentation app
+        build.parser		    Target directory for TLDParser sevlet
+	dist.doc                    Destination for documentation
+	dist.parser		    Destination WAR for TLDParser servlet
+	dist.tutorial               Destination for tutorial WAR
+	dist.ext                    Destination for .mxp extension file
+
+    </comment>
+<characters>
+
+    </characters>
+<startElement uri="" localName="property" qName="property">
+  <attribute qName="name" localName="name" uri="" value="build.doc"/>
+  <attribute qName="value" localName="value" uri="" value="${build.dir}/${taglib.name}/${taglib.name}-doc"/>
+</startElement>
+<endElement uri="" localName="property" qName="property"/>
+<characters>
+    </characters>
+<startElement uri="" localName="property" qName="property">
+  <attribute qName="name" localName="name" uri="" value="build.parser"/>
+  <attribute qName="value" localName="value" uri="" value="${build.dir}/${taglib.name}/TLDParser"/>
+</startElement>
+<endElement uri="" localName="property" qName="property"/>
+<characters>
+    </characters>
+<startElement uri="" localName="property" qName="property">
+  <attribute qName="name" localName="name" uri="" value="dist.doc"/>
+  <attribute qName="value" localName="value" uri="" value="${dist.dir}/${taglib.name}/${taglib.name}-doc.war"/>
+</startElement>
+<endElement uri="" localName="property" qName="property"/>
+<characters>
+    </characters>
+<startElement uri="" localName="property" qName="property">
+  <attribute qName="name" localName="name" uri="" value="dist.parser"/>
+  <attribute qName="value" localName="value" uri="" value="${dist.dir}/${taglib.name}/TLDParser.war"/>
+</startElement>
+<endElement uri="" localName="property" qName="property"/>
+<characters>
+    </characters>
+<startElement uri="" localName="property" qName="property">
+  <attribute qName="name" localName="name" uri="" value="dist.tutorial"/>
+  <attribute qName="value" localName="value" uri="" value="${dist.dir}/${taglib.name}/${taglib.name}-tutorial.war"/>
+</startElement>
+<endElement uri="" localName="property" qName="property"/>
+<characters>
+    </characters>
+<startElement uri="" localName="property" qName="property">
+  <attribute qName="name" localName="name" uri="" value="dist.ext"/>
+  <attribute qName="value" localName="value" uri="" value="${dist.dir}/${taglib.name}/ctlx.mxp"/>
+</startElement>
+<endElement uri="" localName="property" qName="property"/>
+<characters>
+    </characters>
+<startElement uri="" localName="property" qName="property">
+  <attribute qName="name" localName="name" uri="" value="taglibs.doc"/>
+  <attribute qName="value" localName="value" uri="" value="${dist.dir}/doc/doc/${taglib.name}-doc"/>
+</startElement>
+<endElement uri="" localName="property" qName="property"/>
+<characters>
+
+  </characters>
+<comment> ********************** Destination Preparation ********************* </comment>
+<characters>
+
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="prepare"/>
+</startElement>
+<characters>
+    </characters>
+<comment> Set up build directories </comment>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${build.dir}"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${build.doc}"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${build.doc}/WEB-INF"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${build.doc}/WEB-INF/classes"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${build.doc}/WEB-INF/lib"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${build.parser}"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${build.parser}/tlds"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${build.parser}/WEB-INF"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${build.parser}/WEB-INF/classes"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${build.parser}/WEB-INF/lib"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<comment> Set up distribution directory </comment>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${dist.dir}"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${dist.dir}/${taglib.name}"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<comment> Compile the documentation application </comment>
+<characters>                               
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="depends" localName="depends" uri="" value="prepare"/>
+  <attribute qName="name" localName="name" uri="" value="documentation"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="copy" qName="copy">
+  <attribute qName="file" localName="file" uri="" value="${doc.src}/ctlxmanual.html"/>
+  <attribute qName="tofile" localName="tofile" uri="" value="${build.doc}/index.html"/>
+</startElement>
+<endElement uri="" localName="copy" qName="copy"/>
+<characters>
+    </characters>
+<startElement uri="" localName="copy" qName="copy">
+  <attribute qName="todir" localName="todir" uri="" value="${build.doc}/WEB-INF"/>
+</startElement>
+<characters>
+      </characters>
+<startElement uri="" localName="fileset" qName="fileset">
+  <attribute qName="dir" localName="dir" uri="" value="${doc.src}/conf"/>
+</startElement>
+<endElement uri="" localName="fileset" qName="fileset"/>
+<characters>
+    </characters>
+<endElement uri="" localName="copy" qName="copy"/>
+<characters>
+    </characters>
+<comment> intro.xml isn't part of the documentation application,
+         this is just a handy place to build it for the web site. </comment>
+<characters>
+    </characters>
+<startElement uri="" localName="style" qName="style">
+  <attribute qName="destdir" localName="destdir" uri="" value="${build.doc}"/>
+  <attribute qName="in" localName="in" uri="" value="xml/intro.xml"/>
+  <attribute qName="out" localName="out" uri="" value="${build.doc}/intro.html"/>
+  <attribute qName="style" localName="style" uri="" value="${taglibs.xsl}"/>
+</startElement>
+<characters>
+      </characters>
+<startElement uri="" localName="param" qName="param">
+  <attribute qName="expression" localName="expression" uri="" value="../../"/>
+  <attribute qName="name" localName="name" uri="" value="prefix"/>
+</startElement>
+<endElement uri="" localName="param" qName="param"/>
+<characters>
+    </characters>
+<endElement uri="" localName="style" qName="style"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<comment> **************** Compile TLDParser Servlet ******************** </comment>
+<characters>
+
+  </characters>
+<comment> Compile the TLDParser servlet </comment>
+<characters>
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="depends" localName="depends" uri="" value="prepare"/>
+  <attribute qName="name" localName="name" uri="" value="TLDParser"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="copy" qName="copy">
+  <attribute qName="todir" localName="todir" uri="" value="${build.parser}/WEB-INF/lib"/>
+</startElement>
+<characters> 
+      </characters>
+<startElement uri="" localName="fileset" qName="fileset">
+  <attribute qName="dir" localName="dir" uri="" value="${lib.src}"/>
+</startElement>
+<endElement uri="" localName="fileset" qName="fileset"/>
+<characters>
+    </characters>
+<endElement uri="" localName="copy" qName="copy"/>
+<characters>
+    </characters>
+<startElement uri="" localName="copy" qName="copy">
+  <attribute qName="todir" localName="todir" uri="" value="${build.parser}/WEB-INF"/>
+</startElement>
+<characters>
+      </characters>
+<startElement uri="" localName="fileset" qName="fileset">
+  <attribute qName="dir" localName="dir" uri="" value="${conf.src}"/>
+</startElement>
+<endElement uri="" localName="fileset" qName="fileset"/>
+<characters>
+    </characters>
+<endElement uri="" localName="copy" qName="copy"/>
+<characters>
+    </characters>
+<startElement uri="" localName="javac" qName="javac">
+  <attribute qName="classpath" localName="classpath" uri="" value="${servlet.jar};${xerces.jar}"/>
+  <attribute qName="debug" localName="debug" uri="" value="on"/>
+  <attribute qName="destdir" localName="destdir" uri="" value="${build.parser}/WEB-INF/classes/"/>
+  <attribute qName="srcdir" localName="srcdir" uri="" value="${library.src}"/>
+</startElement>
+<endElement uri="" localName="javac" qName="javac"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<comment> Compile TLDParser WAR, place into dist with doc, tutorial, and .mxp  </comment>
+<characters>
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="depends" localName="depends" uri="" value="documentation,dist"/>
+  <attribute qName="name" localName="name" uri="" value="main"/>
+</startElement>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+
+  </characters>
+<comment> ******************* Create Distribution Files ********************** </comment>
+<characters>
+
+  </characters>
+<comment> Create the documentation application WAR file </comment>
+<characters>
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="depends" localName="depends" uri="" value="documentation"/>
+  <attribute qName="name" localName="name" uri="" value="documentation-dist"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="jar" qName="jar">
+  <attribute qName="basedir" localName="basedir" uri="" value="${build.doc}"/>
+  <attribute qName="excludes" localName="excludes" uri="" value="intro.html"/>
+  <attribute qName="jarfile" localName="jarfile" uri="" value="${dist.doc}"/>
+</startElement>
+<endElement uri="" localName="jar" qName="jar"/>
+<characters>
+    </characters>
+<startElement uri="" localName="mkdir" qName="mkdir">
+  <attribute qName="dir" localName="dir" uri="" value="${taglibs.doc}"/>
+</startElement>
+<endElement uri="" localName="mkdir" qName="mkdir"/>
+<characters>
+    </characters>
+<startElement uri="" localName="copy" qName="copy">
+  <attribute qName="todir" localName="todir" uri="" value="${taglibs.doc}"/>
+</startElement>
+<characters>
+      </characters>
+<startElement uri="" localName="fileset" qName="fileset">
+  <attribute qName="dir" localName="dir" uri="" value="${build.doc}"/>
+</startElement>
+<characters>
+        </characters>
+<startElement uri="" localName="exclude" qName="exclude">
+  <attribute qName="name" localName="name" uri="" value="WEB-INF/**"/>
+</startElement>
+<endElement uri="" localName="exclude" qName="exclude"/>
+<characters>
+      </characters>
+<endElement uri="" localName="fileset" qName="fileset"/>
+<characters>
+    </characters>
+<endElement uri="" localName="copy" qName="copy"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters> 
+
+  </characters>
+<comment> Create the TLDParser servlet WAR file </comment>
+<characters>
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="depends" localName="depends" uri="" value="TLDParser"/>
+  <attribute qName="name" localName="name" uri="" value="TLDParser-dist"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="jar" qName="jar">
+  <attribute qName="basedir" localName="basedir" uri="" value="${build.parser}"/>
+  <attribute qName="jarfile" localName="jarfile" uri="" value="${dist.parser}"/>
+</startElement>
+<endElement uri="" localName="jar" qName="jar"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+  </characters>
+<comment> Copy the documentation, tutorial and UltraDev extension file to dist </comment>
+<characters>
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="depends" localName="depends" uri="" value="prepare"/>
+  <attribute qName="name" localName="name" uri="" value="copy-others"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="copy" qName="copy">
+  <attribute qName="file" localName="file" uri="" value="${tutorial.src}/"/>
+  <attribute qName="tofile" localName="tofile" uri="" value="${dist.tutorial}"/>
+</startElement>
+<endElement uri="" localName="copy" qName="copy"/>
+<characters>
+    </characters>
+<startElement uri="" localName="copy" qName="copy">
+  <attribute qName="file" localName="file" uri="" value="${ext.src}"/>
+  <attribute qName="tofile" localName="tofile" uri="" value="${dist.ext}"/>
+</startElement>
+<endElement uri="" localName="copy" qName="copy"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+  
+  </characters>
+<comment> Create the entire set of distribution files </comment>
+<characters>
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="depends" localName="depends" uri="" value="TLDParser-dist,copy-others,documentation-dist"/>
+  <attribute qName="name" localName="name" uri="" value="dist"/>
+</startElement>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+
+  </characters>
+<comment> ************************ Utility Commands ************************** </comment>
+<characters>
+
+  </characters>
+<comment> Delete output directories and files so we can build from scratch </comment>
+<characters>
+  </characters>
+<startElement uri="" localName="target" qName="target">
+  <attribute qName="name" localName="name" uri="" value="clean"/>
+</startElement>
+<characters>
+    </characters>
+<startElement uri="" localName="delete" qName="delete">
+  <attribute qName="dir" localName="dir" uri="" value="${build.doc}"/>
+</startElement>
+<endElement uri="" localName="delete" qName="delete"/>
+<characters>
+    </characters>
+<startElement uri="" localName="delete" qName="delete">
+  <attribute qName="dir" localName="dir" uri="" value="${build.parser}"/>
+</startElement>
+<endElement uri="" localName="delete" qName="delete"/>
+<characters>
+    </characters>
+<startElement uri="" localName="delete" qName="delete">
+  <attribute qName="dir" localName="dir" uri="" value="${dist.dir}/${taglib.name}"/>
+</startElement>
+<endElement uri="" localName="delete" qName="delete"/>
+<characters>
+  </characters>
+<endElement uri="" localName="target" qName="target"/>
+<characters>
+
+</characters>
+<endElement uri="" localName="project" qName="project"/>
+<endDocument/>
+</sax>

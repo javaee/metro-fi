@@ -1,0 +1,1408 @@
+<sax xmlns="http://www.sun.com/xml/sax-events">
+<startDocument/>
+<startPrefixMapping prefix="" uri="urn:oasis:names:specification:ubl:schema:xsd:Invoice-1.0"/>
+<startPrefixMapping prefix="cac" uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0"/>
+<startPrefixMapping prefix="cbc" uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0"/>
+<startPrefixMapping prefix="cur" uri="urn:oasis:names:specification:ubl:schema:xsd:CurrencyCode-1.0"/>
+<startPrefixMapping prefix="xsi" uri="http://www.w3.org/2001/XMLSchema-instance"/>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:Invoice-1.0" localName="Invoice" qName="Invoice">
+  <attribute qName="xsi:schemaLocation" localName="schemaLocation" uri="http://www.w3.org/2001/XMLSchema-instance" value="urn:oasis:names:specification:ubl:schema:xsd:Invoice-1.0 ../../xsd/maindoc/UBL-Invoice-1.0.xsd"/>
+</startElement>
+<characters>
+	</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:Invoice-1.0" localName="ID" qName="ID"/>
+<characters>IN 2003/00645</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:Invoice-1.0" localName="ID" qName="ID"/>
+<characters>
+	</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="CopyIndicator" qName="cbc:CopyIndicator"/>
+<characters>false</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="CopyIndicator" qName="cbc:CopyIndicator"/>
+<characters>
+	</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="IssueDate" qName="cbc:IssueDate"/>
+<characters>2003-02-25</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="IssueDate" qName="cbc:IssueDate"/>
+<characters>
+	</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:Invoice-1.0" localName="TaxPointDate" qName="TaxPointDate"/>
+<characters>2003-02-25</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:Invoice-1.0" localName="TaxPointDate" qName="TaxPointDate"/>
+<characters>
+	</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="OrderReference" qName="cac:OrderReference"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BuyersID" qName="cac:BuyersID"/>
+<characters>S03-034257</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BuyersID" qName="cac:BuyersID"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="SellersID" qName="cac:SellersID"/>
+<characters>SW/F1/50156</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="SellersID" qName="cac:SellersID"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="IssueDate" qName="cbc:IssueDate"/>
+<characters>2003-02-03</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="IssueDate" qName="cbc:IssueDate"/>
+<characters>
+	</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="OrderReference" qName="cac:OrderReference"/>
+<characters>
+	</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:Invoice-1.0" localName="DespatchDocumentReference" qName="DespatchDocumentReference"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>DEL-03/55-712</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="IssueDate" qName="cbc:IssueDate"/>
+<characters>2003-02-24</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="IssueDate" qName="cbc:IssueDate"/>
+<characters>
+	</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:Invoice-1.0" localName="DespatchDocumentReference" qName="DespatchDocumentReference"/>
+<characters>
+	</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BuyerParty" qName="cac:BuyerParty"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="Party" qName="cac:Party"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PartyName" qName="cac:PartyName"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Name" qName="cbc:Name"/>
+<characters>Jerry Builder plc</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Name" qName="cbc:Name"/>
+<characters>
+			</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PartyName" qName="cac:PartyName"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="Address" qName="cac:Address"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="StreetName" qName="cbc:StreetName"/>
+<characters>Marsh Lane</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="StreetName" qName="cbc:StreetName"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="CityName" qName="cbc:CityName"/>
+<characters>Nowhere</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="CityName" qName="cbc:CityName"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="PostalZone" qName="cbc:PostalZone"/>
+<characters>NR18 4XX</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="PostalZone" qName="cbc:PostalZone"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="CountrySubentity" qName="cbc:CountrySubentity"/>
+<characters>Norfolk</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="CountrySubentity" qName="cbc:CountrySubentity"/>
+<characters>
+			</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="Address" qName="cac:Address"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="Contact" qName="cac:Contact"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Name" qName="cbc:Name"/>
+<characters>Eva Brick</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Name" qName="cbc:Name"/>
+<characters>
+			</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="Contact" qName="cac:Contact"/>
+<characters>
+		</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="Party" qName="cac:Party"/>
+<characters>
+	</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BuyerParty" qName="cac:BuyerParty"/>
+<characters>
+	</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="SellerParty" qName="cac:SellerParty"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="Party" qName="cac:Party"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PartyName" qName="cac:PartyName"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Name" qName="cbc:Name"/>
+<characters>Specialist Windows plc</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Name" qName="cbc:Name"/>
+<characters>
+			</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PartyName" qName="cac:PartyName"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="Address" qName="cac:Address"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="BuildingName" qName="cbc:BuildingName"/>
+<characters>Snowhill Works</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="BuildingName" qName="cbc:BuildingName"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="CityName" qName="cbc:CityName"/>
+<characters>Little Snoring</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="CityName" qName="cbc:CityName"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="PostalZone" qName="cbc:PostalZone"/>
+<characters>SM2 3NW</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="PostalZone" qName="cbc:PostalZone"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="CountrySubentity" qName="cbc:CountrySubentity"/>
+<characters>Whereshire</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="CountrySubentity" qName="cbc:CountrySubentity"/>
+<characters>
+			</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="Address" qName="cac:Address"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PartyTaxScheme" qName="cac:PartyTaxScheme"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="CompanyID" qName="cac:CompanyID"/>
+<characters>03004567</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="CompanyID" qName="cac:CompanyID"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxScheme" qName="cac:TaxScheme"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxTypeCode" qName="cac:TaxTypeCode"/>
+<characters>VAT</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxTypeCode" qName="cac:TaxTypeCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxScheme" qName="cac:TaxScheme"/>
+<characters>
+			</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PartyTaxScheme" qName="cac:PartyTaxScheme"/>
+<characters>
+		</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="Party" qName="cac:Party"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AccountsContact" qName="cac:AccountsContact"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Name" qName="cbc:Name"/>
+<characters>Paul Carpenter</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Name" qName="cbc:Name"/>
+<characters>
+		</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AccountsContact" qName="cac:AccountsContact"/>
+<characters>
+	</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="SellerParty" qName="cac:SellerParty"/>
+<characters>
+	</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="Delivery" qName="cac:Delivery"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="ActualDeliveryDateTime" qName="cbc:ActualDeliveryDateTime"/>
+<characters>2003-02-24T00:00:00</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="ActualDeliveryDateTime" qName="cbc:ActualDeliveryDateTime"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DeliveryAddress" qName="cac:DeliveryAddress"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="StreetName" qName="cbc:StreetName"/>
+<characters>Riverside Rd.</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="StreetName" qName="cbc:StreetName"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="BuildingName" qName="cbc:BuildingName"/>
+<characters>Plot 17, Whitewater Estate</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="BuildingName" qName="cbc:BuildingName"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="CityName" qName="cbc:CityName"/>
+<characters>Whetstone</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="CityName" qName="cbc:CityName"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="CountrySubentity" qName="cbc:CountrySubentity"/>
+<characters>Middlesex</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="CountrySubentity" qName="cbc:CountrySubentity"/>
+<characters>
+		</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DeliveryAddress" qName="cac:DeliveryAddress"/>
+<characters>
+	</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="Delivery" qName="cac:Delivery"/>
+<characters>
+	</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PaymentMeans" qName="cac:PaymentMeans"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PaymentMeansCode" qName="cac:PaymentMeansCode"/>
+<characters>ZZZ</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PaymentMeansCode" qName="cac:PaymentMeansCode"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PayeeFinancialAccount" qName="cac:PayeeFinancialAccount"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>07044961</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Name" qName="cbc:Name"/>
+<characters>Specialist Windows pc</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Name" qName="cbc:Name"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AccountTypeCode" qName="cac:AccountTypeCode"/>
+<characters>Credit</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AccountTypeCode" qName="cac:AccountTypeCode"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="FinancialInstitutionBranch" qName="cac:FinancialInstitutionBranch"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>776631</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="FinancialInstitution" qName="cac:FinancialInstitution"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>LOYDGB852</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="FinancialInstitution" qName="cac:FinancialInstitution"/>
+<characters>
+			</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="FinancialInstitutionBranch" qName="cac:FinancialInstitutionBranch"/>
+<characters>
+		</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PayeeFinancialAccount" qName="cac:PayeeFinancialAccount"/>
+<characters>
+	</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PaymentMeans" qName="cac:PaymentMeans"/>
+<characters>
+	</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PaymentTerms" qName="cac:PaymentTerms"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Note" qName="cbc:Note"/>
+<characters>Settlement discount may be deducted if paid by due date</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Note" qName="cbc:Note"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="SettlementDiscountPercent" qName="cbc:SettlementDiscountPercent"/>
+<characters>2.5</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="SettlementDiscountPercent" qName="cbc:SettlementDiscountPercent"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="SettlementPeriod" qName="cac:SettlementPeriod"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="StartDateTime" qName="cbc:StartDateTime"/>
+<characters>2003-02-25T00:00:00</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="StartDateTime" qName="cbc:StartDateTime"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="DurationMeasure" qName="cbc:DurationMeasure">
+  <attribute qName="measureUnitCode" localName="measureUnitCode" uri="" value="days"/>
+</startElement>
+<characters>30</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="DurationMeasure" qName="cbc:DurationMeasure"/>
+<characters>
+		</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="SettlementPeriod" qName="cac:SettlementPeriod"/>
+<characters>
+	</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PaymentTerms" qName="cac:PaymentTerms"/>
+<characters>
+	</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AllowanceCharge" qName="cac:AllowanceCharge"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="ChargeIndicator" qName="cbc:ChargeIndicator"/>
+<characters>false</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="ChargeIndicator" qName="cbc:ChargeIndicator"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ReasonCode" qName="cac:ReasonCode">
+  <attribute qName="codeListAgencyID" localName="codeListAgencyID" uri="" value="6"/>
+  <attribute qName="codeListAgencyName" localName="codeListAgencyName" uri="" value="United Nations Economic Commission for Europe"/>
+  <attribute qName="codeListID" localName="codeListID" uri="" value="UN/ECE 4465"/>
+  <attribute qName="codeListName" localName="codeListName" uri="" value="Adjustment Reason Description"/>
+  <attribute qName="codeListSchemeURI" localName="codeListSchemeURI" uri="" value="urn:oasis:names:specification:ubl:schema:xsd:AllowanceChargeReasonCode-1.0"/>
+  <attribute qName="codeListURI" localName="codeListURI" uri="" value="http://www.unece.org/trade/untdid/d03a/tred/tred4465.htm"/>
+  <attribute qName="codeListVersionID" localName="codeListVersionID" uri="" value="D03A"/>
+  <attribute qName="name" localName="name" uri="" value="Trade discount"/>
+</startElement>
+<characters>19</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ReasonCode" qName="cac:ReasonCode"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="MultiplierFactorNumeric" qName="cbc:MultiplierFactorNumeric"/>
+<characters>.25</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="MultiplierFactorNumeric" qName="cbc:MultiplierFactorNumeric"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Amount" qName="cbc:Amount">
+  <attribute qName="amountCurrencyID" localName="amountCurrencyID" uri="" value="GBP"/>
+</startElement>
+<characters>457.50</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Amount" qName="cbc:Amount"/>
+<characters>
+	</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AllowanceCharge" qName="cac:AllowanceCharge"/>
+<characters>
+	</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxTotal" qName="cac:TaxTotal"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="TotalTaxAmount" qName="cbc:TotalTaxAmount">
+  <attribute qName="amountCurrencyCodeListVersionID" localName="amountCurrencyCodeListVersionID" uri="" value="0.3"/>
+  <attribute qName="amountCurrencyID" localName="amountCurrencyID" uri="" value="GBP"/>
+</startElement>
+<characters>238.45</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="TotalTaxAmount" qName="cbc:TotalTaxAmount"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxSubTotal" qName="cac:TaxSubTotal"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="TaxableAmount" qName="cbc:TaxableAmount">
+  <attribute qName="amountCurrencyCodeListVersionID" localName="amountCurrencyCodeListVersionID" uri="" value="0.3"/>
+  <attribute qName="amountCurrencyID" localName="amountCurrencyID" uri="" value="GBP"/>
+</startElement>
+<characters>1362.56</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="TaxableAmount" qName="cbc:TaxableAmount"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="TaxAmount" qName="cbc:TaxAmount">
+  <attribute qName="amountCurrencyCodeListVersionID" localName="amountCurrencyCodeListVersionID" uri="" value="0.3"/>
+  <attribute qName="amountCurrencyID" localName="amountCurrencyID" uri="" value="GBP"/>
+</startElement>
+<characters>238.45</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="TaxAmount" qName="cbc:TaxAmount"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxCategory" qName="cac:TaxCategory"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>A</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Percent" qName="cbc:Percent"/>
+<characters>17.50</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Percent" qName="cbc:Percent"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxScheme" qName="cac:TaxScheme"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxTypeCode" qName="cac:TaxTypeCode"/>
+<characters>VAT</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxTypeCode" qName="cac:TaxTypeCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxScheme" qName="cac:TaxScheme"/>
+<characters>
+			</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxCategory" qName="cac:TaxCategory"/>
+<characters>
+		</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxSubTotal" qName="cac:TaxSubTotal"/>
+<characters>
+	</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxTotal" qName="cac:TaxTotal"/>
+<characters>
+	</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="LegalTotal" qName="cac:LegalTotal"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="LineExtensionTotalAmount" qName="cbc:LineExtensionTotalAmount">
+  <attribute qName="amountCurrencyCodeListVersionID" localName="amountCurrencyCodeListVersionID" uri="" value="0.3"/>
+  <attribute qName="amountCurrencyID" localName="amountCurrencyID" uri="" value="GBP"/>
+</startElement>
+<characters>1855.00</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="LineExtensionTotalAmount" qName="cbc:LineExtensionTotalAmount"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="TaxExclusiveTotalAmount" qName="cbc:TaxExclusiveTotalAmount">
+  <attribute qName="amountCurrencyCodeListVersionID" localName="amountCurrencyCodeListVersionID" uri="" value="0.3"/>
+  <attribute qName="amountCurrencyID" localName="amountCurrencyID" uri="" value="GBP"/>
+</startElement>
+<characters>1397.50</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="TaxExclusiveTotalAmount" qName="cbc:TaxExclusiveTotalAmount"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="TaxInclusiveTotalAmount" qName="cbc:TaxInclusiveTotalAmount">
+  <attribute qName="amountCurrencyCodeListVersionID" localName="amountCurrencyCodeListVersionID" uri="" value="0.3"/>
+  <attribute qName="amountCurrencyID" localName="amountCurrencyID" uri="" value="GBP"/>
+</startElement>
+<characters>1635.95</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="TaxInclusiveTotalAmount" qName="cbc:TaxInclusiveTotalAmount"/>
+<characters>
+	</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="LegalTotal" qName="cac:LegalTotal"/>
+<characters>
+	</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="InvoiceLine" qName="cac:InvoiceLine"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>1</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="InvoicedQuantity" qName="cbc:InvoicedQuantity">
+  <attribute qName="quantityUnitCode" localName="quantityUnitCode" uri="" value="unit"/>
+</startElement>
+<characters>2</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="InvoicedQuantity" qName="cbc:InvoicedQuantity"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="LineExtensionAmount" qName="cbc:LineExtensionAmount">
+  <attribute qName="amountCurrencyCodeListVersionID" localName="amountCurrencyCodeListVersionID" uri="" value="0.3"/>
+  <attribute qName="amountCurrencyID" localName="amountCurrencyID" uri="" value="GBP"/>
+</startElement>
+<characters>205.00</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="LineExtensionAmount" qName="cbc:LineExtensionAmount"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="OrderLineReference" qName="cac:OrderLineReference"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BuyersLineID" qName="cac:BuyersLineID"/>
+<characters>A</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BuyersLineID" qName="cac:BuyersLineID"/>
+<characters>
+		</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="OrderLineReference" qName="cac:OrderLineReference"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="Item" qName="cac:Item"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="SellersItemIdentification" qName="cac:SellersItemIdentification"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>236WV</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>wood</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>soft</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>finish</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>primed</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>fittings</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>satin</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>glazing</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>single</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+			</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="SellersItemIdentification" qName="cac:SellersItemIdentification"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxCategory" qName="cac:TaxCategory"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>A</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxScheme" qName="cac:TaxScheme"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxTypeCode" qName="cac:TaxTypeCode"/>
+<characters>VAT</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxTypeCode" qName="cac:TaxTypeCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxScheme" qName="cac:TaxScheme"/>
+<characters>
+			</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxCategory" qName="cac:TaxCategory"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BasePrice" qName="cac:BasePrice"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="PriceAmount" qName="cbc:PriceAmount">
+  <attribute qName="amountCurrencyCodeListVersionID" localName="amountCurrencyCodeListVersionID" uri="" value="0.3"/>
+  <attribute qName="amountCurrencyID" localName="amountCurrencyID" uri="" value="GBP"/>
+</startElement>
+<characters>102.50</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="PriceAmount" qName="cbc:PriceAmount"/>
+<characters>
+			</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BasePrice" qName="cac:BasePrice"/>
+<characters>
+		</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="Item" qName="cac:Item"/>
+<characters>
+	</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="InvoiceLine" qName="cac:InvoiceLine"/>
+<characters>
+	</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="InvoiceLine" qName="cac:InvoiceLine"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>2</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="InvoicedQuantity" qName="cbc:InvoicedQuantity">
+  <attribute qName="quantityUnitCode" localName="quantityUnitCode" uri="" value="unit"/>
+</startElement>
+<characters>3</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="InvoicedQuantity" qName="cbc:InvoicedQuantity"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="LineExtensionAmount" qName="cbc:LineExtensionAmount">
+  <attribute qName="amountCurrencyCodeListVersionID" localName="amountCurrencyCodeListVersionID" uri="" value="0.3"/>
+  <attribute qName="amountCurrencyID" localName="amountCurrencyID" uri="" value="GBP"/>
+</startElement>
+<characters>720.00</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="LineExtensionAmount" qName="cbc:LineExtensionAmount"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="OrderLineReference" qName="cac:OrderLineReference"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BuyersLineID" qName="cac:BuyersLineID"/>
+<characters>B</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BuyersLineID" qName="cac:BuyersLineID"/>
+<characters>
+		</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="OrderLineReference" qName="cac:OrderLineReference"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="Item" qName="cac:Item"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="SellersItemIdentification" qName="cac:SellersItemIdentification"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>340TW</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>hand</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>RH</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>wood</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>hard</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>finish</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>stain</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>fittings</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>brass</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>glazing</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>double</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+			</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="SellersItemIdentification" qName="cac:SellersItemIdentification"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxCategory" qName="cac:TaxCategory"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>A</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxScheme" qName="cac:TaxScheme"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxTypeCode" qName="cac:TaxTypeCode"/>
+<characters>VAT</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxTypeCode" qName="cac:TaxTypeCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxScheme" qName="cac:TaxScheme"/>
+<characters>
+			</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxCategory" qName="cac:TaxCategory"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BasePrice" qName="cac:BasePrice"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="PriceAmount" qName="cbc:PriceAmount">
+  <attribute qName="amountCurrencyCodeListVersionID" localName="amountCurrencyCodeListVersionID" uri="" value="0.3"/>
+  <attribute qName="amountCurrencyID" localName="amountCurrencyID" uri="" value="GBP"/>
+</startElement>
+<characters>240.00</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="PriceAmount" qName="cbc:PriceAmount"/>
+<characters>
+			</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BasePrice" qName="cac:BasePrice"/>
+<characters>
+		</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="Item" qName="cac:Item"/>
+<characters>
+	</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="InvoiceLine" qName="cac:InvoiceLine"/>
+<characters>
+	</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="InvoiceLine" qName="cac:InvoiceLine"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>3</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="InvoicedQuantity" qName="cbc:InvoicedQuantity">
+  <attribute qName="quantityUnitCode" localName="quantityUnitCode" uri="" value="unit"/>
+</startElement>
+<characters>3</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="InvoicedQuantity" qName="cbc:InvoicedQuantity"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="LineExtensionAmount" qName="cbc:LineExtensionAmount">
+  <attribute qName="amountCurrencyCodeListVersionID" localName="amountCurrencyCodeListVersionID" uri="" value="0.3"/>
+  <attribute qName="amountCurrencyID" localName="amountCurrencyID" uri="" value="GBP"/>
+</startElement>
+<characters>720.00</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="LineExtensionAmount" qName="cbc:LineExtensionAmount"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="OrderLineReference" qName="cac:OrderLineReference"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BuyersLineID" qName="cac:BuyersLineID"/>
+<characters>C</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BuyersLineID" qName="cac:BuyersLineID"/>
+<characters>
+		</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="OrderLineReference" qName="cac:OrderLineReference"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="Item" qName="cac:Item"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="SellersItemIdentification" qName="cac:SellersItemIdentification"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>340TW</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>hand</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>LH</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>wood</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>hard</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>finish</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>stain</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>fittings</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>brass</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>glazing</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>double</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+			</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="SellersItemIdentification" qName="cac:SellersItemIdentification"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxCategory" qName="cac:TaxCategory"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>A</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxScheme" qName="cac:TaxScheme"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxTypeCode" qName="cac:TaxTypeCode"/>
+<characters>VAT</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxTypeCode" qName="cac:TaxTypeCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxScheme" qName="cac:TaxScheme"/>
+<characters>
+			</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxCategory" qName="cac:TaxCategory"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BasePrice" qName="cac:BasePrice"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="PriceAmount" qName="cbc:PriceAmount">
+  <attribute qName="amountCurrencyCodeListVersionID" localName="amountCurrencyCodeListVersionID" uri="" value="0.3"/>
+  <attribute qName="amountCurrencyID" localName="amountCurrencyID" uri="" value="GBP"/>
+</startElement>
+<characters>240.00</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="PriceAmount" qName="cbc:PriceAmount"/>
+<characters>
+			</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BasePrice" qName="cac:BasePrice"/>
+<characters>
+		</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="Item" qName="cac:Item"/>
+<characters>
+	</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="InvoiceLine" qName="cac:InvoiceLine"/>
+<characters>
+	</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="InvoiceLine" qName="cac:InvoiceLine"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>4</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="InvoicedQuantity" qName="cbc:InvoicedQuantity">
+  <attribute qName="quantityUnitCode" localName="quantityUnitCode" uri="" value="unit"/>
+</startElement>
+<characters>1</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="InvoicedQuantity" qName="cbc:InvoicedQuantity"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="LineExtensionAmount" qName="cbc:LineExtensionAmount">
+  <attribute qName="amountCurrencyCodeListVersionID" localName="amountCurrencyCodeListVersionID" uri="" value="0.3"/>
+  <attribute qName="amountCurrencyID" localName="amountCurrencyID" uri="" value="GBP"/>
+</startElement>
+<characters>110.00</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="LineExtensionAmount" qName="cbc:LineExtensionAmount"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="OrderLineReference" qName="cac:OrderLineReference"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BuyersLineID" qName="cac:BuyersLineID"/>
+<characters>D</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BuyersLineID" qName="cac:BuyersLineID"/>
+<characters>
+		</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="OrderLineReference" qName="cac:OrderLineReference"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="Item" qName="cac:Item"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="SellersItemIdentification" qName="cac:SellersItemIdentification"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>FDDR15</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>hand</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>RH</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>wood</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>hard</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>finish</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>stain</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>fittings</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>brass</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>glazing</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>safety</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="MeasurementDimension" qName="cac:MeasurementDimension"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>height</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Measure" qName="cbc:Measure">
+  <attribute qName="measureUnitCode" localName="measureUnitCode" uri="" value="inches"/>
+</startElement>
+<characters>78</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Measure" qName="cbc:Measure"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Description" qName="cbc:Description"/>
+<characters>Height in inches</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Description" qName="cbc:Description"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="MeasurementDimension" qName="cac:MeasurementDimension"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="MeasurementDimension" qName="cac:MeasurementDimension"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>width</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Measure" qName="cbc:Measure">
+  <attribute qName="measureUnitCode" localName="measureUnitCode" uri="" value="inches"/>
+</startElement>
+<characters>33</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Measure" qName="cbc:Measure"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Description" qName="cbc:Description"/>
+<characters>Width in inches</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Description" qName="cbc:Description"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="MeasurementDimension" qName="cac:MeasurementDimension"/>
+<characters>
+			</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="SellersItemIdentification" qName="cac:SellersItemIdentification"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxCategory" qName="cac:TaxCategory"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>A</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxScheme" qName="cac:TaxScheme"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxTypeCode" qName="cac:TaxTypeCode"/>
+<characters>VAT</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxTypeCode" qName="cac:TaxTypeCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxScheme" qName="cac:TaxScheme"/>
+<characters>
+			</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxCategory" qName="cac:TaxCategory"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BasePrice" qName="cac:BasePrice"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="PriceAmount" qName="cbc:PriceAmount">
+  <attribute qName="amountCurrencyCodeListVersionID" localName="amountCurrencyCodeListVersionID" uri="" value="0.3"/>
+  <attribute qName="amountCurrencyID" localName="amountCurrencyID" uri="" value="GBP"/>
+</startElement>
+<characters>110.00</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="PriceAmount" qName="cbc:PriceAmount"/>
+<characters>
+			</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BasePrice" qName="cac:BasePrice"/>
+<characters>
+		</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="Item" qName="cac:Item"/>
+<characters>
+	</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="InvoiceLine" qName="cac:InvoiceLine"/>
+<characters>
+	</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="InvoiceLine" qName="cac:InvoiceLine"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>5</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="InvoicedQuantity" qName="cbc:InvoicedQuantity">
+  <attribute qName="quantityUnitCode" localName="quantityUnitCode" uri="" value="feet"/>
+</startElement>
+<characters>30</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="InvoicedQuantity" qName="cbc:InvoicedQuantity"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="LineExtensionAmount" qName="cbc:LineExtensionAmount">
+  <attribute qName="amountCurrencyCodeListVersionID" localName="amountCurrencyCodeListVersionID" uri="" value="0.3"/>
+  <attribute qName="amountCurrencyID" localName="amountCurrencyID" uri="" value="GBP"/>
+</startElement>
+<characters>75.00</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="LineExtensionAmount" qName="cbc:LineExtensionAmount"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="OrderLineReference" qName="cac:OrderLineReference"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BuyersLineID" qName="cac:BuyersLineID"/>
+<characters>E</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BuyersLineID" qName="cac:BuyersLineID"/>
+<characters>
+		</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="OrderLineReference" qName="cac:OrderLineReference"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="Item" qName="cac:Item"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="SellersItemIdentification" qName="cac:SellersItemIdentification"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>HW100X50</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>wood</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>hard</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>finish</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>stain</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="DescriptionCode" qName="cac:DescriptionCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="PhysicalAttribute" qName="cac:PhysicalAttribute"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="MeasurementDimension" qName="cac:MeasurementDimension"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>length</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="AttributeID" qName="cac:AttributeID"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Measure" qName="cbc:Measure">
+  <attribute qName="measureUnitCode" localName="measureUnitCode" uri="" value="feet"/>
+</startElement>
+<characters>6</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Measure" qName="cbc:Measure"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Description" qName="cbc:Description"/>
+<characters>Length in feet</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="Description" qName="cbc:Description"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="MeasurementDimension" qName="cac:MeasurementDimension"/>
+<characters>
+			</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="SellersItemIdentification" qName="cac:SellersItemIdentification"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxCategory" qName="cac:TaxCategory"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>A</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxScheme" qName="cac:TaxScheme"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxTypeCode" qName="cac:TaxTypeCode"/>
+<characters>VAT</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxTypeCode" qName="cac:TaxTypeCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxScheme" qName="cac:TaxScheme"/>
+<characters>
+			</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxCategory" qName="cac:TaxCategory"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BasePrice" qName="cac:BasePrice"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="PriceAmount" qName="cbc:PriceAmount">
+  <attribute qName="amountCurrencyCodeListVersionID" localName="amountCurrencyCodeListVersionID" uri="" value="0.3"/>
+  <attribute qName="amountCurrencyID" localName="amountCurrencyID" uri="" value="GBP"/>
+</startElement>
+<characters>2.50</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="PriceAmount" qName="cbc:PriceAmount"/>
+<characters>
+			</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BasePrice" qName="cac:BasePrice"/>
+<characters>
+		</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="Item" qName="cac:Item"/>
+<characters>
+	</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="InvoiceLine" qName="cac:InvoiceLine"/>
+<characters>
+	</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="InvoiceLine" qName="cac:InvoiceLine"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>6</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="InvoicedQuantity" qName="cbc:InvoicedQuantity">
+  <attribute qName="quantityUnitCode" localName="quantityUnitCode" uri="" value=""/>
+</startElement>
+<characters>1</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="InvoicedQuantity" qName="cbc:InvoicedQuantity"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="LineExtensionAmount" qName="cbc:LineExtensionAmount">
+  <attribute qName="amountCurrencyCodeListVersionID" localName="amountCurrencyCodeListVersionID" uri="" value="0.3"/>
+  <attribute qName="amountCurrencyID" localName="amountCurrencyID" uri="" value="GBP"/>
+</startElement>
+<characters>25.00</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="LineExtensionAmount" qName="cbc:LineExtensionAmount"/>
+<characters>
+		</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="Item" qName="cac:Item"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="SellersItemIdentification" qName="cac:SellersItemIdentification"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>Delivery</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>
+			</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="SellersItemIdentification" qName="cac:SellersItemIdentification"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxCategory" qName="cac:TaxCategory"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>A</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="ID" qName="cac:ID"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxScheme" qName="cac:TaxScheme"/>
+<characters>
+					</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxTypeCode" qName="cac:TaxTypeCode"/>
+<characters>VAT</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxTypeCode" qName="cac:TaxTypeCode"/>
+<characters>
+				</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxScheme" qName="cac:TaxScheme"/>
+<characters>
+			</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="TaxCategory" qName="cac:TaxCategory"/>
+<characters>
+			</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BasePrice" qName="cac:BasePrice"/>
+<characters>
+				</characters>
+<startElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="PriceAmount" qName="cbc:PriceAmount">
+  <attribute qName="amountCurrencyCodeListVersionID" localName="amountCurrencyCodeListVersionID" uri="" value="0.3"/>
+  <attribute qName="amountCurrencyID" localName="amountCurrencyID" uri="" value="GBP"/>
+</startElement>
+<characters>25.00</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" localName="PriceAmount" qName="cbc:PriceAmount"/>
+<characters>
+			</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="BasePrice" qName="cac:BasePrice"/>
+<characters>
+		</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="Item" qName="cac:Item"/>
+<characters>
+	</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" localName="InvoiceLine" qName="cac:InvoiceLine"/>
+<characters>
+</characters>
+<endElement uri="urn:oasis:names:specification:ubl:schema:xsd:Invoice-1.0" localName="Invoice" qName="Invoice"/>
+<endPrefixMapping prefix=""/>
+<endPrefixMapping prefix="cac"/>
+<endPrefixMapping prefix="cbc"/>
+<endPrefixMapping prefix="cur"/>
+<endPrefixMapping prefix="xsi"/>
+<endDocument/>
+</sax>

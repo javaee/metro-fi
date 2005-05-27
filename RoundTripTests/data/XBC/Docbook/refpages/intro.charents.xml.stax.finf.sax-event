@@ -1,0 +1,179 @@
+<sax xmlns="http://www.sun.com/xml/sax-events">
+<startDocument/>
+<startElement uri="" localName="partintro" qName="partintro"/>
+<characters>
+</characters>
+<comment> this can't actually go here...
+<docinfo>
+<pubdate>$Date: 2005-05-27 20:50:11 $</pubdate>
+<releaseinfo>$Revision: 1.1 $</releaseinfo>
+</docinfo>
+</comment>
+<characters>
+</characters>
+<startElement uri="" localName="para" qName="para"/>
+<characters>
+</characters>
+<startElement uri="" localName="indexterm" qName="indexterm"/>
+<startElement uri="" localName="primary" qName="primary"/>
+<characters>entity sets</characters>
+<endElement uri="" localName="primary" qName="primary"/>
+<characters>
+  </characters>
+<startElement uri="" localName="secondary" qName="secondary"/>
+<characters>characters</characters>
+<endElement uri="" localName="secondary" qName="secondary"/>
+<endElement uri="" localName="indexterm" qName="indexterm"/>
+<characters>
+</characters>
+<startElement uri="" localName="indexterm" qName="indexterm"/>
+<startElement uri="" localName="primary" qName="primary"/>
+<characters>characters</characters>
+<endElement uri="" localName="primary" qName="primary"/>
+<characters>
+  </characters>
+<startElement uri="" localName="secondary" qName="secondary"/>
+<characters>entity sets</characters>
+<endElement uri="" localName="secondary" qName="secondary"/>
+<startElement uri="" localName="see" qName="see"/>
+<characters>entity sets</characters>
+<endElement uri="" localName="see" qName="see"/>
+<endElement uri="" localName="indexterm" qName="indexterm"/>
+<characters>
+</characters>
+<startElement uri="" localName="indexterm" qName="indexterm"/>
+<startElement uri="" localName="primary" qName="primary"/>
+<characters>ISO standards</characters>
+<endElement uri="" localName="primary" qName="primary"/>
+<characters>
+  </characters>
+<startElement uri="" localName="secondary" qName="secondary"/>
+<characters>entity sets</characters>
+<endElement uri="" localName="secondary" qName="secondary"/>
+<characters>
+    </characters>
+<startElement uri="" localName="tertiary" qName="tertiary"/>
+<characters>characters</characters>
+<endElement uri="" localName="tertiary" qName="tertiary"/>
+<endElement uri="" localName="indexterm" qName="indexterm"/>
+<characters>
+</characters>
+<startElement uri="" localName="indexterm" qName="indexterm"/>
+<startElement uri="" localName="primary" qName="primary"/>
+<characters>glyphs (Unicode character references)</characters>
+<endElement uri="" localName="primary" qName="primary"/>
+<endElement uri="" localName="indexterm" qName="indexterm"/>
+<characters>
+</characters>
+<startElement uri="" localName="indexterm" qName="indexterm"/>
+<startElement uri="" localName="primary" qName="primary"/>
+<characters>Unicode character set</characters>
+<endElement uri="" localName="primary" qName="primary"/>
+<characters>
+  </characters>
+<startElement uri="" localName="secondary" qName="secondary"/>
+<characters>character numbers and reference glyphs</characters>
+<endElement uri="" localName="secondary" qName="secondary"/>
+<endElement uri="" localName="indexterm" qName="indexterm"/>
+<characters>
+The reference pages in this section describe each of the </characters>
+<startElement uri="" localName="acronym" qName="acronym"/>
+<characters>ISO</characters>
+<endElement uri="" localName="acronym" qName="acronym"/>
+<characters> character
+entity sets referenced in DocBook.
+</characters>
+<endElement uri="" localName="para" qName="para"/>
+<characters>
+
+</characters>
+<startElement uri="" localName="note" qName="note"/>
+<startElement uri="" localName="title" qName="title"/>
+<characters>A Note on Unicode Character References and Glyphs</characters>
+<endElement uri="" localName="title" qName="title"/>
+<characters>
+</characters>
+<startElement uri="" localName="para" qName="para"/>
+<characters>
+Most of the glyphs this reference are from the TmsPF Roman font
+by
+</characters>
+<startElement uri="" localName="ulink" qName="ulink">
+  <attribute qName="url" localName="url" uri="" value="http://ourworld.compuserve.com/homepages/profirst/homepagx.htm"/>
+</startElement>
+<characters>Production First Software</characters>
+<endElement uri="" localName="ulink" qName="ulink"/>
+<characters>. A few glyphs are from
+</characters>
+<startElement uri="" localName="ulink" qName="ulink">
+  <attribute qName="url" localName="url" uri="" value="http://www.indigo.ie/egt/celtscript/"/>
+</startElement>
+<characters>Everson Mono</characters>
+<endElement uri="" localName="ulink" qName="ulink"/>
+<characters>,
+and are provided with the permission of Michael Everson.
+</characters>
+<endElement uri="" localName="para" qName="para"/>
+<characters>
+</characters>
+<startElement uri="" localName="para" qName="para"/>
+<characters>
+The Unicode character numbers and reference glyphs in this
+section are examples only. Some characters have more than one
+Unicode representation and different Unicode characters may be
+appropriate in different contexts. Similarly, the glyph images
+offer only one of many possible representations for the specified
+character.
+</characters>
+<endElement uri="" localName="para" qName="para"/>
+<characters>
+</characters>
+<startElement uri="" localName="para" qName="para"/>
+<characters>
+</characters>
+<startElement uri="" localName="indexterm" qName="indexterm"/>
+<startElement uri="" localName="primary" qName="primary"/>
+<characters>Unicode character set</characters>
+<endElement uri="" localName="primary" qName="primary"/>
+<characters>
+  </characters>
+<startElement uri="" localName="secondary" qName="secondary"/>
+<characters>Unicode Standard, Version 2.0 (online information)</characters>
+<endElement uri="" localName="secondary" qName="secondary"/>
+<endElement uri="" localName="indexterm" qName="indexterm"/>
+<characters>
+
+Unicode support requires much more than a simple character to glyph
+mapping; for more information on Unicode, consult
+</characters>
+<startElement uri="" localName="citetitle" qName="citetitle"/>
+<startElement uri="" localName="ulink" qName="ulink">
+  <attribute qName="url" localName="url" uri="" value="http://www.unicode.org/unicode/uni2book/u2.html"/>
+</startElement>
+<characters>The
+Unicode Standard, Version 2.0</characters>
+<endElement uri="" localName="ulink" qName="ulink"/>
+<endElement uri="" localName="citetitle" qName="citetitle"/>
+<characters> and
+</characters>
+<startElement uri="" localName="citetitle" qName="citetitle"/>
+<characters>
+</characters>
+<startElement uri="" localName="ulink" qName="ulink">
+  <attribute qName="url" localName="url" uri="" value="http://www.unicode.org/unicode/reports/tr8.html"/>
+</startElement>
+<characters>Unicode
+Technical Report #8</characters>
+<endElement uri="" localName="ulink" qName="ulink"/>
+<endElement uri="" localName="citetitle" qName="citetitle"/>
+<characters>, which describes Unicode Version 2.1.
+</characters>
+<endElement uri="" localName="para" qName="para"/>
+<characters>
+</characters>
+<endElement uri="" localName="note" qName="note"/>
+<characters>
+</characters>
+<endElement uri="" localName="partintro" qName="partintro"/>
+<endDocument/>
+</sax>
