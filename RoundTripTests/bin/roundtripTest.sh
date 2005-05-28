@@ -49,4 +49,6 @@ do
     fi
 done 
 
-removeEmptyDir.sh
+removeUnusedFiles.sh ent -d
+removeUnusedFiles.sh dtd -d
+
