@@ -132,6 +132,7 @@
         <target name="wspack" depends="dist" >
             <mkdir dir="${wspack.home}" />
             <mkdir dir="${wspack.home}/lib" />
+            <mkdir dir="${wspack.home}/docs" />
             <copy file="${dist.dir}/${app.jar}"
                 todir="${wspack.home}/lib" />
         </target>
