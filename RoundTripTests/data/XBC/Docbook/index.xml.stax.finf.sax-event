@@ -1,8 +1,0 @@
-<sax xmlns="http://www.sun.com/xml/sax-events">
-<startDocument/>
-<startElement uri="" localName="index" qName="index">
-  <attribute qName="id" localName="id" uri="" value="index"/>
-</startElement>
-<endElement uri="" localName="index" qName="index"/>
-<endDocument/>
-</sax>
