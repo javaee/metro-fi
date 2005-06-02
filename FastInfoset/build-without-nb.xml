@@ -132,10 +132,258 @@
         <target name="wspack" depends="dist" >
             <mkdir dir="${wspack.home}" />
             <mkdir dir="${wspack.home}/lib" />
-            <mkdir dir="${wspack.home}/docs" />
             <copy file="${dist.dir}/${app.jar}"
                 todir="${wspack.home}/lib" />
+
+            <!-- docs content -->
+            <mkdir dir="${wspack.home}/docs" />
+            <copy todir="${wspack.home}/docs" >
+                <fileset dir="${basedir}/docs" />
+            </copy>
         </target>
 
-        
+
+  <!-- BEGIN: Packaging related   -->
+
+  <property name="dist.home" value="${dist.dir}" />
+  <property name="pkg.version" value="1.0"/>
+  <property name="rpm.version" value="1.0"/>
+
+  <property name="rpm.release" value="1"/>
+
+  <!-- The package name -->
+  <property name="pkg.fastinfoset"    value="SUNWfastinfoset"/>
+
+   <!-- The package product name -->
+  <property name="pkg.prod.name"    value="Sun Java(TM) Enterprise System"/>
+
+  <!-- The package product version -->
+  <property name="pkg.prod.version"    value="4.0"/>
+
+  <!-- The package build directory -->
+  <property name="pkg.build.dir"    value="${build.home}/pkg"/>
+
+  <!-- The package distribution directory -->
+  <property name="pkg.release.dir"    value="${basedir}/pkg-dist"/>
+
+  <!-- The rpm build directory -->
+  <property name="rpm.build.dir"    value="${build.home}/rpm/FASTINFOSET"/>
+
+  <!-- The rpm distribution directory -->
+  <property name="rpm.release.dir"    value="${basedir}/rpm-dist"/>
+
+  <!-- The zip build directory -->
+  <property name="zip.build.dir"    value="${build.home}/zip"/>
+
+  <!-- The zip distribution directory -->
+  <property name="zip.release.dir"    value="${basedir}/zip-dist"/>
+
+  <!-- The SJSXP (StAX RI) distribution directory -->
+  <property name="sjsxp.build" value="${basedir}" />
+
+  <!-- =====================
+       SVR4 PKG DISTRIBUTION
+       ===================== -->
+  <!-- assumes the dist target has been run -->
+  <target name="create.pkg" description="Create Fast Infoset package">
+
+    <!-- copy pkginfo.tmpl to pkginfo in build dir and replace variables -->
+    <copy tofile="${pkg.build.dir}/${pkg.fastinfoset}/pkginfo" file="${basedir}/pkg/${pkg.fastinfoset}/pkginfo.tmpl"
+      overwrite="yes"/>
+
+    <!-- replace architecture value
+    <exec executable="mach" failonerror="true" outputproperty="arch">
+    </exec>
+    -->
+
+    <replace file="${pkg.build.dir}/${pkg.fastinfoset}/pkginfo" value="all">
+      <replacetoken>@arch@</replacetoken>
+    </replace>
+
+    <!-- replace date stamp... 1st specify correct format  -->
+    <tstamp>
+      <format property="pkg.datestamp" pattern="yyyy.MM.dd.hh.mm"/>
+    </tstamp>
+
+    <replace file="${pkg.build.dir}/${pkg.fastinfoset}/pkginfo" value="${pkg.datestamp}">
+      <replacetoken>@datestamp@</replacetoken>
+    </replace>
+
+    <!-- replace fast infoset version -->
+    <replace file="${pkg.build.dir}/${pkg.fastinfoset}/pkginfo" value="${pkg.version}">
+      <replacetoken>@fastinfoset.version@</replacetoken>
+    </replace>
+
+    <!-- replace product version -->
+    <replace file="${pkg.build.dir}/${pkg.fastinfoset}/pkginfo" value="${pkg.prod.version}" >
+      <replacetoken>@prod.version@</replacetoken>
+    </replace>
+
+    <!-- replace product name -->
+    <replace file="${pkg.build.dir}/${pkg.fastinfoset}/pkginfo" value="${pkg.prod.name}">
+      <replacetoken>@prod.name@</replacetoken>
+    </replace>
+
+    <!-- copy prototype, depend, copyright, installation script files -->
+    <copy todir="${pkg.build.dir}/${pkg.fastinfoset}" overwrite="yes">
+      <fileset dir="${basedir}/pkg/${pkg.fastinfoset}">
+        <include name="prototype*"/>
+        <include name="depend"/>
+        <include name="copyright"/>
+      </fileset>
+    </copy>
+
+    <!-- copy fast infoset specific jar files into the right directory structure -->
+    <echo message="Copying FastInfoset.jar to proper directory" />
+    <copy todir="${pkg.build.dir}/${pkg.fastinfoset}/usr/share/lib" overwrite="yes">
+      <fileset dir="${dist.home}">
+        <include name="FastInfoset.jar"/>
+      </fileset>
+    </copy>
+
+    <!-- copy fast infoset dependent jar files into the right directory structure -->
+    <echo message="Copying sjsxp dependent jar file to proper directory" />
+    <copy todir="${pkg.build.dir}/${pkg.fastinfoset}/usr/share/lib" overwrite="yes">
+      <fileset dir="${sjsxp.build}/lib">
+        <include name="jsr173_api.jar"/>
+      </fileset>
+    </copy>
+
+    <!-- make output directory -->
+    <mkdir dir="${pkg.release.dir}"/>
+
+    <!-- run pkgmk -f prototype_sparc -d tmp_dir -o PKGNAME -->
+    <exec executable="pkgmk" failonerror="true"
+     dir="${pkg.build.dir}/${pkg.fastinfoset}">
+      <arg value="-f"/>
+      <arg value="prototype_sparc"/>
+      <arg value="-d"/>
+      <arg value="${pkg.release.dir}"/>
+      <arg value="-r"/>
+      <arg value="."/>
+      <arg value="-o"/>
+      <arg value="${pkg.fastinfoset}"/>
+    </exec>
+
+  </target>
+
+
+  <!-- =====================
+         RPM DISTRIBUTION
+       ===================== -->
+  <!-- assumes the dist target has been called -->
+  <target name="create.rpm" description="Create Fast Infoset rpm">
+
+    <!-- assign prefix of where files will be installed on system -->
+    <property name="rpm.install.base"    value="/opt/sun"/>
+
+    <!-- make sure this directory is initially clean -->
+    <delete dir="${rpm.build.dir}/SOURCES"/>
+
+    <!-- Create build subdirectories -->
+    <mkdir dir="${rpm.build.dir}/BUILD"/>
+    <mkdir dir="${rpm.build.dir}/RPMS"/>
+    <mkdir dir="${rpm.build.dir}/SOURCES"/>
+    <mkdir dir="${rpm.build.dir}/SPECS"/>
+    <mkdir dir="${rpm.build.dir}/SRPMS"/>
+
+    <!-- copy template spec file to spec file in build dir and replace variables -->
+    <copy tofile="${rpm.build.dir}/SPECS/FASTINFOSET.spec" file="${basedir}/rpm/FASTINFOSET.spec.tmpl"
+      overwrite="yes"/>
+
+    <!-- replace FastInfoset version -->
+    <replace file="${rpm.build.dir}/SPECS/FASTINFOSET.spec" value="${rpm.version}">
+      <replacetoken>@fastinfoset.version@</replacetoken>
+    </replace>
+
+    <!-- replace fastinfoset release -->
+    <replace file="${rpm.build.dir}/SPECS/FASTINFOSET.spec" value="${rpm.release}">
+      <replacetoken>@fastinfoset.release@</replacetoken>
+    </replace>
+
+    <!-- replace product name -->
+    <replace file="${rpm.build.dir}/SPECS/FASTINFOSET.spec" value="${pkg.prod.name}">
+      <replacetoken>@prod.name@</replacetoken>
+    </replace>
+
+    <!-- replace build dir  -->
+    <replace file="${rpm.build.dir}/SPECS/FASTINFOSET.spec" value="${rpm.build.dir}">
+      <replacetoken>@build.dir@</replacetoken>
+    </replace>
+
+    <!-- replace prefix value  -->
+    <replace file="${rpm.build.dir}/SPECS/FASTINFOSET.spec" value="${rpm.install.base}">
+      <replacetoken>@install.prefix@</replacetoken>
+    </replace>
+
+    <!-- copy fastinfoset specific jar files into the right directory structure -->
+    <copy todir="${rpm.build.dir}/SOURCES/sun-fastinfoset-${rpm.version}${rpm.install.base}/share/lib" overwrite="yes">
+      <fileset dir="${dist.home}">
+        <include name="FastInfoset.jar"/>
+      </fileset>
+    </copy>
+
+    <!-- copy fastinfoset dependent jar files into the right directory structure -->
+    <copy todir="${rpm.build.dir}/SOURCES/sun-fastinfoset-${rpm.version}${rpm.install.base}/share/lib" overwrite="yes">
+      <fileset dir="${sjsxp.build}/lib">
+        <include name="jsr173_api.jar"/>
+      </fileset>
+    </copy>
+
+    <!-- compress fastinfoset files -->
+    <tar destfile="${rpm.build.dir}/SOURCES/sun-fastinfoset-${rpm.version}.tar" basedir="${rpm.build.dir}/SOURCES"/>
+
+    <!-- build rpm -->
+    <exec executable="rpmbuild" failonerror="true"
+     dir="${rpm.build.dir}">
+      <arg value="-bb"/>
+      <arg value="SPECS/FASTINFOSET.spec"/>
+    </exec>
+
+    <!-- make output directory -->
+    <mkdir dir="${rpm.release.dir}"/>
+
+    <!-- copy rpm to dist directory -->
+    <copy todir="${rpm.release.dir}">
+      <fileset dir="${rpm.build.dir}/RPMS"/>
+    </copy>
+
+  </target>
+
+
+  <!-- =======================
+       ZIP FILE DISTRIBUTION
+       ======================= -->
+  <!-- assumes the dist target has been called -->
+  <target name="create.zip" description="Create FastInfoset zip file distribution for windows">
+
+    <!-- make build and output directories -->
+    <mkdir dir="${zip.build.dir}"/>
+    <mkdir dir="${zip.release.dir}"/>
+
+    <!-- copy FastInfoset specific jar files into the right directory structure -->
+    <copy todir="${zip.build.dir}/fastinfoset/lib" overwrite="yes">
+      <fileset dir="${dist.home}">
+        <include name="FastInfoset.jar"/>
+      </fileset>
+    </copy>
+
+    <!-- copy FastInfoset dependent jar files into the right directory structure -->
+    <copy todir="${zip.build.dir}/fastinfoset/lib" overwrite="yes">
+      <fileset dir="${sjsxp.build}/lib">
+        <include name="jsr173_api.jar"/>
+      </fileset>
+    </copy>
+
+    <!-- make zip file -->
+    <zip destfile="${zip.release.dir}/FASTINFOSET-${pkg.version}.zip" basedir="${zip.build.dir}" whenempty="fail"/>
+
+
+  </target>
+
+
+
+
+<!-- END: Packaging related  -->
+
 </project>
