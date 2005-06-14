@@ -772,7 +772,7 @@ public abstract class Decoder implements FastInfosetParser {
         }
     }
 
-    protected static int _prefixIndex;
+    protected int _prefixIndex;
     
     /*
      * C.13
@@ -903,7 +903,7 @@ public abstract class Decoder implements FastInfosetParser {
         }
     }
     
-    protected static int _namespaceNameIndex;
+    protected int _namespaceNameIndex;
     
     /*
      * C.13
