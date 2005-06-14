@@ -1,6 +1,0 @@
-135c135,137
-< <startElement uri="" localName="section" qName="section"/>
----
-> <startElement uri="" localName="section" qName="section">
->   <attribute qName="xml:base" localName="base" uri="http://www.w3.org/XML/1998/namespace" value="file:///home/hw123265/workproj/fws/cvsroot/fi/RoundTripTests/data/XBC/UBL-1.0/fs/xml/FS-status.xml"/>
-> </startElement>
