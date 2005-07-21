@@ -672,7 +672,6 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
             return true;
         }
         return false;
-        //throw new UnsupportedOperationException("Not implemented");
     }
     
     public final String getAttributeValue(String namespaceURI, String localName) {
@@ -682,8 +681,8 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         
         // Search for the attributes in _attributes
         for (int i = 0; i < _attributes.getLength(); i++) {
-            if (_attributes.getLocalName(i) == localName &&
-                    _attributes.getURI(i) == namespaceURI) {
+            if (_attributes.getLocalName(i).equals(localName) &&
+                    _attributes.getURI(i).equals(namespaceURI)) {
                 return _attributes.getValue(i);
             }
         }
