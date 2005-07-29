@@ -45,7 +45,7 @@ public class QualifiedName {
     public final String prefix;
     public final String namespaceName;
     public final String localName;
-    public final String qName;
+    public String qName;
     public final int index;
     public final int prefixIndex;
     public final int namespaceNameIndex;
@@ -88,21 +88,11 @@ public class QualifiedName {
         this.localNameIndex = localNameIndex;
     }    
     
-    public QualifiedName(String prefix, String namespaceName, String localName, 
-            boolean intern) {
+    public QualifiedName(String prefix, String namespaceName, String localName) {
         this.prefix = prefix;
         this.namespaceName = namespaceName;
         this.localName = localName;
-
-        if (this.prefix != null && this.prefix != "") {
-            StringBuffer b = new StringBuffer(this.prefix);
-            b.append(':');
-            b.append(this.localName);
-            this.qName = (intern) ? b.toString().intern() : b.toString();
-        } else {
-            this.qName = this.localName;
-        }
-
+        this.qName = createQNameString(prefix, localName);
         this.index = -1;
         this.prefixIndex = 0;
         this.namespaceNameIndex = 0;        
@@ -111,7 +101,7 @@ public class QualifiedName {
 
     public QualifiedName(String prefix, String namespaceName, String localName, 
             int prefixIndex, int namespaceNameIndex, int localNameIndex, 
-            char[] charBuffer, boolean intern) {
+            char[] charBuffer) {
         this.prefix = prefix;
         this.namespaceName = namespaceName;
         this.localName = localName;
@@ -124,13 +114,9 @@ public class QualifiedName {
                 prefix.getChars(0, l1, charBuffer, 0);
                 charBuffer[l1] = ':';
                 localName.getChars(0, l2, charBuffer, l1 + 1);
-                this.qName = (intern) ? new String(charBuffer, 0, total).intern() 
-                    : new String(charBuffer, 0, total);
+                this.qName = new String(charBuffer, 0, total);
             } else {
-                StringBuffer b = new StringBuffer(this.prefix);
-                b.append(':');
-                b.append(this.localName);
-                this.qName = (intern) ? b.toString().intern() : b.toString();
+                this.qName = createQNameString(prefix, localName);
             }
         } else {
             this.qName = this.localName;
@@ -142,20 +128,11 @@ public class QualifiedName {
         this.index = -1;
     }    
     
-    public QualifiedName(String prefix, String namespaceName, String localName, int index, boolean intern) {
+    public QualifiedName(String prefix, String namespaceName, String localName, int index) {
         this.prefix = prefix;
         this.namespaceName = namespaceName;
         this.localName = localName;
-
-        if (this.prefix != null && this.prefix != "") {
-            StringBuffer b = new StringBuffer(this.prefix);
-            b.append(':');
-            b.append(this.localName);
-            this.qName = (intern) ? b.toString().intern() : b.toString();
-        } else {
-            this.qName = this.localName;
-        }
-
+        this.qName = createQNameString(prefix, localName);
         this.index = index;
         this.prefixIndex = 0;
         this.namespaceNameIndex = 0;        
@@ -163,21 +140,11 @@ public class QualifiedName {
     }    
     
     public QualifiedName(String prefix, String namespaceName, String localName, int index, 
-            int prefixIndex, int namespaceNameIndex, int localNameIndex, 
-            boolean intern) {
+            int prefixIndex, int namespaceNameIndex, int localNameIndex) {
         this.prefix = prefix;
         this.namespaceName = namespaceName;
         this.localName = localName;
-
-        if (this.prefix != null && this.prefix != "") {
-            StringBuffer b = new StringBuffer(this.prefix);
-            b.append(':');
-            b.append(this.localName);
-            this.qName = (intern) ? b.toString().intern() : b.toString();
-        } else {
-            this.qName = this.localName;
-        }
-
+        this.qName = createQNameString(prefix, localName);
         this.index = index;
         this.prefixIndex = prefixIndex + 1;
         this.namespaceNameIndex = namespaceNameIndex + 1;
@@ -204,8 +171,27 @@ public class QualifiedName {
         return qNameObject;
     }
     
+    public final String getQNameString() {
+        if (this.qName != "") {
+            return this.qName;
+        }
+        
+        return this.qName = createQNameString(prefix, localName);
+    }
+    
     public final void createAttributeValues(int size) {
         attributeId = localNameIndex | (namespaceNameIndex << 20);
         attributeHash = localNameIndex % size;
+    }
+    
+    private final String createQNameString(String p, String l) {
+        if (p != null && p != "") {
+            final StringBuffer b = new StringBuffer(p);
+            b.append(':');
+            b.append(l);
+            return b.toString();
+        } else {
+            return l;
+        }
     }
 }

@@ -922,6 +922,21 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
 
     
     
+    public final String getNameString() {
+        if (_eventType == START_ELEMENT || _eventType == END_ELEMENT) {
+            return _qualifiedName.getQNameString();
+        } else {
+            throw new IllegalStateException(CommonResourceBundle.getInstance().getString("message.invalidCallingGetName"));
+        }
+    }
+    
+    public final String getAttributeNameString(int index) {
+        if (_eventType != START_ELEMENT) {
+            throw new IllegalStateException(CommonResourceBundle.getInstance().getString("message.invalidCallingGetAttributeValue"));
+        }
+        return _attributes.getQualifiedName(index).getQNameString();
+    }
+        
     
     public final String getTextAlgorithmURI() {
         return _algorithmURI;

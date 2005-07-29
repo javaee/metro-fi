@@ -418,7 +418,7 @@ public abstract class Decoder implements FastInfosetParser {
 
             QualifiedName qualifiedName = new QualifiedName(prefix, namespaceName, localName, 
                     prefixIndex, namespaceNameIndex, localNameIndex, 
-                    _charBuffer, _stringInterning);
+                    _charBuffer);
             if (isAttribute) {
                 qualifiedName.createAttributeValues(_duplicateAttributeVerifier.MAP_SIZE);
             }
@@ -541,8 +541,7 @@ public abstract class Decoder implements FastInfosetParser {
                         -1,
                         -1,
                         _identifier,
-                        null,
-                        _stringInterning);
+                        null);
             // no prefix, namespace
             case 1:
                 return new QualifiedName(
@@ -552,8 +551,7 @@ public abstract class Decoder implements FastInfosetParser {
                         -1,
                         _namespaceNameIndex,
                         _identifier,
-                        null,
-                        _stringInterning);
+                        null);
             // prefix, no namespace
             case 2:
                 throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.qNameMissingNamespaceName"));
@@ -566,8 +564,7 @@ public abstract class Decoder implements FastInfosetParser {
                         _prefixIndex,
                         _namespaceNameIndex,
                         _identifier,
-                        _charBuffer,
-                        _stringInterning);
+                        _charBuffer);
             default:
                 throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.decodingEII"));                
         }        

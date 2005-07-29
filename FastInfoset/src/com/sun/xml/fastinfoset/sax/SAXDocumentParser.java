@@ -911,8 +911,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     _attributes.addAttribute(new QualifiedName(
                             EncodingConstants.XMLNS_NAMESPACE_PREFIX,
                             EncodingConstants.XMLNS_NAMESPACE_NAME,
-                            prefix, 
-                            _stringInterning),
+                            prefix),
                             namespaceName);
                 } else {
                     _attributes.addAttribute(DEFAULT_NAMESPACE_DECLARATION,

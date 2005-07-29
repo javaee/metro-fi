@@ -91,7 +91,7 @@ public class AttributesHolder implements EncodingAlgorithmAttributes {
     }
 
     public final String getQName(int index) {
-        return _names[index].qName;
+        return _names[index].getQNameString();
     }
 
     public final String getType(int index) {
@@ -242,7 +242,7 @@ public class AttributesHolder implements EncodingAlgorithmAttributes {
     public final String getPrefix(int index) {
         return _names[index].prefix;
     }
-    
+        
     private final void resize() {
         final int newLength = _attributeCount * 3 / 2 + 1;
 
