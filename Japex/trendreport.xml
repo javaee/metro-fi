@@ -1,0 +1,55 @@
+<project name="trendreport" default="trendreport" basedir=".">
+    <path id="class.path">
+        <pathelement location="dist/japex.jar"/>
+    </path>
+    <target name="means">
+        <java dir="." fork="true" classname="com.sun.japex.TrendReport">
+            <classpath refid="class.path"/>
+            <arg value="Means Trend"/>
+            <arg line="/projects/fws/WSTest/Java/src/reports"/>
+            <arg line="/projects/fws/cvsroot/fi/Japex/work/test"/>
+            <arg line="2005-03-30"/>
+            <arg line="-1M"/>
+            <arg line="TestFIDriver"/>
+        </java>
+    </target>
+    <target name="echoVoid">
+        <java dir="." fork="true" classname="com.sun.japex.TrendReport">
+            <classpath refid="class.path"/>
+            <arg value="echoVoid Trend"/>
+            <arg line="/projects/fws/WSTest/Java/src/reports"/>
+            <arg line="/projects/fws/cvsroot/fi/Japex/work/test"/>
+            <arg line="2005-03-24"/>
+            <arg line="-6D"/>
+            <arg line="TestFIDriver"/>
+            <arg line="echoVoid"/>
+        </java>
+    </target>
+    <target name="echoStruct">
+        <java dir="." fork="true" classname="com.sun.japex.TrendReport">
+            <classpath refid="class.path"/>
+            <arg value="echoStruct Trend"/>
+            <arg line="/projects/fws/WSTest/Java/src/reports"/>
+            <arg line="/projects/fws/cvsroot/fi/Japex/work/test"/>
+            <arg line="2005-03-24"/>
+            <arg line="-6D"/>
+            <arg line="TestFIDriver"/>
+            <arg line="echoStruct"/>
+        </java>
+    </target>
+    <target name="echoListandSynthetic">
+        <java dir="." fork="true" classname="com.sun.japex.TrendReport">
+            <classpath refid="class.path"/>
+            <arg value="Trends for echoList and Synthetic"/>
+            <arg line="/projects/fws/WSTest/Java/src/reports"/>
+            <arg line="/projects/fws/cvsroot/fi/Japex/work/test"/>
+            <arg line="2005-03-24"/>
+            <arg line="-6D"/>
+            <arg line="TestFIDriver"/>
+            <arg line="echoList echoSynthetic"/>
+        </java>
+    </target>
+    <target name="trendreport" depends="means, echoVoid, echoStruct, echoListandSynthetic">
+    </target>
+
+</project>
