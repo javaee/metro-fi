@@ -46,8 +46,26 @@ import java.util.Map;
  * @author Paul.Sandoz@Sun.Com
  */
 public interface FastInfosetSerializer {
+    /**
+     * The default value for the limit on the size of character content chunks
+     * that will be indexed.
+     */
+    public final static int CHARACTER_CONTENT_CHUNK_SIZE_CONSTRAINT = 7;
+    
+    /**
+     * The default value for the limit on the size of attribute values
+     * that will be indexed.
+     */
+    public final static int ATTRIBUTE_VALUE_SIZE_CONSTRAINT = 7;
+    
+    /**
+     * The character encoding scheme string for UTF-8
+     */
     public static final String UTF_8 = "UTF-8";
     
+    /**
+     * The character encoding scheme string for UTF-16BE
+     */
     public static final String UTF_16BE = "UTF-16BE";
     
     /**
@@ -82,6 +100,41 @@ public interface FastInfosetSerializer {
      * @return The set of registered algorithms.
      */
     public Map getRegisteredEncodingAlgorithms();
+    
+    /**
+     * Sets the limit on the size of character content chunks
+     * that will be indexed.
+     *
+     * @param size The character content chunk size limit. Any chunk less
+     * that a length of size limit will be indexed.
+     */
+    public void setCharacterContentChunkSizeLimit(int size);
+    
+    /**
+     * Gets the limit on the size of character content chunks
+     * that will be indexed.
+     *
+     * @return The character content chunk size limit.
+     */
+    public int getCharacterContentChunkSizeLimit();
+
+    /**
+     * Sets the limit on the size of attribute values
+     * that will be indexed.
+     *
+     * @param size The attribute value size limit. Any value less
+     * that a length of size limit will be indexed.
+     */
+    public void setAttributeValueSizeLimit(int size);
+    
+    /**
+     * Gets the limit on the size of attribute values
+     * that will be indexed.
+     *
+     * @return The attribute value size limit.
+     */
+    public int getAttributeValueSizeLimit();
+    
     
     // Before serializing
     

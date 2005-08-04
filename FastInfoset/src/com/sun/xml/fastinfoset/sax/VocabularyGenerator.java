@@ -56,11 +56,16 @@ import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.DefaultHandler;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
+import org.jvnet.fastinfoset.FastInfosetSerializer;
 
 public class VocabularyGenerator extends DefaultHandler implements LexicalHandler {
     
     protected SerializerVocabulary _serializerVocabulary;
     protected ParserVocabulary _parserVocabulary;
+    
+    protected int attributeValueSizeConstraint = FastInfosetSerializer.ATTRIBUTE_VALUE_SIZE_CONSTRAINT;
+    
+    protected int characterContentChunkSizeContraint = FastInfosetSerializer.CHARACTER_CONTENT_CHUNK_SIZE_CONSTRAINT;
     
     /** Creates a new instance of VocabularyGenerator */
     public VocabularyGenerator(SerializerVocabulary serializerVocabulary) {
@@ -77,6 +82,30 @@ public class VocabularyGenerator extends DefaultHandler implements LexicalHandle
     public VocabularyGenerator(SerializerVocabulary serializerVocabulary, ParserVocabulary parserVocabulary) {
         _serializerVocabulary = serializerVocabulary;
         _parserVocabulary = parserVocabulary;
+    }
+    
+    public void setCharacterContentChunkSizeLimit(int size) {
+        if (size < 0 ) {
+            size = 0;
+        }
+                
+        characterContentChunkSizeContraint = size;
+    }
+    
+    public int getCharacterContentChunkSizeLimit() {
+        return characterContentChunkSizeContraint;
+    }
+
+    public void setAttributeValueSizeLimit(int size) {
+        if (size < 0 ) {
+            size = 0;
+        }
+        
+        attributeValueSizeConstraint = size;
+    }
+    
+    public int getAttributeValueSizeLimit() {
+        return attributeValueSizeConstraint;
     }
     
     // ContentHandler
@@ -102,7 +131,7 @@ public class VocabularyGenerator extends DefaultHandler implements LexicalHandle
             addToNameTable(atts.getURI(a), atts.getQName(a), atts.getLocalName(a), _serializerVocabulary.attributeName, _parserVocabulary.attributeName, true);
         
             String value = atts.getValue(a);
-            if (value.length() < _serializerVocabulary.attributeValueSizeConstraint) {
+            if (value.length() < attributeValueSizeConstraint) {
                 addToTable(value, _serializerVocabulary.attributeValue, _parserVocabulary.attributeValue);
             }
         }
@@ -112,7 +141,7 @@ public class VocabularyGenerator extends DefaultHandler implements LexicalHandle
     }
         
     public void characters(char[] ch, int start, int length) throws SAXException {
-        if (length < _serializerVocabulary.characterContentChunkSizeContraint) {
+        if (length < characterContentChunkSizeContraint) {
             addToCharArrayTable(new CharArray(ch, start, length, true));
         }
     }    

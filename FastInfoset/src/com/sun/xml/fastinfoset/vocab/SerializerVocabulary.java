@@ -46,10 +46,13 @@ import com.sun.xml.fastinfoset.util.KeyIntMap;
 import com.sun.xml.fastinfoset.util.LocalNameQualifiedNamesMap;
 import com.sun.xml.fastinfoset.util.StringIntMap;
 import java.net.URI;
+import org.jvnet.fastinfoset.FastInfosetSerializer;
 
 public class SerializerVocabulary extends Vocabulary {
+    /*
     public final static int ATTRIBUTE_VALUE_SIZE_CONSTRAINT = 7;
     public final static int CHARACTER_CONTENT_CHUNK_SIZE_CONSTRAINT = 7;
+    */
     
     public final StringIntMap restrictedAlphabet;
     public final StringIntMap encodingAlgorithm;
@@ -69,8 +72,10 @@ public class SerializerVocabulary extends Vocabulary {
     
     public final KeyIntMap[] tables = new KeyIntMap[12];
 
-    public int attributeValueSizeConstraint = ATTRIBUTE_VALUE_SIZE_CONSTRAINT;
-    public int characterContentChunkSizeContraint = CHARACTER_CONTENT_CHUNK_SIZE_CONSTRAINT;
+    /*
+    public int attributeValueSizeConstraint = FastInfosetSerializer.ATTRIBUTE_VALUE_SIZE_CONSTRAINT;
+    public int characterContentChunkSizeContraint = FastInfosetSerializer.CHARACTER_CONTENT_CHUNK_SIZE_CONSTRAINT;
+    */
     
     protected SerializerVocabulary _readOnlyVocabulary;
     

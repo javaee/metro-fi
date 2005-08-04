@@ -145,7 +145,7 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
                         if (encodeAttribute(atts.getURI(i), atts.getQName(i), atts.getLocalName(i))) {
                             value = eAtts.getValue(i);
                             if (value != null) {
-                                addToTable = (value.length() < _v.attributeValueSizeConstraint) ? true : false;
+                                addToTable = (value.length() < attributeValueSizeConstraint) ? true : false;
                                 encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
                             } else {
                                 encodeNonIdentifyingStringOnFirstBit(eAtts.getAlgorithmURI(i),
@@ -157,7 +157,7 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
                     for (int i = 0; i < atts.getLength(); i++) {
                         if (encodeAttribute(atts.getURI(i), atts.getQName(i), atts.getLocalName(i))) {
                             value = atts.getValue(i);
-                            addToTable = (value.length() < _v.attributeValueSizeConstraint) ? true : false;
+                            addToTable = (value.length() < attributeValueSizeConstraint) ? true : false;
                             encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
                         }
                     }

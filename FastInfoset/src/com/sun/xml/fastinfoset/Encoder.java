@@ -102,7 +102,10 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
    
     protected int _markIndex = -1;
 
+    protected int attributeValueSizeConstraint = FastInfosetSerializer.ATTRIBUTE_VALUE_SIZE_CONSTRAINT;
     
+    protected int characterContentChunkSizeContraint = FastInfosetSerializer.CHARACTER_CONTENT_CHUNK_SIZE_CONSTRAINT;
+
     // FastInfosetSerializer
 
     public Encoder() {
@@ -173,6 +176,30 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         _vIsInternal = false;
     }
 
+    public void setCharacterContentChunkSizeLimit(int size) {
+        if (size < 0 ) {
+            size = 0;
+        }
+                
+        characterContentChunkSizeContraint = size;
+    }
+    
+    public int getCharacterContentChunkSizeLimit() {
+        return characterContentChunkSizeContraint;
+    }
+
+    public void setAttributeValueSizeLimit(int size) {
+        if (size < 0 ) {
+            size = 0;
+        }
+        
+        attributeValueSizeConstraint = size;
+    }
+    
+    public int getAttributeValueSizeLimit() {
+        return attributeValueSizeConstraint;
+    }
+    
     protected final void encodeHeader(boolean encodeXmlDecl) throws IOException {
         if (encodeXmlDecl) {
             _s.write(EncodingConstants.XML_DECLARATION_VALUES[0]);
@@ -272,18 +299,18 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     }
 
     protected final void encodeCharacters(char[] ch, int start, int length) throws IOException {
-        final boolean addToTable = (length < _v.characterContentChunkSizeContraint) ? true : false;
+        final boolean addToTable = (length < characterContentChunkSizeContraint) ? true : false;
         encodeNonIdentifyingStringOnThirdBit(ch, start, length, _v.characterContentChunk, addToTable, true);
     }
 
     protected final void encodeCharactersNoClone(char[] ch, int start, int length) throws IOException {
-        final boolean addToTable = (length < _v.characterContentChunkSizeContraint) ? true : false;
+        final boolean addToTable = (length < characterContentChunkSizeContraint) ? true : false;
         encodeNonIdentifyingStringOnThirdBit(ch, start, length, _v.characterContentChunk, addToTable, false);
     }
     
     protected final void encodeFourBitCharacters(int id, int[] table, char[] ch, int start, int length) throws FastInfosetException, IOException {
         // This procedure assumes that id <= 64
-        _b = (length < _v.characterContentChunkSizeContraint) ?
+        _b = (length < characterContentChunkSizeContraint) ?
             EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_RESTRICTED_ALPHABET_FLAG | EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG :
             EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_RESTRICTED_ALPHABET_FLAG;
         write (_b);
@@ -301,7 +328,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
         id += EncodingConstants.RESTRICTED_ALPHABET_APPLICATION_START;
         
-        _b = (length < _v.characterContentChunkSizeContraint) ?
+        _b = (length < characterContentChunkSizeContraint) ?
             EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_RESTRICTED_ALPHABET_FLAG | EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG :
             EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_RESTRICTED_ALPHABET_FLAG;        
         _b |= (id & 0xC0) >> 6;
@@ -320,21 +347,21 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         encodeIdentifyingNonEmptyStringOnFirstBit(target, _v.otherNCName);
 
         // Data
-        boolean addToTable = (data.length() < _v.characterContentChunkSizeContraint) ? true : false;
+        boolean addToTable = (data.length() < characterContentChunkSizeContraint) ? true : false;
         encodeNonIdentifyingStringOnFirstBit(data, _v.otherString, addToTable);
     }
 
     protected final void encodeComment(char[] ch, int start, int length) throws IOException {
         write(EncodingConstants.COMMENT);
 
-        boolean addToTable = (length < _v.characterContentChunkSizeContraint) ? true : false;
+        boolean addToTable = (length < characterContentChunkSizeContraint) ? true : false;
         encodeNonIdentifyingStringOnFirstBit(ch, start, length, _v.otherString, addToTable, true);
     }
 
     protected final void encodeCommentNoClone(char[] ch, int start, int length) throws IOException {
         write(EncodingConstants.COMMENT);
 
-        boolean addToTable = (length < _v.characterContentChunkSizeContraint) ? true : false;
+        boolean addToTable = (length < characterContentChunkSizeContraint) ? true : false;
         encodeNonIdentifyingStringOnFirstBit(ch, start, length, _v.otherString, addToTable, false);
     }
 

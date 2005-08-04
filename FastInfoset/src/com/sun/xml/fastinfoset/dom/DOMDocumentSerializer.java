@@ -180,7 +180,7 @@ public class DOMDocumentSerializer extends Encoder {
                 encodeAttribute(namespaceURI, a.getNodeName(), a.getLocalName());
                 
                 final String value = a.getNodeValue();
-                final boolean addToTable = (value.length() < _v.attributeValueSizeConstraint) ? true : false;
+                final boolean addToTable = (value.length() < attributeValueSizeConstraint) ? true : false;
                 encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
             }
             
