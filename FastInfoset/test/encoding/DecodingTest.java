@@ -92,14 +92,14 @@ public class DecodingTest extends TestCase {
 
     public void testDecodeWithVocabulary() throws Exception {
         SerializerVocabulary serializerExternalVocabulary = new SerializerVocabulary();
-        serializerExternalVocabulary.attributeValueSizeConstraint = serializerExternalVocabulary.characterContentChunkSizeContraint = 0;
         ParserVocabulary parserExternalVocabulary = new ParserVocabulary();
         
         VocabularyGenerator vocabularyGenerator = new VocabularyGenerator(serializerExternalVocabulary, parserExternalVocabulary);
+        vocabularyGenerator.setCharacterContentChunkSizeLimit(0);
+        vocabularyGenerator.setAttributeValueSizeLimit(0);
         _saxParser.parse(_xmlDocumentURL.openStream(), vocabularyGenerator);
 
         SerializerVocabulary initialVocabulary = new SerializerVocabulary();
-        initialVocabulary.attributeValueSizeConstraint = initialVocabulary.characterContentChunkSizeContraint = 6;
         initialVocabulary.setExternalVocabulary(
                 new URI(EXTERNAL_VOCABULARY_URI_STRING),
                 serializerExternalVocabulary, false);
@@ -110,6 +110,8 @@ public class DecodingTest extends TestCase {
         
         
         SAXDocumentSerializer documentSerializer = new SAXDocumentSerializer();
+        documentSerializer.setCharacterContentChunkSizeLimit(6);
+        documentSerializer.setAttributeValueSizeLimit(6);
         documentSerializer.setVocabulary(initialVocabulary);        
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         documentSerializer.setOutputStream(baos);
@@ -126,9 +128,10 @@ public class DecodingTest extends TestCase {
 
     public void testDecodeWithoutVocabulary() throws Exception {
         SerializerVocabulary initialVocabulary = new SerializerVocabulary();
-        initialVocabulary.attributeValueSizeConstraint = initialVocabulary.characterContentChunkSizeContraint = 6;
 
         SAXDocumentSerializer documentSerializer = new SAXDocumentSerializer();
+        documentSerializer.setCharacterContentChunkSizeLimit(6);
+        documentSerializer.setAttributeValueSizeLimit(6);
         documentSerializer.setVocabulary(initialVocabulary);        
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         documentSerializer.setOutputStream(baos);

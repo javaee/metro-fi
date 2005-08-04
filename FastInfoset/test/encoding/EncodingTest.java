@@ -82,8 +82,9 @@ public class EncodingTest extends TestCase {
         _finfRefVocabDocumentURL = this.getClass().getClassLoader().getResource(FINF_SPEC_UBL_FINF_REFVOCAB_RESOURCE);
         
         _ds = new SAXDocumentSerializer();
+        _ds.setCharacterContentChunkSizeLimit(6);
+        _ds.setAttributeValueSizeLimit(6);
         _initialVocabulary = new SerializerVocabulary();
-        _initialVocabulary.attributeValueSizeConstraint = _initialVocabulary.characterContentChunkSizeContraint = 6;
     }
     
     public static Test suite() {
@@ -93,9 +94,10 @@ public class EncodingTest extends TestCase {
     
     public void testEncodeWithVocabulary() throws Exception {
         SerializerVocabulary externalVocabulary = new SerializerVocabulary();
-        externalVocabulary.attributeValueSizeConstraint = externalVocabulary.characterContentChunkSizeContraint = 0;
         
         VocabularyGenerator vocabularyGenerator = new VocabularyGenerator(externalVocabulary);
+        vocabularyGenerator.setCharacterContentChunkSizeLimit(0);
+        vocabularyGenerator.setAttributeValueSizeLimit(0);
         _saxParser.parse(_xmlDocumentURL.openStream(), vocabularyGenerator);
         
         _initialVocabulary.setExternalVocabulary(
