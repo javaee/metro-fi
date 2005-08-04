@@ -83,7 +83,7 @@ public class TrendDataset {
         String[] tests = params.test();        
         
         for (int ii = 0; ii< drivers.size(); ii++) {
-            ArrayList<TimeSeries> ts = new ArrayList();
+            ArrayList ts = new ArrayList();
             for(int i=0; i<tests.length; i++) {
                 ts.add(new TimeSeries(tests[i], Day.class));
             }
@@ -107,7 +107,7 @@ public class TrendDataset {
         
     }    
     void getDataset(TrendReportParams params, Map[] reports, Date[] dates) {
-        ArrayList<String> drivers = new ArrayList();        
+        ArrayList drivers = new ArrayList();        
         TimeSeries[] testcases;
         //if [driver] is not specified, output both drivers
         if (!params.isDriverSpecified()) {

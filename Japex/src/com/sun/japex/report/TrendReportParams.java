@@ -62,7 +62,7 @@ public class TrendReportParams {
                 _isDriverSpecified = true;
             }
             if (args.length > ARGS_TESTCASE) {
-                ArrayList<String> testcases = new ArrayList<String>();
+                ArrayList testcases = new ArrayList();
                 for (int i=ARGS_TESTCASE; i<args.length; i++) {
                     testcases.add((String)args[i]);
                 }
