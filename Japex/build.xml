@@ -84,4 +84,8 @@
         </ant>
     </target>
 
+    <target name="trendreport">
+        <ant antfile="trendreport.xml" dir="." target="trendreport"/>
+    </target>
+    
 </project>
