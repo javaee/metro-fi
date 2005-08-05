@@ -1,155 +1,178 @@
 <project name="FastInfoset" default="dist" basedir=".">
 
-	<property name="version" value="0.1"/>
+    <!-- initialize build properties -->
+    <property file="${basedir}/build.properties" />
+
+    <property name="app.jar" value="${ant.project.name}.jar"/>
+
+    <path id="compile.class.path">
+        <pathelement location="${jsr173_api.jar}"/>
+    </path>
+
+    <!-- task that generates a manifest file -->
+    <macrodef name="createManifest">
+        <attribute name="extensionName"/>
+        <attribute name="file"/>
+      <sequential>
+        <copy tofile="@{file}"
+            file="${manifest.root}/manifest.mf"
+            overwrite="yes"/>
+        <replace file="@{file}">
+            <replacefilter token="@@@@IMPL_VERSION@@@@"
+                   value="${release.impl.version}"/>
+            <replacefilter token="@@@@VENDOR_ID@@@@"
+                   value="com.sun"/>
+            <replacefilter token="@@@@EXTENSION_NAME@@@@"
+                   value="@{extensionName}"/>
+            <replacefilter token="@@@@BUILD_ID@@@@"
+                   value="${build.id}"/>
+        </replace>
+        </sequential>
+    </macrodef>
+
+    <target name="prepare">
+        <tstamp>
+            <format property="now" pattern="MM/dd/yyyy hh:mm aa" unit="hour"/>
+        </tstamp>
+        <property name="build.id" value="${now}(${user.name})" />
+        <property name="build.version" value="${release.impl.version}-${build.id}" />
+        <echo message="The build id is: ${build.version}" />
+
+	<tstamp>
+	    <format property="TSTAMP" pattern="hhmmss"/>
+	</tstamp>
+        <mkdir dir="${build.dir}/classes"/>
+        <mkdir dir="${dist.dir}"/>
+        <mkdir dir="${package.dir}"/>
+    </target>
+
+    <target name="clean">
+        <delete quiet="true" dir="${dist.dir}"/>
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <target name="compile" depends="prepare">
+        <javac source="1.4" srcdir="src" destdir="${build.dir}/classes"
+            debug="on" optimize="on" deprecation="on">
+            <classpath refid="compile.class.path"/>
+        </javac>
+        <mkdir dir="${build.dir}/classes/com/sun/xml/fastinfoset/resources"/>
+	<copy todir="${build.dir}/classes/com/sun/xml/fastinfoset/resources">
+	    <fileset dir="src/com/sun/xml/fastinfoset/resources">
+		<include name="*.properties"/>
+	    </fileset>
+	</copy>
+    </target>
+
+    <target name="dist" depends="compile">
+	<createManifest file="${basedir}/build/manifest.rt" extensionName="com.sun.xml.fastinfoset" />
+        <jar jarfile="${dist.dir}/${app.jar}"
+		basedir="${build.dir}/classes"
+		manifest="${basedir}/build/manifest.rt"/>
+    </target>
+
         
-	<property name="app.jar" value="${ant.project.name}.jar"/>
-
-	<property name="jsr173_api.jar" value="lib/jsr173_api.jar"/>
-
-        <property name="junit.jar" value="lib/junit.jar"/>
-
-        <property name="build.dir" value="build" />
-        <property name="dist.dir"  value="dist" />
-        <property name="package.dir"  value="package" />
-
-	<path id="compile.class.path">
-		<pathelement location="${jsr173_api.jar}"/>
-	</path>
-
-	<target name="prepare">
-                <tstamp>
-                    <format property="TSTAMP" pattern="hhmmss"/>
-                </tstamp>
-		<mkdir dir="${build.dir}/classes"/>
-		<mkdir dir="${dist.dir}"/>
-		<mkdir dir="${package.dir}"/>
-	</target>
-
-	<target name="clean">
-		<delete quiet="true" dir="${dist.dir}"/>
-		<delete dir="${build.dir}"/>
-	</target>
-
-	<target name="compile" depends="prepare">
-		<javac source="1.4" srcdir="src" destdir="${build.dir}/classes"
-			debug="on" optimize="on" deprecation="on">
-			<classpath refid="compile.class.path"/>
-		</javac>
-		<mkdir dir="${build.dir}/classes/com/sun/xml/fastinfoset/resources"/>
-                <copy todir="${build.dir}/classes/com/sun/xml/fastinfoset/resources">
-                    <fileset dir="src/com/sun/xml/fastinfoset/resources">
-                        <include name="*.properties"/>
-                    </fileset>
-                </copy>
-	</target>
-
-	<target name="dist" depends="compile">
-		<jar jarfile="${dist.dir}/${app.jar}"
-			basedir="${build.dir}/classes"/>
-	</target>
-
+    <path id="compile-test.class.path">
+        <path refid="compile.class.path"/>
+        <pathelement location="${dist.dir}/${app.jar}"/>
+        <pathelement location="${junit.jar}"/>
+    </path>
         
-	<path id="compile-test.class.path">
-		<pathelement path="compile.class.path"/>
-		<pathelement location="${dist.dir}/${app.jar}"/>
-		<pathelement location="${junit.jar}"/>
-	</path>
+    <target name="prepare-test">
+        <mkdir dir="${build.dir}/test/classes"/>
+        <mkdir dir="${build.dir}/test/results"/>
+    </target>
         
-	<target name="prepare-test">
-		<mkdir dir="${build.dir}/test/classes"/>
-		<mkdir dir="${build.dir}/test/results"/>
-	</target>
+    <target name="compile-test" depends="prepare-test, dist">
+        <javac source="1.4" srcdir="test" destdir="${build.dir}/test/classes"
+		debug="on" optimize="on" deprecation="on">
+            <classpath refid="compile-test.class.path"/>
+        </javac>
+	<copy todir="${build.dir}/test/classes">
+	    <fileset dir="test">
+		<include name="X.finf/**"/>
+	    </fileset>
+	</copy>
+    </target>
+
+    <path id="test.class.path">
+        <path refid="compile.class.path"/>
+        <pathelement location="${dist.dir}/${app.jar}"/>
+        <pathelement location="${build.dir}/test/classes"/>
+    </path>
         
-	<target name="compile-test" depends="prepare-test, dist">
-		<javac source="1.4" srcdir="test" destdir="${build.dir}/test/classes"
-			debug="on" optimize="on" deprecation="on">
-			<classpath refid="compile-test.class.path"/>
-		</javac>
-                <copy todir="${build.dir}/test/classes">
-                    <fileset dir="test">
-                        <include name="X.finf/**"/>
-                    </fileset>
-                </copy>
-	</target>
-
-	<path id="test.class.path">
-		<pathelement path="compile.class.path"/>
-		<pathelement location="${dist.dir}/${app.jar}"/>
-		<pathelement location="${build.dir}/test/classes"/>
-	</path>
+    <target name="test" depends="compile-test">
+	<junit printsummary="yes" fork="yes" dir="test">
+		<classpath refid="test.class.path"/>
+		<formatter type="plain"/>
+	    <batchtest todir="${build.dir}/test/results">
+		<fileset dir="test">
+		    <include name="**/*Test*.java"/>
+		</fileset>
+	    </batchtest>
+	</junit>
+    </target>        
         
-        <target name="test" depends="compile-test">
-            <junit printsummary="yes" fork="yes" dir="test">
-                    <classpath refid="test.class.path"/>
-                    <formatter type="plain"/>
-                <batchtest todir="${build.dir}/test/results">
-                    <fileset dir="test">
-                        <include name="**/*Suite*.java"/>
-                    </fileset>
-                </batchtest>
-            </junit>
-	</target>        
-        
-	<target name="doc" depends="dist">
-		<javadoc source="1.4"
-                        sourcepath="src"
-                        packagenames="com.sun.xml.fastinfoset.*"
-			destdir="${dist.dir}/javadoc"
-                        version="true">
-			<classpath refid="compile.class.path"/>
-                </javadoc>
-	</target>
+    <target name="doc" depends="dist">
+        <javadoc source="1.4"
+		sourcepath="src"
+		packagenames="com.sun.xml.fastinfoset.*"
+		destdir="${dist.dir}/javadoc"
+		version="true">
+            <classpath refid="compile.class.path"/>
+	</javadoc>
+    </target>
 
-        <target name="package-contents" depends="doc">
-            <copy todir="${package.dir}/${ant.project.name}_${version}_${DSTAMP}_${TSTAMP}">
-                <fileset dir="dist">
-                    <include name="javadoc/**"/>
-                </fileset>
-                <fileset dir="${basedir}">
-                    <include name="README-PACKAGE.txt"/>
-                    <include name="XERCES-APACHE-1.1-license.txt"/>
-                    <include name="bin/*"/>
-                    <include name="lib/*.jar"/>
-                    <include name="${dist.dir}/${app.jar}"/>
-                </fileset>
-                <fileset dir="${basedir}/..">
-                    <include name="LICENSE.txt"/>
-                </fileset>
-            </copy>
-        </target>
+    <target name="package-contents" depends="doc">
+	<copy todir="${package.dir}/${ant.project.name}_${release.impl.version}_${DSTAMP}_${TSTAMP}">
+	    <fileset dir="dist">
+		<include name="javadoc/**"/>
+	    </fileset>
+	    <fileset dir="${basedir}">
+		<include name="README-PACKAGE.txt"/>
+		<include name="XERCES-APACHE-1.1-license.txt"/>
+		<include name="bin/*"/>
+		<include name="lib/*.jar"/>
+		<include name="${dist.dir}/${app.jar}"/>
+	    </fileset>
+	    <fileset dir="${basedir}/..">
+		<include name="LICENSE.txt"/>
+	    </fileset>
+	</copy>
+    </target>
 
-        <target name="package" depends="package-contents">
-            <zip destfile="${package.dir}/${ant.project.name}_${version}_${DSTAMP}_${TSTAMP}.zip">
-                <fileset dir="${package.dir}">
-                    <include name="${ant.project.name}_${version}_${DSTAMP}_${TSTAMP}/**"/>
-                </fileset>                
-            </zip>
-        </target>
+    <target name="package" depends="package-contents">
+	<zip destfile="${package.dir}/${ant.project.name}_${release.impl.version}_${DSTAMP}_${TSTAMP}.zip">
+	    <fileset dir="${package.dir}">
+		<include name="${ant.project.name}_${release.impl.version}_${DSTAMP}_${TSTAMP}/**"/>
+	    </fileset>                
+	</zip>
+    </target>
 
-         <property name="wspack.home" value="fi-wspack" />
+     <property name="wspack.home" value="fi-wspack" />
 
-        <!-- target that would be invoked from wspack build -->
-        <target name="wspack" depends="dist" >
-            <mkdir dir="${wspack.home}" />
-            <mkdir dir="${wspack.home}/lib" />
-            <copy file="${dist.dir}/${app.jar}"
-                todir="${wspack.home}/lib" />
+    <!-- target that would be invoked from wspack build -->
+    <target name="wspack" depends="dist" >
+	<mkdir dir="${wspack.home}" />
+	<mkdir dir="${wspack.home}/lib" />
+	<copy file="${dist.dir}/${app.jar}"
+	    todir="${wspack.home}/lib" />
 
-            <!-- docs content -->
-            <mkdir dir="${wspack.home}/docs" />
-            <copy todir="${wspack.home}/docs" >
-                <fileset dir="${basedir}/docs" />
-            </copy>
-        </target>
+	<!-- docs content -->
+	<mkdir dir="${wspack.home}/docs" />
+	<copy todir="${wspack.home}/docs" >
+	    <fileset dir="${basedir}/docs" />
+	</copy>
+    </target>
 
 
   <!-- BEGIN: Packaging related   -->
 
   <property name="dist.home" value="${dist.dir}" />
-  <property name="pkg.version" value="1.0"/>
-  <property name="rpm.version" value="1.0"/>
 
-  <property name="rpm.release" value="1"/>
+  <property name="pkg.version" value="${release.impl.version}"/>
+  <property name="rpm.version" value="${release.impl.version}"/>
+  <property name="rpm.release" value="${release.impl.version}"/>
 
   <!-- The package name -->
   <property name="pkg.fastinfoset"    value="SUNWfastinfoset"/>
