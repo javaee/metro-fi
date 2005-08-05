@@ -1,0 +1,34 @@
+<project name="trendreport" default="trendreport" basedir=".">
+    <path id="class.path">
+        <pathelement location="dist/japex.jar"/>
+    </path>
+    <property name="DATE" value="2005-08-04">
+    <target name="means">
+        <java dir="." fork="true" classname="com.sun.japex.TrendReport">
+            <classpath refid="class.path"/>
+            <arg value="Means Trend"/>
+            <arg line="~/workproj/fws/performance/japex/parsing/reports"/>
+            <arg line="~/workproj/fws/performance/japex/parsing/trend"/>
+            <arg line="today"/>
+            <arg line="-1M"/>
+            <arg line="FastInfosetDriver"/>
+            <arg line="-overwrite"/>
+        </java>
+    </target>
+    <target name="RPCInvoices">
+        <java dir="." fork="true" classname="com.sun.japex.TrendReport">
+            <classpath refid="class.path"/>
+            <arg value="RPC Invoices"/>
+            <arg line="~/workproj/fws/performance/japex/parsing/reports"/>
+            <arg line="~/workproj/fws/performance/japex/parsing/trend"/>
+            <arg line="today"/>
+            <arg line="-1M"/>
+            <arg line="FastInfosetDriver"/>
+            <arg line="inv1.xml inv10.xml inv50.xml inv100.xml inv500.xml inv1000.xml"/>
+            <arg line="-overwrite"/>
+        </java>
+    </target>
+    <target name="trendreport" depends="means, RPCInvoices, echoStruct, echoListandSynthetic">
+    </target>
+
+</project>
