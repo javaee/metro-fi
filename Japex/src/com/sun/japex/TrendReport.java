@@ -61,6 +61,10 @@ System.out.println("chartname: "+chartName);
 System.out.println("test specified: "+params.isTestSpecified());
 
             System.out.println(params.outputPath()+"/"+chartName);
+            File file = new File(params.outputPath());
+            if (!file.exists()) {
+                file.mkdirs();
+            }
             ChartUtilities.saveChartAsJPEG(new File(params.outputPath()+"/"+chartName), chart1, 500, 300);
             new IndexPage(params, chartName).report();
             

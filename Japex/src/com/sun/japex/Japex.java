@@ -101,13 +101,13 @@ public class Japex {
             DateFormat df = new SimpleDateFormat("yyyy_MM_dd_HH_mm");
             String outputDir = testSuite.getParam(Constants.REPORTS_DIRECTORY) 
                 + fileSep + df.format(TODAY);            
-            new File(outputDir).mkdirs();
 
             // Generate report to string buffer
             StringBuffer report = new StringBuffer();
             testSuite.serialize(report);            
 
             // Output report to file
+            new File(outputDir).mkdirs();
             System.out.println("Generating reports ...");
             System.out.println("  " + 
                 new File(outputDir + "/" + "report.xml").toURL());

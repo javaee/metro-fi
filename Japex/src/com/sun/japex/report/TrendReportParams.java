@@ -14,7 +14,7 @@ import java.util.GregorianCalendar;
 import java.util.ArrayList;
 
 /*
- *TrendReport title reportPath outputPath date offset [driver] [test]
+ *TrendReport title reportPath outputPath date offset [driver] [test] [-H/HISTORY] [-O/OVERWRITE]
     where parameters are the same as the first format except:
     title -- name of the chart to be generated
     reportPath -- path to where the report directory is
@@ -27,6 +27,10 @@ import java.util.ArrayList;
     driver -- name of a driver for which a trend report is to be generated. All drivers if not specified.
     test(s) -- specific test(s) in a driver for which a trend report will be created.  
             Return means if no tests specified.
+ 
+    options:
+    -H or -History -- indicate that the trend report should be saved to a subdirectory in a timestamp format
+    -O or -Overwrite -- overwrite existing report under "outputPath"
   
 */
 
@@ -48,12 +52,19 @@ public class TrendReportParams {
     boolean _isDriverSpecified = false;
     String[] _test;
     boolean _isTestSpecified = false;
+    boolean _overwrite = false;
+    boolean _history = false;
     
     /** Creates a new instance of TrendReportParams */
     public TrendReportParams(String[] args) {
+        args = checkOptions(args);
         _title = args[ARGS_TITLE];
         _reportPath = args[ARGS_PATH];
         _outputPath = args[ARGS_OUTPUTPATH];
+        if (_history) {
+            DateFormat df = new SimpleDateFormat("yyyy_MM_dd_HH_mm");
+            _outputPath = _outputPath + df.format(new Date());            
+        }
         parseDates(args[ARGS_DATE], args[ARGS_OFFSET]);
                 
         try {
@@ -104,7 +115,28 @@ public class TrendReportParams {
     public boolean isTestSpecified() {
         return _isTestSpecified;
     }
+    public boolean overwrite() {
+        return _overwrite;
+    }
+    public boolean history() {
+        return _history;
+    }
     
+    String[] checkOptions(String[] args) {
+        ArrayList argList = new ArrayList();
+        for (int i=0; i<args.length; i++) {
+            if (args[i].toUpperCase().equals("-O") || args[i].toUpperCase().equals("-OVERWRITE")) {
+                _overwrite = true;
+            } else if (args[i].toUpperCase().equals("-H") || args[i].toUpperCase().equals("-HISTORY")) {
+                _history = true;
+            } else {
+                argList.add(args[i]);
+            }
+        }
+        String[] newArgs = new String[argList.size()];
+        argList.toArray(newArgs);
+        return newArgs;
+    }
     void parseDates(String date, String offset) {
         try {            
             Date date1 = null;

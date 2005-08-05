@@ -8,6 +8,8 @@ package com.sun.japex.report;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.BufferedInputStream;
+import java.io.InputStream;
 import java.io.DataInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
@@ -39,8 +41,16 @@ public class IndexPage {
     }
     public String reportContent(File file) {
         StringBuffer content = new StringBuffer();
-        if (file.exists()) {
-            content.append(readFromFile(file));
+        if (!_params.overwrite() && file.exists()) {
+            try {
+                InputStream in = new BufferedInputStream(new FileInputStream(file));
+                //content.append(readFromFile(file));
+                byte[] b = new byte[in.available()];
+                in.read(b);
+                content.append(new String(b));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         } else {
             content.append(getTemplate());
         }
