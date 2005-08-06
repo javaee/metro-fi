@@ -7,8 +7,8 @@
         <java dir="." fork="true" classname="com.sun.japex.TrendReport">
             <classpath refid="class.path"/>
             <arg value="Means Trend"/>
-            <arg line="~/workproj/fws/performance/japex/parsing/reports"/>
-            <arg line="~/workproj/fws/performance/japex/parsing/trend"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/parsing/reports"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/parsing/trend"/>
             <arg line="today"/>
             <arg line="-1M"/>
             <arg line="FISAXDriver"/>
