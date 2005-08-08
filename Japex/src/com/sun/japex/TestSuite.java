@@ -213,7 +213,7 @@ public class TestSuite extends Params {
     private void readAndSetSystemProperties() {
         Properties sysProps = System.getProperties();
         
-        for (Iterator i = sysProps.keySet().iterator(); i.hasNext(); i.next()) {
+        for (Iterator i = sysProps.keySet().iterator(); i.hasNext();) {
             String name = (String) i.next();
             if (name.startsWith("japex.")) {
                 setParam(name, sysProps.getProperty(name));
