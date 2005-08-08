@@ -146,9 +146,9 @@ public class Engine {
                         runTime = Util.currentTimeMillis() - runTime;
 
                         // Set japex.actualRunTime output param
-                        if (!testSuite.hasParam(Constants.RUN_TIME)) {
+                        //if (!testSuite.hasParam(Constants.RUN_TIME)) {
                             tc.setDoubleParam(Constants.ACTUAL_RUN_TIME, runTime);  
-                        }
+                        //}
 
                         // Do finish phase
                         for (int i = 0; i < nOfThreads; i++) {
