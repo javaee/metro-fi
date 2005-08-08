@@ -157,6 +157,9 @@ public class TestSuite extends Params {
             System.getProperty("java.vendor") + " " + 
             System.getProperty("java.vm.version"));
         
+        // Finally, override config props using system properties
+        readAndSetSystemProperties();
+        
         // Create and populate list of drivers
         Iterator it = ts.getDriver().iterator();
         while (it.hasNext()) {
@@ -200,6 +203,21 @@ public class TestSuite extends Params {
         while (it.hasNext()) {
             DriverInfo di = (DriverInfo) it.next();
             di.setTestCases(testCases);
+        }
+    }
+    
+    /**
+     * System properties that start with "japex." can be used to override
+     * global params of the same name from the config file.
+     */
+    private void readAndSetSystemProperties() {
+        Properties sysProps = System.getProperties();
+        
+        for (Iterator i = sysProps.keySet().iterator(); i.hasNext(); i.next()) {
+            String name = (String) i.next();
+            if (name.startsWith("japex.")) {
+                setParam(name, sysProps.getProperty(name));
+            }
         }
     }
     
