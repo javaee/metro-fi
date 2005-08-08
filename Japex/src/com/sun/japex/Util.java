@@ -188,4 +188,5 @@ public class Util {
     public static String formatDouble(double value) {
         return _decimalFormat.format(value);   
     }
+    
 }

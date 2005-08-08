@@ -58,6 +58,7 @@ public class Constants {
     
     // Driver input parameters        
     public static final String DRIVER_CLASS = "japex.driverClass";
+    public static final String INPUT_FILE   = "japex.inputFile";
     
     // Driver output parameters
     public static final String RESULT_ARIT_MEAN = "japex.resultAritMean";
