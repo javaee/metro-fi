@@ -75,18 +75,18 @@ public class Params {
         _params.setProperty(name, evaluate(name, value));
     }
     
+    public synchronized void setIntParam(String name, int value) {
+        _params.setProperty(name, Integer.toString(value));
+    }
+    
     public synchronized int getIntParam(String name) {
         String s = _params.getProperty(name);
         try {
             return Integer.parseInt(s);
         }
         catch (NumberFormatException e) {
-            throw new RuntimeException(e);
+            return (int) getDoubleParam(name);
         }
-    }
-    
-    public synchronized void setIntParam(String name, int value) {
-        _params.setProperty(name, Integer.toString(value));
     }
     
     public synchronized void setLongParam(String name, long value) {
@@ -99,7 +99,7 @@ public class Params {
             return Long.parseLong(s);
         }
         catch (NumberFormatException e) {
-            throw new RuntimeException(e);
+            return (long) getDoubleParam(name);
         }
     }
     
