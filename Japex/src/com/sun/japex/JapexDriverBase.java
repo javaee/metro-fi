@@ -171,6 +171,53 @@ public class JapexDriverBase implements JapexDriver {
         }
     }
     
+    // -- Internal interface ---------------------------------------------
+    
+    /**
+     * Called exactly once after calling run. Computes japex.resultValue
+     * based on global param japex.resultUnit. Only three possible values
+     * are recognized: "tps" (default), "ms" (latency in millis) and 
+     * "mbps" (which requires setting japex.inputFile). If no errors are
+     * found calls finish(testCase) on the driver.
+     */
+    public void finish() {
+        String resultUnit = getTestSuite().getParam(Constants.RESULT_UNIT);
+        
+        if (resultUnit == null || resultUnit.equalsIgnoreCase("tps")) {
+            // Default - computed elsewhere
+        }
+        else if (resultUnit.equalsIgnoreCase("ms")) {
+            _testCase.setParam(Constants.RESULT_UNIT, "ms");
+
+            _testCase.setDoubleParam(Constants.RESULT_VALUE, 
+                _testCase.getLongParam(Constants.ACTUAL_RUN_TIME) /
+                _testCase.getLongParam(Constants.ACTUAL_RUN_ITERATIONS));                            
+        }
+        else if (resultUnit.equalsIgnoreCase("mbps")) {
+            _testCase.setParam(Constants.RESULT_UNIT, "Mbps");
+
+            String inputFile = _testCase.getParam(Constants.INPUT_FILE);
+            if (inputFile != null) {
+                long fileSize = new File(inputFile).length();
+                _testCase.setDoubleParam(Constants.RESULT_VALUE,
+                    (fileSize * 0.000008d 
+                        * _testCase.getLongParam(Constants.ACTUAL_RUN_ITERATIONS)) /    // Mbits
+                    (_testCase.getLongParam(Constants.ACTUAL_RUN_TIME) / 1000.0));      // Seconds
+            }
+            else {
+                throw new RuntimeException("Unable to compute japex.resultValue in 'Mbps'" + 
+                    " because japex.inputFile is not defined or refers to an illegal path.");
+            }
+        }
+        else {
+            throw new RuntimeException("Unknown value '" + 
+                resultUnit + "' for global param japex.resultUnit.");
+        }
+        
+        // Call finish(testCase)
+        finish(_testCase);
+    }
+    
     // -- JapexDriver interface ------------------------------------------
     
     /**
@@ -200,44 +247,9 @@ public class JapexDriverBase implements JapexDriver {
     }
     
     /**
-     * Called exactly once after calling run. Computes japex.resultValue
-     * based on global param japex.resultUnit. Only three possible values
-     * are recognized: "tps" (default), "ms" (latency in millis) and 
-     * "mbps" (which requires setting japex.inputFile).
+     * Called exactly once after calling run. 
      */
     public void finish(TestCase testCase) {
-        String resultUnit = getTestSuite().getParam(Constants.RESULT_UNIT);
-        
-        if (resultUnit == null || resultUnit.equalsIgnoreCase("tps")) {
-            // Default - computed elsewhere
-        }
-        else if (resultUnit.equalsIgnoreCase("ms")) {
-                testCase.setParam(Constants.RESULT_UNIT, "ms");
-                
-                testCase.setDoubleParam(Constants.RESULT_VALUE, 
-                    testCase.getLongParam(Constants.ACTUAL_RUN_TIME) /
-                    testCase.getLongParam(Constants.ACTUAL_RUN_ITERATIONS));                            
-            }
-        else if (resultUnit.equalsIgnoreCase("mbps")) {
-            testCase.setParam(Constants.RESULT_UNIT, "Mbps");
-
-            String inputFile = testCase.getParam(Constants.INPUT_FILE);
-            if (inputFile != null) {
-                long fileSize = new File(inputFile).length();
-                testCase.setDoubleParam(Constants.RESULT_VALUE,
-                    (fileSize * 0.000008d 
-                        * testCase.getLongParam(Constants.ACTUAL_RUN_ITERATIONS)) /    // Mbits
-                    (testCase.getLongParam(Constants.ACTUAL_RUN_TIME) / 1000.0));      // Seconds
-            }
-            else {
-                throw new RuntimeException("Unable to compute japex.resultValue in 'Mbps'" + 
-                    " because japex.inputFile is not defined or refers to an illegal path.");
-            }
-        }
-        else {
-            throw new RuntimeException("Unknown value '" + 
-                resultUnit + "' for global param japex.resultUnit.");
-        }
     }
     
     /**

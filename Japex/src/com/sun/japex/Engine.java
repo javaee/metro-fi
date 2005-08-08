@@ -152,7 +152,7 @@ public class Engine {
 
                         // Do finish phase
                         for (int i = 0; i < nOfThreads; i++) {
-                            drivers[i][driverRun].finish(tc);
+                            drivers[i][driverRun].finish();
                         }                    
 
                         double result = 0.0;
