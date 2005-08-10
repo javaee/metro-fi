@@ -183,7 +183,7 @@ public class Util {
         return Math.sqrt(variance);
     }
     
-    static DecimalFormat _decimalFormat = new DecimalFormat("0.00");
+    static DecimalFormat _decimalFormat = new DecimalFormat("0.000");
     
     public static String formatDouble(double value) {
         return _decimalFormat.format(value);   

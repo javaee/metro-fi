@@ -69,7 +69,7 @@ public class DriverInfo extends Params {
     }
        
     public DriverInfo(String name, boolean isNormal, int runsPerDriver, 
-        Properties params) 
+        Params params) 
     {
         super(params);
         _name = name;

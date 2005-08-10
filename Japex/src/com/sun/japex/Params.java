@@ -49,115 +49,213 @@ public class Params {
     final static int IN_EXPR  = 1;
     final static String DELIMITER = "\uFFFE";      // A Unicode nonchar
     
-    private Properties _params;
+    /**
+     * Mapping between strings and values. Values could be of three 
+     * possible types: String, Long or Double.
+     */
+    Map _mapping = new HashMap();
+    
+    /**
+     * Default mapping used when a parameter is not defined in this
+     * mapping.
+     */
+    Params _defaults = null;
     
     public Params() {
-        this(new Properties());
     }
     
-    public Params(Properties params) {
-        _params = params;
+    public Params(Properties props) {
+        for (Iterator i = props.keySet().iterator(); i.hasNext(); ) {
+            String key = (String) i.next();
+            convertAndPut(key, props.getProperty(key));
+        }
+    }
+    
+    public Params(Params defaults) {
+        _defaults = defaults;
     }
 
-    public synchronized Properties getParams() {
-        return _params;
-    }
-    
-    public synchronized boolean hasParam(String name) {
-        return _params.getProperty(name) != null;
-    }
-    
-    public synchronized String getParam(String name) {
-        return _params.getProperty(name);
-    }
-    
-    public synchronized void setParam(String name, String value) {
-        _params.setProperty(name, evaluate(name, value));
-    }
-    
-    public synchronized void setIntParam(String name, int value) {
-        _params.setProperty(name, Integer.toString(value));
-    }
-    
-    public synchronized int getIntParam(String name) {
-        String s = _params.getProperty(name);
+    private void convertAndPut(String key, String value) {
         try {
-            return Integer.parseInt(s);
+            long l = Long.parseLong(value);
+            _mapping.put(key, new Long(l));
         }
-        catch (NumberFormatException e) {
-            return (int) getDoubleParam(name);
-        }
+        catch (NumberFormatException e1) {
+            try {
+                double d = Double.parseDouble(value);
+                _mapping.put(key, new Double(d));
+            }
+            catch (NumberFormatException e2) {
+                _mapping.put(key, value);                    
+            }
+        }        
     }
     
-    public synchronized void setLongParam(String name, long value) {
-        _params.setProperty(name, Long.toString(value));
-    }
-    
-    public synchronized long getLongParam(String name) {
-        String s = _params.getProperty(name);
+    public Object clone() {
         try {
-            return Long.parseLong(s);
+            // Start with a shallow copy of the object
+            Params clone = (Params) super.clone();
+
+            // Make a deep copy of _mapping
+            clone._mapping = new HashMap();
+            for (Iterator i = _mapping.keySet().iterator(); i.hasNext(); ) {
+                String key = (String) i.next();
+                clone._mapping.put(key, _mapping.get(key));
+            }
+            
+            return clone;
         }
-        catch (NumberFormatException e) {
-            return (long) getDoubleParam(name);
-        }
-    }
-    
-    public synchronized double getDoubleParam(String name) {
-        String s = _params.getProperty(name);
-        try {
-            return Double.parseDouble(s);
-        }
-        catch (NumberFormatException e) {
+        catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);
         }
     }
+
+    private Object getParamOrDefault(String name) {
+        Object value = _mapping.get(name);
+        if (value == null && _defaults != null) {
+            value = _defaults.getParamOrDefault(name);
+        }
+        return value;
+    }
+    
+    public synchronized boolean hasParam(String name) {
+        return getParamOrDefault(name) != null;
+    }
+
+    // -- String params --------------------------------------------------
+    
+    public synchronized void setParam(String name, String value) {
+        convertAndPut(name, evaluate(name, value));
+    }
+    
+    public synchronized String getParam(String name) {
+        Object value = getParamOrDefault(name);
+        if (value instanceof Long) {
+            value = ((Long) value).toString();
+        }
+        else if (value instanceof Double) {
+            value = Util.formatDouble(((Double) value).doubleValue());
+        }
+        return (String) value;
+    }
+    
+    // -- Int params -----------------------------------------------------
+    
+    public synchronized void setIntParam(String name, int value) {
+        _mapping.put(name, new Long(value));
+    }
+    
+    public synchronized int getIntParam(String name) {
+        Object value = getParamOrDefault(name);
+        if (value instanceof Long) {
+            return ((Long) value).intValue();
+        }
+        else if (value instanceof Double) {
+            return ((Double) value).intValue();
+        }
+        else {
+            try {
+                return Integer.parseInt((String) value);
+            }
+            catch (NumberFormatException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+    
+    // -- Long params ----------------------------------------------------
+    
+    public synchronized void setLongParam(String name, long value) {
+        _mapping.put(name, new Long(value));
+    }
+    
+    public synchronized long getLongParam(String name) {
+        Object value = getParamOrDefault(name);
+        if (value instanceof Long) {
+            return ((Long) value).longValue();
+        }
+        else if (value instanceof Double) {
+            return ((Double) value).longValue();
+        }
+        else {
+            try {
+                return Long.parseLong((String) value);
+            }
+            catch (NumberFormatException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+    
+    // -- Double params --------------------------------------------------
     
     public synchronized void setDoubleParam(String name, double value) {
-        // Cconversion to String is less than ideal in this case.
-        _params.setProperty(name, Util.formatDouble(value));
-    }    
+        _mapping.put(name, new Double(value));
+    }
+    
+    public synchronized double getDoubleParam(String name) {
+        Object value = getParamOrDefault(name);
+        if (value instanceof Long) {
+            return ((Long) value).doubleValue();
+        }
+        else if (value instanceof Double) {
+            return ((Double) value).doubleValue();
+        }
+        else {
+            try {
+                return Double.parseDouble((String) value);
+            }
+            catch (NumberFormatException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    // -- Other methods --------------------------------------------------
     
     public void serialize(StringBuffer buffer, int indent) {        
         // Serialize built-in params first (TODO sort)
-        Enumeration names = _params.keys();
-        while (names.hasMoreElements()) {
-            String name = (String) names.nextElement();
+        Iterator names = _mapping.keySet().iterator();
+        
+        while (names.hasNext()) {
+            String name = (String) names.next();
+            
             if (name.startsWith("japex.")) {
-                String xmlName = name.substring(name.indexOf('.') + 1);
-                
+                String xmlName = name.substring(name.indexOf('.') + 1);                
                 // Replace path.separator by a single space
                 if (name.equals(Constants.CLASS_PATH)) {
                     buffer.append(Util.getSpaces(indent) 
                         + "<" + xmlName + ">" 
-                        + _params.getProperty(name).replaceAll(
+                        + getParam(name).replaceAll(
                               System.getProperty("path.separator"), "\n")
                         + "</" + xmlName + ">\n");                    
                 }
                 else {
                     buffer.append(Util.getSpaces(indent) 
                         + "<" + xmlName + ">" 
-                        + _params.getProperty(name)
+                        + getParam(name)
                         + "</" + xmlName + ">\n");
                 }
             }
         }
         
         // Serialize driver-defined params (TODO sort)
-        names = _params.keys();
-        while (names.hasMoreElements()) {
-            String name = (String) names.nextElement();
+        names = _mapping.keySet().iterator();
+        
+        while (names.hasNext()) {
+            String name = (String) names.next();
+            
             if (!name.startsWith("japex.")) {
                 buffer.append(Util.getSpaces(indent) 
                     + "<" + name + " xmlns=\"\">" 
-                    + _params.getProperty(name) 
+                    + getParam(name) 
                     + "</" + name + ">\n");                
             }
         }
     }
 
     /**
-     * Expand expression of the form $[paramname}
+     * Expand expression of the form ${paramname}
      */
     private String evaluate(String name, String value) {
         StringTokenizer tokenizer = 
@@ -227,7 +325,7 @@ public class Params {
             
             if (t.equals(DELIMITER)) {
                 String paramName = tokenizer.nextToken();
-                String paramValue =  _params.getProperty(paramName);
+                String paramValue = getParam(paramName);
                 if (paramValue != null) {
                     result.append(paramValue);
                 }

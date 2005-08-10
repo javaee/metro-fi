@@ -41,7 +41,6 @@ package com.sun.japex;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Properties;
 import javax.xml.bind.*;
 
 public class ConfigFileLoader {

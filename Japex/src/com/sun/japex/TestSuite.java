@@ -165,37 +165,42 @@ public class TestSuite extends Params {
         while (it.hasNext()) {
             TestSuiteType.DriverType dt = (TestSuiteType.DriverType) it.next();
             
-            Properties driverParams = new Properties(getParams());
+            // Create new DriverInfo
+            DriverInfo driverInfo = new DriverInfo(dt.getName(), 
+                dt.isNormal(), getIntParam(Constants.RUNS_PER_DRIVER), this);
+            
+            // Copy params from JAXB object to Japex object
             Iterator driverParamsIt = dt.getParam().iterator();
             while (driverParamsIt.hasNext()) {
                 ParamType pt = (ParamType) driverParamsIt.next();
-                driverParams.setProperty(pt.getName(), pt.getValue());
+                driverInfo.setParam(pt.getName(), pt.getValue());
             }
 
             // If japex.driverClass not specified, use the driver's name
-            if (driverParams.getProperty(Constants.DRIVER_CLASS) == null) {
-                driverParams.setProperty(Constants.DRIVER_CLASS, dt.getName());
-            }            
-            _driverInfo.add(
-                new DriverInfo(dt.getName(), dt.isNormal(), 
-                               getIntParam(Constants.RUNS_PER_DRIVER),
-                               driverParams));
+            if (!driverInfo.hasParam(Constants.DRIVER_CLASS)) {
+                driverInfo.setParam(Constants.DRIVER_CLASS, dt.getName());
+            }          
+
+            _driverInfo.add(driverInfo);
         }
         
         // Create and populate list of test cases
         TestCaseArrayList testCases = new TestCaseArrayList();
         it = ts.getTestCase().iterator();
         while (it.hasNext()) {
-            TestSuiteType.TestCaseType tc = 
-                (TestSuiteType.TestCaseType) it.next();
+            TestSuiteType.TestCaseType tc = (TestSuiteType.TestCaseType) it.next();
             
-            Properties localParams = new Properties(getParams());
+            // Create new TestCase
+            TestCase testCase = new TestCase(tc.getName(), this);
+            
+            // Copy params from JAXB object to Japex object
             Iterator itParams = tc.getParam().iterator();
             while (itParams.hasNext()) {
                 ParamType pt = (ParamType) itParams.next();
-                localParams.setProperty(pt.getName(), pt.getValue());
+                testCase.setParam(pt.getName(), pt.getValue());
             }
-            testCases.add(new TestCase(tc.getName(), localParams));
+            
+            testCases.add(testCase);
         }
         
         // Set list of test cases and number of runs on each driver

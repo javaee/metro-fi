@@ -39,8 +39,6 @@
 
 package com.sun.japex;
 
-import java.util.Properties;
-
 public interface JapexDriver extends Runnable {
     
     /**

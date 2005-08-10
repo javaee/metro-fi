@@ -146,9 +146,7 @@ public class Engine {
                         runTime = Util.currentTimeMillis() - runTime;
 
                         // Set japex.actualRunTime output param
-                        //if (!testSuite.hasParam(Constants.RUN_TIME)) {
-                            tc.setDoubleParam(Constants.ACTUAL_RUN_TIME, runTime);  
-                        //}
+                        tc.setDoubleParam(Constants.ACTUAL_RUN_TIME, runTime);  
 
                         // Do finish phase
                         for (int i = 0; i < nOfThreads; i++) {
@@ -198,7 +196,7 @@ public class Engine {
                         harmMeanresultInverse += 1.0 / (nOfTests * result);
                     
                         // Display results for this test
-                        System.out.print(tc.getDoubleParam(Constants.RESULT_VALUE) + ",");
+                        System.out.print(tc.getParam(Constants.RESULT_VALUE) + ",");
                         System.out.flush();
                     }
                 
@@ -225,11 +223,11 @@ public class Engine {
                     }
                     System.out.print(
                         "aritmean," +
-                        di.getDoubleParam(Constants.RESULT_ARIT_MEAN) + 
+                        di.getParam(Constants.RESULT_ARIT_MEAN) + 
                         ",geommean," +
-                        di.getDoubleParam(Constants.RESULT_GEOM_MEAN) + 
+                        di.getParam(Constants.RESULT_GEOM_MEAN) + 
                         ",harmmean," +
-                        di.getDoubleParam(Constants.RESULT_HARM_MEAN));   
+                        di.getParam(Constants.RESULT_HARM_MEAN));   
 
                     // Print standardDevs for all runs
                     System.out.print("\n    Stdev: ");
@@ -241,11 +239,11 @@ public class Engine {
                     }
                     System.out.println(
                         "aritmean," +
-                        di.getDoubleParam(Constants.RESULT_ARIT_MEAN_STDDEV) + 
+                        di.getParam(Constants.RESULT_ARIT_MEAN_STDDEV) + 
                         ",geommean," +
-                        di.getDoubleParam(Constants.RESULT_GEOM_MEAN_STDDEV) + 
+                        di.getParam(Constants.RESULT_GEOM_MEAN_STDDEV) + 
                         ",harmmean," +
-                        di.getDoubleParam(Constants.RESULT_HARM_MEAN_STDDEV));   
+                        di.getParam(Constants.RESULT_HARM_MEAN_STDDEV));   
                 }
                 else {
                     System.out.println("");
