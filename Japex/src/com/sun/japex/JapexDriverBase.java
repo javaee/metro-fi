@@ -184,16 +184,20 @@ public class JapexDriverBase implements JapexDriver, Params {
      * "mbps" (which requires setting japex.inputFile). If no errors are
      * found calls finish(testCase) on the driver.
      */
-    public void finish() {
+    public void finish() {        
+        // Call finish(testCase) in user's driver
+        finish(_testCase);
+
+        // If result value has been computed then we're done
+        if (_testCase.hasParam(Constants.RESULT_VALUE)) {
+            return;
+        }
+        
         String resultUnit = getTestSuite().getParam(Constants.RESULT_UNIT);
         
-        if (resultUnit == null 
-                || resultUnit.equalsIgnoreCase("tps")) {
+        // Check to see if a different result unit was set
+        if (resultUnit == null || resultUnit.equalsIgnoreCase("tps")) {
             // Default - computed elsewhere
-        }
-        else if (resultUnit.equalsIgnoreCase("KBytes")) {
-            _testCase.setDoubleParam(Constants.RESULT_VALUE, 
-                _testCase.getLongParam(Constants.RESULT_VALUE) / 1024.0);                            
         }
         else if (resultUnit.equalsIgnoreCase("ms")) {
             _testCase.setParam(Constants.RESULT_UNIT, "ms");
@@ -203,28 +207,28 @@ public class JapexDriverBase implements JapexDriver, Params {
                 _testCase.getDoubleParam(Constants.ACTUAL_RUN_ITERATIONS));                            
         }
         else if (resultUnit.equalsIgnoreCase("mbps")) {
-            _testCase.setParam(Constants.RESULT_UNIT, "Mbps");
-
-            String inputFile = _testCase.getParam(Constants.INPUT_FILE);
-            if (inputFile != null) {
-                long fileSize = new File(inputFile).length();
-                _testCase.setDoubleParam(Constants.RESULT_VALUE,
-                    (fileSize * 0.000008d 
-                        * _testCase.getLongParam(Constants.ACTUAL_RUN_ITERATIONS)) /    // Mbits
-                    (_testCase.getLongParam(Constants.ACTUAL_RUN_TIME) / 1000.0));      // Seconds
-            }
-            else {
-                throw new RuntimeException("Unable to compute japex.resultValue in 'Mbps'" + 
+            // Check if japex.inputFile was defined
+            String inputFile = _testCase.getParam(Constants.INPUT_FILE);            
+            if (inputFile == null) {
+                throw new RuntimeException("Unable to compute japex.resultValue " + 
                     " because japex.inputFile is not defined or refers to an illegal path.");
             }
+
+            // Length of input file
+            long fileSize = new File(inputFile).length();
+            
+            // Calculate Mbps
+            _testCase.setParam(Constants.RESULT_UNIT, "Mbps");
+            _testCase.setDoubleParam(Constants.RESULT_VALUE,
+                (fileSize * 0.000008d 
+                    * _testCase.getLongParam(Constants.ACTUAL_RUN_ITERATIONS)) /    // Mbits
+                (_testCase.getLongParam(Constants.ACTUAL_RUN_TIME) / 1000.0));      // Seconds
         }
         else {
             throw new RuntimeException("Unknown value '" + 
                 resultUnit + "' for global param japex.resultUnit.");
         }
         
-        // Call finish(testCase)
-        finish(_testCase);
     }
     
     // -- Params interface -----------------------------------------------
