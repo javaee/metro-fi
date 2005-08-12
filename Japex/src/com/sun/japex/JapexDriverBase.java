@@ -241,6 +241,14 @@ public class JapexDriverBase implements JapexDriver, Params {
         return _driver.getParam(name);
     }
        
+    public void setBooleanParam(String name, boolean value) {
+        _driver.setBooleanParam(name, value);
+    }
+    
+    public boolean getBooleanParam(String name) {
+        return _driver.getBooleanParam(name);
+    }
+    
     public void setIntParam(String name, int value) {
         _driver.setIntParam(name, value);
     }    

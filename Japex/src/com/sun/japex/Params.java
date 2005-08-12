@@ -43,9 +43,12 @@ public interface Params {
         
     public boolean hasParam(String name);
     
-    public  void setParam(String name, String value);    
+    public void setParam(String name, String value);    
     public String getParam(String name);
        
+    public void setBooleanParam(String name, boolean value);    
+    public boolean getBooleanParam(String name);
+    
     public void setIntParam(String name, int value);    
     public int getIntParam(String name);
     

@@ -139,6 +139,22 @@ public class ParamsImpl implements Params {
         return (String) value;
     }
     
+    // -- Boolean params --------------------------------------------------
+    
+    public synchronized void setBooleanParam(String name, boolean value) {
+        _mapping.put(name, new Boolean(value));
+    }
+    
+    public synchronized boolean getBooleanParam(String name) {
+        Object value = getParamOrDefault(name);
+        if (value instanceof Boolean) {
+            return ((Boolean) value).booleanValue();
+        }
+        else {
+            return Boolean.parseBoolean((String) value);
+        }
+    }
+    
     // -- Int params -----------------------------------------------------
     
     public synchronized void setIntParam(String name, int value) {
@@ -178,12 +194,7 @@ public class ParamsImpl implements Params {
             return ((Double) value).longValue();
         }
         else {
-            try {
-                return Long.parseLong((String) value);
-            }
-            catch (NumberFormatException e) {
-                throw new RuntimeException(e);
-            }
+            return Long.parseLong((String) value);
         }
     }
     
@@ -202,12 +213,7 @@ public class ParamsImpl implements Params {
             return ((Double) value).doubleValue();
         }
         else {
-            try {
-                return Double.parseDouble((String) value);
-            }
-            catch (NumberFormatException e) {
-                throw new RuntimeException(e);
-            }
+            return Double.parseDouble((String) value);
         }
     }
 
