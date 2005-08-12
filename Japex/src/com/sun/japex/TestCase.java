@@ -39,23 +39,8 @@
 
 package com.sun.japex;
 
-public class TestCase extends Params implements Cloneable {
-    
-    final String _testName;
-    
-    public TestCase(String testName, Params params) {
-        super(params);
-        _testName = testName;
-    }
-    
-    public String getTestName() {
-        return _testName;
-    }
+public interface TestCase extends Params {
         
-    public void serialize(StringBuffer buffer, int spaces) {
-        buffer.append(Util.getSpaces(spaces)
-            +"<testCase name=\"" + _testName + "\">\n");
-        super.serialize(buffer, 6);
-        buffer.append(Util.getSpaces(spaces) + "</testCase>\n");
-    }
+    public String getName();
+    
 }

@@ -45,30 +45,25 @@ public interface JapexDriver extends Runnable {
      * Called once when the class is loaded.
      */
     public void initializeDriver();
-    
+        
     /**
      * Called exactly once for every test, before calling warmup.
      */
-    public void prepare(TestCase testCase);
+    public void prepare(TestCaseImpl testCase);
     
     /**
      * Called once or more for every test, before calling run.
      */
-    public void warmup(TestCase testCase);
+    public void warmup(TestCaseImpl testCase);
     
     /**
      * Called once or more for every test to obtain perf data.
      */
-    public void run(TestCase testCase);
+    public void run(TestCaseImpl testCase);
     
     /**
      * Called exactly once after calling run.
      */
-    public void finish(TestCase testCase);
-    
-    /**
-     * Called after all tests are completed.
-     */
-    public void terminateDriver();
-    
+    public void finish(TestCaseImpl testCase);
+        
 }

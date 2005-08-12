@@ -39,8 +39,11 @@
 
 package com.sun.japex;
 
-public interface TestSuite extends Params {
-        
+
+public interface Driver extends Params {
+       
     public String getName();
+    
+    public boolean isNormal();
     
 }

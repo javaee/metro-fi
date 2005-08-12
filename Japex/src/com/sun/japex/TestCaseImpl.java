@@ -39,8 +39,23 @@
 
 package com.sun.japex;
 
-public interface TestSuite extends Params {
-        
-    public String getName();
+public class TestCaseImpl extends ParamsImpl implements TestCase, Cloneable {
     
+    final String _testName;
+    
+    public TestCaseImpl(String testName, ParamsImpl params) {
+        super(params);
+        _testName = testName;
+    }
+    
+    public java.lang.String getName() {
+        return _testName;
+    }
+        
+    public void serialize(StringBuffer buffer, int spaces) {
+        buffer.append(Util.getSpaces(spaces)
+            +"<testCase name=\"" + _testName + "\">\n");
+        super.serialize(buffer, 6);
+        buffer.append(Util.getSpaces(spaces) + "</testCase>\n");
+    }
 }

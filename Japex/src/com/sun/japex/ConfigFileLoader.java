@@ -45,7 +45,7 @@ import javax.xml.bind.*;
 
 public class ConfigFileLoader {
     
-    TestSuite _testSuite;
+    TestSuiteImpl _testSuite;
     
     public ConfigFileLoader(String fileName) throws ConfigFileException {
         try {
@@ -58,14 +58,14 @@ public class ConfigFileLoader {
                 new BufferedInputStream(new FileInputStream(fileName)));
             
             // Map JAXB object model to internal object model
-            _testSuite = new TestSuite(testsuite);            
+            _testSuite = new TestSuiteImpl(testsuite);            
         }
         catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
     
-    public TestSuite getTestSuite() {
+    public TestSuiteImpl getTestSuite() {
         return _testSuite;        
     }
     

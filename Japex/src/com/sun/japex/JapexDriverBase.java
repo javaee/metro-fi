@@ -41,20 +41,25 @@ package com.sun.japex;
 
 import java.io.File;
 
-public class JapexDriverBase implements JapexDriver {
+public class JapexDriverBase implements JapexDriver, Params {
     
-    private TestSuite _testSuite;
-    private TestCase _testCase;
+    private Driver _driver;    
+    private TestSuiteImpl _testSuite;    
+    private TestCaseImpl _testCase;
     
-    public void setTestSuite(TestSuite testSuite) {
+    public void setDriver(Driver driver) {
+        _driver = driver;
+    }
+    
+    public void setTestSuite(TestSuiteImpl testSuite) {
         _testSuite = testSuite;
     }
     
-    public void setTestCase(TestCase testCase) {
+    public void setTestCase(TestCaseImpl testCase) {
         _testCase = testCase;
     }
     
-    protected TestSuite getTestSuite() {
+    protected TestSuiteImpl getTestSuite() {
         return _testSuite;
     }
     
@@ -65,7 +70,7 @@ public class JapexDriverBase implements JapexDriver {
      */
     public void prepareAndWarmup() {
         long millis, nanos;
-        TestCase tc = _testCase;
+        TestCaseImpl tc = _testCase;
         
         // -- Prepare ----------------------------------------
         
@@ -122,7 +127,7 @@ public class JapexDriverBase implements JapexDriver {
      */
     public void run() {
         long millis, nanos;
-        TestCase tc = _testCase;
+        TestCaseImpl tc = _testCase;
         
         // Force GC before running test
         System.gc();
@@ -222,6 +227,44 @@ public class JapexDriverBase implements JapexDriver {
         finish(_testCase);
     }
     
+    // -- Params interface -----------------------------------------------
+    
+    public boolean hasParam(String name) {
+        return _driver.hasParam(name);
+    }
+    
+    public void setParam(String name, String value) {
+        _driver.setParam(name, value);
+    }
+    
+    public String getParam(String name) {
+        return _driver.getParam(name);
+    }
+       
+    public void setIntParam(String name, int value) {
+        _driver.setIntParam(name, value);
+    }    
+    
+    public int getIntParam(String name) {
+        return _driver.getIntParam(name);
+    }
+    
+    public void setLongParam(String name, long value) {
+        _driver.setLongParam(name, value);
+    }    
+    
+    public long getLongParam(String name) {
+        return _driver.getLongParam(name);
+    }
+    
+    public void setDoubleParam(String name, double value) {
+        _driver.setDoubleParam(name, value);
+    }
+    
+    public double getDoubleParam(String name) {
+        return _driver.getDoubleParam(name);
+    }
+    
     // -- JapexDriver interface ------------------------------------------
     
     /**
@@ -233,27 +276,27 @@ public class JapexDriverBase implements JapexDriver {
     /**
      * Called exactly once for every test, before calling warmup.
      */
-    public void prepare(TestCase testCase) {
+    public void prepare(TestCaseImpl testCase) {
     }
     
     /**
      * Called once or more for every test, before calling run. Default 
      * implementation is to call run().
      */
-    public void warmup(TestCase testCase) {   
+    public void warmup(TestCaseImpl testCase) {   
         run(testCase);
     }
     
     /**
      * Called once or more for every test to obtain perf data.
      */
-    public void run(TestCase testCase) {
+    public void run(TestCaseImpl testCase) {
     }
     
     /**
      * Called exactly once after calling run. 
      */
-    public void finish(TestCase testCase) {
+    public void finish(TestCaseImpl testCase) {
     }
     
     /**

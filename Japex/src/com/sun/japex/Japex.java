@@ -94,7 +94,7 @@ public class Japex {
             System.out.println("Running ...");
             
             // Create testsuite object from configuration file
-            TestSuite testSuite = new Engine().start(configFile);
+            TestSuiteImpl testSuite = new Engine().start(configFile);
             
             // Create report directory
             String fileSep = System.getProperty("file.separator");

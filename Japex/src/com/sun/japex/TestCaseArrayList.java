@@ -50,7 +50,7 @@ public class TestCaseArrayList extends ArrayList {
         TestCaseArrayList result = new TestCaseArrayList();
         Iterator it = iterator();
         while (it.hasNext()) {
-            result.add(((TestCase) it.next()).clone());
+            result.add(((TestCaseImpl) it.next()).clone());
         }
         return result;
     }

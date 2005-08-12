@@ -49,8 +49,8 @@ public class Engine {
     public Engine() {
     }
     
-    public TestSuite start(String configFile) {
-        TestSuite testSuite = null;
+    public TestSuiteImpl start(String configFile) {
+        TestSuiteImpl testSuite = null;
         Boolean computeResult = null;
                 
         try {
@@ -61,7 +61,7 @@ public class Engine {
             // Iterate through each driver
             Iterator jdi = testSuite.getDriverInfoList().iterator();
             while (jdi.hasNext()) {                               
-                DriverInfo di = (DriverInfo) jdi.next();
+                DriverImpl di = (DriverImpl) jdi.next();
                 
                 // Display driver's name
                 System.out.print("  " + di.getName());
@@ -74,6 +74,7 @@ public class Engine {
                 for (int i = 0; i < nOfThreads; i++) {
                     for (int j = 0; j < runsPerDriver; j++) {
                         drivers[i][j] = di.getJapexDriver();   // returns fresh copy
+                        drivers[i][j].setDriver(di);
                         drivers[i][j].setTestSuite(testSuite);
                         drivers[i][j].initializeDriver();
                     }
@@ -97,9 +98,9 @@ public class Engine {
                     Iterator tci = tcList.iterator();
                     while (tci.hasNext()) {
                         long runTime = 0L;
-                        TestCase tc = (TestCase) tci.next();               
+                        TestCaseImpl tc = (TestCaseImpl) tci.next();               
 
-                        System.out.print(tc.getTestName() + ",");
+                        System.out.print(tc.getName() + ",");
 
                         // If nOfThreads == 1, re-use this thread
                         if (nOfThreads == 1) {
@@ -217,8 +218,8 @@ public class Engine {
                     System.out.print("\n     Avgs: ");
                     Iterator tci = di.getAggregateTestCases().iterator();
                     while (tci.hasNext()) {
-                        TestCase tc = (TestCase) tci.next();
-                        System.out.print(tc.getTestName() + ",");                        
+                        TestCaseImpl tc = (TestCaseImpl) tci.next();
+                        System.out.print(tc.getName() + ",");                        
                         System.out.print(tc.getDoubleParam(Constants.RESULT_VALUE) + ",");
                     }
                     System.out.print(
@@ -233,8 +234,8 @@ public class Engine {
                     System.out.print("\n    Stdev: ");
                     tci = di.getAggregateTestCases().iterator();
                     while (tci.hasNext()) {
-                        TestCase tc = (TestCase) tci.next();
-                        System.out.print(tc.getTestName() + ",");                        
+                        TestCaseImpl tc = (TestCaseImpl) tci.next();
+                        System.out.print(tc.getName() + ",");                        
                         System.out.print(tc.getDoubleParam(Constants.RESULT_VALUE_STDDEV) + ",");
                     }
                     System.out.println(
