@@ -182,7 +182,9 @@ public class JapexDriverBase implements JapexDriver {
     public void finish() {
         String resultUnit = getTestSuite().getParam(Constants.RESULT_UNIT);
         
-        if (resultUnit == null || resultUnit.equalsIgnoreCase("tps")) {
+        if (resultUnit == null 
+                || resultUnit.equalsIgnoreCase("tps")
+                || resultUnit.equalsIgnoreCase("KBytes")) {
             // Default - computed elsewhere
         }
         else if (resultUnit.equalsIgnoreCase("ms")) {
