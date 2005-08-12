@@ -58,7 +58,7 @@ public class DriverImpl extends ParamsImpl implements Driver {
     
     static class JapexClassLoader extends URLClassLoader {
         public JapexClassLoader(URL[] urls) {
-            super(urls);
+            super(urls, DriverImpl.class.getClassLoader());
         }        
         public Class findClass(String name) throws ClassNotFoundException {
             return super.findClass(name);
