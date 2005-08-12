@@ -194,8 +194,8 @@ public class JapexDriverBase implements JapexDriver {
             _testCase.setParam(Constants.RESULT_UNIT, "ms");
 
             _testCase.setDoubleParam(Constants.RESULT_VALUE, 
-                _testCase.getLongParam(Constants.ACTUAL_RUN_TIME) /
-                _testCase.getLongParam(Constants.ACTUAL_RUN_ITERATIONS));                            
+                _testCase.getDoubleParam(Constants.ACTUAL_RUN_TIME) /
+                _testCase.getDoubleParam(Constants.ACTUAL_RUN_ITERATIONS));                            
         }
         else if (resultUnit.equalsIgnoreCase("mbps")) {
             _testCase.setParam(Constants.RESULT_UNIT, "Mbps");
