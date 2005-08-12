@@ -48,11 +48,15 @@ import javax.xml.transform.stream.*;
 
 public class Japex {
     
-    public static boolean HTML_OUTPUT = true;
+    public static boolean html = true;
     public static Date TODAY = new Date();
     
     /** Creates a new instance of Japex */
     public Japex() {
+    }
+    
+    public void setHtml(boolean html) {
+        this.html = html;
     }
     
     /**
@@ -67,7 +71,7 @@ public class Japex {
         String configFile = null;
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("-nohtml")) {
-                HTML_OUTPUT = false;
+                html = false;
             }
             else if (args[i].equals("-cp") || args[i].equals("-classpath")) {
                 i++; // Skip, already processed
@@ -118,7 +122,7 @@ public class Japex {
             osr.close();
 
             // Return if no HTML needs to be output
-            if (!HTML_OUTPUT) return;
+            if (!html) return;
             
             // Generate charts
             final String resultChart = "result.jpg";
