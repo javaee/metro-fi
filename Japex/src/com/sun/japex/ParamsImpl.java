@@ -151,7 +151,7 @@ public class ParamsImpl implements Params {
             return ((Boolean) value).booleanValue();
         }
         else {
-            return Boolean.parseBoolean((String) value);
+            return Boolean.valueOf((String) value).booleanValue();
         }
     }
     
