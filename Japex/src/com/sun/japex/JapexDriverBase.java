@@ -276,27 +276,27 @@ public class JapexDriverBase implements JapexDriver, Params {
     /**
      * Called exactly once for every test, before calling warmup.
      */
-    public void prepare(TestCaseImpl testCase) {
+    public void prepare(TestCase testCase) {
     }
     
     /**
      * Called once or more for every test, before calling run. Default 
      * implementation is to call run().
      */
-    public void warmup(TestCaseImpl testCase) {   
+    public void warmup(TestCase testCase) {   
         run(testCase);
     }
     
     /**
      * Called once or more for every test to obtain perf data.
      */
-    public void run(TestCaseImpl testCase) {
+    public void run(TestCase testCase) {
     }
     
     /**
      * Called exactly once after calling run. 
      */
-    public void finish(TestCaseImpl testCase) {
+    public void finish(TestCase testCase) {
     }
     
     /**
