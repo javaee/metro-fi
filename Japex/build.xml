@@ -16,16 +16,17 @@
     
     <target name="clean">
         <delete dir="dist"/>
+        <delete dir="build"/>
         <delete dir="src/binding"/>
     </target>
     
     <target name="prepare">
-        <mkdir dir="dist"/>
-        <mkdir dir="dist/classes"/>
+        <mkdir dir="build"/>
+        <mkdir dir="build/classes"/>
     </target>
     
     <target name="prepare.binding" depends="prepare">
-        <uptodate property="generate.xml.notRequired" targetfile="dist/classes/com/sun/japex/testsuite/TestSuite.class">
+        <uptodate property="generate.xml.notRequired" targetfile="src/binding/com/sun/japex/testsuite/TestSuite.java">
             <srcfiles dir="resources" includes="testsuite.xsd"/>
         </uptodate>
         <mkdir dir="src/binding"/>
@@ -43,19 +44,19 @@
     
     <target name="compile.binding" depends="binding.jaxb">
         <javac fork="yes" memoryInitialSize="128m" memoryMaximumSize="128m" srcdir="src/binding"
-            destdir="dist/classes" debug="on" optimize="on" deprecation="on">
+            destdir="build/classes" debug="on" optimize="on" deprecation="on">
             <classpath refid="compile.class.path"/>
         </javac>
-        <copy todir="dist/classes/">
+        <copy todir="build/classes/">
             <fileset dir="src/binding" includes="**/*.properties, **/bgm.ser"/>
         </copy>
     </target>
     
     <target name="compile" depends="compile.binding" description="Compile sources">
-        <javac srcdir="src" destdir="dist/classes" debug="on" optimize="on" deprecation="on">
+        <javac srcdir="src" destdir="build/classes" debug="on" optimize="on" deprecation="on">
             <classpath refid="compile.class.path"/>
         </javac>
-        <copy todir="dist/classes/resources">
+        <copy todir="build/classes/resources">
             <fileset dir="resources">
                 <include name="*.xsl"/>
                 <include name="*.xsd"/>
@@ -64,12 +65,24 @@
         </copy>
     </target>
     
+    <target name="build" depends="compile" description="Compiles Japex"/>
+    
     <target name="dist" depends="compile" description="Build distribution">
-        <!-- Include JFreeChart classes for convenience -->
-        <unjar dest="dist/classes">
-            <fileset dir="${jfreechart-dir}" includes="*.jar"/>
-        </unjar>
-        <jar jarfile="dist/${app.jar}" basedir="dist/classes/"/>
+        <mkdir dir="dist"/>
+        <mkdir dir="dist/bin"/>
+        <mkdir dir="dist/lib"/>
+        
+        <jar jarfile="dist/lib/${app.jar}" basedir="build/classes/"/>
+        <copy todir="dist/lib/">
+            <fileset dir="lib/jwsdp">
+                <include name="*.jar"/>
+            </fileset>
+        </copy>
+        <copy todir="dist/lib/">
+            <fileset dir="lib/jfreechart">
+                <include name="*.jar"/>
+            </fileset>
+        </copy>
     </target>
     
     <target name="test" depends="dist" description="Test using simple config file">
