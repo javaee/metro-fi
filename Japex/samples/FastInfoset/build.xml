@@ -8,10 +8,8 @@
     <property name="lib-dir" value="lib"/>
     
     <path id="compile.class.path">
-        <pathelement location="../../dist/japex.jar"/>
         <pathelement location="../../../FastInfoset/dist/FastInfoset.jar"/>
-        <fileset dir="${jwsdp-dir}" includes="*.jar"/>
-        <fileset dir="${lib-dir}" includes="*.jar"/>
+        <fileset dir="../../dist/lib/" includes="*.jar"/>
     </path>
     
     <path id="class.path">
@@ -72,4 +70,19 @@
            <arg line="${config}/"/>
        </java>
     </target>
+
+<!-- ================== -->
+
+    <path id="japex.classpath">
+        <fileset dir="../../dist/lib/" includes="*.jar"/>
+    </path>
+
+    <taskdef name="japex" classname="com.sun.japex.ant.JapexTask">
+	<classpath refid="japex.classpath"/>
+    </taskdef>
+
+    <target name="run-japex" depends="compile">
+        <japex config="${config}" fork="true"/>
+    </target>
+
 </project>
