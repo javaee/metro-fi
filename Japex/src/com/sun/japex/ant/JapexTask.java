@@ -148,6 +148,11 @@ public class JapexTask extends MatchingTask {
      * Executes the given classname with the given arguments in a separate VM.
      */
     private int run(String[] command) throws BuildException {
+
+        for (int i = 0; i < command.length; i++) {
+            System.out.println("#### command[" + i + "] =" + command[i]);
+        }
+        
         Execute exe = null;
         exe = new Execute();
         exe.setAntRun(project);

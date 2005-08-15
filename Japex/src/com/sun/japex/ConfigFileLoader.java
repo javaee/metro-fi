@@ -54,8 +54,7 @@ public class ConfigFileLoader {
             
             // Unmarshall config file into JAXB object
             com.sun.japex.testsuite.TestSuite testsuite = 
-                (com.sun.japex.testsuite.TestSuite) u.unmarshal(
-                new BufferedInputStream(new FileInputStream(fileName)));
+                (com.sun.japex.testsuite.TestSuite) u.unmarshal(new File(fileName));
             
             // Map JAXB object model to internal object model
             _testSuite = new TestSuiteImpl(testsuite);            

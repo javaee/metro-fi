@@ -42,7 +42,6 @@ package com.sun.japex;
 import java.util.*;
 import java.text.*;
 import java.io.File;
-import com.sun.japex.testsuite.*;
 
 import java.awt.Paint;
 import java.awt.Color;
@@ -90,7 +89,8 @@ public class TestSuiteImpl extends ParamsImpl implements TestSuite {
         if (params != null) {
             Iterator it = params.iterator();
             while (it.hasNext()) {
-                ParamType pt = (ParamType) it.next();
+                com.sun.japex.testsuite.ParamType pt = 
+                    (com.sun.japex.testsuite.ParamType) it.next();
                 String name = pt.getName();
                 String value = pt.getValue();
                 String oldValue = getParam(name);
@@ -164,7 +164,8 @@ public class TestSuiteImpl extends ParamsImpl implements TestSuite {
         // Create and populate list of drivers
         Iterator it = ts.getDriver().iterator();
         while (it.hasNext()) {
-            TestSuiteType.DriverType dt = (TestSuiteType.DriverType) it.next();
+            com.sun.japex.testsuite.TestSuite.Driver dt = 
+                (com.sun.japex.testsuite.TestSuite.Driver) it.next();
             
             // Create new DriverImpl
             DriverImpl driverInfo = new DriverImpl(dt.getName(), 
@@ -173,7 +174,8 @@ public class TestSuiteImpl extends ParamsImpl implements TestSuite {
             // Copy params from JAXB object to Japex object
             Iterator driverParamsIt = dt.getParam().iterator();
             while (driverParamsIt.hasNext()) {
-                ParamType pt = (ParamType) driverParamsIt.next();
+                com.sun.japex.testsuite.ParamType pt = 
+                    (com.sun.japex.testsuite.ParamType) driverParamsIt.next();
                 driverInfo.setParam(pt.getName(), pt.getValue());
             }
 
@@ -189,7 +191,8 @@ public class TestSuiteImpl extends ParamsImpl implements TestSuite {
         TestCaseArrayList testCases = new TestCaseArrayList();
         it = ts.getTestCase().iterator();
         while (it.hasNext()) {
-            TestSuiteType.TestCaseType tc = (TestSuiteType.TestCaseType) it.next();
+            com.sun.japex.testsuite.TestSuite.TestCase tc = 
+                (com.sun.japex.testsuite.TestSuite.TestCase) it.next();
             
             // Create new TestCaseImpl
             TestCaseImpl testCase = new TestCaseImpl(tc.getName(), this);
@@ -197,7 +200,8 @@ public class TestSuiteImpl extends ParamsImpl implements TestSuite {
             // Copy params from JAXB object to Japex object
             Iterator itParams = tc.getParam().iterator();
             while (itParams.hasNext()) {
-                ParamType pt = (ParamType) itParams.next();
+                com.sun.japex.testsuite.ParamType pt = 
+                    (com.sun.japex.testsuite.ParamType) itParams.next();
                 testCase.setParam(pt.getName(), pt.getValue());
             }
             
