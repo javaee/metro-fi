@@ -1,7 +1,40 @@
 /*
- * RoundTripReport.java
- *
- * Created on May 9, 2005, 9:59 PM
+ * Japex ver. 0.1 software ("Software")
+ * 
+ * Copyright, 2004-2005 Sun Microsystems, Inc. All Rights Reserved.
+ * 
+ * This Software is distributed under the following terms:
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, is permitted provided that the following conditions are met:
+ * 
+ * Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 
+ * Redistribution in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 
+ * Neither the name of Sun Microsystems, Inc., 'Java', 'Java'-based names,
+ * nor the names of contributors may be used to endorse or promote products
+ * derived from this Software without specific prior written permission.
+ * 
+ * The Software is provided "AS IS," without a warranty of any kind. ALL
+ * EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND WARRANTIES, INCLUDING
+ * ANY IMPLIED WARRANTY OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE OR NON-INFRINGEMENT, ARE HEREBY EXCLUDED. SUN AND ITS LICENSORS
+ * SHALL NOT BE LIABLE FOR ANY DAMAGES OR LIABILITIES SUFFERED BY LICENSEE
+ * AS A RESULT OF OR RELATING TO USE, MODIFICATION OR DISTRIBUTION OF THE
+ * SOFTWARE OR ITS DERIVATIVES. IN NO EVENT WILL SUN OR ITS LICENSORS BE
+ * LIABLE FOR ANY LOST REVENUE, PROFIT OR DATA, OR FOR DIRECT, INDIRECT,
+ * SPECIAL, CONSEQUENTIAL, INCIDENTAL OR PUNITIVE DAMAGES, HOWEVER CAUSED
+ * AND REGARDLESS OF THE THEORY OF LIABILITY, ARISING OUT OF THE USE OF OR
+ * INABILITY TO USE SOFTWARE, EVEN IF SUN HAS BEEN ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGES.
+ * 
+ * You acknowledge that the Software is not designed, licensed or intended
+ * for use in the design, construction, operation or maintenance of any
+ * nuclear facility.
  */
 
 package com.sun.japex.report;
@@ -16,6 +49,7 @@ import java.io.OutputStreamWriter;
 
 
 public class IndexPage {    
+    static final String REPORT_NEWINDEX = "<!--{new index}-->";
     static final String REPORT_NEWROW = "<!--{new row}-->";
     
     TrendReportParams _params;
@@ -57,10 +91,15 @@ public class IndexPage {
         
         int start = 0;
         int end = 0;      
+        StringBuffer newindex = new StringBuffer();
+        newindex.append("<li><a href=\"#"+_params.title()+"\">"+_params.title()+"</a></li>\n");
+        newindex.append(REPORT_NEWINDEX+"\n");
+                
         StringBuffer newrow = new StringBuffer();
+        newrow.append("<br><a name=\""+_params.title()+"\">\n");
         newrow.append("<table width=\"100%\" border=\"0\">");
         newrow.append("<tr><th width=\"50%\"><h2>"+_params.title());
-        newrow.append("</h2></th><th align=\"right\"><a href=\"#top\">Top</a></th></tr>");
+        newrow.append("</h2></th><th align=\"right\"><a href=\"#top\">Top</a>&nbsp;&nbsp;</th></tr>");
         newrow.append("</table>");
         newrow.append("<ul>\n<li>Report Path: " + _params.reportPath() +  "</li>\n");
         newrow.append("<li>Oupput Path: " + _params.outputPath() + "</li>\n");
@@ -84,12 +123,16 @@ public class IndexPage {
         newrow.append("</table>");
         newrow.append(REPORT_NEWROW+"\n");
 
+        start = content.indexOf(REPORT_NEWINDEX);
+        end = start + REPORT_NEWINDEX.length();
+        content.replace(start, end, newindex.toString());
+
         start = content.indexOf(REPORT_NEWROW);
         end = start + REPORT_NEWROW.length();
         content.replace(start, end, newrow.toString());
         return content.toString();
     }
-
+/*
     private String readFromFile(File file) {
         StringBuffer sb = new StringBuffer();
         try
@@ -113,12 +156,16 @@ public class IndexPage {
         }
         return sb.toString();
     }
-    
+  
+ */  
     private String getTemplate() {
         StringBuffer template = new StringBuffer();
         template.append("<html>\n<link href=\"report.css\" type=\"text/css\" rel=\"stylesheet\"/>\n");
         template.append("<head><title>Japex Trend Report</title></head>\n<body>\n");
         template.append("<a name=\"top\"><h1>Japex Trend Report</h1>\n");
+        template.append("<ul>");
+        template.append(REPORT_NEWINDEX);
+        template.append("</ul>");
         template.append(REPORT_NEWROW);
         template.append("<small><hr/><i><font size=\"-2\"><!--datetime--></font></i></small>\n");
         template.append("</body>\n</html>");
