@@ -27,10 +27,22 @@
             <arg line="inv1.xml inv10.xml inv50.xml inv100.xml"/>
         </java>
     </target>
+    <target name="RPCInvoices50">
+        <java dir="." fork="true" classname="com.sun.japex.TrendReport">
+            <classpath refid="class.path"/>
+            <arg value="RPC Invoices 50,100"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/parsing/reports"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/parsing/trend"/>
+            <arg line="today"/>
+            <arg line="-1M"/>
+            <arg line="FISAXDriver"/>
+            <arg line="inv50.xml inv100.xml"/>
+        </java>
+    </target>
     <target name="RPCInvoices500">
         <java dir="." fork="true" classname="com.sun.japex.TrendReport">
             <classpath refid="class.path"/>
-            <arg value="RPC Invoices 500-1000"/>
+            <arg value="RPC Invoices 500,1000"/>
             <arg line="/home/hw123265/workproj/fws/performance/japex/parsing/reports"/>
             <arg line="/home/hw123265/workproj/fws/performance/japex/parsing/trend"/>
             <arg line="today"/>
@@ -54,25 +66,49 @@
     <target name="DBFile">
         <java dir="." fork="true" classname="com.sun.japex.TrendReport">
             <classpath refid="class.path"/>
-            <arg value="DBs Files"/>
+            <arg value="DBs Files (10, 50)"/>
             <arg line="/home/hw123265/workproj/fws/performance/japex/parsing/reports"/>
             <arg line="/home/hw123265/workproj/fws/performance/japex/parsing/trend"/>
             <arg line="today"/>
             <arg line="-1M"/>
             <arg line="FISAXDriver"/>
-            <arg line="db10.xml db50.xml db100.xml db500.xml"/>
+            <arg line="db10.xml db50.xml"/>
+        </java>
+    </target>
+    <target name="DBFile100">
+        <java dir="." fork="true" classname="com.sun.japex.TrendReport">
+            <classpath refid="class.path"/>
+            <arg value="DBs Files (100, 500)"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/parsing/reports"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/parsing/trend"/>
+            <arg line="today"/>
+            <arg line="-1M"/>
+            <arg line="FISAXDriver"/>
+            <arg line="db100.xml db500.xml"/>
         </java>
     </target>
     <target name="DBFile1000">
         <java dir="." fork="true" classname="com.sun.japex.TrendReport">
             <classpath refid="class.path"/>
-            <arg value="DBs Files (1000, 10000)"/>
+            <arg value="DBs Files (1000)"/>
             <arg line="/home/hw123265/workproj/fws/performance/japex/parsing/reports"/>
             <arg line="/home/hw123265/workproj/fws/performance/japex/parsing/trend"/>
             <arg line="today"/>
             <arg line="-1M"/>
             <arg line="FISAXDriver"/>
             <arg line="db1000.xml db10000.xml"/>
+        </java>
+    </target>
+    <target name="DBFile10000">
+        <java dir="." fork="true" classname="com.sun.japex.TrendReport">
+            <classpath refid="class.path"/>
+            <arg value="DBs Files (10000)"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/parsing/reports"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/parsing/trend"/>
+            <arg line="today"/>
+            <arg line="-1M"/>
+            <arg line="FISAXDriver"/>
+            <arg line="db10000.xml"/>
         </java>
     </target>
     <target name="XSL">
@@ -90,17 +126,41 @@
     <target name="LargeXML">
         <java dir="." fork="true" classname="com.sun.japex.TrendReport">
             <classpath refid="class.path"/>
-            <arg value="Large XML files"/>
+            <arg value="Large XML files (periodic.xml)"/>
             <arg line="/home/hw123265/workproj/fws/performance/japex/parsing/reports"/>
             <arg line="/home/hw123265/workproj/fws/performance/japex/parsing/trend"/>
             <arg line="today"/>
             <arg line="-1M"/>
             <arg line="FISAXDriver"/>
-            <arg line="periodic.xml weblog.xml factbook.xml"/>
+            <arg line="periodic.xml"/>
         </java>
     </target>
-    <target name="trendreport" depends="means, RPCInvoices, RPCInvoices500, 
-        Soap, DBFile, DBFile1000, XSL, LargeXML">
+    <target name="LargeXML_web">
+        <java dir="." fork="true" classname="com.sun.japex.TrendReport">
+            <classpath refid="class.path"/>
+            <arg value="Large XML files (weblog.xml)"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/parsing/reports"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/parsing/trend"/>
+            <arg line="today"/>
+            <arg line="-1M"/>
+            <arg line="FISAXDriver"/>
+            <arg line="weblog.xml"/>
+        </java>
+    </target>
+    <target name="LargeXML_fact">
+        <java dir="." fork="true" classname="com.sun.japex.TrendReport">
+            <classpath refid="class.path"/>
+            <arg value="Large XML files (factbook.xml)"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/parsing/reports"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/parsing/trend"/>
+            <arg line="today"/>
+            <arg line="-1M"/>
+            <arg line="FISAXDriver"/>
+            <arg line="factbook.xml"/>
+        </java>
+    </target>
+    <target name="trendreport" depends="means, RPCInvoices, RPCInvoices50, RPCInvoices500, 
+        Soap, DBFile, DBFile100, DBFile1000, DBFile10000, XSL, LargeXML, LargeXML_web, LargeXML_fact">
     </target>
 
 </project>
