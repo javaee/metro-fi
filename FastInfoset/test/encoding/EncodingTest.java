@@ -101,7 +101,7 @@ public class EncodingTest extends TestCase {
         _saxParser.parse(_xmlDocumentURL.openStream(), vocabularyGenerator);
         
         _initialVocabulary.setExternalVocabulary(
-                new URI(EXTERNAL_VOCABULARY_URI_STRING),
+                EXTERNAL_VOCABULARY_URI_STRING,
                 externalVocabulary, false);
 
         _finfDocument = parse();

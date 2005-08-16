@@ -679,7 +679,7 @@ public class AlgorithmTest extends TestCase {
 
         SerializerVocabulary initialVocabulary = new SerializerVocabulary();
         initialVocabulary.setExternalVocabulary(
-                new URI(EXTERNAL_VOCABULARY_URI_STRING),
+                EXTERNAL_VOCABULARY_URI_STRING,
                 externalVocabulary, false);
 
         s.setVocabulary(initialVocabulary);
@@ -791,7 +791,7 @@ public class AlgorithmTest extends TestCase {
 
         SerializerVocabulary initialVocabulary = new SerializerVocabulary();
         initialVocabulary.setExternalVocabulary(
-                new URI(EXTERNAL_VOCABULARY_URI_STRING),
+                EXTERNAL_VOCABULARY_URI_STRING,
                 externalVocabulary, false);
 
         s.setVocabulary(initialVocabulary);
