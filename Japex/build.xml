@@ -100,5 +100,8 @@
     <target name="trendreport">
         <ant antfile="trendreport.xml" dir="." target="trendreport"/>
     </target>
+    <target name="trend_serializing_dom">
+        <ant antfile="trend_japex_serializing_DOMDriver.xml" dir="." target="trendreport"/>
+    </target>
     
 </project>

@@ -1,0 +1,119 @@
+<project name="trendreport" default="trendreport" basedir=".">
+    <property name="DATE" value="2005-08-04" />
+    <property name="distdir" value="dist/lib" />
+    <path id="class.path">
+        <fileset dir="${distdir}" includes="*.jar"/>
+    </path>
+    <target name="means">
+        <java dir="." fork="true" classname="com.sun.japex.TrendReport">
+            <classpath refid="class.path"/>
+            <arg value="Means Trend"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/serializing/reports"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/serializing/trend/dom"/>
+            <arg line="today"/>
+            <arg line="-1M"/>
+            <arg line="FIDOMDriver"/>
+            <arg line="-overwrite"/>
+        </java>
+    </target>
+    <target name="RPCInvoices">
+        <java dir="." fork="true" classname="com.sun.japex.TrendReport">
+            <classpath refid="class.path"/>
+            <arg value="RPC Invoices (inv1.xml, inv10.xml)"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/serializing/reports"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/serializing/trend/dom"/>
+            <arg line="today"/>
+            <arg line="-1M"/>
+            <arg line="FIDOMDriver"/>
+            <arg line="inv1.xml inv10.xml"/>
+        </java>
+    </target>
+    <target name="RPCInvoices50">
+        <java dir="." fork="true" classname="com.sun.japex.TrendReport">
+            <classpath refid="class.path"/>
+            <arg value="RPC Invoices (inv50.xml, inv100.xml)"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/serializing/reports"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/serializing/trend/dom"/>
+            <arg line="today"/>
+            <arg line="-1M"/>
+            <arg line="FIDOMDriver"/>
+            <arg line="inv50.xml inv100.xml"/>
+        </java>
+    </target>
+    <target name="RPCInvoices500">
+        <java dir="." fork="true" classname="com.sun.japex.TrendReport">
+            <classpath refid="class.path"/>
+            <arg value="RPC Invoices (500, 1000)"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/serializing/reports"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/serializing/trend/dom"/>
+            <arg line="today"/>
+            <arg line="-1M"/>
+            <arg line="FIDOMDriver"/>
+            <arg line="inv500.xml inv1000.xml"/>
+        </java>
+    </target>
+    <target name="Soap">
+        <java dir="." fork="true" classname="com.sun.japex.TrendReport">
+            <classpath refid="class.path"/>
+            <arg value="Soap"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/serializing/reports"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/serializing/trend/dom"/>
+            <arg line="today"/>
+            <arg line="-1M"/>
+            <arg line="FIDOMDriver"/>
+            <arg line="soap1.xml soap2.xml soap3.xml soap3.xml"/>
+        </java>
+    </target>
+    <target name="DBFile">
+        <java dir="." fork="true" classname="com.sun.japex.TrendReport">
+            <classpath refid="class.path"/>
+            <arg value="DBs Files"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/serializing/reports"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/serializing/trend/dom"/>
+            <arg line="today"/>
+            <arg line="-1M"/>
+            <arg line="FIDOMDriver"/>
+            <arg line="db10.xml db50.xml db100.xml db500.xml"/>
+        </java>
+    </target>
+    <target name="DBFile1000">
+        <java dir="." fork="true" classname="com.sun.japex.TrendReport">
+            <classpath refid="class.path"/>
+            <arg value="DBs Files (1000, 10000)"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/serializing/reports"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/serializing/trend/dom"/>
+            <arg line="today"/>
+            <arg line="-1M"/>
+            <arg line="FIDOMDriver"/>
+            <arg line="db1000.xml db10000.xml"/>
+        </java>
+    </target>
+    <target name="XSL">
+        <java dir="." fork="true" classname="com.sun.japex.TrendReport">
+            <classpath refid="class.path"/>
+            <arg value="XSL Stylesheets"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/serializing/reports"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/serializing/trend/dom"/>
+            <arg line="today"/>
+            <arg line="-1M"/>
+            <arg line="FIDOMDriver"/>
+            <arg line="xsl1.xml xsl2.xml xsl3.xml xsl4.xml"/>
+        </java>
+    </target>
+    <target name="LargeXML">
+        <java dir="." fork="true" classname="com.sun.japex.TrendReport">
+            <classpath refid="class.path"/>
+            <arg value="Large XML files"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/serializing/reports"/>
+            <arg line="/home/hw123265/workproj/fws/performance/japex/serializing/trend/dom"/>
+            <arg line="today"/>
+            <arg line="-1M"/>
+            <arg line="FIDOMDriver"/>
+            <arg line="periodic.xml weblog.xml factbook.xml"/>
+        </java>
+    </target>
+    <target name="trendreport" depends="means, RPCInvoices, RPCInvoices50, RPCInvoices500, 
+        Soap, DBFile, DBFile1000, XSL, LargeXML">
+    </target>
+
+</project>
