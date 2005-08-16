@@ -1,8 +1,10 @@
 <project name="trendreport" default="trendreport" basedir=".">
-    <path id="class.path">
-        <pathelement location="dist/japex.jar"/>
-    </path>
+
     <property name="DATE" value="2005-08-04" />
+    <property name="distdir" value="dist/lib" />
+    <path id="class.path">
+        <fileset dir="${distdir}" includes="*.jar"/>
+    </path>
     <target name="means">
         <java dir="." fork="true" classname="com.sun.japex.TrendReport">
             <classpath refid="class.path"/>
