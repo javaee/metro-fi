@@ -65,7 +65,10 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Map;
 import java.util.ArrayList;
-
+/*
+ by default, if no Driver and Testcase are specified, generates a report 
+ with the means *and* a curve for each test
+ */
 public class TrendDataset {
     static final String FIDRIVER = "TestFIDriver";
     static final String XMLDRIVER ="TestXMLDriver";

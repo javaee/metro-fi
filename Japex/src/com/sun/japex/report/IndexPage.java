@@ -94,13 +94,14 @@ public class IndexPage {
         StringBuffer newindex = new StringBuffer();
         newindex.append("<li><a href=\"#"+_params.title()+"\">"+_params.title()+"</a></li>\n");
         newindex.append(REPORT_NEWINDEX+"\n");
-                
+
+
         StringBuffer newrow = new StringBuffer();
         newrow.append("<br><a name=\""+_params.title()+"\">\n");
         newrow.append("<table width=\"100%\" border=\"0\">");
-        newrow.append("<tr><th width=\"50%\"><h2>"+_params.title());
-        newrow.append("</h2></th><th align=\"right\"><a href=\"#top\">Top</a>&nbsp;&nbsp;</th></tr>");
-        newrow.append("</table>");
+        newrow.append("<tr><td width=\"90%\"><h2>"+_params.title());
+        newrow.append("</h2></td><td align=\"right\"><j2><a href=\"#top\"><font size=\"2\">Top</font></a></h2></th></tr>");
+        newrow.append("</table>\n");
         newrow.append("<ul>\n<li>Report Path: " + _params.reportPath() +  "</li>\n");
         newrow.append("<li>Oupput Path: " + _params.outputPath() + "</li>\n");
         newrow.append("<li>Report Period: " + _params.dateFrom() + " - " + _params.dateTo() + "</li>\n");
