@@ -230,6 +230,8 @@ public class PrefixArray extends ValueArray {
             _readOnlyArray = readOnlyArray;
             _readOnlyArraySize = readOnlyArray.getSize();
             
+            clearCompletely();
+            
             // Resize according to size of read only arrays
             _inScopeNamespaces = new NamespaceEntry[_readOnlyArraySize + _inScopeNamespaces.length];
             _currentInScope = new int[_readOnlyArraySize + _currentInScope.length];

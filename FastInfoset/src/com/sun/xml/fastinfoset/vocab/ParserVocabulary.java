@@ -151,10 +151,12 @@ public class ParserVocabulary extends Vocabulary {
         setReadOnlyVocabulary(initialVocabulary, clear);
     }
     
-    public void setReferencedVocabulary(URI referencedVocabularyURI, ParserVocabulary referencedVocabulary, boolean clear) {
-        setInitialReadOnlyVocabulary(false);
-        setExternalVocabularyURI(referencedVocabularyURI);
-        setReadOnlyVocabulary(referencedVocabulary, clear);
+    public void setReferencedVocabulary(String referencedVocabularyURI, ParserVocabulary referencedVocabulary, boolean clear) {
+        if (!referencedVocabularyURI.equals(getExternalVocabularyURI())) {
+            setInitialReadOnlyVocabulary(false);
+            setExternalVocabularyURI(referencedVocabularyURI);
+            setReadOnlyVocabulary(referencedVocabulary, clear);
+        }
     }
     
     public void clear() {

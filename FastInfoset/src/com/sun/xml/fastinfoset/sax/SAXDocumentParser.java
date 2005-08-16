@@ -204,7 +204,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             }
         } else if (name.equals(FastInfosetReader.EXTERNAL_VOCABULARIES_PROPERTY)) {
             if (value instanceof Map) {
-                _externalVocabularies = (Map)value;
+                setExternalVocabularies((Map)value);
             } else {
                 throw new SAXNotSupportedException(FastInfosetReader.EXTERNAL_VOCABULARIES_PROPERTY);
             }

@@ -110,7 +110,7 @@ public class SerializerVocabulary extends Vocabulary {
         setReadOnlyVocabulary(initialVocabulary, clear);
     }
     
-    public void setExternalVocabulary(URI externalVocabularyURI, SerializerVocabulary externalVocabulary, boolean clear) {
+    public void setExternalVocabulary(String externalVocabularyURI, SerializerVocabulary externalVocabulary, boolean clear) {
         setInitialReadOnlyVocabulary(false);
         setExternalVocabularyURI(externalVocabularyURI);
         setReadOnlyVocabulary(externalVocabulary, clear);

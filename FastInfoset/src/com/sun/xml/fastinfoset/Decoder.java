@@ -202,7 +202,7 @@ public abstract class Decoder implements FastInfosetParser {
     }
     
     public void setExternalVocabularies(Map referencedVocabualries) {
-        throw new UnsupportedOperationException();
+        _externalVocabularies = referencedVocabualries;
     }
 
     public void setDynamicVocabulary(Vocabulary v) {
@@ -348,11 +348,7 @@ public abstract class Decoder implements FastInfosetParser {
             throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.externalVocabularyNotRegistered", new Object[]{externalVocabularyURI}));
         }
 
-        try {
-            _v.setReferencedVocabulary(new URI(externalVocabularyURI), externalVocabulary, false);
-        } catch (URISyntaxException e) {
-            throw new FastInfosetException("URISyntaxException", e);
-        }
+        _v.setReferencedVocabulary(externalVocabularyURI, externalVocabulary, false);
     }
 
     public final void decodeTableItems(StringArray array) throws FastInfosetException, IOException {

@@ -57,7 +57,7 @@ public abstract class Vocabulary {
         
     protected boolean _hasInitialReadOnlyVocabulary;
     
-    protected URI _referencedVocabularyURI;
+    protected String _referencedVocabularyURI;
     
     public boolean hasInitialVocabulary() {
         return _hasInitialReadOnlyVocabulary;
@@ -71,11 +71,11 @@ public abstract class Vocabulary {
         return _referencedVocabularyURI != null;
     }
     
-    public URI getExternalVocabularyURI() {
+    public String getExternalVocabularyURI() {
         return _referencedVocabularyURI;
     }
     
-    protected void setExternalVocabularyURI(URI referencedVocabularyURI) {
+    protected void setExternalVocabularyURI(String referencedVocabularyURI) {
         _referencedVocabularyURI = referencedVocabularyURI;
     }
 
