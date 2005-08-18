@@ -40,12 +40,21 @@
 package com.sun.japex;
 
 import java.io.File;
+import java.lang.management.*;
 
 public class JapexDriverBase implements JapexDriver, Params {
     
     private Driver _driver;    
     private TestSuiteImpl _testSuite;    
     private TestCaseImpl _testCase;
+    
+    private MemoryMXBean _memoryBean;
+    private long _heapBytes;
+    
+    public JapexDriverBase() {
+        _memoryBean = ManagementFactory.getMemoryMXBean();
+        _heapBytes = 0L;
+    }
     
     public void setDriver(Driver driver) {
         _driver = driver;
@@ -129,8 +138,9 @@ public class JapexDriverBase implements JapexDriver, Params {
         long millis, nanos;
         TestCaseImpl tc = _testCase;
         
-        // Force GC before running test
-        System.gc();
+        // Force GC and record current memory usage
+        _memoryBean.gc();
+        _heapBytes = _memoryBean.getHeapMemoryUsage().getUsed();
         
         // Get number of threads to adjust iterations
         int nOfThreads = tc.getIntParam(Constants.NUMBER_OF_THREADS);
@@ -223,6 +233,12 @@ public class JapexDriverBase implements JapexDriver, Params {
                 (fileSize * 0.000008d 
                     * _testCase.getLongParam(Constants.ACTUAL_RUN_ITERATIONS)) /    // Mbits
                 (_testCase.getLongParam(Constants.ACTUAL_RUN_TIME) / 1000.0));      // Seconds
+        }
+        else if (resultUnit.equalsIgnoreCase("mbs")) {
+            _testCase.setParam(Constants.RESULT_UNIT, "MBs");
+            _testCase.setDoubleParam(Constants.RESULT_VALUE, 
+                (_memoryBean.getHeapMemoryUsage().getUsed() - _heapBytes) / 
+                (1024.0 * 1024.0));     // Megabytes used
         }
         else {
             throw new RuntimeException("Unknown value '" + 
