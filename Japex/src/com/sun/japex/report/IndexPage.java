@@ -98,12 +98,12 @@ public class IndexPage {
 
         StringBuffer newrow = new StringBuffer();
         newrow.append("<br><a name=\""+_params.title()+"\">\n");
-        newrow.append("<table width=\"100%\" border=\"0\">");
-        newrow.append("<tr><td width=\"90%\"><h2>"+_params.title());
-        newrow.append("</h2></td><td align=\"right\"><j2><a href=\"#top\"><font size=\"2\">Top</font></a></h2></th></tr>");
-        newrow.append("</table>\n");
+        newrow.append("<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tbody>");
+        newrow.append("<tr valign=\"top\"><td width=\"90%\"><font color=\"005A9C\" size=\"5\">"+_params.title());
+        newrow.append("</font></td><td align=\"right\"><a href=\"#top\"><font size=\"3\">[Top]</font></a></td></tr>");
+        newrow.append("</tbody></table>\n");
         newrow.append("<ul>\n<li>Report Path: " + _params.reportPath() +  "</li>\n");
-        newrow.append("<li>Oupput Path: " + _params.outputPath() + "</li>\n");
+        newrow.append("<li>Output Path: " + _params.outputPath() + "</li>\n");
         newrow.append("<li>Report Period: " + _params.dateFrom() + " - " + _params.dateTo() + "</li>\n");
         if (_params.isDriverSpecified()) {
             newrow.append("<li>Driver: " + _params.driver() + "</li>\n");
