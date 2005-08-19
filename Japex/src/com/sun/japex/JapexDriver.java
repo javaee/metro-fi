@@ -64,6 +64,11 @@ public interface JapexDriver extends Runnable {
     /**
      * Called exactly once after calling run.
      */
-    public void finish(TestCase testCase);
+    public void finish(TestCase testCase);    
+        
+    /**
+     * Called after all tests are completed.
+     */
+    public void terminateDriver();
         
 }
