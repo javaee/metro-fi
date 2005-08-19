@@ -119,9 +119,9 @@ public class IndexPage {
             newrow.append("not specified");            
         }
         newrow.append("</li>\n</ul>\n");
-        newrow.append("<table width=\"80%\" border=\"0\">");
+        newrow.append("<table width=\"100%\" border=\"0\">");
         newrow.append("<tr><td colspan=\"2\" align=\"center\"><img src=\""+_chartName+"\"></td></tr>");
-        newrow.append("</table>");
+        newrow.append("</table><br>");
         newrow.append(REPORT_NEWROW+"\n");
 
         start = content.indexOf(REPORT_NEWINDEX);

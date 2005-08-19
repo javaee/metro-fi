@@ -113,7 +113,7 @@ public class TrendReport {
             if (!file.exists()) {
                 file.mkdirs();
             }
-            ChartUtilities.saveChartAsJPEG(new File(params.outputPath()+fileSep+chartName), chart1, 500, 300);
+            ChartUtilities.saveChartAsJPEG(new File(params.outputPath()+fileSep+chartName), chart1, 700, 400);
             new IndexPage(params, chartName).report();
             copyCss(params.outputPath());
         } catch (Exception e) {
