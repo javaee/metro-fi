@@ -43,6 +43,7 @@ import java.util.*;
 import java.text.*;
 import java.net.*;
 import java.io.File;
+import java.util.concurrent.*;
 
 public class Engine {
     
@@ -80,6 +81,9 @@ public class Engine {
                     }
                 }
                 
+                // Allocate a fix pool of nOfThreads threads
+                ExecutorService threadPool = Executors.newFixedThreadPool(nOfThreads);
+                
                 for (int driverRun = 0; driverRun < runsPerDriver; driverRun++) {
                     System.out.print("\n    Run " + (driverRun + 1) + ": ");
                     
@@ -110,17 +114,10 @@ public class Engine {
                             // Start timer 
                             runTime = Util.currentTimeMillis();
 
-                            drivers[0][driverRun].run();
+                            drivers[0][driverRun].call();
                         }
                         else {  // nOfThreads > 1
                             Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-
-                            // Create one thread for each driver instance
-                            Thread threads[] = new Thread[nOfThreads];
-                            for (int i = 0; i < nOfThreads; i++) {
-                                threads[i] = new Thread(drivers[i][driverRun]);
-                                threads[i].setPriority(Thread.MAX_PRIORITY);
-                            }
 
                             // Initialize driver instance with test case object
                             // and do prepare and warmup phases
@@ -133,13 +130,14 @@ public class Engine {
                             runTime = Util.currentTimeMillis();
 
                             // Fork all threads
+                            Future<?>[] futures = new Future<?>[nOfThreads];                            
                             for (int i = 0; i < nOfThreads; i++) {
-                                threads[i].start();
+                                futures[i] = threadPool.submit(drivers[i][driverRun]);
                             }
 
                             // Wait for all threads to finish
                             for (int i = 0; i < nOfThreads; i++) {
-                                threads[i].join();
+                                futures[i].get();
                             }
                         }
 
@@ -212,7 +210,7 @@ public class Engine {
                         drivers[i][driverRun].terminateDriver();
                     }
                 }
-                
+                              
                 if (runsPerDriver > 1) {
                     // Print average for all runs
                     System.out.print("\n     Avgs: ");
@@ -249,6 +247,9 @@ public class Engine {
                 else {
                     System.out.println("");
                 }
+                    
+                // Shutdown thread pool -- all threads must have stopped by now
+                threadPool.shutdown();
             }
         }
         catch (Exception e) {

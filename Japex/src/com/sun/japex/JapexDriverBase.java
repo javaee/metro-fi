@@ -126,15 +126,16 @@ public class JapexDriverBase implements JapexDriver, Params {
         }
     }
     
-    // -- Runnable interface ------------------------------------------
     
+    // -- Callable interface ------------------------------------------
+
     /**
      * Execute the run phase. This method can be executed concurrently
      * by multiple threads. Care should be taken to ensure proper
      * synchronization. Note that parameter getters and setters are
      * already synchronized.
      */
-    public void run() {
+    public Object call() {
         long millis, nanos;
         TestCaseImpl tc = _testCase;
         
@@ -183,6 +184,8 @@ public class JapexDriverBase implements JapexDriver, Params {
             tc.setIntParam(Constants.ACTUAL_RUN_ITERATIONS, 
                            actualRunIterations + runIterations);
         }
+        
+        return null;
     }
     
     // -- Internal interface ---------------------------------------------
@@ -332,5 +335,5 @@ public class JapexDriverBase implements JapexDriver, Params {
      */
     public void terminateDriver() {
     }
-    
+
 }

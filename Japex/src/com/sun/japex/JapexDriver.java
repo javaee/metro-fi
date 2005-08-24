@@ -39,7 +39,9 @@
 
 package com.sun.japex;
 
-public interface JapexDriver extends Runnable {
+import java.util.concurrent.Callable;
+
+public interface JapexDriver extends Callable<Object> {
     
     /**
      * Called once when the class is loaded.
