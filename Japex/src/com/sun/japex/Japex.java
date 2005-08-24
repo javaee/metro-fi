@@ -94,9 +94,7 @@ public class Japex {
     }
     
     public void run(String configFile) {  
-        try {
-            System.out.println("Running ...");
-            
+        try {            
             // Create testsuite object from configuration file
             TestSuiteImpl testSuite = new Engine().start(configFile);
             
