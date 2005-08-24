@@ -54,12 +54,16 @@ public class Engine {
         TestSuiteImpl testSuite = null;
         Boolean computeResult = null;
                 
-        try {
+        try { 
             // Load config file
             ConfigFileLoader cfl = new ConfigFileLoader(configFile);
             testSuite = cfl.getTestSuite();
-            
-            // Iterate through each driver
+
+            // Get number of threads and print it out
+            int nOfThreads = testSuite.getIntParam(Constants.NUMBER_OF_THREADS);
+            System.out.println("Running using " + nOfThreads + " thread(s) ...");
+             
+           // Iterate through each driver
             Iterator jdi = testSuite.getDriverInfoList().iterator();
             while (jdi.hasNext()) {                               
                 DriverImpl di = (DriverImpl) jdi.next();
@@ -70,7 +74,6 @@ public class Engine {
                 int runsPerDriver = testSuite.getIntParam(Constants.RUNS_PER_DRIVER);
 
                 // Allocate a matrix of nOfThreads * runPerDriver size and initialize each instance
-                int nOfThreads = testSuite.getIntParam(Constants.NUMBER_OF_THREADS);
                 JapexDriverBase drivers[][] = new JapexDriverBase[nOfThreads][runsPerDriver];
                 for (int i = 0; i < nOfThreads; i++) {
                     for (int j = 0; j < runsPerDriver; j++) {
