@@ -42,6 +42,7 @@ package com.sun.japex;
 import java.util.*;
 import java.net.*;
 import java.io.File;
+import java.io.FilenameFilter;
 
 public class DriverImpl extends ParamsImpl implements Driver {
     
@@ -56,17 +57,29 @@ public class DriverImpl extends ParamsImpl implements Driver {
     
     int _runsPerDriver;
     
+    /**
+     * Set the parent class loader to null in order to force the use of 
+     * the bootstrap classloader. The boostrap class loader does not 
+     * have access to the system's class path.
+     */ 
     static class JapexClassLoader extends URLClassLoader {
         public JapexClassLoader(URL[] urls) {
-            super(urls, DriverImpl.class.getClassLoader());
-        }        
+            super(urls, null);
+        }          
         public Class findClass(String name) throws ClassNotFoundException {
+            // Delegate when loading Japex classes, excluding JDSL drivers
+            if (name.startsWith("com.sun.japex.") && !name.startsWith("com.sun.japex.jdsl.")) {
+                return DriverImpl.class.getClassLoader().loadClass(name);
+            }
+            
+            // Otherwise, use class loader based on japex.classPath only
             return super.findClass(name);
         }        
         public void addURL(URL url) {
             super.addURL(url);
         }
     }
+    
        
     public DriverImpl(String name, boolean isNormal, int runsPerDriver, 
         ParamsImpl params) 
@@ -74,8 +87,7 @@ public class DriverImpl extends ParamsImpl implements Driver {
         super(params);
         _name = name;
         _isNormal = isNormal;
-        _classLoader = newJapexClassLoader();
-        
+        _classLoader = newJapexClassLoader();        
         _runsPerDriver = runsPerDriver;
     }
     
@@ -240,13 +252,42 @@ public class DriverImpl extends ParamsImpl implements Driver {
             return result;
         }
         
-        StringTokenizer tokenizer = new StringTokenizer(classPath, 
-            System.getProperty("path.separator"));
+        String pathSep = System.getProperty("path.separator");
+        String fileSep = System.getProperty("file.separator");
+        StringTokenizer tokenizer = new StringTokenizer(classPath, pathSep); 
         
+        // TODO: Ensure that this code works on Windows too!
 	while (tokenizer.hasMoreTokens()) {
             String path = tokenizer.nextToken();            
             try {
-                result.addURL(new File(path).toURL());
+                boolean lookForJars = false;
+                
+                // Strip off '*.jar' at the end if present
+                if (path.endsWith("*.jar")) {
+                    int k = path.lastIndexOf('/');
+                    path = (k >= 0) ? path.substring(0, k + 1) : "./";
+                    lookForJars = true;
+                }
+                
+                // Create a file from the resulting path
+                File file = new File(path);
+                
+                // If a directory, add all '.jar'
+                if (file.isDirectory() && lookForJars) {
+                    String children[] = file.list(
+                        new FilenameFilter() {
+                            public boolean accept(File dir, String name) {
+                                return name.endsWith(".jar");
+                            }
+                        });
+                        
+                    for (String c : children) {
+                        result.addURL(new File(path + fileSep + c).toURL());
+                    }
+                }
+                else {
+                    result.addURL(file.toURL());
+                }
             }
             catch (MalformedURLException e) {
                 // ignore
