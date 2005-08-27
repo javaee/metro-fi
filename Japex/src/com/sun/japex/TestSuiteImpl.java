@@ -218,7 +218,8 @@ public class TestSuiteImpl extends ParamsImpl implements TestSuite {
     
     /**
      * System properties that start with "japex." can be used to override
-     * global params of the same name from the config file.
+     * global params of the same name from the config file. If the value
+     * of the system property is "", then it is ignored.
      */
     private void readAndSetSystemProperties() {
         Properties sysProps = System.getProperties();
@@ -226,7 +227,10 @@ public class TestSuiteImpl extends ParamsImpl implements TestSuite {
         for (Iterator i = sysProps.keySet().iterator(); i.hasNext();) {
             String name = (String) i.next();
             if (name.startsWith("japex.")) {
-                setParam(name, sysProps.getProperty(name));
+                String value = sysProps.getProperty(name);
+                if (value.length() > 0) {
+                    setParam(name, value);
+                }
             }
         }
     }
