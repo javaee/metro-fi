@@ -62,6 +62,14 @@ public class Engine {
             // Get number of threads and print it out
             int nOfThreads = testSuite.getIntParam(Constants.NUMBER_OF_THREADS);
             System.out.println("Running using " + nOfThreads + " thread(s) ...");
+            if (testSuite.hasParam(Constants.WARMUP_TIME) && 
+                    testSuite.hasParam(Constants.RUN_TIME)) 
+            {
+                int time = estimateRunningTime(testSuite);
+                int seconds = time % 60;                
+                System.out.println("Estimated warmup time + run time is " +
+                    (time / 60) + ":" + ((seconds < 10) ? "0" : "") + seconds + " minutes");
+            }
              
            // Iterate through each driver
             Iterator jdi = testSuite.getDriverInfoList().iterator();
@@ -112,7 +120,7 @@ public class Engine {
                         // If nOfThreads == 1, re-use this thread
                         if (nOfThreads == 1) {
                             drivers[0][driverRun].setTestCase(tc);     // tc is shared!
-                            drivers[0][driverRun].prepareAndWarmup();
+                            drivers[0][driverRun].prepare();
 
                             // Start timer 
                             runTime = Util.currentTimeMillis();
@@ -122,18 +130,43 @@ public class Engine {
                         else {  // nOfThreads > 1
                             Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 
-                            // Initialize driver instance with test case object
-                            // and do prepare and warmup phases
+                            // -- Prepare phase --------------------------------------
+                            
+                            // Initialize driver instance with test case object do prepare
                             for (int i = 0; i < nOfThreads; i++) {
                                 drivers[i][driverRun].setTestCase(tc);     // tc is shared!
-                                drivers[i][driverRun].prepareAndWarmup();
+                                drivers[i][driverRun].prepare();
                             }
-
-                            // Start timer 
+                                                        
+                            // -- Warmup phase ---------------------------------------
+                            
+                            // Start timer for warmup phase 
                             runTime = Util.currentTimeMillis();
 
-                            // Fork all threads
+                            // Fork all threads -- first time drivers will warmup
                             Future<?>[] futures = new Future<?>[nOfThreads];                            
+                            for (int i = 0; i < nOfThreads; i++) {
+                                futures[i] = threadPool.submit(drivers[i][driverRun]);
+                            }
+
+                            // Wait for all threads to finish
+                            for (int i = 0; i < nOfThreads; i++) {
+                                futures[i].get();
+                            }
+                            
+                            // Stop timer
+                            runTime = Util.currentTimeMillis() - runTime;
+
+                            // Set japex.actualWarmupTime output param
+                            tc.setDoubleParam(Constants.ACTUAL_WARMUP_TIME, runTime);  
+                            
+                            // -- Run phase -------------------------------------------
+                            
+                            // Start timer for run phase
+                            runTime = Util.currentTimeMillis();
+
+                            // Fork all threads -- second time drivers will run
+                            futures = new Future<?>[nOfThreads];                            
                             for (int i = 0; i < nOfThreads; i++) {
                                 futures[i] = threadPool.submit(drivers[i][driverRun]);
                             }
@@ -150,11 +183,11 @@ public class Engine {
                         // Set japex.actualRunTime output param
                         tc.setDoubleParam(Constants.ACTUAL_RUN_TIME, runTime);  
 
-                        // Do finish phase
+                        // Finish phase                         
                         for (int i = 0; i < nOfThreads; i++) {
                             drivers[i][driverRun].finish();
                         }                    
-
+                        
                         double result = 0.0;
 
                         if (computeResult == null) {
@@ -200,8 +233,7 @@ public class Engine {
                         // Display results for this test
                         System.out.print(tc.getParam(Constants.RESULT_VALUE) + ",");
                         System.out.flush();
-                    }
-                
+                    }               
                 
                     System.out.print(
                         "aritmean," + Util.formatDouble(aritMeanresult) +
@@ -262,4 +294,16 @@ public class Engine {
 
         return testSuite;
     }        
+    
+    /**
+     * Calculates the time of the warmup and run phases in seconds.
+     */
+    private int estimateRunningTime(TestSuiteImpl testSuite) {        
+        int nOfDrivers = testSuite.getDriverInfoList().size();
+        int nOfTests = ((DriverImpl) testSuite.getDriverInfoList().get(0)).getTestCases(0).size();
+        
+        return (nOfDrivers * nOfTests * testSuite.getIntParam(Constants.WARMUP_TIME) +
+                nOfDrivers * nOfTests * testSuite.getIntParam(Constants.RUN_TIME)) *
+                testSuite.getIntParam(Constants.RUNS_PER_DRIVER);        
+    }
 }

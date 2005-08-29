@@ -48,6 +48,8 @@ public class JapexDriverBase implements JapexDriver, Params {
     private TestSuiteImpl _testSuite;    
     private TestCaseImpl _testCase;
     
+    private boolean _needWarmup = true;
+    
     private MemoryMXBean _memoryBean;
     private long _heapBytes;
     
@@ -72,25 +74,37 @@ public class JapexDriverBase implements JapexDriver, Params {
         return _testSuite;
     }
     
+    // -- Internal interface ---------------------------------------------
+    
     /**
-     * Execute prepare and warmup phases. Even in multi-threaded test, this
+     * Execute prepare phase. Even in multi-threaded test, this
      * method will only be executed in single-threaded mode, so there's no
      * need for additional synchronization.
      */
-    public void prepareAndWarmup() {
+    public void prepare() {
         long millis, nanos;
         TestCaseImpl tc = _testCase;
-        
-        // -- Prepare ----------------------------------------
         
         nanos = Util.currentTimeNanos();
         prepare(tc);
         nanos = Util.currentTimeNanos() - nanos;
         tc.setDoubleParam(Constants.ACTUAL_PREPARE_TIME, 
                           Util.nanosToMillis(nanos));
-
-        // -- Warmup -----------------------------------------
-
+    }
+    
+    /**
+     * Execute the warmup phase. This method can be executed concurrently
+     * by multiple threads. Care should be taken to ensure proper
+     * synchronization. Note that parameter getters and setters are
+     * already synchronized.
+     */
+    public void warmup() {
+        long millis;
+        TestCaseImpl tc = _testCase;
+        
+        // Get number of threads to adjust iterations
+        int nOfThreads = tc.getIntParam(Constants.NUMBER_OF_THREADS);
+        
         int warmupIterations = 0;
         String warmupTime = tc.getParam(Constants.WARMUP_TIME);
         if (warmupTime != null) {
@@ -103,40 +117,34 @@ public class JapexDriverBase implements JapexDriver, Params {
                 warmupIterations++;
                 millis = Util.currentTimeMillis();
             } 
-
-            // Set actual number of millis
-            millis -= startTime;
-
-            // Set actual number of iterations
-            tc.setIntParam(Constants.ACTUAL_WARMUP_ITERATIONS, warmupIterations);
         }
         else {
             // Adjust warmup iterations based on number of threads
-            warmupIterations = tc.getIntParam(Constants.WARMUP_ITERATIONS);
+            warmupIterations = tc.getIntParam(Constants.WARMUP_ITERATIONS) / nOfThreads;
             
-            nanos = Util.currentTimeNanos();
             for (int i = 0; i < warmupIterations; i++) {
                 warmup(tc);      // Call warmup
             }
-            nanos = Util.currentTimeNanos() - nanos;
-
-            // Set actual warmup time
-            tc.setDoubleParam(Constants.ACTUAL_WARMUP_TIME, 
-                              Util.nanosToMillis(nanos));
+        }
+        
+        // Accumulate actual number of iterations
+        synchronized (tc) {
+            int actualWarmupIterations =  
+                tc.hasParam(Constants.ACTUAL_WARMUP_ITERATIONS) ? 
+                    tc.getIntParam(Constants.ACTUAL_WARMUP_ITERATIONS) : 0;
+            tc.setIntParam(Constants.ACTUAL_WARMUP_ITERATIONS, 
+                           actualWarmupIterations + warmupIterations);
         }
     }
     
-    
-    // -- Callable interface ------------------------------------------
-
     /**
      * Execute the run phase. This method can be executed concurrently
      * by multiple threads. Care should be taken to ensure proper
      * synchronization. Note that parameter getters and setters are
      * already synchronized.
      */
-    public Object call() {
-        long millis, nanos;
+    public void run() {
+        long millis;
         TestCaseImpl tc = _testCase;
         
         // Force GC and record current memory usage
@@ -159,21 +167,15 @@ public class JapexDriverBase implements JapexDriver, Params {
                 runIterations++;
                 millis = Util.currentTimeMillis();
             } while (endTime >= millis);
-
-            // Set actual number of millis
-            millis -= startTime;
         }
         else {
             // Adjust runIterations based on number of threads
             runIterations = tc.getIntParam(Constants.RUN_ITERATIONS) / nOfThreads;
 
             // Run phase
-            nanos = Util.currentTimeNanos();
             for (int i = 0; i < runIterations; i++) {
                 run(tc);      // Call run
             }
-            nanos = Util.currentTimeNanos() - nanos;            
-            
         }
         
         // Accumulate actual number of iterations
@@ -184,11 +186,7 @@ public class JapexDriverBase implements JapexDriver, Params {
             tc.setIntParam(Constants.ACTUAL_RUN_ITERATIONS, 
                            actualRunIterations + runIterations);
         }
-        
-        return null;
     }
-    
-    // -- Internal interface ---------------------------------------------
     
     /**
      * Called exactly once after calling run. Computes japex.resultValue
@@ -249,6 +247,25 @@ public class JapexDriverBase implements JapexDriver, Params {
         }
         
     }
+    
+    // -- Callable interface ------------------------------------------
+
+    /**
+     * Concurrently execute the warmup phase the first time it is 
+     * called, and the run phase the second time it is called.
+     * Care should be taken to ensure proper synchronization. Note 
+     * that parameter getters and setters are already synchronized.
+     */
+    public Object call() {
+        if (_needWarmup) {
+            warmup(); 
+            _needWarmup = false;
+        }
+        else {
+            run();
+        }
+        return null;
+    }    
     
     // -- Params interface -----------------------------------------------
     
