@@ -125,6 +125,10 @@ public class Engine {
                             // Start timer 
                             runTime = Util.currentTimeMillis();
 
+                            // First time call does warmup
+                            drivers[0][driverRun].call();
+                            
+                            // Second time call does run
                             drivers[0][driverRun].call();
                         }
                         else {  // nOfThreads > 1
@@ -166,7 +170,6 @@ public class Engine {
                             runTime = Util.currentTimeMillis();
 
                             // Fork all threads -- second time drivers will run
-                            futures = new Future<?>[nOfThreads];                            
                             for (int i = 0; i < nOfThreads; i++) {
                                 futures[i] = threadPool.submit(drivers[i][driverRun]);
                             }
