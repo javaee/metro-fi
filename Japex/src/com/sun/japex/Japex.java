@@ -49,7 +49,7 @@ import javax.xml.transform.stream.*;
 public class Japex {
     
     public static boolean html = true;
-    public static boolean verbose = true;
+    public static boolean verbose = false;
     public static Date TODAY = new Date();
     
     /** Creates a new instance of Japex */
