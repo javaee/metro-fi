@@ -115,7 +115,12 @@ public class Engine {
                         long runTime = 0L;
                         TestCaseImpl tc = (TestCaseImpl) tci.next();               
 
-                        System.out.print(tc.getName() + ",");
+                        if (Japex.verbose) {
+                            System.out.println(tc.getName());
+                        }
+                        else {
+                            System.out.print(tc.getName() + ",");
+                        }
 
                         // If nOfThreads == 1, re-use this thread
                         if (nOfThreads == 1) {
@@ -234,8 +239,14 @@ public class Engine {
                         harmMeanresultInverse += 1.0 / (nOfTests * result);
                     
                         // Display results for this test
-                        System.out.print(tc.getParam(Constants.RESULT_VALUE) + ",");
-                        System.out.flush();
+                        if (Japex.verbose) {
+                            System.out.println("           " + tc.getParam(Constants.RESULT_VALUE));
+                            System.out.print("           ");
+                        }
+                        else {
+                            System.out.print(tc.getParam(Constants.RESULT_VALUE) + ",");
+                            System.out.flush();
+                        }
                     }               
                 
                     System.out.print(

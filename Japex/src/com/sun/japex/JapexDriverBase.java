@@ -83,6 +83,11 @@ public class JapexDriverBase implements JapexDriver, Params {
      * need for additional synchronization.
      */
     public void prepare() {
+        if (Japex.verbose) {
+            System.out.println("             " + 
+                Thread.currentThread().getName() + " prepare()"); 
+        }
+      
         TestCaseImpl tc = _testCase;
         
         long nanos = Util.currentTimeNanos();
@@ -98,6 +103,11 @@ public class JapexDriverBase implements JapexDriver, Params {
      * already synchronized.
      */
     public void warmup() {
+        if (Japex.verbose) {
+            System.out.println("             " + 
+                Thread.currentThread().getName() + " warmup()"); 
+        }
+
         long millis;
         TestCaseImpl tc = _testCase;
         
@@ -143,6 +153,11 @@ public class JapexDriverBase implements JapexDriver, Params {
      * already synchronized.
      */
     public void run() {
+        if (Japex.verbose) {
+            System.out.println("             " + 
+                Thread.currentThread().getName() + " run()"); 
+        }
+
         long millis;
         TestCaseImpl tc = _testCase;
         
@@ -262,6 +277,7 @@ public class JapexDriverBase implements JapexDriver, Params {
         }
         else {
             run();
+            _needWarmup = true;
         }
         return null;
     }    

@@ -49,6 +49,7 @@ import javax.xml.transform.stream.*;
 public class Japex {
     
     public static boolean html = true;
+    public static boolean verbose = true;
     public static Date TODAY = new Date();
     
     /** Creates a new instance of Japex */
@@ -73,6 +74,9 @@ public class Japex {
             if (args[i].equals("-nohtml")) {
                 html = false;
             }
+            else if (args[i].equals("-verbose")) {
+                verbose = true;
+            }
             else if (args[i].equals("-cp") || args[i].equals("-classpath")) {
                 i++; // Skip, already processed
             }
@@ -89,7 +93,7 @@ public class Japex {
     }
 
     private static void displayUsageAndExit() {
-        System.err.println("Usage: japex [-cp <classpath>] [-nohtml] config.xml");
+        System.err.println("Usage: japex [-cp <classpath>] [-verbose] [-nohtml] config.xml");
         System.exit(1);        
     }
     
