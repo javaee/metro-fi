@@ -70,8 +70,11 @@ public class Engine {
                 System.out.println("Estimated warmup time + run time is " +
                     (time / 60) + ":" + ((seconds < 10) ? "0" : "") + seconds + " minutes");
             }
-             
-           // Iterate through each driver
+
+            // Allocate a fix pool of nOfThreads threads
+            ExecutorService threadPool = Executors.newFixedThreadPool(nOfThreads);
+                
+            // Iterate through each driver
             Iterator jdi = testSuite.getDriverInfoList().iterator();
             while (jdi.hasNext()) {                               
                 DriverImpl di = (DriverImpl) jdi.next();
@@ -91,9 +94,6 @@ public class Engine {
                         drivers[i][j].initializeDriver();
                     }
                 }
-                
-                // Allocate a fix pool of nOfThreads threads
-                ExecutorService threadPool = Executors.newFixedThreadPool(nOfThreads);
                 
                 for (int driverRun = 0; driverRun < runsPerDriver; driverRun++) {
                     System.out.print("\n    Run " + (driverRun + 1) + ": ");
@@ -296,10 +296,10 @@ public class Engine {
                 else {
                     System.out.println("");
                 }
-                    
-                // Shutdown thread pool -- all threads must have stopped by now
-                threadPool.shutdown();
             }
+
+	    // Shutdown thread pool -- all threads must have stopped by now
+	    threadPool.shutdown();
         }
         catch (Exception e) {
             e.printStackTrace();
