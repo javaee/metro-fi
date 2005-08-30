@@ -263,6 +263,7 @@ public class JapexDriverBase implements JapexDriver, Params {
         }
         else {
             run();
+            _needWarmup = true;
         }
         return null;
     }    
