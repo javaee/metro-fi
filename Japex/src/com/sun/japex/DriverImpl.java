@@ -47,7 +47,6 @@ import java.io.FilenameFilter;
 public class DriverImpl extends ParamsImpl implements Driver {
     
     String _name;
-    JapexClassLoader _classLoader;
     Class _class = null;
     boolean _isNormal = false;
     boolean _computeMeans = true;
@@ -57,6 +56,8 @@ public class DriverImpl extends ParamsImpl implements Driver {
     
     int _runsPerDriver;
     
+    static JapexClassLoader _classLoader;
+
     /**
      * Set the parent class loader to null in order to force the use of 
      * the bootstrap classloader. The boostrap class loader does not 
@@ -87,8 +88,8 @@ public class DriverImpl extends ParamsImpl implements Driver {
         super(params);
         _name = name;
         _isNormal = isNormal;
-        _classLoader = newJapexClassLoader();        
         _runsPerDriver = runsPerDriver;
+        initJapexClassLoader();        
     }
     
     public void setTestCases(TestCaseArrayList testCases) {
@@ -245,11 +246,21 @@ public class DriverImpl extends ParamsImpl implements Driver {
         report.append(Util.getSpaces(spaces) + "</driver>\n");       
     }
     
-    private JapexClassLoader newJapexClassLoader() {
-        JapexClassLoader result = new JapexClassLoader(new URL[0]);
+    /**
+     * Initializes the Japex class loader. A single class loader will be
+     * created for all drivers. Thus, if japex.classPath is defined as
+     * a driver's property, it will be ignored.
+     */ 
+    private void initJapexClassLoader() {
+        // Initialize class loader only once
+        if (_classLoader != null) {
+            return;
+        }
+
+        _classLoader = new JapexClassLoader(new URL[0]);
         String classPath = getParam(Constants.CLASS_PATH);
         if (classPath == null) {
-            return result;
+            return;
         }
         
         String pathSep = System.getProperty("path.separator");
@@ -282,17 +293,16 @@ public class DriverImpl extends ParamsImpl implements Driver {
                         });
                         
                     for (String c : children) {
-                        result.addURL(new File(path + fileSep + c).toURL());
+                        _classLoader.addURL(new File(path + fileSep + c).toURL());
                     }
                 }
                 else {
-                    result.addURL(file.toURL());
+                    _classLoader.addURL(file.toURL());
                 }
             }
             catch (MalformedURLException e) {
                 // ignore
             }
         }        
-        return result;
     }
 }
