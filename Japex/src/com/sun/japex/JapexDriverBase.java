@@ -83,14 +83,12 @@ public class JapexDriverBase implements JapexDriver, Params {
      * need for additional synchronization.
      */
     public void prepare() {
-        long millis, nanos;
         TestCaseImpl tc = _testCase;
         
-        nanos = Util.currentTimeNanos();
+        long nanos = Util.currentTimeNanos();
         prepare(tc);
         nanos = Util.currentTimeNanos() - nanos;
-        tc.setDoubleParam(Constants.ACTUAL_PREPARE_TIME, 
-                          Util.nanosToMillis(nanos));
+        tc.setDoubleParam(Constants.ACTUAL_PREPARE_TIME, Util.nanosToMillis(nanos));
     }
     
     /**
@@ -236,7 +234,7 @@ public class JapexDriverBase implements JapexDriver, Params {
                     * _testCase.getLongParam(Constants.ACTUAL_RUN_ITERATIONS)) /    // Mbits
                 (_testCase.getLongParam(Constants.ACTUAL_RUN_TIME) / 1000.0));      // Seconds
         }
-        else if (resultUnit.equalsIgnoreCase("mbs")) {
+        else if (resultUnit.equalsIgnoreCase("mbs")) {      // EXPERIMENTAL
             _testCase.setParam(Constants.RESULT_UNIT, "MBs");
             _testCase.setDoubleParam(Constants.RESULT_VALUE, 
                 (_memoryBean.getHeapMemoryUsage().getUsed() - _heapBytes) / 
@@ -253,7 +251,7 @@ public class JapexDriverBase implements JapexDriver, Params {
 
     /**
      * Concurrently execute the warmup phase the first time it is 
-     * called, and the run phase the second time it is called.
+     * called, and then the run phase the second time it is called.
      * Care should be taken to ensure proper synchronization. Note 
      * that parameter getters and setters are already synchronized.
      */
