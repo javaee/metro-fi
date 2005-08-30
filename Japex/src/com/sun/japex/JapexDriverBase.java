@@ -68,6 +68,7 @@ public class JapexDriverBase implements JapexDriver, Params {
     
     public void setTestCase(TestCaseImpl testCase) {
         _testCase = testCase;
+        _needWarmup = true;
     }
     
     protected TestSuiteImpl getTestSuite() {
@@ -263,7 +264,6 @@ public class JapexDriverBase implements JapexDriver, Params {
         }
         else {
             run();
-            _needWarmup = true;
         }
         return null;
     }    
