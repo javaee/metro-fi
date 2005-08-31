@@ -65,10 +65,11 @@ public class Engine {
             if (testSuite.hasParam(Constants.WARMUP_TIME) && 
                     testSuite.hasParam(Constants.RUN_TIME)) 
             {
-                int time = estimateRunningTime(testSuite);
-                int seconds = time % 60;                
+                int[] hms = estimateRunningTime(testSuite);
                 System.out.println("Estimated warmup time + run time is " +
-                    (time / 60) + ":" + ((seconds < 10) ? "0" : "") + seconds + " minutes");
+                    (hms[0] > 0 ? (hms[0] + " hours ") : "") +
+                    (hms[1] > 0 ? (hms[1] + " minutes ") : "") +
+                    (hms[2] > 0 ? (hms[2] + " seconds ") : ""));                    
             }
 
             // Allocate a fix pool of nOfThreads threads
@@ -310,14 +311,22 @@ public class Engine {
     }        
     
     /**
-     * Calculates the time of the warmup and run phases in seconds.
+     * Calculates the time of the warmup and run phases. Returns an array 
+     * of size 3 with hours, minutes and seconds.
      */
-    private int estimateRunningTime(TestSuiteImpl testSuite) {        
+    private int[] estimateRunningTime(TestSuiteImpl testSuite) {        
         int nOfDrivers = testSuite.getDriverInfoList().size();
         int nOfTests = ((DriverImpl) testSuite.getDriverInfoList().get(0)).getTestCases(0).size();
         
-        return (nOfDrivers * nOfTests * testSuite.getIntParam(Constants.WARMUP_TIME) +
-                nOfDrivers * nOfTests * testSuite.getIntParam(Constants.RUN_TIME)) *
-                testSuite.getIntParam(Constants.RUNS_PER_DRIVER);        
+        int seconds =
+            (nOfDrivers * nOfTests * testSuite.getIntParam(Constants.WARMUP_TIME) +
+            nOfDrivers * nOfTests * testSuite.getIntParam(Constants.RUN_TIME)) *
+            testSuite.getIntParam(Constants.RUNS_PER_DRIVER);     
+        
+        int[] hms = new int[3];
+        hms[0] = seconds / 60 / 60;
+        hms[1] = (seconds / 60) % 60;
+        hms[2] = seconds % 60;
+        return hms;
     }
 }
