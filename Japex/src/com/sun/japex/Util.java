@@ -43,6 +43,8 @@ import java.io.*;
 import java.util.*;
 import java.lang.reflect.*;
 import java.text.DecimalFormat;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 public class Util {
     
@@ -187,6 +189,33 @@ public class Util {
     
     public static String formatDouble(double value) {
         return _decimalFormat.format(value);   
+    }
+    
+    public static String getManifestAsString(URLClassLoader cl, String jarBaseName) {
+        try {
+            Enumeration<URL> e = ((URLClassLoader) cl).findResources("META-INF/MANIFEST.MF");
+            
+            while (e.hasMoreElements()) {
+                URL url = e.nextElement();
+                String urlString = url.toString();
+                
+                // Have we found the right jar?
+                if (urlString.indexOf(jarBaseName) > 0) {
+                    StringBuilder sb = new StringBuilder();
+                    int c;
+                    InputStream is = url.openStream();
+                    while ((c = is.read()) != -1) {
+                        char ch = (char) c;
+                        sb.append(Character.isWhitespace(ch) ? ' ' : ch);
+                    }
+                    return sb.toString();
+                }
+            }
+            return "";
+        } 
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
     
 }
