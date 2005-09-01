@@ -268,7 +268,9 @@ public class Engine {
                     while (tci.hasNext()) {
                         TestCaseImpl tc = (TestCaseImpl) tci.next();
                         System.out.print(tc.getName() + ",");                        
-                        System.out.print(tc.getDoubleParam(Constants.RESULT_VALUE) + ",");
+                        System.out.print(
+                            Util.formatDouble(tc.getDoubleParam(Constants.RESULT_VALUE)) 
+                            + ",");
                     }
                     System.out.print(
                         "aritmean," +
@@ -284,7 +286,9 @@ public class Engine {
                     while (tci.hasNext()) {
                         TestCaseImpl tc = (TestCaseImpl) tci.next();
                         System.out.print(tc.getName() + ",");                        
-                        System.out.print(tc.getDoubleParam(Constants.RESULT_VALUE_STDDEV) + ",");
+                        System.out.print(
+                            Util.formatDouble(tc.getDoubleParam(Constants.RESULT_VALUE_STDDEV)) 
+                            + ",");
                     }
                     System.out.println(
                         "aritmean," +
