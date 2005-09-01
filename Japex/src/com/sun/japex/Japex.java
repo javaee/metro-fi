@@ -155,24 +155,35 @@ public class Japex {
 
                 System.out.println("  " + 
                     new File(outputDir + "/" + "report.html").toURL());
+                
+                File htmlReport = new File(outputDir + fileSep + "report.html");
                 transformer.transform(
                     new StreamSource(new StringReader(extendedReport.toString())),
-                    new StreamResult(new FileOutputStream(
-                        new File(outputDir + fileSep + "report.html"))));
+                    new StreamResult(new FileOutputStream(htmlReport)));
                 
-                // Copy CSS to the same directory
+                // For convenience copy report.html to index.html
+                InputStream is = new BufferedInputStream(new FileInputStream(htmlReport));
+                OutputStream os = new BufferedOutputStream(new FileOutputStream(
+                                    new File(outputDir + fileSep + "index.html")));
+                int c;
+                while ((c = is.read()) != -1) {
+                    os.write(c);
+                }
+                is.close();
+                os.close();                    
+                    
+                // Copy CSS into the same directory
                 URL css = getClass().getResource("/resources/report.css");
                 if (css != null) {
-                    InputStream is = css.openStream();
-                    FileOutputStream fos = new FileOutputStream(
-                        new File(outputDir + fileSep + "report.css"));
+                    is = css.openStream();
+                    os = new BufferedOutputStream(new FileOutputStream(
+                            new File(outputDir + fileSep + "report.css")));
                     
-                    int c;
                     while ((c = is.read()) != -1) {
-                        fos.write(c);
+                        os.write(c);
                     }
                     is.close();
-                    fos.close();                    
+                    os.close();                    
                 }
             }
         }
