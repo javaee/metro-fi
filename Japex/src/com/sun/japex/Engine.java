@@ -125,15 +125,30 @@ public class Engine {
 
                         // If nOfThreads == 1, re-use this thread
                         if (nOfThreads == 1) {
+                            // -- Prepare phase --------------------------------------
+
                             drivers[0][driverRun].setTestCase(tc);     // tc is shared!
                             drivers[0][driverRun].prepare();
+
+                            // -- Warmup phase ---------------------------------------
 
                             // Start timer 
                             runTime = Util.currentTimeMillis();
 
                             // First time call does warmup
                             drivers[0][driverRun].call();
+
+                            // Stop timer
+                            runTime = Util.currentTimeMillis() - runTime;
+
+                            // Set japex.actualWarmupTime output param
+                            tc.setDoubleParam(Constants.ACTUAL_WARMUP_TIME, runTime);  
                             
+                            // -- Run phase -------------------------------------------
+
+                            // Start timer for run phase
+                            runTime = Util.currentTimeMillis();
+
                             // Second time call does run
                             drivers[0][driverRun].call();
                         }
