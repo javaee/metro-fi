@@ -1220,28 +1220,44 @@ public abstract class Decoder implements FastInfosetParser {
 
     public final void ensureOctetBufferSize() throws IOException {
         if (_octetBufferEnd < (_octetBufferOffset + _octetBufferLength)) {
-            final int bytesRemaining = _octetBufferEnd - _octetBufferOffset;
+            final int octetsInBuffer = _octetBufferEnd - _octetBufferOffset;
 
             if (_octetBuffer.length < _octetBufferLength) {
+                // Length to read is too large, resize the buffer
                 byte[] newOctetBuffer = new byte[_octetBufferLength];
-                System.arraycopy(_octetBuffer, _octetBufferOffset, newOctetBuffer, 0, bytesRemaining);
+                // Move partially read octets to the start of the buffer
+                System.arraycopy(_octetBuffer, _octetBufferOffset, newOctetBuffer, 0, octetsInBuffer);
                 _octetBuffer = newOctetBuffer;
             } else {
-                System.arraycopy(_octetBuffer, _octetBufferOffset, _octetBuffer, 0, bytesRemaining);
+                // Move partially read octets to the start of the buffer
+                System.arraycopy(_octetBuffer, _octetBufferOffset, _octetBuffer, 0, octetsInBuffer);
             }
             _octetBufferOffset = 0;
-
-            final int bytesRead = _s.read(_octetBuffer, bytesRemaining, _octetBuffer.length - bytesRemaining);
-            if (bytesRead < 0) {
+            
+            // Read as many octets as possible to fill the buffer
+            final int octetsRead = _s.read(_octetBuffer, octetsInBuffer, _octetBuffer.length - octetsInBuffer);
+            if (octetsRead < 0) {
                 throw new EOFException("Unexpeceted EOF");
             }
+            _octetBufferEnd = octetsInBuffer + octetsRead;
 
-            if (bytesRead < _octetBufferLength - bytesRemaining) {
-                // TODO keep reading until require bytes have been obtained
-                throw new IOException(CommonResourceBundle.getInstance().getString("message.fullBytesNotRead"));
+            // Check if the number of octets that have been read is not enough
+            // This can happen when underlying non-blocking is used to read
+            if (_octetBufferEnd < _octetBufferLength) {
+                repeatedRead();
             }
-
-            _octetBufferEnd = bytesRemaining + bytesRead;
+        }
+    }
+    
+    private final void repeatedRead() throws IOException {
+        // Check if the number of octets that have been read is not enough
+        while (_octetBufferEnd < _octetBufferLength) {
+            // Read as many octets as possible to fill the buffer
+            final int octetsRead = _s.read(_octetBuffer, _octetBufferEnd, _octetBuffer.length - _octetBufferEnd);
+            if (octetsRead < 0) {
+                throw new EOFException("Unexpeceted EOF");
+            }
+            _octetBufferEnd += octetsRead;
         }
     }
     
