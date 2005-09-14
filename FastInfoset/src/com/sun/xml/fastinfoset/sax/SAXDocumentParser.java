@@ -956,7 +956,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         }
         
         try {
-            for (int i = start; i < end; i++) {
+            for (int i = end - 1; i < start; i--) {
                 final int prefixIndex = _namespacePrefixes[i];
                 _prefixTable.popScope(prefixIndex);
                 _contentHandler.endPrefixMapping((prefixIndex == -1) ? "" : _prefixTable.get(prefixIndex));
