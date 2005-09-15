@@ -217,5 +217,38 @@ public class Util {
             throw new RuntimeException(e);
         }
     }
+
+    
+    /**
+     * Calculate group sizes for tests to avoid a very small final group. 
+     * For example, calculateGroupSizes(21, 5) return { 5,5,5,3,3 } instead
+     * of { 5,5,5,5,1 }.
+     */
+    public static int[] calculateGroupSizes(int nOfTests, int maxGroupSize) {
+        if (nOfTests <= maxGroupSize) {
+            return new int[] { nOfTests };
+        }
+        
+        int[] result = new int[nOfTests / maxGroupSize + 
+                               ((nOfTests % maxGroupSize > 0) ? 1 : 0)];
+        
+        // Var m1 represents the number of groups of size maxGroupSize
+        int m1 = (nOfTests - maxGroupSize) / maxGroupSize;
+        for (int i = 0; i < m1; i++) {
+            result[i] = maxGroupSize;
+        }
+        
+        // Var m2 represents the number of tests not allocated into groups
+        int m2 = nOfTests - m1 * maxGroupSize;
+        if (m2 <= maxGroupSize) {
+            result[result.length - 1] = m2;
+        }
+        else {
+            // Allocate last two groups
+            result[result.length - 2] = (int) Math.ceil(m2 / 2.0);            
+            result[result.length - 1] = m2 - result[result.length - 2];
+        }
+        return result;
+    }
     
 }
