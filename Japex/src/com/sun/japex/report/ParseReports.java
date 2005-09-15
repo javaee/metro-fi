@@ -63,6 +63,12 @@ public class ParseReports {
         File cwd = new File(params.reportPath());
         ReportFilter filter =new ReportFilter(params.dateFrom(), params.dateTo());
         File[] reportDirs = cwd.listFiles(filter);
+        if (reportDirs == null) {
+            System.out.println("No report found between " + params.dateFrom() + 
+                    " and " + params.dateTo() + ". exit.");
+            return;
+            
+        }
         Arrays.sort(reportDirs, new DateComparator());
         
         String separator = System.getProperty("file.separator");
@@ -83,7 +89,7 @@ public class ParseReports {
                     int day = cal.get(cal.DAY_OF_MONTH);
                     int month = cal.get(cal.MONTH);
                     int year = cal.get(cal.YEAR);
-                    //add one report per day
+                    //add one report per day, TimeSeries does not allow multiple points for the same day
                     if (day==lastDay && month==lastMonth && year==lastYear) {
                         //skip
                     } else {

@@ -47,47 +47,74 @@ import java.io.DataInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 
-
+/*
+ * use IndexPage(TrendReportParams params, String chartName) and report() for version 0.1
+ * use IndexPage(TrendReportParams params, String chartName, boolean openfile=true) and update()
+ * for version 0.2 to update content for multiple charts 
+ */
 public class IndexPage {    
     static final String REPORT_NEWINDEX = "<!--{new index}-->";
     static final String REPORT_NEWROW = "<!--{new row}-->";
     
     TrendReportParams _params;
     String _chartName;
+    StringBuffer _content;
+    
     /** Creates a new instance of RoundTripReport */
     public IndexPage(TrendReportParams params, String chartName) {
         _params = params;
         _chartName = chartName;
     }
     
+    //
+    public IndexPage(TrendReportParams params, boolean openfile) {
+        _params = params;
+        if (openfile) {
+            try {
+                //String filename = args[INDEX_REPORT];    
+                String filename = _params.outputPath()+"/index.html"; 
+                File file = new File(filename);
+                initContent(file);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }            
+        }
+    }
+    
+    //version 0.1 -- create and add one chart at a time
     public void report() {
         try {
             //String filename = args[INDEX_REPORT];    
             String filename = _params.outputPath()+"/index.html"; 
             File file = new File(filename);
-            String content = reportContent(file);
+            initContent(file);
+            updateContent(_chartName);
             OutputStreamWriter osr = new OutputStreamWriter(new FileOutputStream(file));
-            osr.write(content);
+            osr.write(_content.toString());
             osr.close();
         } catch (Exception e) {
             e.printStackTrace();
         }        
     }
-    public String reportContent(File file) {
-        StringBuffer content = new StringBuffer();
+    
+    private void initContent(File file) {
+        _content = new StringBuffer();
         if (!_params.overwrite() && file.exists()) {
             try {
                 InputStream in = new BufferedInputStream(new FileInputStream(file));
                 //content.append(readFromFile(file));
                 byte[] b = new byte[in.available()];
                 in.read(b);
-                content.append(new String(b));
+                _content.append(new String(b));
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {
-            content.append(getTemplate());
+            _content.append(getTemplate());
         }
+    }
+    
+    public void updateContent(String chartName) {
         
         int start = 0;
         int end = 0;      
@@ -106,7 +133,7 @@ public class IndexPage {
         newrow.append("<li>Output Path: " + _params.outputPath() + "</li>\n");
         newrow.append("<li>Report Period: " + _params.dateFrom() + " - " + _params.dateTo() + "</li>\n");
         if (_params.isDriverSpecified()) {
-            newrow.append("<li>Driver: " + _params.driver() + "</li>\n");
+            newrow.append("<li>Driver(s): " + driversToString(_params.driver()) + "</li>\n");
         } else {
             newrow.append("<li>Driver: not specified</li>\n");            
         }
@@ -120,18 +147,40 @@ public class IndexPage {
         }
         newrow.append("</li>\n</ul>\n");
         newrow.append("<table width=\"100%\" border=\"0\">");
-        newrow.append("<tr><td colspan=\"2\" align=\"center\"><img src=\""+_chartName+"\"></td></tr>");
+        newrow.append("<tr><td colspan=\"2\" align=\"center\"><img src=\""+chartName+"\"></td></tr>");
         newrow.append("</table><br>");
         newrow.append(REPORT_NEWROW+"\n");
 
-        start = content.indexOf(REPORT_NEWINDEX);
+        start = _content.indexOf(REPORT_NEWINDEX);
         end = start + REPORT_NEWINDEX.length();
-        content.replace(start, end, newindex.toString());
+        _content.replace(start, end, newindex.toString());
 
-        start = content.indexOf(REPORT_NEWROW);
+        start = _content.indexOf(REPORT_NEWROW);
         end = start + REPORT_NEWROW.length();
-        content.replace(start, end, newrow.toString());
-        return content.toString();
+        _content.replace(start, end, newrow.toString());
+    }
+    
+    public void writeContent() {
+        try {
+            //String filename = args[INDEX_REPORT];    
+            String filename = _params.outputPath()+"/index.html"; 
+            File file = new File(filename);
+            OutputStreamWriter osr = new OutputStreamWriter(new FileOutputStream(file));
+            osr.write(_content.toString());
+            osr.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }        
+    }
+    
+    private String driversToString(String[] drivers) {
+        StringBuffer buffer = new StringBuffer();
+        for (int i=0; i<drivers.length; i++) {
+            buffer.append(drivers[i]);
+            if (i<drivers.length-1)
+                buffer.append(",");
+        }
+        return buffer.toString();
     }
 /*
     private String readFromFile(File file) {

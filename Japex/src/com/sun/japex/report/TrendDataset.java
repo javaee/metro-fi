@@ -79,7 +79,7 @@ public class TrendDataset {
         Map[] reports = testReports.getReports();
         if (reports != null) {
             Date[] dates = testReports.getDates();
-            getDataset(params, reports, dates);
+            generateDataset(params, reports, dates);
         }
     }
     void getMeansDataset(ArrayList drivers, Map[] reports, Date[] dates) {
@@ -96,7 +96,7 @@ public class TrendDataset {
                 int day = cal.get(cal.DAY_OF_MONTH);
                 int month = cal.get(cal.MONTH) + 1; //month starts at 0!
                 int year = cal.get(cal.YEAR);
-//        System.out.println(day + "-" + month + "-" + year);                    
+//System.out.println("Driver: " +drivers.get(ii));
                 result = (ResultPerDriver)reports[i].get(drivers.get(ii));
 //    System.out.println("AritMean="+result.getAritMean());            
 //    System.out.println("GeomMean="+result.getGeomMean());            
@@ -142,7 +142,7 @@ public class TrendDataset {
         }
         
     }    
-    void getDataset(TrendReportParams params, Map[] reports, Date[] dates) {
+    void generateDataset(TrendReportParams params, Map[] reports, Date[] dates) {
         ArrayList drivers = new ArrayList();        
         TimeSeries[] testcases;
         //if [driver] is not specified, output both drivers
@@ -150,7 +150,10 @@ public class TrendDataset {
             drivers.add(FIDRIVER);
             drivers.add(XMLDRIVER);
         } else {
-            drivers.add(params.driver());
+            String[] inputDrivers = params.driver();
+            for (int i=0; i<inputDrivers.length; i++) {
+                drivers.add(inputDrivers[i]);
+            }
         }
         _dataset = new TimeSeriesCollection();
         if (!params.isTestSpecified()) {
@@ -162,6 +165,7 @@ public class TrendDataset {
         _dataset.setDomainIsPointsInTime(true);
         
     }
+    
     public XYDataset getDataset() {
         return _dataset;
     }    

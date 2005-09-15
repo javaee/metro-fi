@@ -60,7 +60,8 @@ public class ReportDataParser extends DefaultHandler {
     StringBuffer textBuffer;
     Map _reports;
     TrendReportParams _params; 
-
+    String _drivers[] = null;
+    
     ResultPerDriver _resultPerDriver = null;
     boolean _driverStart = false;
     boolean _testStart = false;
@@ -71,6 +72,7 @@ public class ReportDataParser extends DefaultHandler {
     /** Creates a new instance of ReportData */
     public ReportDataParser(TrendReportParams params) {
         _params = params;
+        _drivers = params.driver();
     }
     public Map getReports() {
         return _reports;
@@ -88,7 +90,10 @@ public class ReportDataParser extends DefaultHandler {
     public void endDocument()
     throws SAXException
     {
-        //do nothing
+        //by default, all drivers are assumed if no driver specified
+        if (!_params.isDriverSpecified()) {
+            _params.setAllDriversAdded(true);
+        }
     }
 
     public void startElement(String namespaceURI,
@@ -106,14 +111,27 @@ public class ReportDataParser extends DefaultHandler {
                 for (int i = 0; i < attrs.getLength(); i++) {
                     String aName = attrs.getLocalName(i); // Attr name 
                     if ("".equals(aName)) aName = attrs.getQName(i);
-//            System.out.println("att: " + aName + "=" +attrs.getValue(i) + "param.driver="+_params.driver());
-                    
-                    if (_params.isDriverSpecified()) {
-                        if (aName.equals("name") && attrs.getValue(i).equals(_params.driver())) {
-//System.out.println("**Driver STart *");                          
+
+                    if (aName.equals("name")) {
+                        String aValue = attrs.getValue(i);
+                        if (_params.isDriverSpecified()) {
+                            for (int j=0; j<_drivers.length; j++) {
+                                if (aValue.equalsIgnoreCase(_drivers[j])) {
+                                    _driverStart = true;
+                                    _resultPerDriver = new ResultPerDriver();
+                                    _currentDriverName = aValue;                                    
+                                }
+                            }
+                        } else {
+                            //add all drivers if driver not specified
+                            
+                            //if (!_params.allDriversAdded()) {  --reports may contain different drivers
+                                _params.addDriver(aValue);
+                            //}
+                            
                             _driverStart = true;
                             _resultPerDriver = new ResultPerDriver();
-                            _currentDriverName = attrs.getValue(i);
+                            _currentDriverName = aValue;                                    
                         }
                     }
                 }
@@ -154,6 +172,7 @@ public class ReportDataParser extends DefaultHandler {
                 //System.out.println(test.getAritMean());
             }            
 //            System.out.println("end driver: " + eName);
+            _currentDriverName = null;
             _driverStart = false;
         } else if (_driverStart) {
             if (_testStart) {
@@ -164,10 +183,7 @@ public class ReportDataParser extends DefaultHandler {
                 }
             } else {
                 if (eName.equals("resultHarmMean")) {
-//                    System.out.println("resultHarmMean: " + textBuffer.toString());
-
                     _resultPerDriver.setHarmMean(textBuffer.toString());
-//                    System.out.println("resultHarmMean: " + _resultPerDriver.getHarmMean());
                 } else if (eName.equals("resultGeomMean")) {
                     _resultPerDriver.setGeomMean(textBuffer.toString());
                 } else if (eName.equals("resultAritMean")) {

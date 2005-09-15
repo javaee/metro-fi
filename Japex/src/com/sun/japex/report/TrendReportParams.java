@@ -45,10 +45,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 /*
- *TrendReport title reportPath outputPath date offset [driver] [test] [-H/HISTORY] [-O/OVERWRITE]
-    where parameters are the same as the first format except:
+ *TrendReport title reportPath outputPath date offset [-d {driver}] [-m {means}] [-t {test}] [-H/HISTORY] [-O/OVERWRITE]
+    where:
     title -- name of the chart to be generated
     reportPath -- path to where the report directory is
     outputPath -- path where the html report will be saved. If
@@ -57,10 +58,13 @@ import java.util.ArrayList;
     offset -- days, weeks, months or years from/to the above date a trend report will be created. 
             Supports format: xD where x is a positive or negative integer, and D indicates Days
             Similarily, xW, xM and xY are also support where W=Week, M=Month, and Y=Year
-    driver -- name of a driver for which a trend report is to be generated. All drivers if not specified.
-    test(s) -- specific test(s) in a driver for which a trend report will be created.  
-            Return means if no tests specified.
+    -d/driver driver1:driver2:... -- name of driver(s) for which a trend report is to be generated. All drivers if not specified.
+    -m/means means1:means2:... -- one or more of the three means. Use keyword "all" to display all three means
+    -t/testcases test1:test2:... -- specific test(s) in a driver for which a trend report will be created. Use keyword "all" 
+                to display all testcases
  
+    support version 0.1 interface:
+    [driver] --
     options:
     -H or -History -- indicate that the trend report should be saved to a subdirectory in a timestamp format
     -O or -Overwrite -- overwrite existing report under "outputPath"
@@ -75,18 +79,26 @@ public class TrendReportParams {
     static final int ARGS_OFFSET = 4;
     static final int ARGS_DRIVER = 5;
     static final int ARGS_TESTCASE = 6;
-    
+        
     String _title;
     String _reportPath;
     String _outputPath;
     Date _from;
     Date _to;
-    String _driver;
+    String[] _drivers;
     boolean _isDriverSpecified = false;
-    String[] _test;
+    String[] _means;
+    boolean _isMeansSpecified = false;
+    String[] _tests;
     boolean _isTestSpecified = false;
     boolean _overwrite = false;
     boolean _history = false;
+    
+    int _version = ReportConstants.TRENDREPORT_VERSION_01;
+    
+    private int _type = ReportConstants.REPORT_UNKNOWN;
+    private int _smartGroupingSize = 4;
+    private boolean _allDriverAdded = false;
     
     /** Creates a new instance of TrendReportParams */
     public TrendReportParams(String[] args) {
@@ -99,65 +111,69 @@ public class TrendReportParams {
             _outputPath = _outputPath + df.format(new Date());            
         }
         parseDates(args[ARGS_DATE], args[ARGS_OFFSET]);
-                
-        try {
-            if (args.length > ARGS_DRIVER) {
-                _driver = args[ARGS_DRIVER];
-                _isDriverSpecified = true;
-            }
-            if (args.length > ARGS_TESTCASE) {
-                ArrayList testcases = new ArrayList();
-                for (int i=ARGS_TESTCASE; i<args.length; i++) {
-                    testcases.add((String)args[i]);
+        
+        // support version 0.1
+        if (_version == ReportConstants.TRENDREPORT_VERSION_01) {
+            try {
+                if (args.length > ARGS_DRIVER) {
+                    _drivers = new String[1];
+                    _drivers[0] = args[ARGS_DRIVER];
+                    _isDriverSpecified = true;
+                } else {
+                    //use version 0.2 to handle Default condition (no driver specified
+                    _version = ReportConstants.TRENDREPORT_VERSION_02;
                 }
-                _test = new String[(testcases.size())];
-                testcases.toArray(_test);
-                //_test = (String[])testcases.toArray();
-                _isTestSpecified = true;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            
-        }        
+                if (args.length > ARGS_TESTCASE) {
+                    ArrayList testcases = new ArrayList();
+                    for (int i=ARGS_TESTCASE; i<args.length; i++) {
+                        testcases.add((String)args[i]);
+                    }
+                    _tests = new String[(testcases.size())];
+                    testcases.toArray(_tests);
+                    //_tests = (String[])testcases.toArray();
+                    _isTestSpecified = true;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+
+            }        
+        }
     }
-    
-    public String title() {
-        return _title;
-    }
-    public String reportPath() {
-        return _reportPath;
-    }
-    public String outputPath() {
-        return _outputPath;
-    }
-    public Date dateFrom() {
-        return _from;
-    }
-    public Date dateTo() {
-        return _to;
-    }
-    public String driver() {
-        return _driver;
-    }
-    public boolean isDriverSpecified() {
-        return _isDriverSpecified;
-    }
-    public String[] test() {
-        return _test;
-    }
-    public boolean isTestSpecified() {
-        return _isTestSpecified;
-    }
-    public boolean overwrite() {
-        return _overwrite;
-    }
-    public boolean history() {
-        return _history;
-    }
-    
     String[] checkOptions(String[] args) {
         ArrayList argList = new ArrayList();
+        boolean isDriver = false;
+        boolean isMeans = false;
+        boolean isTest = false;
+
         for (int i=0; i<args.length; i++) {
+            if (isDriver) {
+                _drivers = parseSwitchArg(args[i]);
+                isDriver = false;
+            }
+            if (args[i].equalsIgnoreCase("-d") ||args[i].equalsIgnoreCase("-driver")) {
+                _isDriverSpecified = true;
+                _version = ReportConstants.TRENDREPORT_VERSION_02;
+                isDriver = true;
+            }
+            if (isMeans) {
+                _means = parseSwitchArg(args[i]);
+                isMeans = false;
+            }
+            if (args[i].equalsIgnoreCase("-m")||args[i].equalsIgnoreCase("-means")) {
+                _isMeansSpecified = true;
+                _version = ReportConstants.TRENDREPORT_VERSION_02;
+                isMeans = true;
+            }
+            if (isTest) {
+                _tests = parseSwitchArg(args[i]);
+                isTest = false;
+            }
+            if (args[i].equalsIgnoreCase("-t")||args[i].equalsIgnoreCase("-tests")) {
+                _isTestSpecified = true;
+                _version = ReportConstants.TRENDREPORT_VERSION_02;
+                isTest = true;
+            }
+            
             if (args[i].toUpperCase().equals("-O") || args[i].toUpperCase().equals("-OVERWRITE")) {
                 _overwrite = true;
             } else if (args[i].toUpperCase().equals("-H") || args[i].toUpperCase().equals("-HISTORY")) {
@@ -166,9 +182,26 @@ public class TrendReportParams {
                 argList.add(args[i]);
             }
         }
+        
+        if (!_isDriverSpecified && !_isMeansSpecified && !_isTestSpecified) {
+            _type = ReportConstants.REPORT_DEFAULT;
+        }
+        
         String[] newArgs = new String[argList.size()];
         argList.toArray(newArgs);
         return newArgs;
+    }
+    
+    String[] parseSwitchArg(String arg) {
+        ArrayList list = new ArrayList();
+        StringTokenizer tokenizer = new StringTokenizer(arg, ":"); 
+        
+	while (tokenizer.hasMoreTokens()) {
+            list.add(tokenizer.nextToken());
+        }        
+        String[] array = new String[list.size()];
+        list.toArray(array);
+        return array;
     }
     void parseDates(String date, String offset) {
         try {            
@@ -217,4 +250,94 @@ public class TrendReportParams {
             e.printStackTrace();
         }        
     }
+    
+    public int reportVersion() {
+        return _version;
+    }
+    public int reportType() {
+        return _type;
+    }
+    
+    public void setReportType(int newType) {
+        _type = newType;
+    }
+    public String title() {
+        return _title;
+    }
+    public void setTitle(String title) {
+        _title = title;
+    }
+    public String reportPath() {
+        return _reportPath;
+    }
+    public String outputPath() {
+        return _outputPath;
+    }
+    public Date dateFrom() {
+        return _from;
+    }
+    public Date dateTo() {
+        return _to;
+    }
+    public String[] driver() {
+        return _drivers;
+    }
+    public void setDrivers(String[] drivers) {
+        _drivers = drivers;
+    }
+    
+    //check before trying to addDriver
+    public boolean allDriversAdded() {
+        return _allDriverAdded;
+    }
+    public void setAllDriversAdded(boolean all) {
+        _allDriverAdded = all;
+    }
+    public void addDriver(String driver) {
+        String[] drivers;
+        if (_drivers == null) {
+            _drivers = new String[1];
+            _drivers[0] = driver;
+        } else {
+            if (!arrayContain(_drivers, driver)) {
+                drivers = new String[(_drivers.length+1)];
+                System.arraycopy(_drivers, 0, drivers, 0, _drivers.length);
+                drivers[_drivers.length] = driver;
+                _drivers = null;
+                _drivers = drivers;
+            }
+            
+        }
+    }
+    
+    private boolean arrayContain(String[] array, String value) {
+        for (int i=0; i<array.length; i++) {
+            if (array[i].equals(value)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public boolean isDriverSpecified() {
+        return _isDriverSpecified;
+    }
+    public String[] means() {
+        return _means;
+    }
+    public boolean isMeansSpecified() {
+        return _isMeansSpecified;
+    }
+    public String[] test() {
+        return _tests;
+    }
+    public boolean isTestSpecified() {
+        return _isTestSpecified;
+    }
+    public boolean overwrite() {
+        return _overwrite;
+    }
+    public boolean history() {
+        return _history;
+    }
+    
 }

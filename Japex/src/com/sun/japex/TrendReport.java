@@ -96,32 +96,41 @@ public class TrendReport {
             //parse reports under the Report direction
             ParseReports testReports = new ParseReports(params);
 
-            //get Trend datasets
-            TrendDataset dataset = new TrendDataset(params, testReports);
-            JFreeChart chart1 = LineChart.createChart(params.title(), dataset.getDataset());
+            //support version 0.1 interface
+            if (params.reportVersion() == ReportConstants.TRENDREPORT_VERSION_02) {
+                new ReportGenerator(params, testReports).createReport();
+            } else { //version 0.1
+                //get Trend datasets
+                TrendDataset dataset = new TrendDataset(params, testReports);
+                JFreeChart chart1 = LineChart.createChart(params.title(), dataset.getDataset());
 
-            // Converts chart in JPEG file named chart.jpg            
-            String chartName = null;
-            if (!params.isTestSpecified()) {
-                chartName = "means.jpg";
-            } else {
-                chartName = params.test()[0]+".jpg";
-            }
+                // Converts chart in JPEG file named chart.jpg            
+                String chartName = null;
+                if (!params.isTestSpecified()) {
+                    chartName = "means.jpg";
+                } else {
+                    chartName = params.test()[0]+".jpg";
+                }
 
-            System.out.println(params.outputPath()+fileSep+chartName);
-            File file = new File(params.outputPath());
-            if (!file.exists()) {
-                file.mkdirs();
+                System.out.println(params.outputPath()+fileSep+chartName);
+                File file = new File(params.outputPath());
+                if (!file.exists()) {
+                    file.mkdirs();
+                }
+                ChartUtilities.saveChartAsJPEG(new File(params.outputPath()+fileSep+chartName), chart1, 700, 400);
+                new IndexPage(params, chartName).report();
             }
-            ChartUtilities.saveChartAsJPEG(new File(params.outputPath()+fileSep+chartName), chart1, 700, 400);
-            new IndexPage(params, chartName).report();
+            
             copyCss(params.outputPath());
+            
         } catch (Exception e) {
             e.printStackTrace();
         }
         
         
     }
+    
+    
     private void copyCss(String outputDir) {
         try{
             // Copy CSS to the same directory
