@@ -40,7 +40,7 @@
 package com.sun.japex.report;
 import java.util.Map;
 import java.util.HashMap;
-
+import java.util.ArrayList;
 /**
  * Test results per driver
  * 
@@ -50,10 +50,21 @@ public class ResultPerDriver {
     double _geomMean;
     double _aritMean;
     Map _testResults;
-    
+    ArrayList _tests = new ArrayList();
     /** Creates a new instance of ReportPerDriver */
     public ResultPerDriver() {
         _testResults = new HashMap();
+    }
+    
+    public double getMeans(String key) {
+        if (key.equalsIgnoreCase(ReportConstants.ARITHMETIC_MEANS)) {
+            return _aritMean;
+        } else if (key.equalsIgnoreCase(ReportConstants.GEOMETIC_MEANS)) {
+            return _geomMean;
+        } else if (key.equalsIgnoreCase(ReportConstants.GEOMETIC_MEANS)) {
+            return _harmMean;
+        }
+        return 0;
     }
     public void setHarmMean(String value) {
         try {
@@ -61,7 +72,7 @@ public class ResultPerDriver {
         } catch (NumberFormatException e) {
             System.out.println(e.getMessage());
         }
-    }
+    }    
     public double getHarmMean() {
         return _harmMean;
     }
@@ -91,6 +102,7 @@ public class ResultPerDriver {
     public void addResult(String testName, String value) {
         try {
             _testResults.put(testName, new Double(Double.parseDouble(value)));
+            _tests.add(testName);
         } catch (NumberFormatException e) {
             System.out.println(e.getMessage());
         }
@@ -102,4 +114,9 @@ public class ResultPerDriver {
         return value;
     }
     
+    public String[] getTests() {
+        String[] tests = new String[(_tests.size())];
+        _tests.toArray(tests);
+        return tests;
+    }
 }

@@ -59,9 +59,10 @@ import java.util.StringTokenizer;
             Supports format: xD where x is a positive or negative integer, and D indicates Days
             Similarily, xW, xM and xY are also support where W=Week, M=Month, and Y=Year
     -d/driver driver1:driver2:... -- name of driver(s) for which a trend report is to be generated. All drivers if not specified.
-    -m/means means1:means2:... -- one or more of the three means. Use keyword "all" to display all three means
-    -t/testcases test1:test2:... -- specific test(s) in a driver for which a trend report will be created. Use keyword "all" 
-                to display all testcases
+    -m/means means1:means2:... -- one or more of the three means. Use keyword "all" to display all three means. All means specified will be placed on one chart.
+    -t/testcases test1:test2:... -- specify test(s) for which a trend report will be created. Use keyword "all" 
+                to display all testcases. 
+    -gs/groupsize size -- when displaying all testcases, this parameter regulates the max number of testcases to be written on each chart. The default is 4.
  
     support version 0.1 interface:
     [driver] --
@@ -142,9 +143,11 @@ public class TrendReportParams {
     String[] checkOptions(String[] args) {
         ArrayList argList = new ArrayList();
         boolean isDriver = false;
+        int count_driver = 0;
         boolean isMeans = false;
         boolean isTest = false;
-
+        boolean isGroupSize = false;
+        
         for (int i=0; i<args.length; i++) {
             if (isDriver) {
                 _drivers = parseSwitchArg(args[i]);
@@ -174,6 +177,15 @@ public class TrendReportParams {
                 isTest = true;
             }
             
+            if (isGroupSize) {
+                _smartGroupingSize = Integer.parseInt(args[i]);
+                isGroupSize = false;
+            }
+            if (args[i].equalsIgnoreCase("-gs")||args[i].equalsIgnoreCase("-groupsize")) {
+                _version = ReportConstants.TRENDREPORT_VERSION_02;
+                isGroupSize = true;
+            }
+
             if (args[i].toUpperCase().equals("-O") || args[i].toUpperCase().equals("-OVERWRITE")) {
                 _overwrite = true;
             } else if (args[i].toUpperCase().equals("-H") || args[i].toUpperCase().equals("-HISTORY")) {
@@ -185,6 +197,24 @@ public class TrendReportParams {
         
         if (!_isDriverSpecified && !_isMeansSpecified && !_isTestSpecified) {
             _type = ReportConstants.REPORT_DEFAULT;
+        } else if (_isDriverSpecified && !_isMeansSpecified && !_isTestSpecified) {
+            if (_drivers.length == 1) {
+                _type = ReportConstants.REPORT_ONEDRIVER;
+            } else {
+                _type = ReportConstants.REPORT_ALLDRIVERS;
+            }
+        } else if (_isDriverSpecified && _isMeansSpecified) {
+            if (_drivers.length == 1) {
+                _type = ReportConstants.REPORT_ONEDRIVER;
+            } else {
+                _type = ReportConstants.REPORT_ALLDRIVERS_ALLMEANS;
+            }
+        } else if (_isDriverSpecified && _isTestSpecified) {
+            if (_tests[0].equalsIgnoreCase(ReportConstants.KEYWORD_ALL)) {
+                _type = ReportConstants.REPORT_ALLTESTS;
+            } else {
+                _type = ReportConstants.REPORT_TESTS;
+            }
         }
         
         String[] newArgs = new String[argList.size()];
@@ -284,6 +314,9 @@ public class TrendReportParams {
     }
     public void setDrivers(String[] drivers) {
         _drivers = drivers;
+    }
+    public int groupSize() {
+        return _smartGroupingSize;
     }
     
     //check before trying to addDriver

@@ -38,6 +38,8 @@
  */
 
 package com.sun.japex.report;
+import com.sun.japex.Util;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
@@ -94,10 +96,154 @@ public class ReportGenerator {
         
         switch (_params.reportType()) {
             case ReportConstants.REPORT_DEFAULT:
+                defaultReport(); //print one means per chart
+                break;
+            case ReportConstants.REPORT_ALLDRIVERS:
                 defaultReport();
+                oneTestcaseChart();
+                break;
+            case ReportConstants.REPORT_ALLDRIVERS_ALLMEANS: //all means/drivers on one chart, smart grouping testcases
+                multipleMeansChart();
+                smartGroupingTestsChart();
+                break;
+            case ReportConstants.REPORT_ONEDRIVER: //all means specified on one chart, smart grouping testcases specified
+                multipleMeansChart();
+                smartGroupingTestsChart();
+                break;
+            case ReportConstants.REPORT_ALLTESTS: 
+                smartGroupingTestsChart();
+                break;
+            case ReportConstants.REPORT_TESTS:
+                multiTestsChart();
                 break;
         }
         return true;
+    }
+    
+    //smart grouping testcase for all drivers specified per chart
+    private void smartGroupingTestsChart() {
+        TimeSeries timeSeries;
+        TimeSeriesCollection testDataset;
+        ResultPerDriver result = null;
+        GregorianCalendar cal = new GregorianCalendar();
+        String[] drivers = _params.driver();
+        IndexPage indexPage = new IndexPage(_params, true);
+
+        String[] tests = _params.test(); 
+        if (tests[0].equalsIgnoreCase(ReportConstants.KEYWORD_ALL)) {
+            result = (ResultPerDriver)_japexTestResults[0].get(drivers[0]);
+            tests = result.getTests();
+        }
+        
+        int[] smartGroups = Util.calculateGroupSizes(tests.length, _params.groupSize());
+        for (int g=0; g<smartGroups.length; g++) {
+            testDataset = new TimeSeriesCollection();
+            int start = g * smartGroups[g];
+            int end = (g+1) * smartGroups[g] - 1;
+            if (end > tests.length) end = tests.length;
+            String chartName = tests[start];
+            StringBuffer title = new StringBuffer();
+            for (int k = start; k< end; k++) {
+                if (k>start) title.append(", ");
+                title.append(tests[k]);
+                for (int ii = 0; ii< drivers.length; ii++) {
+                    timeSeries = new TimeSeries(drivers[ii]+"_"+tests[k], Day.class);
+                    for (int i = 0; i < _japexTestResults.length; i++) {
+                        cal.setTime(_dates[i]);
+                        int day = cal.get(cal.DAY_OF_MONTH);
+                        int month = cal.get(cal.MONTH) + 1; //month starts at 0!
+                        int year = cal.get(cal.YEAR);
+                        result = (ResultPerDriver)_japexTestResults[i].get(drivers[ii]);
+                        //check if there's data. Japex reports may contain different drivers
+                        if (result != null) { 
+                            if (result.getResult(tests[k])!=0) timeSeries.add(new Day(day, month, year), result.getResult(tests[k]));                        
+                        }
+                    }
+                    if (result != null) {
+                        testDataset.addSeries(timeSeries);
+                    }
+                } //drivers
+            } //tests        
+            _params.setTitle(title.toString());
+            indexPage.updateContent(chartName);
+            saveChart(title.toString(), testDataset, chartName, 700, 400);
+        } //smartGroups
+        indexPage.writeContent();
+        
+    }
+    //one testcase for all drivers specified per chart
+    private void oneTestcaseChart() {
+        String[] tests = _params.test(); 
+        TimeSeries timeSeries;
+        TimeSeriesCollection testDataset;
+        ResultPerDriver result = null;
+        GregorianCalendar cal = new GregorianCalendar();
+        String[] drivers = _params.driver();
+        IndexPage indexPage = new IndexPage(_params, true);
+        for (int k = 0; k< tests.length; k++) {
+            testDataset = new TimeSeriesCollection();
+            for (int ii = 0; ii< drivers.length; ii++) {
+                timeSeries = new TimeSeries(drivers[ii]+"_"+tests[k], Day.class);
+                for (int i = 0; i < _japexTestResults.length; i++) {
+                    cal.setTime(_dates[i]);
+                    int day = cal.get(cal.DAY_OF_MONTH);
+                    int month = cal.get(cal.MONTH) + 1; //month starts at 0!
+                    int year = cal.get(cal.YEAR);
+                    result = (ResultPerDriver)_japexTestResults[i].get(drivers[ii]);
+                    //check if there's data. Japex reports may contain different drivers
+                    if (result != null) { 
+                        if (result.getResult(tests[k])!=0) timeSeries.add(new Day(day, month, year), result.getResult(tests[k]));                        
+                    }
+                }
+                if (result != null) {
+                    testDataset.addSeries(timeSeries);
+                }
+            } //drivers
+            String chartName = tests[k]+".jpg";
+            _params.setTitle(tests[k]);
+            indexPage.updateContent(chartName);
+            saveChart(tests[k], testDataset, chartName, 700, 400);
+        } //tests        
+        indexPage.writeContent();
+        
+    }
+
+    //all testcases specified for all drivers per chart
+    private void multiTestsChart() {
+        String[] tests = _params.test(); 
+        TimeSeries timeSeries;
+        TimeSeriesCollection testDataset;
+        ResultPerDriver result = null;
+        GregorianCalendar cal = new GregorianCalendar();
+        String[] drivers = _params.driver();
+        IndexPage indexPage = new IndexPage(_params, true);
+        
+        testDataset = new TimeSeriesCollection();
+        for (int k = 0; k< tests.length; k++) {
+            for (int ii = 0; ii< drivers.length; ii++) {
+                timeSeries = new TimeSeries(drivers[ii]+"_"+tests[k], Day.class);
+                for (int i = 0; i < _japexTestResults.length; i++) {
+                    cal.setTime(_dates[i]);
+                    int day = cal.get(cal.DAY_OF_MONTH);
+                    int month = cal.get(cal.MONTH) + 1; //month starts at 0!
+                    int year = cal.get(cal.YEAR);
+                    result = (ResultPerDriver)_japexTestResults[i].get(drivers[ii]);
+                    //check if there's data. Japex reports may contain different drivers
+                    if (result != null) { 
+                        if (result.getResult(tests[k])!=0) timeSeries.add(new Day(day, month, year), result.getResult(tests[k]));                        
+                    }
+                }
+                if (result != null) {
+                    testDataset.addSeries(timeSeries);
+                }
+            } //drivers
+        } //tests        
+        String chartName = _params.title()+".jpg";
+        chartName = chartName.replace(" ", "_");
+        indexPage.updateContent(chartName);
+        saveChart(_params.title(), testDataset, chartName, 700, 400);
+        indexPage.writeContent();
+        
     }
     
     //one means for all drivers
@@ -145,6 +291,48 @@ public class ReportGenerator {
         indexPage.updateContent("HarmonicMeans.jpg");
         indexPage.writeContent();
     }
+    
+    //all means for all drivers on one chart
+    private void multipleMeansChart() {
+        TimeSeries means, aritMeans, geomMeans, harmMeans;
+        TimeSeriesCollection dataset = new TimeSeriesCollection();
+        TimeSeriesCollection geomDataset = new TimeSeriesCollection();
+        TimeSeriesCollection harmDataset = new TimeSeriesCollection();
+        ResultPerDriver result = null;
+        GregorianCalendar cal = new GregorianCalendar();
+        String[] drivers = _params.driver();
+        for (int ii = 0; ii< drivers.length; ii++) {
+            aritMeans = new TimeSeries("Arithmetic Means for "+drivers[ii], Day.class);
+            geomMeans = new TimeSeries("Geometric Means for "+drivers[ii], Day.class);
+            harmMeans = new TimeSeries("Harmonic Means for "+drivers[ii], Day.class);
+            for (int i = 0; i < _japexTestResults.length; i++) {
+                cal.setTime(_dates[i]);
+                int day = cal.get(cal.DAY_OF_MONTH);
+                int month = cal.get(cal.MONTH) + 1; //month starts at 0!
+                int year = cal.get(cal.YEAR);
+                result = (ResultPerDriver)_japexTestResults[i].get(drivers[ii]);
+                //check if there's data. Japex reports may contain different drivers
+                if (result != null) { 
+                    aritMeans.add(new Day(day, month, year), result.getAritMean());
+                    geomMeans.add(new Day(day, month, year), result.getGeomMean());
+                    harmMeans.add(new Day(day, month, year), result.getHarmMean());
+                }
+            }
+            if (result != null) {
+                dataset.addSeries(aritMeans);
+                dataset.addSeries(geomMeans);
+                dataset.addSeries(harmMeans);
+            }
+        }
+        
+        IndexPage indexPage = new IndexPage(_params, true);
+        _params.setTitle("Means");
+        indexPage.updateContent("means.jpg");
+        saveChart("Means", dataset, "means.jpg", 700, 400);
+        indexPage.writeContent();
+    }
+    
+    
     private void saveChart(String title, TimeSeriesCollection dataset, 
                            String fileName, int width, int height) {
         JFreeChart chart = LineChart.createChart(title, dataset);
