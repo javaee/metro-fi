@@ -172,7 +172,7 @@
 
   <property name="pkg.version" value="${release.impl.version}"/>
   <property name="rpm.version" value="${release.impl.version}"/>
-  <property name="rpm.release" value="${release.impl.version}"/>
+  <property name="rpm.release" value="2"/>
 
   <!-- The package name -->
   <property name="pkg.fastinfoset"    value="SUNWfastinfoset"/>
@@ -181,7 +181,7 @@
   <property name="pkg.prod.name"    value="Sun Java(TM) Enterprise System"/>
 
   <!-- The package product version -->
-  <property name="pkg.prod.version"    value="4.0"/>
+  <property name="pkg.prod.version"    value="5"/>
 
   <!-- The package build directory -->
   <property name="pkg.build.dir"    value="${build.home}/pkg"/>
@@ -264,13 +264,14 @@
       </fileset>
     </copy>
 
-    <!-- copy fast infoset dependent jar files into the right directory structure -->
+    <!-- copy fast infoset dependent jar files into the right directory structure 
     <echo message="Copying sjsxp dependent jar file to proper directory" />
     <copy todir="${pkg.build.dir}/${pkg.fastinfoset}/usr/share/lib" overwrite="yes">
       <fileset dir="${sjsxp.build}/lib">
         <include name="jsr173_api.jar"/>
       </fileset>
     </copy>
+    -->
 
     <!-- make output directory -->
     <mkdir dir="${pkg.release.dir}"/>
@@ -346,12 +347,13 @@
       </fileset>
     </copy>
 
-    <!-- copy fastinfoset dependent jar files into the right directory structure -->
+    <!-- copy fastinfoset dependent jar files into the right directory structure 
     <copy todir="${rpm.build.dir}/SOURCES/sun-fastinfoset-${rpm.version}${rpm.install.base}/share/lib" overwrite="yes">
       <fileset dir="${sjsxp.build}/lib">
         <include name="jsr173_api.jar"/>
       </fileset>
     </copy>
+    -->
 
     <!-- compress fastinfoset files -->
     <tar destfile="${rpm.build.dir}/SOURCES/sun-fastinfoset-${rpm.version}.tar" basedir="${rpm.build.dir}/SOURCES"/>
@@ -391,12 +393,13 @@
       </fileset>
     </copy>
 
-    <!-- copy FastInfoset dependent jar files into the right directory structure -->
+    <!-- copy FastInfoset dependent jar files into the right directory structure 
     <copy todir="${zip.build.dir}/fastinfoset/lib" overwrite="yes">
       <fileset dir="${sjsxp.build}/lib">
         <include name="jsr173_api.jar"/>
       </fileset>
     </copy>
+    -->
 
     <!-- make zip file -->
     <zip destfile="${zip.release.dir}/FASTINFOSET-${pkg.version}.zip" basedir="${zip.build.dir}" whenempty="fail"/>

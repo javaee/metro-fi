@@ -2,7 +2,7 @@
 # Copyright 2004 Sun Microsystems, Inc.  All rights reserved.
 # Use is subject to license terms.
 #
-#ident	"$Id: prototype_com,v 1.1 2005-06-02 09:28:10 rameshm Exp $"
+#ident	"$Id: prototype_com,v 1.2 2005-09-27 05:55:02 jwsdp Exp $"
 #
 # This required package information file contains a list of package contents.
 # The 'pkgmk' command uses this file to identify the contents of a package
@@ -27,4 +27,3 @@ d none usr 755 root sys
 d none usr/share 755 root sys
 d none usr/share/lib 755 root sys
 f none usr/share/lib/FastInfoset.jar 444 root sys
-f none usr/share/lib/jsr173_api.jar 444 root sys
