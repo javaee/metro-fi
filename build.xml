@@ -1,12 +1,13 @@
 <project name="FastInfosetPackage" default="dist" basedir=".">
 
-    <property name="version" value="0.1"/>
     
     <property name="FastInfoset.dir" value="FastInfoset"/>
     <property name="samples.dir" value="samples"/>
     <property name="Japex.dir" value="Japex"/>
     
     <property name="package.dir"  value="package" />
+
+    <property file="${basedir}/${FastInfoset.dir}/build.properties" />
 
     <target name="prepare">
             <tstamp>
@@ -28,7 +29,7 @@
     </target>
     
     <target name="source-package" depends="dist, prepare">
-        <zip destfile="${package.dir}/${ant.project.name}_src_${version}_${DSTAMP}_${TSTAMP}.zip">
+        <zip destfile="${package.dir}/${ant.project.name}_src_${release.impl.version}_${DSTAMP}_${TSTAMP}.zip">
             <fileset dir=".">
                 <include name="${FastInfoset.dir}/**"/>
                 <include name="${samples.dir}/**"/>
@@ -38,7 +39,7 @@
     </target>
     
     <target name="dist-package" depends="dist, prepare">
-        <zip destfile="${package.dir}/${ant.project.name}_dist_${version}_${DSTAMP}_${TSTAMP}.zip">
+        <zip destfile="${package.dir}/${ant.project.name}_dist_${release.impl.version}_${DSTAMP}_${TSTAMP}.zip">
             <fileset dir="${FastInfoset.dir}/dist">
                 <include name="javadoc/**"/>
             </fileset>
