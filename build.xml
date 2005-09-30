@@ -57,7 +57,7 @@
 	</copy>
         <zip destfile="${package.dir}/${ant.project.name}_dist_${release.impl.version}_${DSTAMP}_${TSTAMP}.zip">
             <fileset dir="${package.dir}">
-                <include name="${FastInfoset.dir}.${release.impl.version}/**"/>
+                <include name="${FastInfoset.dir}.${release.impl.version}/**/*"/>
             </fileset>
 	</zip>
 	<delete dir="${package.dir}/${FastInfoset.dir}.${release.impl.version}"/>
