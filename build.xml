@@ -39,7 +39,8 @@
     </target>
     
     <target name="dist-package" depends="dist, prepare">
-        <zip destfile="${package.dir}/${ant.project.name}_dist_${release.impl.version}_${DSTAMP}_${TSTAMP}.zip">
+	<mkdir dir="${package.dir}/${FastInfoset.dir}.${release.impl.version}"/>
+	<copy todir="${package.dir}/${FastInfoset.dir}.${release.impl.version}">
             <fileset dir="${FastInfoset.dir}/dist">
                 <include name="javadoc/**"/>
             </fileset>
@@ -53,7 +54,13 @@
             <fileset dir="${basedir}">
                 <include name="LICENSE.txt"/>
             </fileset>
-        </zip>
+	</copy>
+        <zip destfile="${package.dir}/${ant.project.name}_dist_${release.impl.version}_${DSTAMP}_${TSTAMP}.zip">
+            <fileset dir="${package.dir}">
+                <include name="${FastInfoset.dir}.${release.impl.version}/**"/>
+            </fileset>
+	</zip>
+	<delete dir="${package.dir}/${FastInfoset.dir}.${release.impl.version}"/>
     </target>
 
     <target name="package" depends="source-package, dist-package">
