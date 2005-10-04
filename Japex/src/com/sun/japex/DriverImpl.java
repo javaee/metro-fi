@@ -47,7 +47,6 @@ import java.io.FilenameFilter;
 public class DriverImpl extends ParamsImpl implements Driver {
     
     String _name;
-    Class _class = null;
     boolean _isNormal = false;
     boolean _computeMeans = true;
     
@@ -56,6 +55,7 @@ public class DriverImpl extends ParamsImpl implements Driver {
     
     int _runsPerDriver;
     
+    static Class _class = null;
     static JapexClassLoader _classLoader;
 
     /**
@@ -196,8 +196,10 @@ public class DriverImpl extends ParamsImpl implements Driver {
     
     JapexDriverBase getJapexDriver() throws ClassNotFoundException {
         String className = getParam(Constants.DRIVER_CLASS);
-        if (_class == null) {
-            _class = _classLoader.findClass(className);
+        synchronized(this) {
+            if (_class == null) {
+                _class = _classLoader.findClass(className);
+            }
         }
         
         try {
@@ -251,7 +253,7 @@ public class DriverImpl extends ParamsImpl implements Driver {
      * created for all drivers. Thus, if japex.classPath is defined as
      * a driver's property, it will be ignored.
      */ 
-    private void initJapexClassLoader() {
+    synchronized private void initJapexClassLoader() {
         // Initialize class loader only once
         if (_classLoader != null) {
             return;
