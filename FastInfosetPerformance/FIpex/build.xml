@@ -1,0 +1,5 @@
+<project name="FIpex" default="run" basedir=".">
+
+    <import file="${basedir}/../build-template.xml"/>
+
+</project>
