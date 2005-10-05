@@ -49,13 +49,13 @@ public class DriverImpl extends ParamsImpl implements Driver {
     String _name;
     boolean _isNormal = false;
     boolean _computeMeans = true;
+    Class _class = null;
     
     TestCaseArrayList[] _testCases;
     TestCaseArrayList _aggregateTestCases;
     
     int _runsPerDriver;
     
-    static Class _class = null;
     static JapexClassLoader _classLoader;
 
     /**
@@ -196,10 +196,8 @@ public class DriverImpl extends ParamsImpl implements Driver {
     
     JapexDriverBase getJapexDriver() throws ClassNotFoundException {
         String className = getParam(Constants.DRIVER_CLASS);
-        synchronized(this) {
-            if (_class == null) {
-                _class = _classLoader.findClass(className);
-            }
+        if (_class == null) {
+            _class = Class.forName(className, true, _classLoader);
         }
         
         try {
