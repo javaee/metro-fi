@@ -31,6 +31,9 @@ Introduction:
  an alternative version of Xerces (instead of the one supplied by the
  JapexXMLDriverLibrary).
 
+ The execution of the Japex drivers will require that the sub-projects
+ FastInfoset, Japex and JapexXMLDriverLibrary are all built to produce the
+ appropriate jars.
 
 FIpex:
 
