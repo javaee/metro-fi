@@ -10,8 +10,15 @@
         <param name="japex.driverClass" value="com.sun.japex.jdsl.xml.parsing.sax.FastInfosetSAXDriver"/>
     </driver>
     <driver name="FastInfoset24IndexedContentSAXDriver">
-	<param name="description" value="Fast Infoset SAX Parser, indexed content less than 24 chracters"/>
+	<param name="description" value="Fast Infoset SAX Parser, indexed content less than 24 characters"/>
         <param name="japex.driverClass" value="com.sun.japex.jdsl.xml.parsing.sax.FastInfosetSAXDriver"/>
+        <param name="jdsl.characterContentChunkSizeLimit" value="24"/>
+        <param name="jdsl.attributeValueSizeLimit" value="24"/>
+    </driver>
+    <driver name="FastInfoset24IndexedContentSAXExtVocabDriver">
+	<param name="description" value="Fast Infoset StAX Parser, indexed content less than 24 characters, external vocabulary"/>
+        <param name="japex.driverClass" value="com.sun.japex.jdsl.xml.parsing.sax.FastInfosetSAXDriver"/>
+        <param name="jdsl.externalVocabulary" value="true"/>
         <param name="jdsl.characterContentChunkSizeLimit" value="24"/>
         <param name="jdsl.attributeValueSizeLimit" value="24"/>
     </driver>
@@ -20,7 +27,7 @@
         <param name="japex.driverClass" value="com.sun.japex.jdsl.xml.parsing.stax.FastInfosetStAXDriver"/>
     </driver>
     <driver name="FastInfoset24IndexedContentStAXDriver">
-	<param name="description" value="Fast Infoset StAX Parser, indexed content less than 24 chracters"/>
+	<param name="description" value="Fast Infoset StAX Parser, indexed content less than 24 characters"/>
         <param name="japex.driverClass" value="com.sun.japex.jdsl.xml.parsing.stax.FastInfosetStAXDriver"/>
         <param name="jdsl.characterContentChunkSizeLimit" value="24"/>
         <param name="jdsl.attributeValueSizeLimit" value="24"/>
