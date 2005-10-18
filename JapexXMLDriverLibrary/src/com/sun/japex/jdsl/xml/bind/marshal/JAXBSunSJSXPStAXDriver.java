@@ -38,6 +38,7 @@ package com.sun.japex.jdsl.xml.bind.marshal;
 
 import com.sun.japex.TestCase;
 import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
 
 
 public class JAXBSunSJSXPStAXDriver extends BaseMarshallerDriver {
@@ -57,7 +58,9 @@ public class JAXBSunSJSXPStAXDriver extends BaseMarshallerDriver {
     public void run(TestCase testCase) {
         try {
             _outputStream.reset();
-            _marshaller.marshal(_bean, _factory.createXMLStreamWriter(_outputStream));
+            XMLStreamWriter writer = _factory.createXMLStreamWriter(_outputStream);
+            _marshaller.marshal(_bean, writer);
+            writer.close();
         } 
         catch (Exception e) {
             e.printStackTrace();
