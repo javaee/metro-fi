@@ -64,6 +64,7 @@ public class SunSJSXPStAXDriver extends BaseParserDriver {
             while (_reader.hasNext()) {
                 _reader.next();
             }
+            _reader.close();
         }
         catch (Exception e) {
             e.printStackTrace();
