@@ -38,6 +38,7 @@ package com.sun.japex.jdsl.xml.bind.unmarhsal;
 
 import com.sun.japex.TestCase;
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
 import com.sun.japex.jdsl.xml.bind.unmarhsal.BaseUnmarshallerDriver;
 
 public class JAXBSunSJSXPStAXDriver extends BaseUnmarshallerDriver {
@@ -57,7 +58,9 @@ public class JAXBSunSJSXPStAXDriver extends BaseUnmarshallerDriver {
     public void run(TestCase testCase) {
         try {
             _inputStream.reset();
-            _unmarshaller.unmarshal(_factory.createXMLStreamReader(_inputStream));
+            XMLStreamReader reader = _factory.createXMLStreamReader(_inputStream);
+            _unmarshaller.unmarshal(reader);
+            reader.close();
         } 
         catch (Exception e) {
             e.printStackTrace();
