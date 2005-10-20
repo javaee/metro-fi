@@ -343,16 +343,19 @@ public class Engine {
     private int[] estimateRunningTime(TestSuiteImpl testSuite) {        
         int nOfDrivers = testSuite.getDriverInfoList().size();
         int nOfTests = ((DriverImpl) testSuite.getDriverInfoList().get(0)).getTestCases(0).size();
-        
-        int seconds =
-            (nOfDrivers * nOfTests * testSuite.getIntParam(Constants.WARMUP_TIME) +
-            nOfDrivers * nOfTests * testSuite.getIntParam(Constants.RUN_TIME)) *
+    
+        String runTime = testSuite.getParam(Constants.RUN_TIME);
+        String warmupTime = testSuite.getParam(Constants.WARMUP_TIME);
+
+        long seconds =
+            (nOfDrivers * nOfTests * Util.parseDuration(warmupTime) +
+            nOfDrivers * nOfTests * Util.parseDuration(runTime)) *
             testSuite.getIntParam(Constants.RUNS_PER_DRIVER);     
         
         int[] hms = new int[3];
-        hms[0] = seconds / 60 / 60;
-        hms[1] = (seconds / 60) % 60;
-        hms[2] = seconds % 60;
+        hms[0] = (int) (seconds / 60 / 60);
+        hms[1] = (int) ((seconds / 60) % 60);
+        hms[2] = (int) (seconds % 60);
         return hms;
     }
 }
