@@ -121,6 +121,7 @@ public abstract class BaseParserDriver extends JapexDriverBase {
             fps.setExternalVocabularies(map);
         }
         
+        parser.setProperty("http://xml.org/sax/properties/lexical-handler", sds);
         parser.parse(in, sds);
         _inputStream = new ByteArrayInputStream(baos.toByteArray());
     }
