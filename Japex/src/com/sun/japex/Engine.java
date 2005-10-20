@@ -347,9 +347,9 @@ public class Engine {
         String runTime = testSuite.getParam(Constants.RUN_TIME);
         String warmupTime = testSuite.getParam(Constants.WARMUP_TIME);
 
-        long seconds =
-            (nOfDrivers * nOfTests * Util.parseDuration(warmupTime) +
-            nOfDrivers * nOfTests * Util.parseDuration(runTime)) *
+        long seconds = (long)
+            (nOfDrivers * nOfTests * (Util.parseDuration(warmupTime) / 1000.0) +
+            nOfDrivers * nOfTests * (Util.parseDuration(runTime) / 1000.0)) *
             testSuite.getIntParam(Constants.RUNS_PER_DRIVER);     
         
         int[] hms = new int[3];
