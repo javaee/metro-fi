@@ -140,12 +140,23 @@ public class TestSuiteImpl extends ParamsImpl implements TestSuite {
             setParam(Constants.RUNS_PER_DRIVER, 
                      Constants.DEFAULT_RUNS_PER_DRIVER);    
         }
+        int runsPerDriver = getIntParam(Constants.RUNS_PER_DRIVER);
+        if (runsPerDriver < 1) {
+            throw new RuntimeException(
+                "Parameter 'japex.runsPerDriver' must be at least 1");
+        }
+        
+        // Check include warmup run - default tru if runsPerDriver > 1
+        boolean includeWarmupRun = (runsPerDriver > 1);
+        if (!hasParam(Constants.INCLUDE_WARMUP_RUN)) {
+            setBooleanParam(Constants.INCLUDE_WARMUP_RUN, includeWarmupRun); 
+        }
         else {
-            int runsPerDriver = getIntParam(Constants.RUNS_PER_DRIVER);
-            if (runsPerDriver < 1) {
-                throw new RuntimeException(
-                    "Parameter 'japex.runsPerDriver' must be at least 1");
-            }
+            includeWarmupRun = getBooleanParam(Constants.INCLUDE_WARMUP_RUN);
+        }
+        // Increment runsPerDriver to accomodate warmup run
+        if (includeWarmupRun) {
+            setIntParam(Constants.RUNS_PER_DRIVER, ++runsPerDriver);
         }
         
         // Set other global params
@@ -169,7 +180,7 @@ public class TestSuiteImpl extends ParamsImpl implements TestSuite {
             
             // Create new DriverImpl
             DriverImpl driverInfo = new DriverImpl(dt.getName(), 
-                dt.isNormal(), getIntParam(Constants.RUNS_PER_DRIVER), this);
+                dt.isNormal(), runsPerDriver, includeWarmupRun, this);
             
             // Copy params from JAXB object to Japex object
             Iterator driverParamsIt = dt.getParam().iterator();

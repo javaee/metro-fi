@@ -76,19 +76,24 @@ public class ParamsImpl implements Params {
     }
 
     private void convertAndPut(String key, String value) {
-        try {
-            long l = Long.parseLong(value);
-            _mapping.put(key, new Long(l));
+        if (value.equals("true") || value.equals("false")) {
+            _mapping.put(key, new Boolean(value));
         }
-        catch (NumberFormatException e1) {
+        else {
             try {
-                double d = Double.parseDouble(value);
-                _mapping.put(key, new Double(d));
+                long l = Long.parseLong(value);
+                _mapping.put(key, new Long(l));
             }
-            catch (NumberFormatException e2) {
-                _mapping.put(key, value);                    
-            }
-        }        
+            catch (NumberFormatException e1) {
+                try {
+                    double d = Double.parseDouble(value);
+                    _mapping.put(key, new Double(d));
+                }
+                catch (NumberFormatException e2) {
+                    _mapping.put(key, value);                    
+                }
+            }     
+        }
     }
     
     public Object clone() {
@@ -135,6 +140,9 @@ public class ParamsImpl implements Params {
         }
         else if (value instanceof Double) {
             value = Util.formatDouble(((Double) value).doubleValue());
+        }
+        else if (value instanceof Boolean) {
+            value = ((Boolean) value).toString();
         }
         return (String) value;
     }

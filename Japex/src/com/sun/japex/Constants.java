@@ -45,7 +45,8 @@ public class Constants {
     public static final String CLASS_PATH        = "japex.classPath";
     public static final String NUMBER_OF_THREADS = "japex.numberOfThreads";
     public static final String RUNS_PER_DRIVER   = "japex.runsPerDriver";
-    public static final String REPORTS_DIRECTORY  = "japex.reportsDirectory";
+    public static final String REPORTS_DIRECTORY = "japex.reportsDirectory";
+    public static final String INCLUDE_WARMUP_RUN = "japex.includeWarmupRun";
     
     // Global output parameters
     public static final String VERSION         = "japex.version";
@@ -89,5 +90,6 @@ public class Constants {
     public static final String DEFAULT_NUMBER_OF_THREADS = "1";
     public static final String DEFAULT_RUNS_PER_DRIVER   = "1";
     public static final String DEFAULT_REPORTS_DIRECTORY = "reports";
+    public static final String DEFAULT_INCLUDE_WARMUP_RUN = "false";
     
 }

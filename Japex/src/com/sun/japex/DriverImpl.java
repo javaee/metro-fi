@@ -54,7 +54,8 @@ public class DriverImpl extends ParamsImpl implements Driver {
     TestCaseArrayList[] _testCases;
     TestCaseArrayList _aggregateTestCases;
     
-    int _runsPerDriver;
+    int _runsPerDriver;    
+    boolean _includeWarmupRun;
     
     static JapexClassLoader _classLoader;
 
@@ -83,12 +84,13 @@ public class DriverImpl extends ParamsImpl implements Driver {
     
        
     public DriverImpl(String name, boolean isNormal, int runsPerDriver, 
-        ParamsImpl params) 
+        boolean includeWarmupRun, ParamsImpl params) 
     {
         super(params);
         _name = name;
         _isNormal = isNormal;
         _runsPerDriver = runsPerDriver;
+        _includeWarmupRun = includeWarmupRun;
         initJapexClassLoader();        
     }
     
@@ -102,7 +104,8 @@ public class DriverImpl extends ParamsImpl implements Driver {
     }
         
     private void computeMeans() {
-        final int runsPerDriver = _testCases.length;
+        final int runsPerDriver = _testCases.length;        
+        final int startRun = _includeWarmupRun ? 1 : 0;
         
         // Avoid re-computing the driver's aggregates
         if (_computeMeans) {
@@ -114,16 +117,16 @@ public class DriverImpl extends ParamsImpl implements Driver {
                 double[] results = new double[runsPerDriver];
                 
                 // Collect all results
-                for (int i = 0; i < runsPerDriver; i++) {            
+                for (int i = startRun; i < runsPerDriver; i++) {            
                     TestCaseImpl tc = (TestCaseImpl) _testCases[i].get(n);
                     results[i] = tc.getDoubleParam(Constants.RESULT_VALUE);
                 }
                 
                 TestCaseImpl tc = (TestCaseImpl) _aggregateTestCases.get(n);
-                tc.setDoubleParam(Constants.RESULT_VALUE, Util.arithmeticMean(results));
+                tc.setDoubleParam(Constants.RESULT_VALUE, Util.arithmeticMean(results, startRun));
                 if (runsPerDriver > 1) {
                     tc.setDoubleParam(Constants.RESULT_VALUE_STDDEV, 
-                            runsPerDriver > 1 ? Util.standardDev(results) : 0.0);
+                            runsPerDriver > 1 ? Util.standardDev(results, startRun) : 0.0);
                 }
             }
             

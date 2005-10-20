@@ -84,7 +84,8 @@ public class Engine {
                 System.out.print("  " + di.getName());
                 
                 int runsPerDriver = testSuite.getIntParam(Constants.RUNS_PER_DRIVER);
-
+                boolean includeWarmupRun = testSuite.getBooleanParam(Constants.INCLUDE_WARMUP_RUN);
+                
                 // Allocate a matrix of nOfThreads * runPerDriver size and initialize each instance
                 JapexDriverBase drivers[][] = new JapexDriverBase[nOfThreads][runsPerDriver];
                 for (int i = 0; i < nOfThreads; i++) {
@@ -97,7 +98,13 @@ public class Engine {
                 }
                 
                 for (int driverRun = 0; driverRun < runsPerDriver; driverRun++) {
-                    System.out.print("\n    Run " + (driverRun + 1) + ": ");
+                    if (includeWarmupRun) {
+                        System.out.print(driverRun == 0 ? "\n    Warmup run: "
+                            : "\n    Run " + driverRun + ": ");
+                    }
+                    else {
+                        System.out.print("\n    Run " + (driverRun + 1) + ": ");                        
+                    }
                     
                     // Get list of tests
                     List tcList = di.getTestCases(driverRun);

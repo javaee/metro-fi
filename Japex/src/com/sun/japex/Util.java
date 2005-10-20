@@ -164,22 +164,30 @@ public class Util {
     }
     
     public static double arithmeticMean(double[] sample) {
+        return arithmeticMean(sample, 0);
+    }
+    
+    public static double arithmeticMean(double[] sample, int start) {
         double mean = 0.0;
-        for (int i = 0; i < sample.length; i++) {
+        for (int i = start; i < sample.length; i++) {
             mean += sample[i];
         }
-        return (mean / sample.length);
+        return (mean / (sample.length - start));
     }
     
     public static double standardDev(double[] sample) {
-        double mean = arithmeticMean(sample);
+        return standardDev(sample, 0);
+    }
+    
+    public static double standardDev(double[] sample, int start) {
+        double mean = arithmeticMean(sample, start);
 
         // Compute biased variance
         double variance = 0.0;
-        for (int i = 0; i < sample.length; i++) {
+        for (int i = start; i < sample.length; i++) {
             variance += (sample[i] - mean) * (sample[i] - mean);
         }
-        variance /= sample.length;
+        variance /= (sample.length - start);
         
         // Return standard deviation
         return Math.sqrt(variance);
