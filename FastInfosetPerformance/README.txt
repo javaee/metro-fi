@@ -50,6 +50,9 @@ FpMLFIpex
 
 Running: 
 
+ Before running the sub-projects, FastInfoset, Japex and JapexXMLDriverLibrary
+ need to be built.
+
  From a '*pex' directory:
 
  >> ant -Dconfig=<configuration file>

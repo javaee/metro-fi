@@ -16,4 +16,8 @@ Introduction:
 
 Building:
 
+ The FastInfoset and Japex sub-projects are required to be build before this
+ sub-project. When these are built do:
+
  >> ant jar
+
