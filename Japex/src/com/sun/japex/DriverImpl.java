@@ -116,17 +116,18 @@ public class DriverImpl extends ParamsImpl implements Driver {
 
                 double[] results = new double[runsPerDriver];
                 
-                // Collect all results
+                // Collect vertical results for this test
                 for (int i = startRun; i < runsPerDriver; i++) {            
                     TestCaseImpl tc = (TestCaseImpl) _testCases[i].get(n);
                     results[i] = tc.getDoubleParam(Constants.RESULT_VALUE);
                 }
                 
+                // Compute vertical average and stddev for this test
                 TestCaseImpl tc = (TestCaseImpl) _aggregateTestCases.get(n);
                 tc.setDoubleParam(Constants.RESULT_VALUE, Util.arithmeticMean(results, startRun));
-                if (runsPerDriver > 1) {
+                if (runsPerDriver - startRun > 1) {
                     tc.setDoubleParam(Constants.RESULT_VALUE_STDDEV, 
-                            runsPerDriver > 1 ? Util.standardDev(results, startRun) : 0.0);
+                                      Util.standardDev(results, startRun));
                 }
             }
             
@@ -137,7 +138,7 @@ public class DriverImpl extends ParamsImpl implements Driver {
             // harmonic mean inverse = sum{i,n} 1/(n * x_i)
             double harmMeanresultInverse = 0.0;
             
-            // Re-compute means based on averages for all runs
+            // Compute horizontal means based on vertical means
             Iterator tci = _aggregateTestCases.iterator();
             while (tci.hasNext()) {
                 TestCaseImpl tc = (TestCaseImpl) tci.next();       
@@ -158,7 +159,7 @@ public class DriverImpl extends ParamsImpl implements Driver {
             _computeMeans = false;
             
             // If number of runs is just 1, we're done
-            if (runsPerDriver == 1) {
+            if (runsPerDriver - startRun == 1) {
                 return;
             }
             
@@ -169,7 +170,7 @@ public class DriverImpl extends ParamsImpl implements Driver {
             // harmonic mean inverse = sum{i,n} 1/(n * x_i)
             harmMeanresultInverse = 0.0;
             
-            // Re-compute means based on averages for all runs
+            // Compute horizontal stddevs based on vertical stddevs
             tci = _aggregateTestCases.iterator();
             while (tci.hasNext()) {
                 TestCaseImpl tc = (TestCaseImpl) tci.next();       

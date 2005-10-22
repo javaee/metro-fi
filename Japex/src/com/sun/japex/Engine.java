@@ -283,7 +283,8 @@ public class Engine {
                     }
                 }
                               
-                if (runsPerDriver > 1) {
+                int startRun = testSuite.getBooleanParam(Constants.INCLUDE_WARMUP_RUN) ? 1 : 0;
+                if (runsPerDriver - startRun > 1) {
                     // Print average for all runs
                     System.out.print("\n     Avgs: ");
                     Iterator tci = di.getAggregateTestCases().iterator();

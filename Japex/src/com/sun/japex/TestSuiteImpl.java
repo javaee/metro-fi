@@ -72,7 +72,6 @@ public class TestSuiteImpl extends ParamsImpl implements TestSuite {
     List _driverInfo = new ArrayList();
     
     /**
-     * 
      * Creates a new instance of TestSuiteImpl from a JAXB-generated
      * object. In essence, this constructor implements a mapping
      * between the JAXB object model and the internal object model
@@ -146,7 +145,7 @@ public class TestSuiteImpl extends ParamsImpl implements TestSuite {
                 "Parameter 'japex.runsPerDriver' must be at least 1");
         }
         
-        // Check include warmup run - default tru if runsPerDriver > 1
+        // Check include warmup run - default true if runsPerDriver > 1
         boolean includeWarmupRun = (runsPerDriver > 1);
         if (!hasParam(Constants.INCLUDE_WARMUP_RUN)) {
             setBooleanParam(Constants.INCLUDE_WARMUP_RUN, includeWarmupRun); 
