@@ -58,6 +58,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.jfree.chart.*;
+import org.jfree.chart.plot.*;
+import org.jfree.data.xy.*;
+import org.jfree.chart.axis.LogarithmicAxis;
+import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.ui.ApplicationFrame;
 import org.jfree.ui.RefineryUtilities;
@@ -119,6 +123,31 @@ public class TestSuiteImpl extends ParamsImpl implements TestSuite {
         if (!hasParam(Constants.REPORTS_DIRECTORY)) {
             setParam(Constants.REPORTS_DIRECTORY, 
                      Constants.DEFAULT_REPORTS_DIRECTORY);    
+        }
+        
+        // Check chart type
+        if (!hasParam(Constants.CHART_TYPE)) {
+            setParam(Constants.CHART_TYPE, 
+                     Constants.DEFAULT_CHART_TYPE);    
+        }
+        else {
+            String chartType = getParam(Constants.CHART_TYPE);
+            if (!chartType.equalsIgnoreCase("barchart") && 
+                !chartType.equalsIgnoreCase("scatterchart")) 
+            {
+                throw new RuntimeException(
+                    "Parameter 'japex.chartType' must be set to either " +
+                    "'barchart' or 'scatterchart'");
+            }
+        }
+        
+        // Check result axis
+        if (!checkResultAxis(Constants.RESULT_AXIS) ||
+            !checkResultAxis(Constants.RESULT_AXIS_X))
+        {
+                throw new RuntimeException(
+                    "Parameter 'japex.resultAxis' and 'japex.resultAxisX' " +
+                    "must be set to either 'normal' or 'logarithmic'");            
         }
         
         // Check number of threads 
@@ -226,6 +255,18 @@ public class TestSuiteImpl extends ParamsImpl implements TestSuite {
         }
     }
     
+    private boolean checkResultAxis(String paramName) {
+        if (hasParam(paramName)) {
+            String value = getParam(paramName);
+            return value.equalsIgnoreCase("normal") ||
+                   value.equalsIgnoreCase("logarithmic");
+        }
+        else {
+            setParam(paramName, Constants.DEFAULT_RESULT_AXIS);
+        }
+        return true;
+    }
+    
     /**
      * System properties that start with "japex." can be used to override
      * global params of the same name from the config file. If the value
@@ -268,13 +309,60 @@ public class TestSuiteImpl extends ParamsImpl implements TestSuite {
                     
         report.append("</testSuiteReport>\n");
     }
-       
-    public void generateDriverChart(String fileName) {
+    
+    private JFreeChart generateDriverScatterChart() {
         try {
-            DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+            DefaultTableXYDataset xyDataset = new DefaultTableXYDataset();
+                        
+            // Generate charts
+            Iterator jdi = _driverInfo.iterator();
+            for (int i = 0; jdi.hasNext(); i++) {
+                DriverImpl di = (DriverImpl) jdi.next();
+                                          
+                XYSeries xySeries = new XYSeries(di.getName(), true, false);
+                xySeries.add(di.getDoubleParam(Constants.RESULT_ARIT_MEAN_X),
+                             di.getDoubleParam(Constants.RESULT_ARIT_MEAN));
+                xySeries.add(di.getDoubleParam(Constants.RESULT_GEOM_MEAN_X),
+                             di.getDoubleParam(Constants.RESULT_GEOM_MEAN));
+                xySeries.add(di.getDoubleParam(Constants.RESULT_HARM_MEAN_X),
+                             di.getDoubleParam(Constants.RESULT_HARM_MEAN));   
+                xyDataset.addSeries(xySeries);
+            }
+                        
             String resultUnit = getParam(Constants.RESULT_UNIT);
+            String resultUnitX = getParam(Constants.RESULT_UNIT_X);
             
-            // Find first normalizer driver (if any) and adjust unit
+            JFreeChart chart = ChartFactory.createScatterPlot("Result Summary", 
+                resultUnitX, resultUnit, 
+                xyDataset, PlotOrientation.VERTICAL, 
+                true, true, false);
+            
+            // Set log scale depending on japex.resultAxis[_X]
+            XYPlot plot = chart.getXYPlot();
+            if (getParam(Constants.RESULT_AXIS_X).equalsIgnoreCase("logarithmic")) {
+                LogarithmicAxis logAxisX = new LogarithmicAxis(resultUnitX);
+                logAxisX.setAllowNegativesFlag(true);
+                plot.setDomainAxis(logAxisX);   
+            }
+            if (getParam(Constants.RESULT_AXIS).equalsIgnoreCase("logarithmic")) {          
+                LogarithmicAxis logAxis = new LogarithmicAxis(resultUnit);
+                logAxis.setAllowNegativesFlag(true);
+                plot.setRangeAxis(logAxis);   
+            }            
+            
+            return chart;
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }                
+    }
+    
+    private JFreeChart generateDriverBarChart() {
+        try {
+            String resultUnit = getParam(Constants.RESULT_UNIT);
+            DefaultCategoryDataset dataset = new DefaultCategoryDataset();           
+            
+            // Find first normalizer driver (if any) and adjust unit            
             DriverImpl normalizerDriver = null;            
             Iterator jdi = _driverInfo.iterator();
             while (jdi.hasNext()) {
@@ -327,22 +415,32 @@ public class TestSuiteImpl extends ParamsImpl implements TestSuite {
                 }
             }
             
-            JFreeChart chart = ChartFactory.createBarChart3D(
+            return ChartFactory.createBarChart3D(
                 "Result Summary (" + resultUnit + ")", 
                 "", resultUnit, 
                 dataset,
                 PlotOrientation.VERTICAL,
                 true, true, false);
-            chart.setAntiAlias(true);
-            
-            ChartUtilities.saveChartAsJPEG(new File(fileName), chart, 600, 450);       
         }
         catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }        
     }
     
-    public int generateTestCaseCharts(String baseName, String extension) {
+    public void generateDriverChart(String fileName) {
+        try {
+            String chartType = getParam(Constants.CHART_TYPE);
+            JFreeChart chart = chartType.equalsIgnoreCase("barchart") ?
+                generateDriverBarChart() : generateDriverScatterChart();
+            chart.setAntiAlias(true);            
+            ChartUtilities.saveChartAsJPEG(new File(fileName), chart, 600, 450);       
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }        
+    }
+
+    private int generateTestCaseBarCharts(String baseName, String extension) {
         int nOfFiles = 0;
         final int maxGroupSize = 5;
         
@@ -408,6 +506,7 @@ public class TestSuiteImpl extends ParamsImpl implements TestSuite {
                         dataset,
                         PlotOrientation.VERTICAL,
                         true, true, false);
+                    
                     chart.setAntiAlias(true);
                     ChartUtilities.saveChartAsJPEG(
                         new File(baseName + Integer.toString(nOfFiles) + extension),
@@ -425,6 +524,72 @@ public class TestSuiteImpl extends ParamsImpl implements TestSuite {
         }        
         
         return nOfFiles;
+    }
+    
+    private int generateTestCaseScatterCharts(String baseName, String extension) {        
+        int nOfFiles = 0;
+            
+        try {            
+            // Get number of tests from first driver
+            final int nOfTests = 
+                ((DriverImpl) _driverInfo.get(0)).getAggregateTestCases().size();            
+            
+            DefaultTableXYDataset xyDataset = new DefaultTableXYDataset();
+
+            // Generate charts
+            Iterator jdi = _driverInfo.iterator();
+            for (int i = 0; jdi.hasNext(); i++) {
+                DriverImpl di = (DriverImpl) jdi.next();
+
+                XYSeries xySeries = new XYSeries(di.getName(), true, false);
+                for (int j = 0; j < nOfTests; j++) {
+                    TestCaseImpl tc = (TestCaseImpl) di.getAggregateTestCases().get(j);
+                    xySeries.add(tc.getDoubleParam(Constants.RESULT_VALUE_X),
+                                 tc.getDoubleParam(Constants.RESULT_VALUE));
+
+                }                    
+                xyDataset.addSeries(xySeries);
+            }
+
+            String resultUnit = getParam(Constants.RESULT_UNIT);
+            String resultUnitX = getParam(Constants.RESULT_UNIT_X);
+            
+            JFreeChart chart = ChartFactory.createScatterPlot("Results Per Test", 
+                resultUnitX, resultUnit, 
+                xyDataset, PlotOrientation.VERTICAL, 
+                true, true, false);
+
+            // Set log scale depending on japex.resultAxis[_X]
+            XYPlot plot = chart.getXYPlot();
+            if (getParam(Constants.RESULT_AXIS_X).equalsIgnoreCase("logarithmic")) {
+                LogarithmicAxis logAxisX = new LogarithmicAxis(resultUnitX);
+                logAxisX.setAllowNegativesFlag(true);
+                plot.setDomainAxis(logAxisX);   
+            }
+            if (getParam(Constants.RESULT_AXIS).equalsIgnoreCase("logarithmic")) {          
+                LogarithmicAxis logAxis = new LogarithmicAxis(resultUnit);
+                logAxis.setAllowNegativesFlag(true);
+                plot.setRangeAxis(logAxis);   
+            }            
+
+            chart.setAntiAlias(true);
+            ChartUtilities.saveChartAsJPEG(
+                new File(baseName + Integer.toString(nOfFiles) + extension),
+                chart, 600, 450);
+            nOfFiles++;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }        
+        
+        return nOfFiles;
+    }
+    
+    public int generateTestCaseCharts(String baseName, String extension) {
+        String chartType = getParam(Constants.CHART_TYPE);
+        return chartType.equalsIgnoreCase("barchart") ? 
+            generateTestCaseBarCharts(baseName, extension) :
+            generateTestCaseScatterCharts(baseName, extension);
     }
     
     /**

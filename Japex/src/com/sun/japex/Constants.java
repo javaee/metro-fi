@@ -47,6 +47,15 @@ public class Constants {
     public static final String RUNS_PER_DRIVER   = "japex.runsPerDriver";
     public static final String REPORTS_DIRECTORY = "japex.reportsDirectory";
     public static final String INCLUDE_WARMUP_RUN = "japex.includeWarmupRun";
+    public static final String CHART_TYPE        = "japex.chartType";       // barchart | scatterchart
+    public static final String RESULT_UNIT       = "japex.resultUnit";
+    public static final String RESULT_UNIT_X     = "japex.resultUnitX";
+    public static final String RESULT_AXIS       = "japex.resultAxis";      // normal | logarithmic
+    public static final String RESULT_AXIS_X     = "japex.resultAxisX";     // normal | logarithmic
+    public static final String RESULT_AXIS_MIN   = "japex.resultAxisMin";
+    public static final String RESULT_AXIS_X_MIN = "japex.resultAxisXMin";
+    public static final String RESULT_AXIS_MAX   = "japex.resultAxisMax";
+    public static final String RESULT_AXIS_X_MAX = "japex.resultAxisXMax";
     
     // Global output parameters
     public static final String VERSION         = "japex.version";
@@ -55,7 +64,6 @@ public class Constants {
     public static final String OS_ARCHITECTURE = "japex.osArchitecture";
     public static final String DATE_TIME       = "japex.dateTime";
     public static final String VM_INFO         = "japex.vmInfo";
-    public static final String RESULT_UNIT     = "japex.resultUnit";
     
     // Driver input parameters        
     public static final String DRIVER_CLASS = "japex.driverClass";
@@ -68,6 +76,13 @@ public class Constants {
     public static final String RESULT_ARIT_MEAN_STDDEV = "japex.resultAritMeanStddev";
     public static final String RESULT_GEOM_MEAN_STDDEV = "japex.resultGeomMeanStddev";
     public static final String RESULT_HARM_MEAN_STDDEV = "japex.resultHarmMeanStddev";
+    
+    public static final String RESULT_ARIT_MEAN_X = "japex.resultAritMeanX";
+    public static final String RESULT_GEOM_MEAN_X = "japex.resultGeomMeanX";
+    public static final String RESULT_HARM_MEAN_X = "japex.resultHarmMeanX";
+    public static final String RESULT_ARIT_MEAN_X_STDDEV = "japex.resultAritMeanXStddev";
+    public static final String RESULT_GEOM_MEAN_X_STDDEV = "japex.resultGeomMeanXStddev";
+    public static final String RESULT_HARM_MEAN_X_STDDEV = "japex.resultHarmMeanXStddev";
     
     // Global/Testcase input parameters
     public static final String RUN_ITERATIONS    = "japex.runIterations";
@@ -83,6 +98,8 @@ public class Constants {
     public static final String ACTUAL_PREPARE_TIME  = "japex.actualPrepareTime";        
     public static final String RESULT_VALUE         = "japex.resultValue";
     public static final String RESULT_VALUE_STDDEV  = "japex.resultValueStddev";
+    public static final String RESULT_VALUE_X       = "japex.resultValueX";
+    public static final String RESULT_VALUE_X_STDDEV  = "japex.resultValueXStddev";
     
     // Default values
     public static final String DEFAULT_WARMUP_ITERATIONS = "300";
@@ -91,5 +108,7 @@ public class Constants {
     public static final String DEFAULT_RUNS_PER_DRIVER   = "1";
     public static final String DEFAULT_REPORTS_DIRECTORY = "reports";
     public static final String DEFAULT_INCLUDE_WARMUP_RUN = "false";
+    public static final String DEFAULT_CHART_TYPE        = "barchart";
+    public static final String DEFAULT_RESULT_AXIS       = "normal";
     
 }

@@ -107,6 +107,8 @@ public class DriverImpl extends ParamsImpl implements Driver {
         final int runsPerDriver = _testCases.length;        
         final int startRun = _includeWarmupRun ? 1 : 0;
         
+        boolean scatter = getParam(Constants.CHART_TYPE).equals("scatterchart");
+        
         // Avoid re-computing the driver's aggregates
         if (_computeMeans) {
             final int nOfTests = _testCases[0].size();
@@ -115,19 +117,32 @@ public class DriverImpl extends ParamsImpl implements Driver {
                 double avgRunsResult = 0.0;
 
                 double[] results = new double[runsPerDriver];
+                double[] resultsX = new double[runsPerDriver];
                 
                 // Collect vertical results for this test
                 for (int i = startRun; i < runsPerDriver; i++) {            
                     TestCaseImpl tc = (TestCaseImpl) _testCases[i].get(n);
                     results[i] = tc.getDoubleParam(Constants.RESULT_VALUE);
+                    if (scatter) {
+                        resultsX[i] = tc.getDoubleParam(Constants.RESULT_VALUE_X);
+                    }
                 }
                 
                 // Compute vertical average and stddev for this test
                 TestCaseImpl tc = (TestCaseImpl) _aggregateTestCases.get(n);
-                tc.setDoubleParam(Constants.RESULT_VALUE, Util.arithmeticMean(results, startRun));
+                tc.setDoubleParam(Constants.RESULT_VALUE, 
+                                  Util.arithmeticMean(results, startRun));
+                if (scatter) {
+                    tc.setDoubleParam(Constants.RESULT_VALUE_X, 
+                                      Util.arithmeticMean(resultsX, startRun));                    
+                }                
                 if (runsPerDriver - startRun > 1) {
                     tc.setDoubleParam(Constants.RESULT_VALUE_STDDEV, 
                                       Util.standardDev(results, startRun));
+                    if (scatter) {
+                        tc.setDoubleParam(Constants.RESULT_VALUE_X_STDDEV, 
+                                          Util.standardDev(resultsX, startRun));                        
+                    }
                 }
             }
             
@@ -138,22 +153,40 @@ public class DriverImpl extends ParamsImpl implements Driver {
             // harmonic mean inverse = sum{i,n} 1/(n * x_i)
             double harmMeanresultInverse = 0.0;
             
+            // geometric mean = (sum{i,n} x_i) / n
+            double geomMeanresultX = 1.0;
+            // arithmetic mean = (prod{i,n} x_i)^(1/n)
+            double aritMeanresultX = 0.0;
+            // harmonic mean inverse = sum{i,n} 1/(n * x_i)
+            double harmMeanresultXInverse = 0.0;
+            
             // Compute horizontal means based on vertical means
             Iterator tci = _aggregateTestCases.iterator();
             while (tci.hasNext()) {
                 TestCaseImpl tc = (TestCaseImpl) tci.next();       
-                double result = tc.getDoubleParam(Constants.RESULT_VALUE);
                 
                 // Compute running means 
+                double result = tc.getDoubleParam(Constants.RESULT_VALUE);
                 aritMeanresult += result / nOfTests;
                 geomMeanresult *= Math.pow(result, 1.0 / nOfTests);
-                harmMeanresultInverse += 1.0 / (nOfTests * result);
+                harmMeanresultInverse += 1.0 / (nOfTests * result);                
+                if (scatter) {
+                    double resultX = tc.getDoubleParam(Constants.RESULT_VALUE_X);
+                    aritMeanresultX += resultX / nOfTests;
+                    geomMeanresultX *= Math.pow(resultX, 1.0 / nOfTests);
+                    harmMeanresultXInverse += 1.0 / (nOfTests * resultX);
+                }
             }
             
             // Set driver-specific params
             setDoubleParam(Constants.RESULT_ARIT_MEAN, aritMeanresult);
             setDoubleParam(Constants.RESULT_GEOM_MEAN, geomMeanresult);
             setDoubleParam(Constants.RESULT_HARM_MEAN, 1.0 / harmMeanresultInverse);      
+            if (scatter) {
+                setDoubleParam(Constants.RESULT_ARIT_MEAN_X, aritMeanresultX);
+                setDoubleParam(Constants.RESULT_GEOM_MEAN_X, geomMeanresultX);
+                setDoubleParam(Constants.RESULT_HARM_MEAN_X, 1.0 / harmMeanresultXInverse);                      
+            }
             
             // Avoid re-computing these means
             _computeMeans = false;
@@ -170,22 +203,40 @@ public class DriverImpl extends ParamsImpl implements Driver {
             // harmonic mean inverse = sum{i,n} 1/(n * x_i)
             harmMeanresultInverse = 0.0;
             
+            // geometric mean = (sum{i,n} x_i) / n
+            geomMeanresultX = 1.0;
+            // arithmetic mean = (prod{i,n} x_i)^(1/n)
+            aritMeanresultX = 0.0;
+            // harmonic mean inverse = sum{i,n} 1/(n * x_i)
+            harmMeanresultXInverse = 0.0;
+            
             // Compute horizontal stddevs based on vertical stddevs
             tci = _aggregateTestCases.iterator();
             while (tci.hasNext()) {
                 TestCaseImpl tc = (TestCaseImpl) tci.next();       
-                double result = tc.getDoubleParam(Constants.RESULT_VALUE_STDDEV);
                 
                 // Compute running means 
+                double result = tc.getDoubleParam(Constants.RESULT_VALUE_STDDEV);
                 aritMeanresult += result / nOfTests;
                 geomMeanresult *= Math.pow(result, 1.0 / nOfTests);
                 harmMeanresultInverse += 1.0 / (nOfTests * result);
+                if (scatter) {
+                    double resultX = tc.getDoubleParam(Constants.RESULT_VALUE_STDDEV);
+                    aritMeanresultX += resultX / nOfTests;
+                    geomMeanresultX *= Math.pow(resultX, 1.0 / nOfTests);
+                    harmMeanresultXInverse += 1.0 / (nOfTests * resultX);
+                }
             }
             
             // Set driver-specific params
             setDoubleParam(Constants.RESULT_ARIT_MEAN_STDDEV, aritMeanresult);
             setDoubleParam(Constants.RESULT_GEOM_MEAN_STDDEV, geomMeanresult);
             setDoubleParam(Constants.RESULT_HARM_MEAN_STDDEV, 1.0 / harmMeanresultInverse);            
+            if (scatter) {
+                setDoubleParam(Constants.RESULT_ARIT_MEAN_X_STDDEV, aritMeanresultX);
+                setDoubleParam(Constants.RESULT_GEOM_MEAN_X_STDDEV, geomMeanresultX);
+                setDoubleParam(Constants.RESULT_HARM_MEAN_X_STDDEV, 1.0 / harmMeanresultXInverse);                        
+            }
         }        
     }
     
