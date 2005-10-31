@@ -36,6 +36,7 @@
 
 package com.sun.japex.jdsl.xml.serialize.dom;
 
+import com.sun.japex.jdsl.xml.TestCaseUtil;
 import com.sun.japex.TestCase;
 import com.sun.japex.jdsl.xml.DriverConstants;
 import com.sun.japex.jdsl.xml.FastInfosetParamSetter;
@@ -70,10 +71,7 @@ public class FastInfosetDOMDriver extends BaseJAXPDOMDriver {
         try {
             _extVocab = getBooleanParam(DriverConstants.EXTERNAL_VOCABULARY_PROPERTY);
             if (_extVocab == true) {
-                String xmlFile = testCase.getParam("xmlfile");
-                if (xmlFile == null) {
-                    throw new RuntimeException("xmlfile not specified");
-                }
+                String xmlFile = TestCaseUtil.getXmlFile(testCase);
                 BufferedInputStream in = new BufferedInputStream(new FileInputStream(new File(xmlFile)));
 
                 SAXParserFactory spf = SAXParserFactory.newInstance();

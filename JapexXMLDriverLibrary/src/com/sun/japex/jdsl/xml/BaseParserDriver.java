@@ -61,10 +61,7 @@ public abstract class BaseParserDriver extends JapexDriverBase {
     protected ByteArrayInputStream _inputStream;    
     
     public void prepare(TestCase testCase) {
-        String xmlFile = testCase.getParam("xmlfile");
-        if (xmlFile == null) {
-            throw new RuntimeException("xmlfile not specified");
-        }
+        String xmlFile = TestCaseUtil.getXmlFile(testCase);
 
         try {
             FileInputStream fis = new FileInputStream(new File(xmlFile));

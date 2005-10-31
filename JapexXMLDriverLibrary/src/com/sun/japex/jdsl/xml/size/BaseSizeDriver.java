@@ -36,6 +36,7 @@
 
 package com.sun.japex.jdsl.xml.size;
 
+import com.sun.japex.jdsl.xml.TestCaseUtil;
 import com.sun.japex.Constants;
 import com.sun.japex.JapexDriverBase;
 import com.sun.japex.TestCase;
@@ -70,10 +71,7 @@ public abstract class BaseSizeDriver extends JapexDriverBase {
     }
         
     public void finish(TestCase testCase) {
-        String xmlFile = testCase.getParam("xmlfile");
-        if (xmlFile == null) {
-            throw new RuntimeException("xmlfile not specified");
-        }
+        String xmlFile = TestCaseUtil.getXmlFile(testCase);
         
         try {
             serialize(getInputStream(xmlFile), xmlFile);

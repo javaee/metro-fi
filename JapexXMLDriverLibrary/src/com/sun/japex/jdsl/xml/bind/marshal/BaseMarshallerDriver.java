@@ -39,6 +39,7 @@ package com.sun.japex.jdsl.xml.bind.marshal;
 import java.io.*;
 import java.net.URLClassLoader;
 
+import com.sun.japex.jdsl.xml.TestCaseUtil;
 import static com.sun.japex.Util.*;
 import com.sun.japex.JapexDriverBase;
 import com.sun.japex.TestCase;
@@ -66,10 +67,7 @@ public abstract class BaseMarshallerDriver extends JapexDriverBase {
     }
             
     public void prepare(TestCase testCase) {
-        String xmlFile = testCase.getParam("xmlfile");
-        if (xmlFile == null) {
-            throw new RuntimeException("xmlfile not specified");
-        }
+        String xmlFile = TestCaseUtil.getXmlFile(testCase);
         
         try {            
             // Get JAXB unmarshaller

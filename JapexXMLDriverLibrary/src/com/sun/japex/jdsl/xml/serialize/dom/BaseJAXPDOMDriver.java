@@ -36,6 +36,7 @@
 
 package com.sun.japex.jdsl.xml.serialize.dom;
 
+import com.sun.japex.jdsl.xml.TestCaseUtil;
 import com.sun.japex.JapexDriverBase;
 import com.sun.japex.TestCase;
 import java.io.ByteArrayOutputStream;
@@ -62,10 +63,7 @@ public abstract class BaseJAXPDOMDriver extends JapexDriverBase {
     }
     
     public void prepare(TestCase testCase) {
-        String xmlFile = testCase.getParam("xmlfile");
-        if (xmlFile == null) {
-            throw new RuntimeException("xmlfile not specified");
-        }
+        String xmlFile = TestCaseUtil.getXmlFile(testCase);
         
         // Load file into byte array to factor out IO
         try {
