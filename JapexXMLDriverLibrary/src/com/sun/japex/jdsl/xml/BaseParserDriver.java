@@ -36,6 +36,7 @@
 
 package com.sun.japex.jdsl.xml;
 
+import com.sun.japex.Constants;
 import com.sun.japex.JapexDriverBase;
 import com.sun.japex.TestCase;
 import com.sun.xml.fastinfoset.sax.SAXDocumentSerializer;
@@ -135,5 +136,19 @@ public abstract class BaseParserDriver extends JapexDriverBase {
         
         return d;
     }
+    
+    public void finish(TestCase testCase) {
+        super.finish(testCase);
+        
+        /*
+         * Add the size of the encoded data as a point on the X axis.
+         * Such data will be used when constructing scatter charts.
+         */
+        _inputStream.reset();
+        testCase.setDoubleParam(Constants.RESULT_VALUE_X,
+                                _inputStream.available() / 1024.0);
+        getTestSuite().setParam(Constants.RESULT_UNIT_X, "kbs");
+    }
+    
 }
 
