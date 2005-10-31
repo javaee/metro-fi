@@ -73,6 +73,23 @@ import org.xml.sax.helpers.DefaultHandler;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class SAXDocumentParser extends Decoder implements FastInfosetReader {
+
+    /*
+     * Empty lexical handler used by default to report
+     * lexical-based events
+     */
+    private static final class LexicalHandlerImpl implements LexicalHandler {
+        public void comment(char[] ch, int start, int end) { }
+        
+        public void startDTD(String name, String publicId, String systemId) { }
+        public void endDTD() { }
+
+        public void startEntity(String name) { }
+        public void endEntity(String name) { }
+        
+        public void startCDATA() { }
+        public void endCDATA() { }
+    };
     
     /**
      * SAX Namespace attributes features
@@ -128,8 +145,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         _dtdHandler = handler;
         _contentHandler = handler;
         _errorHandler = handler;
-        _lexicalHandler = null;
-        
+        _lexicalHandler = new LexicalHandlerImpl();        
     }
     
     protected void resetOnError() {
