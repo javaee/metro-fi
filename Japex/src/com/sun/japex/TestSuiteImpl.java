@@ -105,6 +105,9 @@ public class TestSuiteImpl extends ParamsImpl implements TestSuite {
             }
         }
         
+        // Override config props using system properties
+        readAndSetSystemProperties();
+        
         // Set default global params if necessary
         if (!hasParam(Constants.WARMUP_TIME) && 
             !hasParam(Constants.WARMUP_ITERATIONS))
@@ -196,9 +199,6 @@ public class TestSuiteImpl extends ParamsImpl implements TestSuite {
         setParam(Constants.VM_INFO,
             System.getProperty("java.vendor") + " " + 
             System.getProperty("java.vm.version"));
-        
-        // Finally, override config props using system properties
-        readAndSetSystemProperties();
         
         // Create and populate list of drivers
         Iterator it = ts.getDriver().iterator();
