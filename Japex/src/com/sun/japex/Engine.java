@@ -47,247 +47,160 @@ import java.util.concurrent.*;
 
 public class Engine {
     
+    /**
+     * The test suite being executed by this engine.
+     */
+    TestSuiteImpl _testSuite;
+
+    /**
+     * Thread pool used for the test's execution.
+     */
+    ExecutorService _threadPool;
+    
+    /**
+     * Matrix of driver instances of size nOfThreads * runsPerDriver.
+     */
+    JapexDriverBase _drivers[][];
+    
+    /**
+     * Current driver being executed.
+     */
+    DriverImpl _driverImpl;
+    
+    /**
+     * Current driver run being executed.
+     */
+    int _driverRun;    
+    
+    /**
+     * Used to check if all drivers (or no driver) compute a result.
+     */
+    Boolean _computeResult = null;
+    
+    /**
+     * Running geometric mean = (sum{i,n} x_i) / n
+     */
+    double _geomMeanresult = 1.0;
+    
+    /**
+     * Running arithmetic mean = (prod{i,n} x_i)^(1/n)
+     */
+    double _aritMeanresult = 0.0;
+    
+    /**
+     * Harmonic mean inverse = sum{i,n} 1/(n * x_i)
+     */
+    double _harmMeanresultInverse = 0.0;
+    
     public Engine() {
     }
     
     public TestSuiteImpl start(String configFile) {
-        TestSuiteImpl testSuite = null;
-        Boolean computeResult = null;
-                
         try { 
             // Load config file
             ConfigFileLoader cfl = new ConfigFileLoader(configFile);
-            testSuite = cfl.getTestSuite();
+            _testSuite = cfl.getTestSuite();
 
-            // Get number of threads and print it out
-            int nOfThreads = testSuite.getIntParam(Constants.NUMBER_OF_THREADS);
-            System.out.println("Running using " + nOfThreads + " thread(s) ...");
-            if (testSuite.hasParam(Constants.WARMUP_TIME) && 
-                    testSuite.hasParam(Constants.RUN_TIME)) 
+            // Print estimated running time
+            if (_testSuite.hasParam(Constants.WARMUP_TIME) && 
+                    _testSuite.hasParam(Constants.RUN_TIME)) 
             {
-                int[] hms = estimateRunningTime(testSuite);
+                int[] hms = estimateRunningTime(_testSuite);
                 System.out.println("Estimated warmup time + run time is " +
                     (hms[0] > 0 ? (hms[0] + " hours ") : "") +
                     (hms[1] > 0 ? (hms[1] + " minutes ") : "") +
                     (hms[2] > 0 ? (hms[2] + " seconds ") : ""));                    
             }
 
-            // Allocate a fix pool of nOfThreads threads
-            ExecutorService threadPool = Executors.newFixedThreadPool(nOfThreads);
+            // Allocate a cached thread pool
+            _threadPool = Executors.newCachedThreadPool();
                 
+            forEachDriver();                  
+            
+            // Shutdown thread pool -- all threads must have stopped by now
+            _threadPool.shutdown();
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return _testSuite;
+    }        
+
+    private void forEachDriver() {
+        try {
             // Iterate through each driver
-            Iterator jdi = testSuite.getDriverInfoList().iterator();
+            Iterator jdi = _testSuite.getDriverInfoList().iterator();
             while (jdi.hasNext()) {                               
-                DriverImpl di = (DriverImpl) jdi.next();
-                
+                _driverImpl = (DriverImpl) jdi.next();
+
+                int nOfThreads = _driverImpl.getIntParam(Constants.NUMBER_OF_THREADS);
+                int runsPerDriver = _driverImpl.getIntParam(Constants.RUNS_PER_DRIVER);
+                boolean includeWarmupRun = _driverImpl.getBooleanParam(Constants.INCLUDE_WARMUP_RUN);
+
                 // Display driver's name
-                System.out.print("  " + di.getName());
-                
-                int runsPerDriver = testSuite.getIntParam(Constants.RUNS_PER_DRIVER);
-                boolean includeWarmupRun = testSuite.getBooleanParam(Constants.INCLUDE_WARMUP_RUN);
-                
+                System.out.print("  " + _driverImpl.getName() + " using " + nOfThreads + " thread(s)");
+
                 // Allocate a matrix of nOfThreads * runPerDriver size and initialize each instance
-                JapexDriverBase drivers[][] = new JapexDriverBase[nOfThreads][runsPerDriver];
+                _drivers = new JapexDriverBase[nOfThreads][runsPerDriver];
                 for (int i = 0; i < nOfThreads; i++) {
                     for (int j = 0; j < runsPerDriver; j++) {
-                        drivers[i][j] = di.getJapexDriver();   // returns fresh copy
-                        drivers[i][j].setDriver(di);
-                        drivers[i][j].setTestSuite(testSuite);
-                        drivers[i][j].initializeDriver();
+                        _drivers[i][j] = _driverImpl.getJapexDriver();   // returns fresh copy
+                        _drivers[i][j].setDriver(_driverImpl);
+                        _drivers[i][j].setTestSuite(_testSuite);
+                        _drivers[i][j].initializeDriver();
                     }
                 }
+
+                forEachRun();
                 
-                for (int driverRun = 0; driverRun < runsPerDriver; driverRun++) {
-                    if (includeWarmupRun) {
-                        System.out.print(driverRun == 0 ? "\n    Warmup run: "
-                            : "\n    Run " + driverRun + ": ");
+                // Call terminate on all driver instances
+                for (int i = 0; i < nOfThreads; i++) {
+                    for (int j = 0; j < runsPerDriver; j++) {
+                        _drivers[i][j].terminateDriver();
                     }
-                    else {
-                        System.out.print("\n    Run " + (driverRun + 1) + ": ");                        
-                    }
-                    
-                    // Get list of tests
-                    List tcList = di.getTestCases(driverRun);
-                    int nOfTests = tcList.size();
-                    
-                    // geometric mean = (sum{i,n} x_i) / n
-                    double geomMeanresult = 1.0;
-                    // arithmetic mean = (prod{i,n} x_i)^(1/n)
-                    double aritMeanresult = 0.0;
-                    // harmonic mean inverse = sum{i,n} 1/(n * x_i)
-                    double harmMeanresultInverse = 0.0;
-                                
-                    // Iterate through list of test cases
-                    Iterator tci = tcList.iterator();
-                    while (tci.hasNext()) {
-                        long runTime = 0L;
-                        TestCaseImpl tc = (TestCaseImpl) tci.next();               
-
-                        if (Japex.verbose) {
-                            System.out.println(tc.getName());
-                        }
-                        else {
-                            System.out.print(tc.getName() + ",");
-                        }
-
-                        // If nOfThreads == 1, re-use this thread
-                        if (nOfThreads == 1) {
-                            // -- Prepare phase --------------------------------------
-
-                            drivers[0][driverRun].setTestCase(tc);     // tc is shared!
-                            drivers[0][driverRun].prepare();
-
-                            // -- Warmup phase ---------------------------------------
-
-                            // Start timer 
-                            runTime = Util.currentTimeMillis();
-
-                            // First time call does warmup
-                            drivers[0][driverRun].call();
-
-                            // Stop timer
-                            runTime = Util.currentTimeMillis() - runTime;
-
-                            // Set japex.actualWarmupTime output param
-                            tc.setDoubleParam(Constants.ACTUAL_WARMUP_TIME, runTime);  
-                            
-                            // -- Run phase -------------------------------------------
-
-                            // Start timer for run phase
-                            runTime = Util.currentTimeMillis();
-
-                            // Second time call does run
-                            drivers[0][driverRun].call();
-                        }
-                        else {  // nOfThreads > 1
-                            Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-
-                            // -- Prepare phase --------------------------------------
-                            
-                            // Initialize driver instance with test case object do prepare
-                            for (int i = 0; i < nOfThreads; i++) {
-                                drivers[i][driverRun].setTestCase(tc);     // tc is shared!
-                                drivers[i][driverRun].prepare();
-                            }
-                                                        
-                            // -- Warmup phase ---------------------------------------
-                            
-                            // Start timer for warmup phase 
-                            runTime = Util.currentTimeMillis();
-
-                            // Fork all threads -- first time drivers will warmup
-                            Future<?>[] futures = new Future<?>[nOfThreads];                            
-                            for (int i = 0; i < nOfThreads; i++) {
-                                futures[i] = threadPool.submit(drivers[i][driverRun]);
-                            }
-
-                            // Wait for all threads to finish
-                            for (int i = 0; i < nOfThreads; i++) {
-                                futures[i].get();
-                            }
-                            
-                            // Stop timer
-                            runTime = Util.currentTimeMillis() - runTime;
-
-                            // Set japex.actualWarmupTime output param
-                            tc.setDoubleParam(Constants.ACTUAL_WARMUP_TIME, runTime);  
-                            
-                            // -- Run phase -------------------------------------------
-                            
-                            // Start timer for run phase
-                            runTime = Util.currentTimeMillis();
-
-                            // Fork all threads -- second time drivers will run
-                            for (int i = 0; i < nOfThreads; i++) {
-                                futures[i] = threadPool.submit(drivers[i][driverRun]);
-                            }
-
-                            // Wait for all threads to finish
-                            for (int i = 0; i < nOfThreads; i++) {
-                                futures[i].get();
-                            }
-                        }
-
-                        // Stop timer
-                        runTime = Util.currentTimeMillis() - runTime;
-
-                        // Set japex.actualRunTime output param
-                        tc.setDoubleParam(Constants.ACTUAL_RUN_TIME, runTime);  
-
-                        // Finish phase                         
-                        for (int i = 0; i < nOfThreads; i++) {
-                            drivers[i][driverRun].finish();
-                        }                    
-                        
-                        double result = 0.0;
-
-                        if (computeResult == null) {
-                            if (!tc.hasParam(Constants.RESULT_VALUE)) {
-                                result = 
-                                    tc.getIntParam(Constants.ACTUAL_RUN_ITERATIONS) / 
-                                        (runTime / 1000.0);
-                                testSuite.setParam(Constants.RESULT_UNIT, "TPS");
-
-                                computeResult = Boolean.TRUE;
-                                tc.setDoubleParam(Constants.RESULT_VALUE, result);
-                            }
-                            else {
-                                result = tc.getDoubleParam(Constants.RESULT_VALUE);
-                                computeResult = Boolean.FALSE;
-                            }                        
-                        }
-                        else if (computeResult == Boolean.TRUE
-                                 && !tc.hasParam(Constants.RESULT_VALUE))  
-                        {
-                            result = 
-                                tc.getIntParam(Constants.ACTUAL_RUN_ITERATIONS) / 
-                                    (runTime / 1000.0);
-                            tc.setDoubleParam(Constants.RESULT_VALUE, result);
-                        }
-                        else if (computeResult == Boolean.FALSE
-                                 && tc.hasParam(Constants.RESULT_VALUE)) 
-                        {
-                            result = tc.getDoubleParam(Constants.RESULT_VALUE);
-                        }
-                        else {
-                            throw new RuntimeException(
-                               "The output parameter '" + Constants.RESULT_VALUE
-                               + "' must be computed by either all or none of "
-                               + "the drivers for the results to be comparable");
-                        }            
-
-                        // Compute running means 
-                        aritMeanresult += result / nOfTests;
-                        geomMeanresult *= Math.pow(result, 1.0 / nOfTests);
-                        harmMeanresultInverse += 1.0 / (nOfTests * result);
-                    
-                        // Display results for this test
-                        if (Japex.verbose) {
-                            System.out.println("           " + tc.getParam(Constants.RESULT_VALUE));
-                            System.out.print("           ");
-                        }
-                        else {
-                            System.out.print(tc.getParam(Constants.RESULT_VALUE) + ",");
-                            System.out.flush();
-                        }
-                    }               
+                }                
                 
-                    System.out.print(
-                        "aritmean," + Util.formatDouble(aritMeanresult) +
-                        ",geommean," + Util.formatDouble(geomMeanresult) +
-                        ",harmmean," + Util.formatDouble(1.0 / harmMeanresultInverse));
-                    
-                    // Call terminate on all driver instances
-                    for (int i = 0; i < nOfThreads; i++) {
-                        drivers[i][driverRun].terminateDriver();
-                    }
+            }   
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    private void forEachRun() {
+        try {
+            int runsPerDriver = _driverImpl.getIntParam(Constants.RUNS_PER_DRIVER);
+            boolean includeWarmupRun = _driverImpl.getBooleanParam(Constants.INCLUDE_WARMUP_RUN);
+            
+            for (_driverRun = 0; _driverRun < runsPerDriver; _driverRun++) {
+                if (includeWarmupRun) {
+                    System.out.print(_driverRun == 0 ? "\n    Warmup run: "
+                        : "\n    Run " + _driverRun + ": ");
                 }
-                              
-                int startRun = testSuite.getBooleanParam(Constants.INCLUDE_WARMUP_RUN) ? 1 : 0;
+                else {
+                    System.out.print("\n    Run " + (_driverRun + 1) + ": ");                        
+                }
+
+                // geometric mean = (sum{i,n} x_i) / n
+                _geomMeanresult = 1.0;
+                // arithmetic mean = (prod{i,n} x_i)^(1/n)
+                _aritMeanresult = 0.0;
+                // harmonic mean inverse = sum{i,n} 1/(n * x_i)
+                _harmMeanresultInverse = 0.0;
+
+                forEachTestCase();
+
+                System.out.print(
+                    "aritmean," + Util.formatDouble(_aritMeanresult) +
+                    ",geommean," + Util.formatDouble(_geomMeanresult) +
+                    ",harmmean," + Util.formatDouble(1.0 / _harmMeanresultInverse));
+
+                int startRun = _driverImpl.getBooleanParam(Constants.INCLUDE_WARMUP_RUN) ? 1 : 0;
                 if (runsPerDriver - startRun > 1) {
                     // Print average for all runs
                     System.out.print("\n     Avgs: ");
-                    Iterator tci = di.getAggregateTestCases().iterator();
+                    Iterator tci = _driverImpl.getAggregateTestCases().iterator();
                     while (tci.hasNext()) {
                         TestCaseImpl tc = (TestCaseImpl) tci.next();
                         System.out.print(tc.getName() + ",");                        
@@ -297,15 +210,15 @@ public class Engine {
                     }
                     System.out.print(
                         "aritmean," +
-                        di.getParam(Constants.RESULT_ARIT_MEAN) + 
+                        _driverImpl.getParam(Constants.RESULT_ARIT_MEAN) + 
                         ",geommean," +
-                        di.getParam(Constants.RESULT_GEOM_MEAN) + 
+                        _driverImpl.getParam(Constants.RESULT_GEOM_MEAN) + 
                         ",harmmean," +
-                        di.getParam(Constants.RESULT_HARM_MEAN));   
+                        _driverImpl.getParam(Constants.RESULT_HARM_MEAN));   
 
                     // Print standardDevs for all runs
                     System.out.print("\n    Stdev: ");
-                    tci = di.getAggregateTestCases().iterator();
+                    tci = _driverImpl.getAggregateTestCases().iterator();
                     while (tci.hasNext()) {
                         TestCaseImpl tc = (TestCaseImpl) tci.next();
                         System.out.print(tc.getName() + ",");                        
@@ -315,31 +228,195 @@ public class Engine {
                     }
                     System.out.println(
                         "aritmean," +
-                        di.getParam(Constants.RESULT_ARIT_MEAN_STDDEV) + 
+                        _driverImpl.getParam(Constants.RESULT_ARIT_MEAN_STDDEV) + 
                         ",geommean," +
-                        di.getParam(Constants.RESULT_GEOM_MEAN_STDDEV) + 
+                        _driverImpl.getParam(Constants.RESULT_GEOM_MEAN_STDDEV) + 
                         ",harmmean," +
-                        di.getParam(Constants.RESULT_HARM_MEAN_STDDEV));   
+                        _driverImpl.getParam(Constants.RESULT_HARM_MEAN_STDDEV));   
                 }
                 else {
                     System.out.println("");
                 }
             }
-
-	    // Shutdown thread pool -- all threads must have stopped by now
-	    threadPool.shutdown();
         }
         catch (Exception e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+    
+    private void forEachTestCase() {
+        try {
+            int nOfThreads = _driverImpl.getIntParam(Constants.NUMBER_OF_THREADS);
+            
+            // Get list of tests
+            List tcList = _driverImpl.getTestCases(_driverRun);
+            int nOfTests = tcList.size();
 
-        return testSuite;
-    }        
+            // Iterate through list of test cases
+            Iterator tci = tcList.iterator();
+            while (tci.hasNext()) {
+                long runTime = 0L;
+                TestCaseImpl tc = (TestCaseImpl) tci.next();               
+
+                if (Japex.verbose) {
+                    System.out.println(tc.getName());
+                }
+                else {
+                    System.out.print(tc.getName() + ",");
+                }
+
+                // If nOfThreads == 1, re-use this thread
+                if (nOfThreads == 1) {
+                    // -- Prepare phase --------------------------------------
+
+                    _drivers[0][_driverRun].setTestCase(tc);     // tc is shared!
+                    _drivers[0][_driverRun].prepare();
+
+                    // -- Warmup phase ---------------------------------------
+
+                    // Start timer 
+                    runTime = Util.currentTimeMillis();
+
+                    // First time call does warmup
+                    _drivers[0][_driverRun].call();
+
+                    // Stop timer
+                    runTime = Util.currentTimeMillis() - runTime;
+
+                    // Set japex.actualWarmupTime output param
+                    tc.setDoubleParam(Constants.ACTUAL_WARMUP_TIME, runTime);  
+
+                    // -- Run phase -------------------------------------------
+
+                    // Start timer for run phase
+                    runTime = Util.currentTimeMillis();
+
+                    // Second time call does run
+                    _drivers[0][_driverRun].call();
+                }
+                else {  // nOfThreads > 1
+                    Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+
+                    // -- Prepare phase --------------------------------------
+
+                    // Initialize driver instance with test case object do prepare
+                    for (int i = 0; i < nOfThreads; i++) {
+                        _drivers[i][_driverRun].setTestCase(tc);     // tc is shared!
+                        _drivers[i][_driverRun].prepare();
+                    }
+
+                    // -- Warmup phase ---------------------------------------
+
+                    // Start timer for warmup phase 
+                    runTime = Util.currentTimeMillis();
+
+                    // Fork all threads -- first time drivers will warmup
+                    Future<?>[] futures = new Future<?>[nOfThreads];                            
+                    for (int i = 0; i < nOfThreads; i++) {
+                        futures[i] = _threadPool.submit(_drivers[i][_driverRun]);
+                    }
+
+                    // Wait for all threads to finish
+                    for (int i = 0; i < nOfThreads; i++) {
+                        futures[i].get();
+                    }
+
+                    // Stop timer
+                    runTime = Util.currentTimeMillis() - runTime;
+
+                    // Set japex.actualWarmupTime output param
+                    tc.setDoubleParam(Constants.ACTUAL_WARMUP_TIME, runTime);  
+
+                    // -- Run phase -------------------------------------------
+
+                    // Start timer for run phase
+                    runTime = Util.currentTimeMillis();
+
+                    // Fork all threads -- second time drivers will run
+                    for (int i = 0; i < nOfThreads; i++) {
+                        futures[i] = _threadPool.submit(_drivers[i][_driverRun]);
+                    }
+
+                    // Wait for all threads to finish
+                    for (int i = 0; i < nOfThreads; i++) {
+                        futures[i].get();
+                    }
+                }
+
+                // Stop timer
+                runTime = Util.currentTimeMillis() - runTime;
+
+                // Set japex.actualRunTime output param
+                tc.setDoubleParam(Constants.ACTUAL_RUN_TIME, runTime);  
+
+                // Finish phase                         
+                for (int i = 0; i < nOfThreads; i++) {
+                    _drivers[i][_driverRun].finish();
+                }                    
+
+                double result = 0.0;
+
+                if (_computeResult == null) {
+                    if (!tc.hasParam(Constants.RESULT_VALUE)) {
+                        result = 
+                            tc.getIntParam(Constants.ACTUAL_RUN_ITERATIONS) / 
+                                (runTime / 1000.0);
+                        _testSuite.setParam(Constants.RESULT_UNIT, "TPS");
+
+                        _computeResult = Boolean.TRUE;
+                        tc.setDoubleParam(Constants.RESULT_VALUE, result);
+                    }
+                    else {
+                        result = tc.getDoubleParam(Constants.RESULT_VALUE);
+                        _computeResult = Boolean.FALSE;
+                    }                        
+                }
+                else if (_computeResult == Boolean.TRUE
+                         && !tc.hasParam(Constants.RESULT_VALUE))  
+                {
+                    result = 
+                        tc.getIntParam(Constants.ACTUAL_RUN_ITERATIONS) / 
+                            (runTime / 1000.0);
+                    tc.setDoubleParam(Constants.RESULT_VALUE, result);
+                }
+                else if (_computeResult == Boolean.FALSE
+                         && tc.hasParam(Constants.RESULT_VALUE)) 
+                {
+                    result = tc.getDoubleParam(Constants.RESULT_VALUE);
+                }
+                else {
+                    throw new RuntimeException(
+                       "The output parameter '" + Constants.RESULT_VALUE
+                       + "' must be computed by either all or none of "
+                       + "the drivers for the results to be comparable");
+                }            
+
+                // Compute running means 
+                _aritMeanresult += result / nOfTests;
+                _geomMeanresult *= Math.pow(result, 1.0 / nOfTests);
+                _harmMeanresultInverse += 1.0 / (nOfTests * result);
+
+                // Display results for this test
+                if (Japex.verbose) {
+                    System.out.println("           " + tc.getParam(Constants.RESULT_VALUE));
+                    System.out.print("           ");
+                }
+                else {
+                    System.out.print(tc.getParam(Constants.RESULT_VALUE) + ",");
+                    System.out.flush();
+                }
+            }
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }        
+    }
+    
     
     /**
      * Calculates the time of the warmup and run phases. Returns an array 
-     * of size 3 with hours, minutes and seconds.
+     * of size 3 with hours, minutes and seconds. Note: if japex.runsPerDriver
+     * is redefined by any driver, this estimate will be off.
      */
     private int[] estimateRunningTime(TestSuiteImpl testSuite) {        
         int nOfDrivers = testSuite.getDriverInfoList().size();
