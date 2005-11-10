@@ -46,17 +46,41 @@ import java.io.FilenameFilter;
 
 public class DriverImpl extends ParamsImpl implements Driver {
     
+    /**
+     * This driver's name.
+     */
     String _name;
+    
+    /**
+     * True if all other results should be normalized based
+     * on this driver's results.
+     */
     boolean _isNormal = false;
+    
+    /**
+     * True means are already computed (avoids unnecessary 
+     * re-computation).
+     */
     boolean _computeMeans = true;
+     
+    /**
+     * Java class implementing this driver.
+     */
     Class _class = null;
     
+    /**
+     * Array of tests cases for this driver.
+     */     
     TestCaseArrayList[] _testCases;
+    
+    /**
+     * Aggregate results for this driver.
+     */
     TestCaseArrayList _aggregateTestCases;
     
-    int _runsPerDriver;    
-    boolean _includeWarmupRun;
-    
+    /**
+     * Class loader shared by all driver instances.
+     */
     static JapexClassLoader _classLoader;
 
     /**
@@ -80,32 +104,28 @@ public class DriverImpl extends ParamsImpl implements Driver {
         public void addURL(URL url) {
             super.addURL(url);
         }
-    }
-    
+    }    
        
-    public DriverImpl(String name, boolean isNormal, int runsPerDriver, 
-        boolean includeWarmupRun, ParamsImpl params) 
-    {
+    public DriverImpl(String name, boolean isNormal, ParamsImpl params) {
         super(params);
         _name = name;
         _isNormal = isNormal;
-        _runsPerDriver = runsPerDriver;
-        _includeWarmupRun = includeWarmupRun;
         initJapexClassLoader();        
     }
     
     public void setTestCases(TestCaseArrayList testCases) {
-        _testCases = new TestCaseArrayList[_runsPerDriver];
-        for (int i = 0; i < _runsPerDriver; i++) {
-            _testCases[i] = (TestCaseArrayList) testCases.clone();
-        }
+        int runsPerDriver = getIntParam(Constants.RUNS_PER_DRIVER);
         
+        _testCases = new TestCaseArrayList[runsPerDriver];
+        for (int i = 0; i < runsPerDriver; i++) {
+            _testCases[i] = (TestCaseArrayList) testCases.clone();
+        }        
         _aggregateTestCases = (TestCaseArrayList) testCases.clone();
     }
         
     private void computeMeans() {
-        final int runsPerDriver = _testCases.length;        
-        final int startRun = _includeWarmupRun ? 1 : 0;
+        final int runsPerDriver = getIntParam(Constants.RUNS_PER_DRIVER);
+        final int startRun = getBooleanParam(Constants.INCLUDE_WARMUP_RUN) ? 1 : 0;
         
         boolean scatter = getParam(Constants.CHART_TYPE).equals("scatterchart");
         
