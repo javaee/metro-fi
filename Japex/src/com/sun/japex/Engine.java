@@ -120,6 +120,9 @@ public class Engine {
             // Shutdown thread pool -- all threads must have stopped by now
             _threadPool.shutdown();
         }
+        catch (RuntimeException e) {
+            throw e;
+        }
         catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -163,6 +166,9 @@ public class Engine {
                 
             }   
         }
+        catch (RuntimeException e) {
+            throw e;
+        }
         catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -195,49 +201,52 @@ public class Engine {
                     "aritmean," + Util.formatDouble(_aritMeanresult) +
                     ",geommean," + Util.formatDouble(_geomMeanresult) +
                     ",harmmean," + Util.formatDouble(1.0 / _harmMeanresultInverse));
-
-                int startRun = _driverImpl.getBooleanParam(Constants.INCLUDE_WARMUP_RUN) ? 1 : 0;
-                if (runsPerDriver - startRun > 1) {
-                    // Print average for all runs
-                    System.out.print("\n     Avgs: ");
-                    Iterator tci = _driverImpl.getAggregateTestCases().iterator();
-                    while (tci.hasNext()) {
-                        TestCaseImpl tc = (TestCaseImpl) tci.next();
-                        System.out.print(tc.getName() + ",");                        
-                        System.out.print(
-                            Util.formatDouble(tc.getDoubleParam(Constants.RESULT_VALUE)) 
-                            + ",");
-                    }
-                    System.out.print(
-                        "aritmean," +
-                        _driverImpl.getParam(Constants.RESULT_ARIT_MEAN) + 
-                        ",geommean," +
-                        _driverImpl.getParam(Constants.RESULT_GEOM_MEAN) + 
-                        ",harmmean," +
-                        _driverImpl.getParam(Constants.RESULT_HARM_MEAN));   
-
-                    // Print standardDevs for all runs
-                    System.out.print("\n    Stdev: ");
-                    tci = _driverImpl.getAggregateTestCases().iterator();
-                    while (tci.hasNext()) {
-                        TestCaseImpl tc = (TestCaseImpl) tci.next();
-                        System.out.print(tc.getName() + ",");                        
-                        System.out.print(
-                            Util.formatDouble(tc.getDoubleParam(Constants.RESULT_VALUE_STDDEV)) 
-                            + ",");
-                    }
-                    System.out.println(
-                        "aritmean," +
-                        _driverImpl.getParam(Constants.RESULT_ARIT_MEAN_STDDEV) + 
-                        ",geommean," +
-                        _driverImpl.getParam(Constants.RESULT_GEOM_MEAN_STDDEV) + 
-                        ",harmmean," +
-                        _driverImpl.getParam(Constants.RESULT_HARM_MEAN_STDDEV));   
-                }
-                else {
-                    System.out.println("");
-                }
             }
+
+            int startRun = _driverImpl.getBooleanParam(Constants.INCLUDE_WARMUP_RUN) ? 1 : 0;
+            if (runsPerDriver - startRun > 1) {
+                // Print average for all runs
+                System.out.print("\n     Avgs: ");
+                Iterator tci = _driverImpl.getAggregateTestCases().iterator();
+                while (tci.hasNext()) {
+                    TestCaseImpl tc = (TestCaseImpl) tci.next();
+                    System.out.print(tc.getName() + ",");                        
+                    System.out.print(
+                        Util.formatDouble(tc.getDoubleParam(Constants.RESULT_VALUE)) 
+                        + ",");
+                }
+                System.out.print(
+                    "aritmean," +
+                    _driverImpl.getParam(Constants.RESULT_ARIT_MEAN) + 
+                    ",geommean," +
+                    _driverImpl.getParam(Constants.RESULT_GEOM_MEAN) + 
+                    ",harmmean," +
+                    _driverImpl.getParam(Constants.RESULT_HARM_MEAN));   
+
+                // Print standardDevs for all runs
+                System.out.print("\n    Stdev: ");
+                tci = _driverImpl.getAggregateTestCases().iterator();
+                while (tci.hasNext()) {
+                    TestCaseImpl tc = (TestCaseImpl) tci.next();
+                    System.out.print(tc.getName() + ",");                        
+                    System.out.print(
+                        Util.formatDouble(tc.getDoubleParam(Constants.RESULT_VALUE_STDDEV)) 
+                        + ",");
+                }
+                System.out.println(
+                    "aritmean," +
+                    _driverImpl.getParam(Constants.RESULT_ARIT_MEAN_STDDEV) + 
+                    ",geommean," +
+                    _driverImpl.getParam(Constants.RESULT_GEOM_MEAN_STDDEV) + 
+                    ",harmmean," +
+                    _driverImpl.getParam(Constants.RESULT_HARM_MEAN_STDDEV));   
+            }
+            else {
+                System.out.println("");
+            }
+        }
+        catch (RuntimeException e) {
+            throw e;
         }
         catch (Exception e) {
             throw new RuntimeException(e);
@@ -406,6 +415,9 @@ public class Engine {
                     System.out.flush();
                 }
             }
+        }
+        catch (RuntimeException e) {
+            throw e;
         }
         catch (Exception e) {
             throw new RuntimeException(e);
