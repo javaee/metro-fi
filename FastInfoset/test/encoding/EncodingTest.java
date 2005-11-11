@@ -45,7 +45,6 @@ import com.sun.xml.fastinfoset.vocab.SerializerVocabulary;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -131,7 +130,7 @@ public class EncodingTest extends TestCase {
     }
         
     private void compare(byte[] specFiDocument) throws Exception {
-        this.assertTrue("Fast infoset document is not the same length as the X.finf specification", 
+        TestCase.assertTrue("Fast infoset document is not the same length as the X.finf specification", 
             _finfDocument.length == specFiDocument.length);
         
         System.out.println(_finfDocument.length);

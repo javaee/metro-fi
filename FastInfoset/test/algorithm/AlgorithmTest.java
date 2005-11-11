@@ -58,7 +58,6 @@ import com.sun.xml.fastinfoset.vocab.SerializerVocabulary;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
