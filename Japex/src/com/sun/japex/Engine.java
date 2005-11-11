@@ -55,7 +55,7 @@ public class Engine {
     /**
      * Thread pool used for the test's execution.
      */
-    ExecutorService _threadPool;
+    ThreadPoolExecutor _threadPool;
     
     /**
      * Matrix of driver instances of size nOfThreads * runsPerDriver.
@@ -112,13 +112,7 @@ public class Engine {
                     (hms[2] > 0 ? (hms[2] + " seconds ") : ""));                    
             }
 
-            // Allocate a cached thread pool
-            _threadPool = Executors.newCachedThreadPool();
-                
             forEachDriver();                  
-            
-            // Shutdown thread pool -- all threads must have stopped by now
-            _threadPool.shutdown();
         }
         catch (RuntimeException e) {
             throw e;
@@ -140,6 +134,11 @@ public class Engine {
                 int nOfThreads = _driverImpl.getIntParam(Constants.NUMBER_OF_THREADS);
                 int runsPerDriver = _driverImpl.getIntParam(Constants.RUNS_PER_DRIVER);
                 boolean includeWarmupRun = _driverImpl.getBooleanParam(Constants.INCLUDE_WARMUP_RUN);
+ 
+                // Created thread pool of nOfThreads size and pre-start threads
+		_threadPool = new ThreadPoolExecutor(nOfThreads, nOfThreads, 0L,
+                    TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+                _threadPool.prestartAllCoreThreads();
 
                 // Display driver's name
                 System.out.print("  " + _driverImpl.getName() + " using " + nOfThreads + " thread(s)");
@@ -164,6 +163,8 @@ public class Engine {
                     }
                 }                
                 
+                // Shutdown thread pool
+                _threadPool.shutdown();
             }   
         }
         catch (RuntimeException e) {
