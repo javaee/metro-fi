@@ -39,13 +39,9 @@
 
 package com.sun.xml.fastinfoset.algorithm;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.CharBuffer;
-import java.util.ArrayList;
-import java.util.List;
 import org.jvnet.fastinfoset.EncodingAlgorithmException;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
 
@@ -210,7 +206,6 @@ public class BASE64EncodingAlgorithm extends BuiltInEncodingAlgorithm {
         s.ensureCapacity(encodedLength);
 
         int idx = 0;
-        char encodedChar;
         for (int i = 0; i < blockCount; ++i) {
             int b1 = value[idx++] & 0xFF;
             int b2 = (idx < value.length) ? value[idx++] & 0xFF : 0;
