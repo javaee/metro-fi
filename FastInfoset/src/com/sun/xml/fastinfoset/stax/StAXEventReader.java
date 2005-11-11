@@ -39,13 +39,10 @@
 package com.sun.xml.fastinfoset.stax;
 
 import com.sun.xml.fastinfoset.stax.events.StAXEventAllocatorBase;
-import com.sun.xml.fastinfoset.stax.events.StAXEventAllocator;
 import java.util.NoSuchElementException;
 import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.events.EntityReference;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.util.XMLEventAllocator;
 import com.sun.xml.fastinfoset.CommonResourceBundle;

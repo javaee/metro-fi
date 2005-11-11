@@ -40,7 +40,6 @@ package com.sun.xml.fastinfoset.stax.events ;
 
 
 import javax.xml.stream.events.Comment;
-import javax.xml.stream.XMLStreamConstants;
 
 public class CommentEvent extends EventBase implements Comment {
     

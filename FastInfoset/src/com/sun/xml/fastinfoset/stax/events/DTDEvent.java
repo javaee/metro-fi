@@ -38,9 +38,11 @@
 
 package com.sun.xml.fastinfoset.stax.events;
 
-import javax.xml.stream.events.DTD;
-import javax.xml.stream.XMLStreamConstants;
 import java.util.List;
+
+import javax.xml.stream.events.DTD;
+import javax.xml.stream.events.EntityDeclaration;
+import javax.xml.stream.events.NotationDeclaration;
 
 /**
  * DTDEvent. Notations and Entities are not used

@@ -40,11 +40,13 @@
 package org.jvnet.fastinfoset;
 
 import java.io.InputStream;
-import org.xml.sax.InputSource;
+
 import javax.xml.transform.sax.SAXSource;
-import com.sun.xml.fastinfoset.sax.SAXDocumentParser;
-import com.sun.xml.fastinfoset.*;
+
+import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
+
+import com.sun.xml.fastinfoset.sax.SAXDocumentParser;
 
 /**
  *  A JAXP Source implementation that supports the parsing fast

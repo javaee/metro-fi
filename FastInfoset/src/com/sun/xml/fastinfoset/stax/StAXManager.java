@@ -41,7 +41,6 @@ package com.sun.xml.fastinfoset.stax;
 import java.util.HashMap;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLResolver;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class StAXManager {

@@ -39,8 +39,6 @@
 
 package com.sun.xml.fastinfoset.util;
 
-import java.util.HashMap;
-import java.util.Map;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class FixedEntryStringIntMap extends StringIntMap {

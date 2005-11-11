@@ -38,9 +38,9 @@
 
 package com.sun.xml.fastinfoset.stax.events ;
 
-import javax.xml.stream.events.StartDocument;
-import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.events.StartDocument;
+
 import com.sun.xml.fastinfoset.util.XMLConstants;
 
 public class StartDocumentEvent extends EventBase implements StartDocument {

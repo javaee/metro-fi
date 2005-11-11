@@ -40,7 +40,6 @@ package org.jvnet.fastinfoset.sax;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 import org.jvnet.fastinfoset.FastInfosetException;
 import org.jvnet.fastinfoset.FastInfosetParser;
 import org.xml.sax.SAXException;

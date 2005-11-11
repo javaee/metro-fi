@@ -44,7 +44,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.Reader;
 import org.xml.sax.InputSource;
 

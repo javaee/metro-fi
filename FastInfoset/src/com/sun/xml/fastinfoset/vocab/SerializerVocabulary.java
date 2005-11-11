@@ -45,8 +45,6 @@ import com.sun.xml.fastinfoset.util.FixedEntryStringIntMap;
 import com.sun.xml.fastinfoset.util.KeyIntMap;
 import com.sun.xml.fastinfoset.util.LocalNameQualifiedNamesMap;
 import com.sun.xml.fastinfoset.util.StringIntMap;
-import java.net.URI;
-import org.jvnet.fastinfoset.FastInfosetSerializer;
 
 public class SerializerVocabulary extends Vocabulary {
     /*

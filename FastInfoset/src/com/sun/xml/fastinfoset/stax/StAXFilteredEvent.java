@@ -6,15 +6,11 @@
 
 package com.sun.xml.fastinfoset.stax;
 
-import javax.xml.namespace.QName;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.EventFilter;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.Characters;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class StAXFilteredEvent implements XMLEventReader {

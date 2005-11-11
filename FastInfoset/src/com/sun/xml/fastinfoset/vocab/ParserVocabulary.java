@@ -45,7 +45,6 @@ import com.sun.xml.fastinfoset.util.PrefixArray;
 import com.sun.xml.fastinfoset.util.QualifiedNameArray;
 import com.sun.xml.fastinfoset.util.StringArray;
 import com.sun.xml.fastinfoset.util.ValueArray;
-import java.net.URI;
 
 public class ParserVocabulary extends Vocabulary {
     public static final String IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS_PEOPERTY = 

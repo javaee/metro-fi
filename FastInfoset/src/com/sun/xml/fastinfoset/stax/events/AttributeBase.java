@@ -39,9 +39,8 @@
 package com.sun.xml.fastinfoset.stax.events;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.events.Attribute;
-import java.io.Writer;
+
 import com.sun.xml.fastinfoset.util.Util;
 
 

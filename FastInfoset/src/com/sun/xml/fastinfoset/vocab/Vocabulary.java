@@ -39,7 +39,6 @@
 
 package com.sun.xml.fastinfoset.vocab;
 
-import java.net.URI;
 
 public abstract class Vocabulary {
     public static final int RESTRICTED_ALPHABET = 0;

@@ -52,7 +52,6 @@ import javax.xml.stream.*;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.util.XMLEventAllocator ;
 import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class StAXInputFactory extends XMLInputFactory {    

@@ -38,15 +38,9 @@
 
 package com.sun.xml.fastinfoset.algorithm;
 
-import com.sun.xml.fastinfoset.algorithm.BuiltInEncodingAlgorithm.WordListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.CharBuffer;
-import java.util.ArrayList;
 import org.jvnet.fastinfoset.EncodingAlgorithmException;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
 

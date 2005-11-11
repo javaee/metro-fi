@@ -39,7 +39,6 @@
 package org.jvnet.fastinfoset;
 
 import java.util.List;
-import javax.xml.namespace.QName;
 
 public interface Vocabulary {
     public static final int RESTRICTED_ALPHABET     = 0;

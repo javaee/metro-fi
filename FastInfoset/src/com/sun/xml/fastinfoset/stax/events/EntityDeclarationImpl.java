@@ -39,7 +39,6 @@
 package com.sun.xml.fastinfoset.stax.events;
 
 import javax.xml.stream.events.EntityDeclaration;
-import javax.xml.stream.XMLStreamConstants;
 
 
 public class EntityDeclarationImpl extends EventBase implements EntityDeclaration {

@@ -38,15 +38,14 @@
 
 package com.sun.xml.fastinfoset.stax.events ;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.Namespace;
-import java.io.Writer;
-import java.util.Iterator;
-import javax.xml.stream.XMLStreamConstants;
+
 import com.sun.xml.fastinfoset.util.EmptyIterator;
 
 

@@ -39,7 +39,6 @@
 
 package com.sun.xml.fastinfoset.stax.events ;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.Location;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.events.Characters;

@@ -50,7 +50,6 @@ import org.jvnet.fastinfoset.sax.FastInfosetReader;
 import org.jvnet.fastinfoset.sax.PrimitiveTypeContentHandler;
 import com.sun.xml.fastinfoset.util.CharArray;
 import com.sun.xml.fastinfoset.util.CharArrayString;
-import com.sun.xml.fastinfoset.util.PrefixArray;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;

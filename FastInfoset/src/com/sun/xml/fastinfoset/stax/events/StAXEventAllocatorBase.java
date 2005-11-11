@@ -38,15 +38,14 @@
 
 package com.sun.xml.fastinfoset.stax.events;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLEventFactory;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.*;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.events.Namespace;
+import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.util.XMLEventAllocator;
 import javax.xml.stream.util.XMLEventConsumer;
-import javax.xml.XMLConstants;
-import javax.xml.namespace.QName;
+
 import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 /**

@@ -38,23 +38,22 @@
 
 package com.sun.xml.fastinfoset.stax.events ;
 
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.namespace.QName;
 import javax.xml.namespace.NamespaceContext;
-import javax.xml.stream.events.StartElement;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Namespace;
-import java.io.Writer;
+import javax.xml.stream.events.StartElement;
 
-import com.sun.xml.fastinfoset.util.ReadIterator;
 import com.sun.xml.fastinfoset.util.EmptyIterator;
+import com.sun.xml.fastinfoset.util.ReadIterator;
 
 public class StartElementEvent extends EventBase implements StartElement {
     

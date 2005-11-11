@@ -41,8 +41,6 @@ package com.sun.xml.fastinfoset.util;
 
 import com.sun.xml.fastinfoset.QualifiedName;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
-import java.util.ArrayList;
-import java.util.List;
 
 public class LocalNameQualifiedNamesMap extends KeyIntMap {
 

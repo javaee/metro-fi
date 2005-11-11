@@ -39,7 +39,6 @@
 package com.sun.xml.fastinfoset.stax.events ;
 
 import javax.xml.stream.events.EndDocument;
-import javax.xml.stream.XMLStreamConstants;
 
 
 public class EndDocumentEvent extends EventBase implements EndDocument {

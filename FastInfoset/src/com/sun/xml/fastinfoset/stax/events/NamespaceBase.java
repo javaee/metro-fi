@@ -38,9 +38,9 @@
 
 package com.sun.xml.fastinfoset.stax.events;
 
-import javax.xml.stream.events.Namespace;
-import javax.xml.stream.events.XMLEvent;
 import javax.xml.namespace.QName;
+import javax.xml.stream.events.Namespace;
+
 import com.sun.xml.fastinfoset.util.Util;
 
 public class NamespaceBase extends AttributeBase implements Namespace{

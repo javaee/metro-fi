@@ -38,12 +38,8 @@
 
 package com.sun.xml.fastinfoset.stax;
 
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.StreamFilter;
-import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.StreamFilter;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
 

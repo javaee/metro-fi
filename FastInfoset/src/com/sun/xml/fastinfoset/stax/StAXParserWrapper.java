@@ -37,15 +37,13 @@
  */ 
 
 package com.sun.xml.fastinfoset.stax;
+
 import javax.xml.namespace.QName;
 import javax.xml.namespace.NamespaceContext;
 
-import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamException;
-import java.util.List;
-import java.io.InputStream;
 
 
 public class StAXParserWrapper implements XMLStreamReader{

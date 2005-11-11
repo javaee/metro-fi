@@ -39,7 +39,6 @@
 
 package com.sun.xml.fastinfoset.util;
 
-import org.jvnet.fastinfoset.FastInfosetException;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class CharArrayArray extends ValueArray {

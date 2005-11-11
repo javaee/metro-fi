@@ -41,7 +41,6 @@ package com.sun.xml.fastinfoset.stax;
 import java.util.Iterator;
 import javax.xml.namespace.QName;
 import javax.xml.namespace.NamespaceContext;
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamWriter;
