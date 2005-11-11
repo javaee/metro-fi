@@ -53,8 +53,6 @@ import com.sun.xml.fastinfoset.vocab.ParserVocabulary;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

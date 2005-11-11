@@ -1,8 +1,6 @@
 
 package com.sun.xml.fastinfoset;
 
-import java.text.MessageFormat;
-import java.util.Enumeration;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
