@@ -128,10 +128,11 @@ public class Japex {
             
             // Generate charts
             final String resultChart = "result.jpg";
-            testSuite.generateDriverChart(outputDir + fileSep 
+            ChartGenerator chartGenerator = new ChartGenerator(testSuite);
+            chartGenerator.generateDriverChart(outputDir + fileSep 
                 + resultChart);
             final String testCaseChartBase = "testcase";
-            int nOfCharts = testSuite.generateTestCaseCharts(outputDir
+            int nOfCharts = chartGenerator.generateTestCaseCharts(outputDir
                 + fileSep + testCaseChartBase, ".jpg");
             
             // Extend report with chart info

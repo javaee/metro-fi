@@ -106,9 +106,7 @@ public class LineChart
         plot.setRangeGridlinePaint(Color.lightGray);
         
         
-        //upgrade Jfreechart and jcommon to use Rectangle instead of spacer
-        plot.setAxisOffset(new Spacer(1, 5.0, 5.0, 5.0, 5.0));
-        //plot.setAxisOffset(new RectangleInsets(UnitType.ABSOLUTE, 5.0, 5.0, 5.0, 5.0));
+        plot.setAxisOffset(new RectangleInsets(UnitType.ABSOLUTE, 5.0, 5.0, 5.0, 5.0));
         
         plot.setDomainCrosshairVisible(true);
         plot.setRangeCrosshairVisible(true);
