@@ -40,7 +40,11 @@
 package com.sun.japex;
 
 import java.io.File;
-import java.lang.management.*;
+import java.lang.management.GarbageCollectorMXBean;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
+import java.util.ArrayList;
+import java.util.List;
 
 public class JapexDriverBase implements JapexDriver, Params {
     
@@ -50,12 +54,12 @@ public class JapexDriverBase implements JapexDriver, Params {
     
     private boolean _needWarmup = true;
     
-    private MemoryMXBean _memoryBean;
-    private long _heapBytes;
+    private List<GarbageCollectorMXBean> _gCCollectors;
+    
+    private long _gCTime;
     
     public JapexDriverBase() {
-        _memoryBean = ManagementFactory.getMemoryMXBean();
-        _heapBytes = 0L;
+        _gCCollectors = ManagementFactory.getGarbageCollectorMXBeans();
     }
     
     public void setDriver(Driver driver) {
@@ -161,9 +165,10 @@ public class JapexDriverBase implements JapexDriver, Params {
         long millis;
         TestCaseImpl tc = _testCase;
         
-        // Force GC and record current memory usage
-        _memoryBean.gc();
-        _heapBytes = _memoryBean.getHeapMemoryUsage().getUsed();
+        // Force GC
+        System.gc();
+        // Get elapsed time for all GCs
+        List<Long> gCStartTimes = getGCAbsoluteTimes();
         
         // Get number of threads to adjust iterations
         int nOfThreads = tc.getIntParam(Constants.NUMBER_OF_THREADS);
@@ -191,6 +196,9 @@ public class JapexDriverBase implements JapexDriver, Params {
                 run(tc);      // Call run
             }
         }
+
+        // Get the total time take for GC over the measurement period
+        _gCTime = getGCRelativeTotalTime(gCStartTimes);
         
         // Accumulate actual number of iterations
         synchronized (tc) {
@@ -200,6 +208,26 @@ public class JapexDriverBase implements JapexDriver, Params {
             tc.setIntParam(Constants.ACTUAL_RUN_ITERATIONS, 
                            actualRunIterations + runIterations);
         }
+    }
+    
+    private List<Long> getGCAbsoluteTimes() {
+        List<Long> gCTimes = new ArrayList();
+        for (GarbageCollectorMXBean gcc : _gCCollectors) {
+            gCTimes.add(gcc.getCollectionTime());
+        }
+        
+        return gCTimes;
+    }
+    
+    private long getGCRelativeTotalTime(List<Long> start) {
+        List<Long> end = getGCAbsoluteTimes();
+        
+        long time = 0;
+        for (int i = 0; i < start.size(); i++) {
+            time += end.get(i) - start.get(i);
+        }
+        
+        return time;
     }
     
     /**
@@ -249,11 +277,19 @@ public class JapexDriverBase implements JapexDriver, Params {
                     * _testCase.getLongParam(Constants.ACTUAL_RUN_ITERATIONS)) /    // Mbits
                 (_testCase.getLongParam(Constants.ACTUAL_RUN_TIME) / 1000.0));      // Seconds
         }
-        else if (resultUnit.equalsIgnoreCase("mbs")) {      // EXPERIMENTAL
-            _testCase.setParam(Constants.RESULT_UNIT, "MBs");
-            _testCase.setDoubleParam(Constants.RESULT_VALUE, 
-                (_memoryBean.getHeapMemoryUsage().getUsed() - _heapBytes) / 
-                (1024.0 * 1024.0));     // Megabytes used
+        else if (resultUnit.equalsIgnoreCase("%GC")) {      // EXPERIMENTAL
+            _testCase.setParam(Constants.RESULT_UNIT, "%GC");
+            // Calculate % of GC relative to the actual run time
+            _testCase.setDoubleParam(Constants.RESULT_VALUE,
+                    (_gCTime / _testCase.getDoubleParam(Constants.ACTUAL_RUN_TIME)) * 100.0);
+            
+            // Add the actual runtime to the X axis
+            // Scatter plots can be used to present %GC and actual time
+            _testCase.setParam(Constants.RESULT_UNIT_X, "ms");
+            getTestSuite().setParam(Constants.RESULT_UNIT_X, "ms");
+            _testCase.setDoubleParam(Constants.RESULT_VALUE_X, 
+                _testCase.getDoubleParam(Constants.ACTUAL_RUN_TIME) /
+                _testCase.getDoubleParam(Constants.ACTUAL_RUN_ITERATIONS));                            
         }
         else {
             throw new RuntimeException("Unknown value '" + 
