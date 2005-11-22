@@ -49,6 +49,7 @@ import org.w3c.dom.NodeList;
 public class JAXPDOMDriver extends BaseParserDriver {
     DocumentBuilderFactory _builderFactory;
     DocumentBuilder _builder;
+    Document _d;
     boolean _traverseNodes;
 
     public void initializeDriver() {
@@ -71,9 +72,9 @@ public class JAXPDOMDriver extends BaseParserDriver {
     public void run(TestCase testCase) {
         try {
             _inputStream.reset();
-            Document d = _builder.parse(_inputStream);
+            _d = _builder.parse(_inputStream);
             if (_traverseNodes) {
-                traverse(d);
+                traverse(_d);
             }
         }
         catch (Exception e) {

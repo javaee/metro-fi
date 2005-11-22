@@ -39,6 +39,8 @@ package com.sun.japex.jdsl.xml;
 public final class DriverConstants {
     public static final String STRING_INTERNING_PROPERTY = "jdsl.stringInterning"; 
     
+    public static final String DO_NOT_REPORT_SIZE = "jdsl.doNotReportSize";
+    
     public static final String INDEXED_CONTENT_PROPERTY = "jdsl.indexedContent";
     public static final String INDEXED_CONTENT_PROPERTY_VALUE_DEFAULT = "default";
     public static final String INDEXED_CONTENT_PROPERTY_VALUE_FULL = "full"; 

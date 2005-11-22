@@ -98,7 +98,7 @@ public abstract class BaseParserDriver extends JapexDriverBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         sds.setOutputStream(baos);
         
-        if (getBooleanParam(DriverConstants.EXTERNAL_VOCABULARY_PROPERTY) == true) {
+        if (getBooleanParam(DriverConstants.EXTERNAL_VOCABULARY_PROPERTY)) {
             SerializerVocabulary externalSerializeVocabulary = new SerializerVocabulary();
             ParserVocabulary externalParserVocabulary = new ParserVocabulary();
             VocabularyGenerator vocabularyGenerator = new VocabularyGenerator(externalSerializeVocabulary, externalParserVocabulary);
@@ -142,9 +142,12 @@ public abstract class BaseParserDriver extends JapexDriverBase {
          * Such data will be used when constructing scatter charts.
          */
         _inputStream.reset();
-        testCase.setDoubleParam(Constants.RESULT_VALUE_X,
-                                _inputStream.available() / 1024.0);
-        getTestSuite().setParam(Constants.RESULT_UNIT_X, "kbs");
+        
+        if (getBooleanParam(DriverConstants.DO_NOT_REPORT_SIZE) == false) {
+            testCase.setDoubleParam(Constants.RESULT_VALUE_X,
+                                    _inputStream.available() / 1024.0);
+            getTestSuite().setParam(Constants.RESULT_UNIT_X, "kbs");
+        }
     }
     
 }
