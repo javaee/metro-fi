@@ -277,14 +277,14 @@ public class JapexDriverBase implements JapexDriver, Params {
                     * _testCase.getLongParam(Constants.ACTUAL_RUN_ITERATIONS)) /    // Mbits
                 (_testCase.getLongParam(Constants.ACTUAL_RUN_TIME) / 1000.0));      // Seconds
         }
-        else if (resultUnit.equalsIgnoreCase("%GC")) {      // EXPERIMENTAL
-            _testCase.setParam(Constants.RESULT_UNIT, "%GC");
+        else if (resultUnit.equalsIgnoreCase("%GCTIME")) {      // EXPERIMENTAL
+            _testCase.setParam(Constants.RESULT_UNIT, "%GCTime");
             // Calculate % of GC relative to the actual run time
             _testCase.setDoubleParam(Constants.RESULT_VALUE,
                     (_gCTime / _testCase.getDoubleParam(Constants.ACTUAL_RUN_TIME)) * 100.0);
             
             // Add the actual runtime to the X axis
-            // Scatter plots can be used to present %GC and actual time
+            // Scatter plots can be used to present %GCTIME and actual time
             _testCase.setParam(Constants.RESULT_UNIT_X, "ms");
             getTestSuite().setParam(Constants.RESULT_UNIT_X, "ms");
             _testCase.setDoubleParam(Constants.RESULT_VALUE_X, 
