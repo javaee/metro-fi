@@ -11,9 +11,21 @@ Xerces parser in JDK 5.0.  All xml files that fail the test are removed.
    d. Remove empty directories
 
 
-2. The process
+2. Getting well-formed XML files
    a. Dowload XML TS and XBC test corpus;
    b. Edit RoundTripTests/bin/env.sh and execute to set FI_HOME and FIRTT_HOME as well as paths to
-FastInfoset/bin and RoundTripTests/bin;
-   c. Make sure JDK 1.5 is on the path;
+FI_HOME/bin and FIRTT_HOME/bin;
+   c. Make sure JDK 1.5 is in the path;
    d. Change to data/xmlconf directory and execute "xercesTest.sh ."
+
+3. Running RoundTrip Tests
+   a. Perform 2.b. above if it's not have been performed;
+   b. Change to FIRTT_HOME/data/xmlconf
+   c. Execute "allRoundTripTests.sh xmlts_report.html" to test against the XMLTS suite and generate
+a report "xmlts_report.html" under FIRTT_HOME/data directory
+   d. Change to FIRTT_HOME/data/XBC
+   e. Execute "allRoundTripTests.sh xbc_report.html" to test against the XBC files and generate a report
+called "xbc_report.html" under FIRTT_HOME/data directory.
+
+4. History 
+   Historical tests along with versions of FastInfoset jars are saved under subdirectory "History". 
