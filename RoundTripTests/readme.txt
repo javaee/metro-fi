@@ -1,4 +1,4 @@
-FastInfoset RoundTrip Tests (FastInfosetRTT)
+FastInfoset RoundTrip Tests (RoundTripTests)
 
 1. General
    The FastInfoset RoundTrip Test suite contains XML files filtered from the W3C test suite: 
@@ -13,7 +13,7 @@ Xerces parser in JDK 5.0.  All xml files that fail the test are removed.
 
 2. The process
    a. Dowload XML TS and XBC test corpus;
-   b. Edit FastInfosetRTCT/bin/env.sh and execute to set FI_HOME and FIRTT_HOME as well as paths to
-FastInfoset/bin and FastInfosetRTCT/bin;
-   c. Make sure JDK 1.5 is in the path;
+   b. Edit RoundTripTests/bin/env.sh and execute to set FI_HOME and FIRTT_HOME as well as paths to
+FastInfoset/bin and RoundTripTests/bin;
+   c. Make sure JDK 1.5 is on the path;
    d. Change to data/xmlconf directory and execute "xercesTest.sh ."
