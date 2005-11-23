@@ -80,6 +80,6 @@ fi
 
 extention=$1
 removedir=$2
-home=$(pwd)
+home="$PWD"
 handle_dir "$home"
 
