@@ -92,6 +92,10 @@ public class Util {
         }
         return bos.toByteArray();
     }
+    
+    static public ByteArrayInputStream streamToByteArrayInputStream(InputStream is) {
+        return new ByteArrayInputStream(streamToByteArray(is));
+    }
         
     public static long parseDuration(String duration) {
         try {
