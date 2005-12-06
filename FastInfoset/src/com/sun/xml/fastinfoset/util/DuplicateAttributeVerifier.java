@@ -44,6 +44,9 @@ public class DuplicateAttributeVerifier {
     
     public final void reset() {
         _poolCurrent = _poolHead;
+        if (_map == null) {
+            _map = new Entry[MAP_SIZE];
+        }
     }
     
     private final void increasePool(int capacity) {
