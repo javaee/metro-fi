@@ -92,6 +92,7 @@ public class DOMDocumentParser extends Decoder {
         if (_v == null) {
             _prefixTable.clearCompletely();
         }
+        _duplicateAttributeVerifier.clear();
     }
     
     protected final void parse() throws FastInfosetException, IOException {
