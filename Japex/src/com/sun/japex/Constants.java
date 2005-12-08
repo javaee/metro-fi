@@ -64,6 +64,7 @@ public class Constants {
     public static final String OS_ARCHITECTURE = "japex.osArchitecture";
     public static final String DATE_TIME       = "japex.dateTime";
     public static final String VM_INFO         = "japex.vmInfo";
+    public static final String CONFIG_FILE     = "japex.configFile";
     
     // Driver input parameters        
     public static final String DRIVER_CLASS = "japex.driverClass";

@@ -1,4 +1,4 @@
-<?xml version='1.0'?>
+<?xml version='1.0' encoding="utf-8"?>
 <!--
 <!DOCTYPE article PUBLIC "-//OASIS//DTD Simplified DocBook XML V1.1CR2//EN"
                   "http://docbook.org/xml/simple/1.1CR2/sdocbook.dtd"> -->
@@ -360,6 +360,10 @@
                 <listitem>
                     <para> japex.dateTime: Timestamp of the run. This value is also used to create a
                         unique directory in which the reports are stored. TYPE: output.</para>
+                </listitem>
+                <listitem>
+                    <para> japex.configFile: Name of the configuration file used for this run. 
+                           TYPE: output.</para>
                 </listitem>
             </itemizedlist>
         </sect2>

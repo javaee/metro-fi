@@ -57,7 +57,10 @@ public class ConfigFileLoader {
                 (com.sun.japex.testsuite.TestSuite) u.unmarshal(new File(fileName));
             
             // Map JAXB object model to internal object model
-            _testSuite = new TestSuiteImpl(testsuite);            
+            _testSuite = new TestSuiteImpl(testsuite);         
+            
+            // Defined japex.configFile here
+            _testSuite.setParam(Constants.CONFIG_FILE, fileName);
         }
         catch (Exception e) {
             throw new RuntimeException(e);
