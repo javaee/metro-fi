@@ -67,7 +67,7 @@ public class TrendReport {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        if (args.length < 4) {
+        if (args.length < 2) {
             displayUsageAndExit(args);
         }
 
@@ -152,7 +152,7 @@ public class TrendReport {
         }        
     }
     private static void displayUsageAndExit(String[] args) {
-        System.err.println("Usage: TrendReport Title reportPath outputPath date offset [driver] [test]");
+        System.err.println("Usage: TrendReport Title reportPath outputPath [date] [offset] [driver] [test]");
         System.err.println("Arguments passed in: \n");
         for (int i=0; i<args.length; i++) {
             System.err.println(i + " = " + args[i]);
