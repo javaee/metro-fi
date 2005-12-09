@@ -57,4 +57,8 @@ public class ReportConstants {
     public static final String HARMONIC_MEANS = "Harmonic";
     
     public static final String KEYWORD_ALL = "all";
+    
+    public static final String DEFAULT_STARTDATE = "TODAY";
+    public static final String DEFAULT_DATEOFFSET = "-1Y";
+    
 }

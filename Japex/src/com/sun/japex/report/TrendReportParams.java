@@ -54,10 +54,10 @@ import java.util.StringTokenizer;
     reportPath -- path to where the report directory is
     outputPath -- path where the html report will be saved. If
     date -- a specific date in format "yyyy-MM-dd", including "Today", 
-            from or to which a trend report shall be made
+            from or to which a trend report shall be made. Default "Today"
     offset -- days, weeks, months or years from/to the above date a trend report will be created. 
             Supports format: xD where x is a positive or negative integer, and D indicates Days
-            Similarily, xW, xM and xY are also support where W=Week, M=Month, and Y=Year
+            Similarily, xW, xM and xY are also support where W=Week, M=Month, and Y=Year. Default 1Y
     -d/driver driver1:driver2:... -- name of driver(s) for which a trend report is to be generated. All drivers if not specified.
     -m/means means1:means2:... -- one or more of the three means. Use keyword "all" to display all three means. All means specified will be placed on one chart.
     -t/testcases test1:test2:... -- specify test(s) for which a trend report will be created. Use keyword "all" 
@@ -111,7 +111,11 @@ public class TrendReportParams {
             DateFormat df = new SimpleDateFormat("yyyy_MM_dd_HH_mm");
             _outputPath = _outputPath + df.format(new Date());            
         }
-        parseDates(args[ARGS_DATE], args[ARGS_OFFSET]);
+        
+        if (args.length == 3)
+            parseDates(ReportConstants.DEFAULT_STARTDATE, ReportConstants.DEFAULT_DATEOFFSET);
+        else
+            parseDates(args[ARGS_DATE], args[ARGS_OFFSET]);
         
         // support version 0.1
         if (_version == ReportConstants.TRENDREPORT_VERSION_01) {

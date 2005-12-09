@@ -76,7 +76,10 @@ public class ReportGenerator {
     TrendReportParams _params;
     Map[] _japexTestResults;
     Date[] _dates;
+    String[] _tests;
+    String[] _drivers;
     boolean _hasReports = true;
+    IndexPage _indexPage = null;
     /** Creates a new instance of ReportFactory */
     public ReportGenerator(TrendReportParams params, ParseReports japexReports) {
         _params = params;
@@ -86,7 +89,16 @@ public class ReportGenerator {
         } else {
             _hasReports = false;
         }
+
+        _tests = _params.test(); 
+        _drivers = _params.driver();
+        //if testcase not specified, or "all", get names of testcases from parsed test result
+        if (!_params.isTestSpecified() || _tests[0].equalsIgnoreCase(ReportConstants.KEYWORD_ALL)) {
+            ResultPerDriver result = (ResultPerDriver)_japexTestResults[0].get(_drivers[0]);
+            _tests = result.getTests();
+        }
         
+        _indexPage = new IndexPage(_params, true);
     }
     
     
@@ -96,10 +108,11 @@ public class ReportGenerator {
         
         switch (_params.reportType()) {
             case ReportConstants.REPORT_DEFAULT:
-                defaultReport(); //print one means per chart
+                singleMeansChart(); //print one means per chart
+                oneTestcaseChart();
                 break;
             case ReportConstants.REPORT_ALLDRIVERS:
-                defaultReport();
+                singleMeansChart();
                 oneTestcaseChart();
                 break;
             case ReportConstants.REPORT_ALLDRIVERS_ALLMEANS: //all means/drivers on one chart, smart grouping testcases
@@ -127,27 +140,30 @@ public class ReportGenerator {
         ResultPerDriver result = null;
         GregorianCalendar cal = new GregorianCalendar();
         String[] drivers = _params.driver();
-        IndexPage indexPage = new IndexPage(_params, true);
-
-        String[] tests = _params.test(); 
-        if (tests[0].equalsIgnoreCase(ReportConstants.KEYWORD_ALL)) {
-            result = (ResultPerDriver)_japexTestResults[0].get(drivers[0]);
-            tests = result.getTests();
-        }
+        //IndexPage indexPage = new IndexPage(_params, true);
         
-        int[] smartGroups = Util.calculateGroupSizes(tests.length, _params.groupSize());
+        int[] smartGroups = Util.calculateGroupSizes(_tests.length, _params.groupSize());
         for (int g=0; g<smartGroups.length; g++) {
             testDataset = new TimeSeriesCollection();
             int start = g * smartGroups[g];
             int end = (g+1) * smartGroups[g] - 1;
-            if (end > tests.length) end = tests.length;
-            String chartName = tests[start];
+            if (end > _tests.length) end = _tests.length;
+            String chartName = _tests[start] + ".jpg";
             StringBuffer title = new StringBuffer();
             for (int k = start; k< end; k++) {
-                if (k>start) title.append(", ");
-                title.append(tests[k]);
+                if (drivers.length == 1) {
+                    if (k == start)
+                        title.append(drivers[0]);
+                } else {
+                    if (k>start) title.append(", ");
+                    title.append(_tests[k]);
+                }
                 for (int ii = 0; ii< drivers.length; ii++) {
-                    timeSeries = new TimeSeries(drivers[ii]+"_"+tests[k], Day.class);
+                    if (drivers.length == 1) {                        
+                        timeSeries = new TimeSeries(_tests[k], Day.class);
+                    } else {
+                        timeSeries = new TimeSeries(_drivers[ii]+"_"+_tests[k], Day.class);                        
+                    }
                     for (int i = 0; i < _japexTestResults.length; i++) {
                         cal.setTime(_dates[i]);
                         int day = cal.get(cal.DAY_OF_MONTH);
@@ -156,7 +172,7 @@ public class ReportGenerator {
                         result = (ResultPerDriver)_japexTestResults[i].get(drivers[ii]);
                         //check if there's data. Japex reports may contain different drivers
                         if (result != null) { 
-                            if (result.getResult(tests[k])!=0) timeSeries.add(new Day(day, month, year), result.getResult(tests[k]));                        
+                            if (result.getResult(_tests[k])!=0) timeSeries.add(new Day(day, month, year), result.getResult(_tests[k]));                        
                         }
                     }
                     if (result != null) {
@@ -165,72 +181,78 @@ public class ReportGenerator {
                 } //drivers
             } //tests        
             _params.setTitle(title.toString());
-            indexPage.updateContent(chartName);
+            _indexPage.updateContent(chartName);
             saveChart(title.toString(), testDataset, chartName, 700, 400);
         } //smartGroups
-        indexPage.writeContent();
+        _indexPage.writeContent();
         
     }
     //one testcase for all drivers specified per chart
     private void oneTestcaseChart() {
-        String[] tests = _params.test(); 
         TimeSeries timeSeries;
         TimeSeriesCollection testDataset;
         ResultPerDriver result = null;
         GregorianCalendar cal = new GregorianCalendar();
-        String[] drivers = _params.driver();
-        IndexPage indexPage = new IndexPage(_params, true);
-        for (int k = 0; k< tests.length; k++) {
+        for (int k = 0; k< _tests.length; k++) {
             testDataset = new TimeSeriesCollection();
-            for (int ii = 0; ii< drivers.length; ii++) {
-                timeSeries = new TimeSeries(drivers[ii]+"_"+tests[k], Day.class);
+            for (int ii = 0; ii< _drivers.length; ii++) {
+                //test name's already in the title for single test chart
+                //timeSeries = new TimeSeries(_drivers[ii]+"_"+_tests[k], Day.class);
+                timeSeries = new TimeSeries(_drivers[ii], Day.class);
                 for (int i = 0; i < _japexTestResults.length; i++) {
                     cal.setTime(_dates[i]);
                     int day = cal.get(cal.DAY_OF_MONTH);
                     int month = cal.get(cal.MONTH) + 1; //month starts at 0!
                     int year = cal.get(cal.YEAR);
-                    result = (ResultPerDriver)_japexTestResults[i].get(drivers[ii]);
+                    result = (ResultPerDriver)_japexTestResults[i].get(_drivers[ii]);
                     //check if there's data. Japex reports may contain different drivers
                     if (result != null) { 
-                        if (result.getResult(tests[k])!=0) timeSeries.add(new Day(day, month, year), result.getResult(tests[k]));                        
+                        if (result.getResult(_tests[k])!=0) timeSeries.add(new Day(day, month, year), result.getResult(_tests[k]));                        
                     }
                 }
                 if (result != null) {
                     testDataset.addSeries(timeSeries);
                 }
             } //drivers
-            String chartName = tests[k]+".jpg";
-            _params.setTitle(tests[k]);
-            indexPage.updateContent(chartName);
-            saveChart(tests[k], testDataset, chartName, 700, 400);
+            String chartName = _tests[k]+".jpg";
+            _params.setTitle(_tests[k]);
+            _indexPage.updateContent(chartName);
+            saveChart(_tests[k], testDataset, chartName, 700, 400);
         } //tests        
-        indexPage.writeContent();
+        _indexPage.writeContent();
         
     }
 
     //all testcases specified for all drivers per chart
     private void multiTestsChart() {
-        String[] tests = _params.test(); 
         TimeSeries timeSeries;
         TimeSeriesCollection testDataset;
         ResultPerDriver result = null;
         GregorianCalendar cal = new GregorianCalendar();
-        String[] drivers = _params.driver();
-        IndexPage indexPage = new IndexPage(_params, true);
+        //IndexPage indexPage = new IndexPage(_params, true);
         
         testDataset = new TimeSeriesCollection();
-        for (int k = 0; k< tests.length; k++) {
-            for (int ii = 0; ii< drivers.length; ii++) {
-                timeSeries = new TimeSeries(drivers[ii]+"_"+tests[k], Day.class);
+        StringBuffer title = new StringBuffer();
+        for (int k = 0; k< _tests.length; k++) {
+            for (int ii = 0; ii< _drivers.length; ii++) {
+                if (ii != 0) {
+                    title.append(", ");
+                }
+                title.append(_drivers[ii]);
+                if (_drivers.length == 1) {
+                    timeSeries = new TimeSeries(_tests[k], Day.class);
+                } else {
+                    timeSeries = new TimeSeries(_drivers[ii]+"_"+_tests[k], Day.class);
+                }
                 for (int i = 0; i < _japexTestResults.length; i++) {
                     cal.setTime(_dates[i]);
                     int day = cal.get(cal.DAY_OF_MONTH);
                     int month = cal.get(cal.MONTH) + 1; //month starts at 0!
                     int year = cal.get(cal.YEAR);
-                    result = (ResultPerDriver)_japexTestResults[i].get(drivers[ii]);
+                    result = (ResultPerDriver)_japexTestResults[i].get(_drivers[ii]);
                     //check if there's data. Japex reports may contain different drivers
                     if (result != null) { 
-                        if (result.getResult(tests[k])!=0) timeSeries.add(new Day(day, month, year), result.getResult(tests[k]));                        
+                        if (result.getResult(_tests[k])!=0) timeSeries.add(new Day(day, month, year), result.getResult(_tests[k]));                        
                     }
                 }
                 if (result != null) {
@@ -240,31 +262,34 @@ public class ReportGenerator {
         } //tests        
         String chartName = _params.title()+".jpg";
         chartName = chartName.replace(" ", "_");
-        indexPage.updateContent(chartName);
-        saveChart(_params.title(), testDataset, chartName, 700, 400);
-        indexPage.writeContent();
+        _indexPage.updateContent(chartName);
+        saveChart(title.toString(), testDataset, chartName, 700, 400);
+        _indexPage.writeContent();
         
     }
     
     //one means for all drivers
-    private void defaultReport() {
+    private void singleMeansChart() {
         TimeSeries means, aritMeans, geomMeans, harmMeans;
         TimeSeriesCollection aritDataset = new TimeSeriesCollection();
         TimeSeriesCollection geomDataset = new TimeSeriesCollection();
         TimeSeriesCollection harmDataset = new TimeSeriesCollection();
         ResultPerDriver result = null;
         GregorianCalendar cal = new GregorianCalendar();
-        String[] drivers = _params.driver();
-        for (int ii = 0; ii< drivers.length; ii++) {
-            aritMeans = new TimeSeries("Arithmetic Means for "+drivers[ii], Day.class);
-            geomMeans = new TimeSeries("Geometric Means for "+drivers[ii], Day.class);
-            harmMeans = new TimeSeries("Harmonic Means for "+drivers[ii], Day.class);
+        for (int ii = 0; ii< _drivers.length; ii++) {
+            //Title of Means already in the title for single Means chart
+            //aritMeans = new TimeSeries("Arithmetic Means for "+_drivers[ii], Day.class);
+            //geomMeans = new TimeSeries("Geometric Means for "+_drivers[ii], Day.class);
+            //harmMeans = new TimeSeries("Harmonic Means for "+_drivers[ii], Day.class);
+            aritMeans = new TimeSeries(_drivers[ii], Day.class);
+            geomMeans = new TimeSeries(_drivers[ii], Day.class);
+            harmMeans = new TimeSeries(_drivers[ii], Day.class);
             for (int i = 0; i < _japexTestResults.length; i++) {
                 cal.setTime(_dates[i]);
                 int day = cal.get(cal.DAY_OF_MONTH);
                 int month = cal.get(cal.MONTH) + 1; //month starts at 0!
                 int year = cal.get(cal.YEAR);
-                result = (ResultPerDriver)_japexTestResults[i].get(drivers[ii]);
+                result = (ResultPerDriver)_japexTestResults[i].get(_drivers[ii]);
                 //check if there's data. Japex reports may contain different drivers
                 if (result != null) { 
                     aritMeans.add(new Day(day, month, year), result.getAritMean());
@@ -279,17 +304,17 @@ public class ReportGenerator {
             }
         }
         
-        IndexPage indexPage = new IndexPage(_params, true);
+        //IndexPage indexPage = new IndexPage(_params, true);
         _params.setTitle("Arithmetic Means");
         saveChart("Arithmetic Means", aritDataset, "ArithmeticMeans.jpg", 700, 400);
-        indexPage.updateContent("ArithmeticMeans.jpg");
+        _indexPage.updateContent("ArithmeticMeans.jpg");
         saveChart("Geometric Means", geomDataset, "GeometricMeans.jpg", 700, 400);
         _params.setTitle("Geometric Means");
-        indexPage.updateContent("GeometricMeans.jpg");
+        _indexPage.updateContent("GeometricMeans.jpg");
         saveChart("Harmonic Means", harmDataset, "HarmonicMeans.jpg", 700, 400);
         _params.setTitle("Harmonic Means");
-        indexPage.updateContent("HarmonicMeans.jpg");
-        indexPage.writeContent();
+        _indexPage.updateContent("HarmonicMeans.jpg");
+        _indexPage.writeContent();
     }
     
     //all means for all drivers on one chart
@@ -301,10 +326,20 @@ public class ReportGenerator {
         ResultPerDriver result = null;
         GregorianCalendar cal = new GregorianCalendar();
         String[] drivers = _params.driver();
+        String title = drivers[0];
         for (int ii = 0; ii< drivers.length; ii++) {
-            aritMeans = new TimeSeries("Arithmetic Means for "+drivers[ii], Day.class);
-            geomMeans = new TimeSeries("Geometric Means for "+drivers[ii], Day.class);
-            harmMeans = new TimeSeries("Harmonic Means for "+drivers[ii], Day.class);
+            if (ii > 0) {
+                title = title + ", " + drivers[ii];
+            }
+            if (drivers.length == 1) {
+                aritMeans = new TimeSeries("Arithmetic Means", Day.class);
+                geomMeans = new TimeSeries("Geometric Means", Day.class);
+                harmMeans = new TimeSeries("Harmonic Means", Day.class);
+            } else {
+                aritMeans = new TimeSeries("Arithmetic Means for "+drivers[ii], Day.class);
+                geomMeans = new TimeSeries("Geometric Means for "+drivers[ii], Day.class);
+                harmMeans = new TimeSeries("Harmonic Means for "+drivers[ii], Day.class);
+            }
             for (int i = 0; i < _japexTestResults.length; i++) {
                 cal.setTime(_dates[i]);
                 int day = cal.get(cal.DAY_OF_MONTH);
@@ -325,11 +360,11 @@ public class ReportGenerator {
             }
         }
         
-        IndexPage indexPage = new IndexPage(_params, true);
-        _params.setTitle("Means");
-        indexPage.updateContent("means.jpg");
-        saveChart("Means", dataset, "means.jpg", 700, 400);
-        indexPage.writeContent();
+        //IndexPage indexPage = new IndexPage(_params, true);
+        _params.setTitle(title);
+        _indexPage.updateContent("means.jpg");
+        saveChart(title, dataset, "means.jpg", 700, 400);
+        _indexPage.writeContent();
     }
     
     
