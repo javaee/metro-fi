@@ -263,4 +263,24 @@ public class Util {
         return result;
     }
     
+    //return a legal filename from a testcase title
+    public static String getFilename(String testcase) {
+        StringBuffer filename = new StringBuffer();
+        for (int i=0; i<testcase.length(); i++) {
+            char achar = testcase.charAt(i);
+            if (achar == 46) { //.
+                char nchar = testcase.charAt(i+1);
+                filename.append("_");
+                if (nchar == 47 || nchar == 92) {  //./
+                    i++;
+                }
+            } else if (achar == 47 || achar == 92 || achar == 32) { // / \ and space
+                filename.append("_");                
+            } else {
+                filename.append(achar);
+            }
+        }
+        return filename.toString();
+    }
+    
 }
