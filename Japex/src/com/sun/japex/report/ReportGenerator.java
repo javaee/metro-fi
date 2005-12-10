@@ -148,8 +148,9 @@ public class ReportGenerator {
             int start = g * smartGroups[g];
             int end = (g+1) * smartGroups[g] - 1;
             if (end > _tests.length) end = _tests.length;
-            String chartName = _tests[start] + ".jpg";
+            String chartName = Util.getFilename(_tests[start]) + ".jpg";
             StringBuffer title = new StringBuffer();
+            StringBuffer linkTitle = new StringBuffer();
             for (int k = start; k< end; k++) {
                 if (drivers.length == 1) {
                     if (k == start)
@@ -158,6 +159,8 @@ public class ReportGenerator {
                     if (k>start) title.append(", ");
                     title.append(_tests[k]);
                 }
+                if (k>start) linkTitle.append(", ");
+                linkTitle.append(_tests[k]);
                 for (int ii = 0; ii< drivers.length; ii++) {
                     if (drivers.length == 1) {                        
                         timeSeries = new TimeSeries(_tests[k], Day.class);
@@ -180,7 +183,7 @@ public class ReportGenerator {
                     }
                 } //drivers
             } //tests        
-            _params.setTitle(title.toString());
+            _params.setTitle(linkTitle.toString());
             _indexPage.updateContent(chartName);
             saveChart(title.toString(), testDataset, chartName, 700, 400);
         } //smartGroups
@@ -214,7 +217,7 @@ public class ReportGenerator {
                     testDataset.addSeries(timeSeries);
                 }
             } //drivers
-            String chartName = _tests[k]+".jpg";
+            String chartName = Util.getFilename(_tests[k])+".jpg";
             _params.setTitle(_tests[k]);
             _indexPage.updateContent(chartName);
             saveChart(_tests[k], testDataset, chartName, 700, 400);
@@ -260,8 +263,7 @@ public class ReportGenerator {
                 }
             } //drivers
         } //tests        
-        String chartName = _params.title()+".jpg";
-        chartName = chartName.replace(" ", "_");
+        String chartName = Util.getFilename(_params.title())+".jpg";
         _indexPage.updateContent(chartName);
         saveChart(title.toString(), testDataset, chartName, 700, 400);
         _indexPage.writeContent();
@@ -361,7 +363,7 @@ public class ReportGenerator {
         }
         
         //IndexPage indexPage = new IndexPage(_params, true);
-        _params.setTitle(title);
+        _params.setTitle("Means");
         _indexPage.updateContent("means.jpg");
         saveChart(title, dataset, "means.jpg", 700, 400);
         _indexPage.writeContent();

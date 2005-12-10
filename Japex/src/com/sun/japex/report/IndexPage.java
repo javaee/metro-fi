@@ -53,6 +53,7 @@ import java.io.OutputStreamWriter;
  * for version 0.2 to update content for multiple charts 
  */
 public class IndexPage {    
+    static final String REPORT_TITLE = "<!--{title}-->";
     static final String REPORT_NEWINDEX = "<!--{new index}-->";
     static final String REPORT_NEWROW = "<!--{new row}-->";
     
@@ -151,6 +152,12 @@ public class IndexPage {
         newrow.append("</table><br>");
         newrow.append(REPORT_NEWROW+"\n");
 
+        start = _content.indexOf(REPORT_TITLE);
+        if (start > 0) {
+            end = start + REPORT_TITLE.length();
+            _content.replace(start, end, _params.pageTitle());
+        }
+        
         start = _content.indexOf(REPORT_NEWINDEX);
         end = start + REPORT_NEWINDEX.length();
         _content.replace(start, end, newindex.toString());
@@ -212,7 +219,7 @@ public class IndexPage {
         StringBuffer template = new StringBuffer();
         template.append("<html>\n<link href=\"report.css\" type=\"text/css\" rel=\"stylesheet\"/>\n");
         template.append("<head><title>Japex Trend Report</title></head>\n<body>\n");
-        template.append("<a name=\"top\"><h1>Japex Trend Report</h1>\n");
+        template.append("<a name=\"top\"><h1>"+REPORT_TITLE+"</h1>\n");
         template.append("<ul>");
         template.append(REPORT_NEWINDEX);
         template.append("</ul>");

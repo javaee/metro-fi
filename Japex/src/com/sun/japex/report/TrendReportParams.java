@@ -52,7 +52,7 @@ import java.util.StringTokenizer;
     where:
     title -- name of the chart to be generated
     reportPath -- path to where the report directory is
-    outputPath -- path where the html report will be saved. If
+    outputPath -- path where the html report will be saved. 
     date -- a specific date in format "yyyy-MM-dd", including "Today", 
             from or to which a trend report shall be made. Default "Today"
     offset -- days, weeks, months or years from/to the above date a trend report will be created. 
@@ -81,6 +81,7 @@ public class TrendReportParams {
     static final int ARGS_DRIVER = 5;
     static final int ARGS_TESTCASE = 6;
         
+    String _pageTitle;
     String _title;
     String _reportPath;
     String _outputPath;
@@ -104,6 +105,7 @@ public class TrendReportParams {
     /** Creates a new instance of TrendReportParams */
     public TrendReportParams(String[] args) {
         args = checkOptions(args);
+        _pageTitle = args[ARGS_TITLE];
         _title = args[ARGS_TITLE];
         _reportPath = args[ARGS_PATH];
         _outputPath = args[ARGS_OUTPUTPATH];
@@ -294,6 +296,9 @@ public class TrendReportParams {
     
     public void setReportType(int newType) {
         _type = newType;
+    }
+    public String pageTitle() {
+        return _pageTitle;
     }
     public String title() {
         return _title;
