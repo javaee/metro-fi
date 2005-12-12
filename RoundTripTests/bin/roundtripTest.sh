@@ -25,7 +25,9 @@ handle_dir() {
 
 handle_file() {
     file=$1
-    ext=${file##*.}
+    ext=`echo "$file" | sed 's/.*\.//'`
+    #echo extionsion: $EXTENSION
+    #ext=${file##*.}
     if [ $ext = "xml" ]; then
         #echo $file is an xml file
         $cmd $file "$PWD" $reportname
@@ -41,11 +43,11 @@ reportname=$2
 for file in *
 do
     if [ -d "$file" ]; then
-        #echo $file is directory
+        echo $file is directory
         handle_dir "$file"
     else
-        #echo $file is file, perform Xerces test
-        handle_file "$file"
+        echo $file is file, perform Xerces test
+#        handle_file "$file"
     fi
 done 
 
