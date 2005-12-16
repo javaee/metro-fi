@@ -54,3 +54,4 @@ done
 removeUnusedFiles.sh ent -d
 removeUnusedFiles.sh dtd -d
 
+cleandiff.sh

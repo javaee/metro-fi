@@ -13,7 +13,8 @@ usage() {
 
 handle_dir() {
     cd "$1"
-    count_subdirs=$(find . -type d| wc -l)
+#linus:    count_subdirs=$(find . -type d| wc -l)
+    count_subdirs=`find . -type d| wc -l`
     if [ $count_subdirs = 1 ]; then
         #echo $1 does not contain sub-directory
         handle_file $1
@@ -36,15 +37,17 @@ handle_dir() {
 }     
 
 handle_file() {
-    count_xmlfiles=$(find . -name '*.xml'| wc -l)
+    #count_xmlfiles=$(find . -name '*.xml'| wc -l)
+    count_xmlfiles=`find . -name '*.xml'| wc -l`
     if [ $count_xmlfiles = 0 ]; then
         #echo $1 does not contain xml files
         for file in *
         do
             if [ -f "$file" ]; then
-                ext=${file##*.}
+                #ext=${file##*.}
+                ext=`echo "$file" | sed 's/.*\.//'`
                 if [ $extention = $ext ]; then
-                    reference=$(grep -lir "$file" .| wc -l)
+                    reference=`grep -lir "$file" .| wc -l`
                     if [ $reference = 0 ]; then
                         echo file $file is not referenced, remove
                         rm $file
@@ -57,7 +60,7 @@ handle_file() {
 }
 
 remove_emptydir() {
-    total_files=$(ls $1 | wc -l)
+    total_files=`ls $1 | wc -l`
     if [ $total_files = 0 ]; then
         echo $1 is empty, remove
         rmdir $1

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 handle_dir() {
-    total_files=$(find $1 -type f | wc -l)
+    total_files=`find $1 -type f | wc -l`
     if [ $total_files = 0 ]; then
         echo $1 is empty
         rmdir $1

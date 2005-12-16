@@ -18,7 +18,8 @@ handle_dir() {
 
 handle_file() {
     file=$1
-    ext=${file##*.}
+    #ext=${file##*.}
+    ext=`echo "$file" | sed 's/.*\.//'`
     if [ $ext = "xml" ]; then
         #echo $file is an xml file
         removeXML1_1.csh $file
