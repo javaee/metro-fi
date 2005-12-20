@@ -40,9 +40,6 @@
 package com.sun.japex;
 
 import java.util.*;
-import java.net.*;
-import java.io.File;
-import java.io.FilenameFilter;
 
 public class DriverImpl extends ParamsImpl implements Driver {
     
@@ -78,39 +75,10 @@ public class DriverImpl extends ParamsImpl implements Driver {
      */
     TestCaseArrayList _aggregateTestCases;
     
-    /**
-     * Class loader shared by all driver instances.
-     */
-    static JapexClassLoader _classLoader;
-
-    /**
-     * Set the parent class loader to null in order to force the use of 
-     * the bootstrap classloader. The boostrap class loader does not 
-     * have access to the system's class path.
-     */ 
-    static class JapexClassLoader extends URLClassLoader {
-        public JapexClassLoader(URL[] urls) {
-            super(urls, null);
-        }          
-        public Class findClass(String name) throws ClassNotFoundException {
-            // Delegate when loading Japex classes, excluding JDSL drivers
-            if (name.startsWith("com.sun.japex.") && !name.startsWith("com.sun.japex.jdsl.")) {
-                return DriverImpl.class.getClassLoader().loadClass(name);
-            }
-            
-            // Otherwise, use class loader based on japex.classPath only
-            return super.findClass(name);
-        }        
-        public void addURL(URL url) {
-            super.addURL(url);
-        }
-    }    
-       
     public DriverImpl(String name, boolean isNormal, ParamsImpl params) {
         super(params);
         _name = name;
         _isNormal = isNormal;
-        initJapexClassLoader();        
     }
     
     public void setTestCases(TestCaseArrayList testCases) {
@@ -269,28 +237,6 @@ public class DriverImpl extends ParamsImpl implements Driver {
         return _aggregateTestCases;
     }
     
-    JapexDriverBase getJapexDriver() throws ClassNotFoundException {
-        String className = getParam(Constants.DRIVER_CLASS);
-        if (_class == null) {
-            _class = Class.forName(className, true, _classLoader);
-        }
-        
-        try {
-            Thread.currentThread().setContextClassLoader(_classLoader);
-            return (JapexDriverBase) _class.newInstance();
-        }
-        catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        }
-        catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-        catch (ClassCastException e) {
-            throw new RuntimeException("Class '" + className 
-                + "' must extend '" + JapexDriverBase.class.getName() + "'");
-        }
-    }
-    
     public String getName() {
         return _name;
     }    
@@ -321,63 +267,4 @@ public class DriverImpl extends ParamsImpl implements Driver {
         report.append(Util.getSpaces(spaces) + "</driver>\n");       
     }
     
-    /**
-     * Initializes the Japex class loader. A single class loader will be
-     * created for all drivers. Thus, if japex.classPath is defined as
-     * a driver's property, it will be ignored.
-     */ 
-    synchronized private void initJapexClassLoader() {
-        // Initialize class loader only once
-        if (_classLoader != null) {
-            return;
-        }
-
-        _classLoader = new JapexClassLoader(new URL[0]);
-        String classPath = getParam(Constants.CLASS_PATH);
-        if (classPath == null) {
-            return;
-        }
-        
-        String pathSep = System.getProperty("path.separator");
-        String fileSep = System.getProperty("file.separator");
-        StringTokenizer tokenizer = new StringTokenizer(classPath, pathSep); 
-        
-        // TODO: Ensure that this code works on Windows too!
-	while (tokenizer.hasMoreTokens()) {
-            String path = tokenizer.nextToken();            
-            try {
-                boolean lookForJars = false;
-                
-                // Strip off '*.jar' at the end if present
-                if (path.endsWith("*.jar")) {
-                    int k = path.lastIndexOf('/');
-                    path = (k >= 0) ? path.substring(0, k + 1) : "./";
-                    lookForJars = true;
-                }
-                
-                // Create a file from the resulting path
-                File file = new File(path);
-                
-                // If a directory, add all '.jar'
-                if (file.isDirectory() && lookForJars) {
-                    String children[] = file.list(
-                        new FilenameFilter() {
-                            public boolean accept(File dir, String name) {
-                                return name.endsWith(".jar");
-                            }
-                        });
-                        
-                    for (String c : children) {
-                        _classLoader.addURL(new File(path + fileSep + c).toURL());
-                    }
-                }
-                else {
-                    _classLoader.addURL(file.toURL());
-                }
-            }
-            catch (MalformedURLException e) {
-                // ignore
-            }
-        }        
-    }
 }

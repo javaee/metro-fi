@@ -134,26 +134,36 @@ public class Engine {
                 int nOfThreads = _driverImpl.getIntParam(Constants.NUMBER_OF_THREADS);
                 int runsPerDriver = _driverImpl.getIntParam(Constants.RUNS_PER_DRIVER);
                 boolean includeWarmupRun = _driverImpl.getBooleanParam(Constants.INCLUDE_WARMUP_RUN);
+                
+                // Create a Japex class loader for this driver
+                JapexClassLoader jcLoader = 
+                    new JapexClassLoader(_driverImpl.getParam(Constants.CLASS_PATH));
+		Thread.currentThread().setContextClassLoader(jcLoader);
  
-                // Created thread pool of nOfThreads size and pre-start threads
-		_threadPool = new ThreadPoolExecutor(nOfThreads, nOfThreads, 0L,
-                    TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
-                _threadPool.prestartAllCoreThreads();
-
-                // Display driver's name
                 System.out.print("  " + _driverImpl.getName() + " using " + nOfThreads + " thread(s)");
-
+                
                 // Allocate a matrix of nOfThreads * runPerDriver size and initialize each instance
                 _drivers = new JapexDriverBase[nOfThreads][runsPerDriver];
                 for (int i = 0; i < nOfThreads; i++) {
                     for (int j = 0; j < runsPerDriver; j++) {
-                        _drivers[i][j] = _driverImpl.getJapexDriver();   // returns fresh copy
+                        _drivers[i][j] = 
+                            jcLoader.getJapexDriver(
+                                _driverImpl.getParam(Constants.DRIVER_CLASS));   // returns fresh copy
                         _drivers[i][j].setDriver(_driverImpl);
                         _drivers[i][j].setTestSuite(_testSuite);
                         _drivers[i][j].initializeDriver();
                     }
                 }
 
+		// Created thread pool of nOfThreads size and pre-start threads                
+		if (nOfThreads > 1) {
+		    _threadPool = new ThreadPoolExecutor(nOfThreads, nOfThreads, 0L,
+			TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(),
+			new JapexThreadFactory(jcLoader));      // Use Japex thread factory
+		    _threadPool.prestartAllCoreThreads();
+		}
+
+                // Display driver's name
                 forEachRun();
                 
                 // Call terminate on all driver instances
@@ -164,7 +174,9 @@ public class Engine {
                 }                
                 
                 // Shutdown thread pool
-                _threadPool.shutdown();
+                if (nOfThreads > 1) {
+		    _threadPool.shutdown();
+                }
             }   
         }
         catch (RuntimeException e) {
