@@ -177,9 +177,10 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
     
     public void setFeature(String name, boolean value)
     throws SAXNotRecognizedException, SAXNotSupportedException {
-        if (name.equals(Features.NAMESPACES_FEATURE)
-        && value == false) {
-            throw new SAXNotSupportedException(name + ":" + value);
+        if (name.equals(Features.NAMESPACES_FEATURE)) {
+            if (value == false) {
+                throw new SAXNotSupportedException(name + ":" + value);
+            }
         } else if (name.equals(Features.NAMESPACE_PREFIXES_FEATURE)) {
             _namespacePrefixesFeature = value;
         } else if (name.equals(Features.STRING_INTERNING_FEATURE) ||
