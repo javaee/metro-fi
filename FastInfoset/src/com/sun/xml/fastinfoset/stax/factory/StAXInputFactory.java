@@ -37,8 +37,12 @@
  */ 
 
 
-package com.sun.xml.fastinfoset.stax;
+package com.sun.xml.fastinfoset.stax.factory;
 
+import com.sun.xml.fastinfoset.stax.*;
+import com.sun.xml.fastinfoset.stax.events.StAXEventReader;
+import com.sun.xml.fastinfoset.stax.events.StAXFilteredEvent;
+import com.sun.xml.fastinfoset.stax.util.StAXFilteredParser;
 import com.sun.xml.fastinfoset.tools.XML_SAX_FI;
 
 import java.io.InputStream;

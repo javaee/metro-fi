@@ -36,7 +36,7 @@
  *
  */ 
 
-package com.sun.xml.fastinfoset.stax;
+package com.sun.xml.fastinfoset.stax.util;
 
 import javax.xml.namespace.QName;
 import javax.xml.namespace.NamespaceContext;

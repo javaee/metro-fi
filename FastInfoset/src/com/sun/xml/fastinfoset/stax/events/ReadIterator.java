@@ -37,11 +37,35 @@
  */ 
 
 
-package com.sun.xml.fastinfoset.util;
+package com.sun.xml.fastinfoset.stax.events;
 
+import java.util.Iterator;
+import com.sun.xml.fastinfoset.CommonResourceBundle;
 
-public class XMLConstants {
+public class ReadIterator implements Iterator {
     
-   public static final String ENCODING = "UTF-8";
-   public static final String XMLVERSION = "1.0";
+    Iterator iterator = EmptyIterator.getInstance();
+    
+    public ReadIterator(){
+    }
+    
+    public ReadIterator(Iterator iterator){
+        if (iterator != null) {
+            this.iterator = iterator;
+        }
+    }
+    
+    public boolean hasNext() {
+        return iterator.hasNext();
+    }
+    
+    public Object next() {
+        return iterator.next();
+    }
+    
+    public void remove() {
+        throw new  UnsupportedOperationException(CommonResourceBundle.getInstance().getString("message.readonlyList"));
+    }
+    
+
 }

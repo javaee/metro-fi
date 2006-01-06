@@ -52,8 +52,8 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.StartElement;
 
-import com.sun.xml.fastinfoset.util.EmptyIterator;
-import com.sun.xml.fastinfoset.util.ReadIterator;
+import com.sun.xml.fastinfoset.stax.events.EmptyIterator;
+import com.sun.xml.fastinfoset.stax.events.ReadIterator;
 
 public class StartElementEvent extends EventBase implements StartElement {
     

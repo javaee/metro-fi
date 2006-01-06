@@ -37,7 +37,7 @@
  */ 
 
 
-package com.sun.xml.fastinfoset.stax;
+package com.sun.xml.fastinfoset.tools;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;

@@ -41,7 +41,7 @@ package com.sun.xml.fastinfoset.stax.events;
 import javax.xml.namespace.QName;
 import javax.xml.stream.events.Attribute;
 
-import com.sun.xml.fastinfoset.util.Util;
+import com.sun.xml.fastinfoset.stax.events.Util;
 
 
 public class AttributeBase extends EventBase implements Attribute

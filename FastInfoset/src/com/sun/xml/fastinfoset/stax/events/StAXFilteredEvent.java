@@ -4,7 +4,7 @@
  * Created on January 12, 2005, 4:46 PM
  */
 
-package com.sun.xml.fastinfoset.stax;
+package com.sun.xml.fastinfoset.stax.events;
 
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.EventFilter;

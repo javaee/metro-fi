@@ -39,10 +39,10 @@
 
 package com.sun.xml.fastinfoset.stax.events ;
 
+import com.sun.xml.fastinfoset.org.apache.xerces.util.XMLChar;
 import javax.xml.stream.events.Characters;
 
-import com.sun.xml.fastinfoset.util.Util;
-import com.sun.xml.fastinfoset.util.XMLChar;
+import com.sun.xml.fastinfoset.stax.events.Util;
 
 public class CharactersEvent extends EventBase implements Characters {
     private String _text;

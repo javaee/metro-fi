@@ -47,8 +47,7 @@ import com.sun.xml.fastinfoset.algorithm.BuiltInEncodingAlgorithmFactory;
 import com.sun.xml.fastinfoset.sax.AttributesHolder;
 import com.sun.xml.fastinfoset.util.CharArray;
 import com.sun.xml.fastinfoset.util.CharArrayString;
-import com.sun.xml.fastinfoset.util.XMLChar;
-import com.sun.xml.fastinfoset.util.EventLocation;
+import com.sun.xml.fastinfoset.stax.EventLocation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
@@ -63,6 +62,7 @@ import org.jvnet.fastinfoset.EncodingAlgorithmException;
 import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
 import org.jvnet.fastinfoset.FastInfosetException;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
+import com.sun.xml.fastinfoset.org.apache.xerces.util.XMLChar;
 
 public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     protected static final int INTERNAL_STATE_START_DOCUMENT = 0;

@@ -37,8 +37,10 @@
  */ 
 
 
-package com.sun.xml.fastinfoset.stax;
+package com.sun.xml.fastinfoset.stax.factory;
 
+import com.sun.xml.fastinfoset.stax.*;
+import com.sun.xml.fastinfoset.stax.events.StAXEventWriter;
 import javax.xml.transform.Result;
 import javax.xml.stream.XMLOutputFactory ;
 import javax.xml.stream.XMLEventWriter;

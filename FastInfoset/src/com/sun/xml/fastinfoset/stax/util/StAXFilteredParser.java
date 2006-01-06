@@ -36,26 +36,43 @@
  *
  */ 
 
-package com.sun.xml.fastinfoset.util;
-import java.util.Iterator;
+package com.sun.xml.fastinfoset.stax.util;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.StreamFilter;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 
-public class EmptyIterator implements Iterator {
-    public static final EmptyIterator instance = new EmptyIterator();
-    /** Creates a new instance of EmptyIterator */
-    private EmptyIterator() {
+public class StAXFilteredParser extends StAXParserWrapper {
+    private StreamFilter _filter;
+    
+    /** Creates a new instance of StAXFilteredParser */
+    public StAXFilteredParser() {
     }
-    public static EmptyIterator getInstance() {
-        return instance;
+    public StAXFilteredParser(XMLStreamReader reader, StreamFilter filter) {
+        super(reader);
+        _filter = filter;
     }
-    public boolean hasNext() {
+    
+    public void setFilter(StreamFilter filter) {
+        _filter = filter;
+    }
+
+    public int next() throws XMLStreamException
+    {
+        if (hasNext())
+            return super.next();
+        throw new IllegalStateException(CommonResourceBundle.getInstance().getString("message.noMoreItems"));
+    }
+
+    public boolean hasNext() throws XMLStreamException
+    {
+        while (super.hasNext()) {
+            if (_filter.accept(getReader())) return true;
+            super.next();
+        }
         return false;
     }
-    public Object next() {
-        return null;
-    }
-    public void remove() {
-         throw new  UnsupportedOperationException(CommonResourceBundle.getInstance().getString("message.emptyIterator"));
-    }
+    
 }

@@ -44,7 +44,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import com.sun.xml.fastinfoset.stax.SAX2StAXWriter;
+import com.sun.xml.fastinfoset.tools.SAX2StAXWriter;
 
 public class XML_SAX_StAX_FI extends TransformInputOutput {
     

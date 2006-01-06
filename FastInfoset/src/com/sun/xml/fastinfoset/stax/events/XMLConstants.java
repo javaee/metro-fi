@@ -36,43 +36,12 @@
  *
  */ 
 
-package com.sun.xml.fastinfoset.stax;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.StreamFilter;
-import com.sun.xml.fastinfoset.CommonResourceBundle;
+package com.sun.xml.fastinfoset.stax.events;
 
 
-public class StAXFilteredParser extends StAXParserWrapper {
-    private StreamFilter _filter;
+public class XMLConstants {
     
-    /** Creates a new instance of StAXFilteredParser */
-    public StAXFilteredParser() {
-    }
-    public StAXFilteredParser(XMLStreamReader reader, StreamFilter filter) {
-        super(reader);
-        _filter = filter;
-    }
-    
-    public void setFilter(StreamFilter filter) {
-        _filter = filter;
-    }
-
-    public int next() throws XMLStreamException
-    {
-        if (hasNext())
-            return super.next();
-        throw new IllegalStateException(CommonResourceBundle.getInstance().getString("message.noMoreItems"));
-    }
-
-    public boolean hasNext() throws XMLStreamException
-    {
-        while (super.hasNext()) {
-            if (_filter.accept(getReader())) return true;
-            super.next();
-        }
-        return false;
-    }
-    
+   public static final String ENCODING = "UTF-8";
+   public static final String XMLVERSION = "1.0";
 }

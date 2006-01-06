@@ -36,7 +36,7 @@
  *
  */ 
 
-package com.sun.xml.fastinfoset.util;
+package com.sun.xml.fastinfoset.stax;
 
 import javax.xml.stream.Location;
 

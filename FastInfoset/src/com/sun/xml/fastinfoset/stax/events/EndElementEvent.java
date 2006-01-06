@@ -46,7 +46,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.Namespace;
 
-import com.sun.xml.fastinfoset.util.EmptyIterator;
+import com.sun.xml.fastinfoset.stax.events.EmptyIterator;
 
 
 public class EndElementEvent extends EventBase implements EndElement {

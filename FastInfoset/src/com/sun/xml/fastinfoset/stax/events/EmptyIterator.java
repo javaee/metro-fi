@@ -36,36 +36,26 @@
  *
  */ 
 
-
-package com.sun.xml.fastinfoset.util;
-
+package com.sun.xml.fastinfoset.stax.events;
 import java.util.Iterator;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
 
-public class ReadIterator implements Iterator {
-    
-    Iterator iterator = EmptyIterator.getInstance();
-    
-    public ReadIterator(){
-    }
-    
-    public ReadIterator(Iterator iterator){
-        if (iterator != null) {
-            this.iterator = iterator;
-        }
-    }
-    
-    public boolean hasNext() {
-        return iterator.hasNext();
-    }
-    
-    public Object next() {
-        return iterator.next();
-    }
-    
-    public void remove() {
-        throw new  UnsupportedOperationException(CommonResourceBundle.getInstance().getString("message.readonlyList"));
-    }
-    
 
+public class EmptyIterator implements Iterator {
+    public static final EmptyIterator instance = new EmptyIterator();
+    /** Creates a new instance of EmptyIterator */
+    private EmptyIterator() {
+    }
+    public static EmptyIterator getInstance() {
+        return instance;
+    }
+    public boolean hasNext() {
+        return false;
+    }
+    public Object next() {
+        return null;
+    }
+    public void remove() {
+         throw new  UnsupportedOperationException(CommonResourceBundle.getInstance().getString("message.emptyIterator"));
+    }
 }

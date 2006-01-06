@@ -36,7 +36,7 @@
  *
  */ 
 
-package com.sun.xml.fastinfoset.stax;
+package com.sun.xml.fastinfoset.stax.events;
 
 import java.util.Iterator;
 import javax.xml.namespace.QName;
@@ -46,7 +46,7 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.*;
-import com.sun.xml.fastinfoset.util.Util;
+import com.sun.xml.fastinfoset.stax.events.Util;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class StAXEventWriter implements XMLEventWriter {

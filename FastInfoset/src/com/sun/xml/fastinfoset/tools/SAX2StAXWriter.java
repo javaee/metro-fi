@@ -37,7 +37,7 @@
  */ 
 
 
-package com.sun.xml.fastinfoset.stax;
+package com.sun.xml.fastinfoset.tools;
 
 import com.sun.xml.fastinfoset.QualifiedName;
 import java.util.ArrayList;

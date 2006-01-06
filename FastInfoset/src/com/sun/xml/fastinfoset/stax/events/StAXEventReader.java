@@ -36,9 +36,9 @@
  *
  */ 
 
-package com.sun.xml.fastinfoset.stax;
+package com.sun.xml.fastinfoset.stax.events;
 
-import com.sun.xml.fastinfoset.stax.events.StAXEventAllocatorBase;
+import com.sun.xml.fastinfoset.stax.*;
 import java.util.NoSuchElementException;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
