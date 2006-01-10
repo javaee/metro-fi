@@ -69,6 +69,11 @@
         <jar jarfile="${dist.dir}/${app.jar}"
 		basedir="${build.dir}/classes"
 		manifest="${basedir}/build/manifest.rt"/>
+	<zip destfile="${dist.dir}/FastInfoset.src.zip">
+            <fileset dir="src">
+                <include name="**/*"/>
+            </fileset>
+	</zip>
     </target>
 
         
