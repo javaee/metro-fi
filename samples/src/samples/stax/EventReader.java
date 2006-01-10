@@ -42,20 +42,16 @@ package samples.stax;
  *
  */
 
+import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
+import com.sun.xml.fastinfoset.stax.events.StAXEventReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
-import java.io.FileReader;
-import javax.xml.stream.*;
 import javax.xml.stream.events.* ;
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLStreamException;
 
-import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
-import com.sun.xml.fastinfoset.stax.StAXEventReader;
 import samples.common.Util;
 
 

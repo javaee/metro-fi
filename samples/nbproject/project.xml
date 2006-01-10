@@ -49,7 +49,7 @@
         <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/1">
             <compilation-unit>
                 <package-root>src</package-root>
-                <classpath mode="compile">lib/FastInfoset.jar;lib/jsr173_1.0_ri.jar;lib/jsr173_api.jar</classpath>
+                <classpath mode="compile">lib/jsr173_1.0_ri.jar:lib/jsr173_api.jar:../FastInfoset/dist/FastInfoset.jar</classpath>
                 <source-level>1.4</source-level>
             </compilation-unit>
         </java-data>

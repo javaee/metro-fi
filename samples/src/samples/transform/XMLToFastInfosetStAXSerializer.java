@@ -39,25 +39,20 @@
 package samples.transform;
 
 import java.io.File;
-import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.FileNotFoundException;
 import java.io.ByteArrayOutputStream;
 
 import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
-import javax.xml.transform.stream.*;
 import javax.xml.parsers.*;
 import org.w3c.dom.*;
 import javax.xml.transform.sax.SAXResult;
 
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.stream.XMLStreamException;
 import com.sun.xml.fastinfoset.stax.StAXDocumentSerializer;
-import com.sun.xml.fastinfoset.stax.SAX2StAXWriter;
+import com.sun.xml.fastinfoset.tools.SAX2StAXWriter;
 
 /** <p>Serializes an XML input stream into FI document using 
  *  StAX document serializer defined in the fastinfoset.stax package.</p>
