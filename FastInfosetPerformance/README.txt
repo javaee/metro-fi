@@ -12,11 +12,14 @@ Introduction:
  executing tests on XML documents within the directory and producing results
  from such documents.
 
+ The tests require that the environment varable JAPEX_HOME be set to point
+ to the location of the Japex project (see http://japex.dev.java.net)
+
  The Japex drivers are set up to:
 
  o use Xerces 2.7.1 for the Xerces specific Japex drivers and Suns SJSXP
    StaX parser for StAX specific Japex drivers, both of which are obtained
-   from the JapexXMLDriverLibrary sub-project. 
+   from Japex. 
 
  o use JAXP as shipped with the JDK.
  
@@ -28,12 +31,11 @@ Introduction:
  It is possible to modify the classpath for executing the Japex drivers by
  editing the 'build-template.xml' ant project and changing the file set of
  the 'japex.class.path' path. For example this could be modified to use
- an alternative version of Xerces (instead of the one supplied by the
- JapexXMLDriverLibrary).
+ an alternative version of Xerces (instead of the one supplied by
+ Japex).
 
  The execution of the Japex drivers will require that the sub-projects
- FastInfoset, Japex and JapexXMLDriverLibrary are all built to produce the
- appropriate jars.
+ FastInfoset is built to produce the appropriate jars.
 
 FIpex:
 
@@ -50,8 +52,7 @@ FpMLFIpex
 
 Running: 
 
- Before running the sub-projects, FastInfoset, Japex and JapexXMLDriverLibrary
- need to be built.
+ Before running the sub-project FastInfoset needs to be built.
 
  From a '*pex' directory:
 
