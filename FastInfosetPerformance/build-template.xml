@@ -1,4 +1,5 @@
 <project name="Build template">
+    <property environment="env"/>
 
     <!--
 	This is a template project that is designed to be imported into
@@ -7,19 +8,16 @@
     -->
     <property name="project.dir" value="${basedir}/../../"/>
 
-    <property name="FastInfoset.dir" value="${project.dir}/FastInfoset"/>
-    <property name="Japex.dir" value="${project.dir}/Japex"/>
-    <property name="JapexXMLDriverLibrary.dir" value="${project.dir}/JapexXMLDriverLibrary"/>
+    <property name="FastInfoset.dir" value="${basedir}/../../FastInfoset"/>
+    <property name="Japex.dir" value="${env.JAPEX_HOME}"/>
 
     <path id="class.path">
 	<fileset dir="${Japex.dir}" includes="dist/lib/*.jar"/>
     </path>
 
     <path id="japex.class.path">
-	<fileset dir="${JapexXMLDriverLibrary.dir}" includes="dist/*.jar"/>
-	<fileset dir="${FastInfoset.dir}" includes="dist/*.jar"/>
-	<fileset dir="${Japex.dir}" includes="dist/lib/jsr173_api.jar"/>
-	<fileset dir="${JapexXMLDriverLibrary.dir}" includes="lib/**/*.jar"/>
+	<fileset dir="${FastInfoset.dir}" includes="dist/lib/*.jar"/>
+	<fileset dir="${Japex.dir}" includes="dist/jdsl/*.jar"/>
     </path>
 
     <property name="japex.classPath" refid="japex.class.path"/>
