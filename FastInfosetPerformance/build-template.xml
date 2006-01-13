@@ -8,15 +8,13 @@
     -->
     <property name="project.dir" value="${basedir}/../../"/>
 
-    <property name="FastInfoset.dir" value="${basedir}/../../FastInfoset"/>
-    <property name="Japex.dir" value="${env.JAPEX_HOME}"/>
+    <property name="Japex.dir" value="${project.dir}/../japex"/>
 
     <path id="class.path">
 	<fileset dir="${Japex.dir}" includes="dist/lib/*.jar"/>
     </path>
 
     <path id="japex.class.path">
-	<fileset dir="${FastInfoset.dir}" includes="dist/lib/*.jar"/>
 	<fileset dir="${Japex.dir}" includes="dist/jdsl/*.jar"/>
     </path>
 
