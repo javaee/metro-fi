@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testSuite name="FI-parse" xmlns="http://www.sun.com/japex/testSuite">
+<testSuite name="FI-serialize" xmlns="http://www.sun.com/japex/testSuite">
 
     <param name="japex.warmupTime" value="5"/>
     <param name="japex.runTime" value="5"/>
