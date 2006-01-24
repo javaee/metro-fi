@@ -1365,7 +1365,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     BuiltInEncodingAlgorithmFactory.longEncodingAlgorithm.
                             decodeFromBytesToLongArray(builtInAlgorithmState.longArray, 0,
                             _octetBuffer, _octetBufferStart, _octetBufferLength);
-                    _primitiveHandler.ints(builtInAlgorithmState.intArray, 0, length);
+                    _primitiveHandler.longs(builtInAlgorithmState.longArray, 0, length);
                     break;
                 case EncodingAlgorithmIndexes.BOOLEAN:
                     length = BuiltInEncodingAlgorithmFactory.booleanEncodingAlgorithm.
