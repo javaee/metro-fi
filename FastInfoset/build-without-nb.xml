@@ -263,7 +263,7 @@
 
     <!-- copy fast infoset specific jar files into the right directory structure -->
     <echo message="Copying FastInfoset.jar to proper directory" />
-    <copy todir="${pkg.build.dir}/${pkg.fastinfoset}/usr/share/lib" overwrite="yes">
+    <copy todir="${pkg.build.dir}/${pkg.fastinfoset}/SUNWjax/share/lib" overwrite="yes">
       <fileset dir="${dist.home}">
         <include name="FastInfoset.jar"/>
       </fileset>
@@ -271,7 +271,7 @@
 
     <!-- copy fast infoset dependent jar files into the right directory structure 
     <echo message="Copying sjsxp dependent jar file to proper directory" />
-    <copy todir="${pkg.build.dir}/${pkg.fastinfoset}/usr/share/lib" overwrite="yes">
+    <copy todir="${pkg.build.dir}/${pkg.fastinfoset}/SUNWjax/share/lib" overwrite="yes">
       <fileset dir="${sjsxp.build}/lib">
         <include name="jsr173_api.jar"/>
       </fileset>
