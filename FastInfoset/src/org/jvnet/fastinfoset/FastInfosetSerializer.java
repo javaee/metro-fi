@@ -40,7 +40,13 @@ package org.jvnet.fastinfoset;
 import java.util.Map;
 
 /**
+ * A general interface for serializers of fast infoset documents.
  *
+ * <p>
+ * This interface contains common methods that are not specific to any
+ * API associated with the serialization of XML Infoset to fast infoset
+ * documents.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public interface FastInfosetSerializer {
@@ -133,7 +139,9 @@ public interface FastInfosetSerializer {
      */
     public int getAttributeValueSizeLimit();
     
+    /*
     
+    TODO
     // Before serializing
     
     public void setExternalVocabulary(ReferencedVocabulary referencedVocabulary);
@@ -148,4 +156,5 @@ public interface FastInfosetSerializer {
     public Vocabulary getDynamicVocabulary();
 
     public Vocabulary getFinalVocabulary();    
+    */
 }

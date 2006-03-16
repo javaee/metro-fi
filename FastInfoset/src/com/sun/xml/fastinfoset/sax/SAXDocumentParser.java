@@ -197,7 +197,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         if (name.equals(Properties.LEXICAL_HANDLER_PROPERTY)) {
             return getLexicalHandler();
         } else if (name.equals(FastInfosetReader.EXTERNAL_VOCABULARIES_PROPERTY)) {
-            return _externalVocabularies;
+            return getExternalVocabularies();
         } else if (name.equals(FastInfosetReader.REGISTERED_ENCODING_ALGORITHMS_PROPERTY)) {
             return getRegisteredEncodingAlgorithms();
         } else if (name.equals(FastInfosetReader.ENCODING_ALGORITHM_CONTENT_HANDLER_PROPERTY)) {
@@ -930,7 +930,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                             prefix),
                             namespaceName);
                 } else {
-                    _attributes.addAttribute(DEFAULT_NAMESPACE_DECLARATION,
+                    _attributes.addAttribute(EncodingConstants.DEFAULT_NAMESPACE_DECLARATION,
                             namespaceName);
                 }
             }

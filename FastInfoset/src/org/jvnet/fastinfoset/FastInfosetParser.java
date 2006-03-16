@@ -41,7 +41,12 @@ package org.jvnet.fastinfoset;
 import java.util.Map;
 
 /**
+ * A general interface for parsers of fast infoset documents.
  *
+ * <p>
+ * This interface contains common methods that are not specific to any
+ * API associated with the parsing of fast infoset documents.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public interface FastInfosetParser {
@@ -130,13 +135,26 @@ public interface FastInfosetParser {
      */
     public Map getRegisteredEncodingAlgorithms();
 
-
+    /**
+     * Set the map of referenced external vocabularies.
+     *
+     * @param referencedVocabualries the map of URI to vocabulary.
+     */
+    public void setExternalVocabularies(Map referencedVocabualries);
     
+    /**
+     * Get the map of referenced external vocabularies.
+     *
+     * @return the map of URI to vocabulary.
+     */
+    public Map getExternalVocabularies();
+    
+    /*
+    
+    TODO
     // Vocabulary methods
     
     // Before parsing 
-    
-    public void setExternalVocabularies(Map referencedVocabualries);
     
     public void setDynamicVocabulary(Vocabulary v);
     
@@ -149,5 +167,7 @@ public interface FastInfosetParser {
 
     public Vocabulary getDynamicVocabulary();
 
-    public Vocabulary getFinalVocabulary();    
+    public Vocabulary getFinalVocabulary();
+     
+    */ 
 }

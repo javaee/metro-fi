@@ -75,6 +75,11 @@ import org.xml.sax.helpers.DefaultHandler;
  * Buffering of octets that are written to an {@link java.io.OutputStream} is 
  * supported in a similar manner to a {@link java.io.BufferedOutputStream}.
  * Combining buffering with encoding enables better performance.
+ *
+ * <p>
+ * More than one fast infoset document may be encoded to the 
+ * {@link java.io.OutputStream}.
+ *
  */
 public abstract class Encoder extends DefaultHandler implements FastInfosetSerializer {
     
@@ -271,6 +276,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         return attributeValueSizeConstraint;
     }
         
+    /*
     public void setExternalVocabulary(ReferencedVocabulary referencedVocabulary) {
         throw new UnsupportedOperationException();
     }
@@ -290,7 +296,8 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     public Vocabulary getFinalVocabulary() {
         throw new UnsupportedOperationException();
     }
-
+    */
+    
     // End of FastInfosetSerializer interface
     
     

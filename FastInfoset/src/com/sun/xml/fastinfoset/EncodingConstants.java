@@ -61,6 +61,12 @@ public final class EncodingConstants {
     public static final int XMLNS_NAMESPACE_NAME_LENGTH = XMLNS_NAMESPACE_NAME.length();
     public static final char[] XMLNS_NAMESPACE_NAME_CHARS = XMLNS_NAMESPACE_NAME.toCharArray();
     
+    public static final QualifiedName DEFAULT_NAMESPACE_DECLARATION = new QualifiedName(
+            "",
+            EncodingConstants.XMLNS_NAMESPACE_NAME,
+            EncodingConstants.XMLNS_NAMESPACE_PREFIX,
+            EncodingConstants.XMLNS_NAMESPACE_PREFIX);
+    
     public static final int DOCUMENT_ADDITIONAL_DATA_FLAG = 0x40; // 01000000
     public static final int DOCUMENT_INITIAL_VOCABULARY_FLAG = 0x20; // 00100000
     public static final int DOCUMENT_NOTATIONS_FLAG = 0x10; // 00010000
