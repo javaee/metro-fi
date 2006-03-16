@@ -135,7 +135,6 @@ import org.xml.sax.ext.LexicalHandler;
  * </p>
  *
  * @version 0.1
- * @see org.jvnet.fastinfoset.VocbularyReader
  * @see org.jvnet.fastinfoset.sax.PrimitiveTypeContentHandler
  * @see org.jvnet.fastinfoset.sax.EncodingAlgorithmContentHandler
  * @see org.xml.sax.XMLReader

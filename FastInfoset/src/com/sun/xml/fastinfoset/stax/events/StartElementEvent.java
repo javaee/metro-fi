@@ -153,7 +153,7 @@ public class StartElementEvent extends EventBase implements StartElement {
  
   /**
    * Returns the attribute referred to by this name
-   * @param name the qname of the desired name
+   * @param qname the qname of the desired name
    * @return the attribute corresponding to the name value or null
    */
     public Attribute getAttributeByName(QName qname) {

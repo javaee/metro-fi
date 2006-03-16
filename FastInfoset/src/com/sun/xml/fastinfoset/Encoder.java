@@ -35,8 +35,6 @@
  * http://www.apache.org/licenses/
  *
  */
-
-
 package com.sun.xml.fastinfoset;
 
 import com.sun.xml.fastinfoset.algorithm.BuiltInEncodingAlgorithm;
@@ -60,15 +58,42 @@ import org.jvnet.fastinfoset.ReferencedVocabulary;
 import org.jvnet.fastinfoset.Vocabulary;
 import org.xml.sax.helpers.DefaultHandler;
 
+/**
+ * Abstract encoder for developing concrete encoders.
+ *
+ * Concrete implementations extending Encoder will utilize methods on Encoder 
+ * to encode XML infoset according to the Fast Infoset standard. It is the
+ * responsibility of the concrete implementation to ensure that methods are
+ * invoked in the correct order to produce a valid fast infoset document.
+ *
+ * <p>
+ * This class extends org.sax.xml.DefaultHandler so that concrete SAX
+ * implementations can be used with javax.xml.parsers.SAXParser and the parse
+ * methods that take org.sax.xml.DefaultHandler as a parameter.
+ *
+ * <p>
+ * Buffering of octets that are written to an {@link java.io.OutputStream} is 
+ * supported in a similar manner to a {@link java.io.BufferedOutputStream}.
+ * Combining buffering with encoding enables better performance.
+ */
 public abstract class Encoder extends DefaultHandler implements FastInfosetSerializer {
     
-    // Character encoding scheme system property
+    /** 
+     * Character encoding scheme system property for the encoding 
+     * of content and attribute values.
+     */
     public static final String CHARACTER_ENCODING_SCHEME_SYSTEM_PROPERTY =
         "com.sun.xml.fastinfoset.serializer.character-encoding-scheme";
 
+    /** 
+     * Default character encoding scheme system property for the encoding 
+     * of content and attribute values.
+     */
     protected static String _characterEncodingSchemeSystemDefault = UTF_8;
         
     static {
+        // Initiate the default character encoding schema from the system
+        // property
         String p = System.getProperty(CHARACTER_ENCODING_SCHEME_SYSTEM_PROPERTY,
             _characterEncodingSchemeSystemDefault);
         if (p.equals(UTF_16BE)) {
@@ -76,46 +101,104 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
-    protected boolean _encodingStringsAsUtf8 = true;
-    
-    protected int _nonIdentifyingStringOnThirdBitCES;
+    /**
+     * True if strings for text content and attribute values will be
+     * UTF-8 encoded otherwise they will be UTF-16 encoded.
+     */
+    private boolean _encodingStringsAsUtf8 = true;
 
-    protected int _nonIdentifyingStringOnFirstBitCES;
-    
-    protected Map _registeredEncodingAlgorithms = new HashMap();
+    /**
+     * Encoding constant generated from the string encoding.
+     */
+    private int _nonIdentifyingStringOnThirdBitCES;
 
+    /**
+     * Encoding constant generated from the string encoding.
+     */
+    private int _nonIdentifyingStringOnFirstBitCES;
+    
+    /**
+     * The map of URIs to algorithms.
+     */
+    private Map _registeredEncodingAlgorithms = new HashMap();
+
+    /**
+     * The vocabulary that is used by the encoder
+     */
     protected SerializerVocabulary _v;
 
-    protected boolean _vIsInternal;
+    /**
+     * True if the vocubulary is internal to the encoder
+     */
+    private boolean _vIsInternal;
 
+    /**
+     * True if terminatation of an information item is required
+     */
     protected boolean _terminate = false;
 
+    /**
+     * The current octet that is to be written.
+     */
     protected int _b;
 
+    /**
+     * The {@link java.io.OutputStream} that the encoded XML infoset (the 
+     * fast infoset document) is written to.
+     */
     protected OutputStream _s;
 
+    /**
+     * The internal buffer of characters used for the UTF-8 or UTF-16 encoding 
+     * of characters.
+     */
     protected char[] _charBuffer = new char[512];
 
+    /**
+     * The internal buffer of bytes.
+     */
     protected byte[] _octetBuffer = new byte[1024];
     
+    /**
+     * The current position in the internal buffer.
+     */
     protected int _octetBufferIndex;
    
+    /**
+     * The current mark in the internal buffer.
+     *
+     * <p>
+     * If the value of the mark is < 0 then the mark is not set.
+     */
     protected int _markIndex = -1;
 
+    /**
+     * The limit on the size of [normalized value] of Attribute Information 
+     * Items that will be indexed.
+     */
     protected int attributeValueSizeConstraint = FastInfosetSerializer.ATTRIBUTE_VALUE_SIZE_CONSTRAINT;
     
+    /**
+     * The limit on the size of character content chunks
+     * of Character Information Items or Comment Information Items that 
+     * will be indexed.
+     */
     protected int characterContentChunkSizeContraint = FastInfosetSerializer.CHARACTER_CONTENT_CHUNK_SIZE_CONSTRAINT;
 
-    // FastInfosetSerializer
-
-    public Encoder() {
+    
+    /**
+     * Default constructor for the Encoder.
+     */
+    protected Encoder() {
         setCharacterEncodingScheme(_characterEncodingSchemeSystemDefault);
     }
     
-    public void reset() {
-        _terminate = false;
-    }
     
+    // FastInfosetSerializer interface
+    
+    /**
+     * {@inheritDoc}
+     */
     public void setCharacterEncodingScheme(String characterEncodingScheme) {
         if (characterEncodingScheme.equals(UTF_16BE)) { 
             _encodingStringsAsUtf8 = false;
@@ -128,10 +211,16 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
         
+    /**
+     * {@inheritDoc}
+     */
     public String getCharacterEncodingScheme() {
         return (_encodingStringsAsUtf8) ? UTF_8 : UTF_16BE;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public void setRegisteredEncodingAlgorithms(Map algorithms) {
         _registeredEncodingAlgorithms = algorithms;
         if (_registeredEncodingAlgorithms == null) {
@@ -139,10 +228,49 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Map getRegisteredEncodingAlgorithms() {
         return _registeredEncodingAlgorithms;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void setCharacterContentChunkSizeLimit(int size) {
+        if (size < 0 ) {
+            size = 0;
+        }
+                
+        characterContentChunkSizeContraint = size;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public int getCharacterContentChunkSizeLimit() {
+        return characterContentChunkSizeContraint;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setAttributeValueSizeLimit(int size) {
+        if (size < 0 ) {
+            size = 0;
+        }
+        
+        attributeValueSizeConstraint = size;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public int getAttributeValueSizeLimit() {
+        return attributeValueSizeConstraint;
+    }
+        
     public void setExternalVocabulary(ReferencedVocabulary referencedVocabulary) {
         throw new UnsupportedOperationException();
     }
@@ -163,43 +291,43 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         throw new UnsupportedOperationException();
     }
 
+    // End of FastInfosetSerializer interface
     
     
+    /**
+     * Reset the encoder for reuse encoding another XML infoset.
+     */
+    public void reset() {
+        _terminate = false;
+    }
+        
+    /**
+     * Set the OutputStream to encode the XML infoset to a 
+     * fast infoset document.
+     *
+     * @param s the OutputStream where the fast infoset document is written to.
+     */
     public void setOutputStream(OutputStream s) {
         _octetBufferIndex = 0;
         _markIndex = -1;
         _s = s;
     }
 
+    /**
+     * Set the SerializerVocabulary to be used for encoding.
+     *
+     * @param vocabulary the vocabulary to be used for encoding.
+     */
     public void setVocabulary(SerializerVocabulary vocabulary) {
         _v = vocabulary;
         _vIsInternal = false;
     }
 
-    public void setCharacterContentChunkSizeLimit(int size) {
-        if (size < 0 ) {
-            size = 0;
-        }
-                
-        characterContentChunkSizeContraint = size;
-    }
-    
-    public int getCharacterContentChunkSizeLimit() {
-        return characterContentChunkSizeContraint;
-    }
-
-    public void setAttributeValueSizeLimit(int size) {
-        if (size < 0 ) {
-            size = 0;
-        }
-        
-        attributeValueSizeConstraint = size;
-    }
-    
-    public int getAttributeValueSizeLimit() {
-        return attributeValueSizeConstraint;
-    }
-    
+    /**
+     * Encode the header of a fast infoset document.
+     *
+     * @param encodeXmlDecl true if the XML declaration should be encoded.
+     */
     protected final void encodeHeader(boolean encodeXmlDecl) throws IOException {
         if (encodeXmlDecl) {
             _s.write(EncodingConstants.XML_DECLARATION_VALUES[0]);
@@ -207,6 +335,10 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         _s.write(EncodingConstants.BINARY_HEADER);
     }
 
+    /**
+     * Encode the initial vocabulary of a fast infoset document.
+     *
+     */
     protected final void encodeInitialVocabulary() throws IOException {
         if (_v == null) {
             _v = new SerializerVocabulary();
@@ -247,6 +379,10 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
+    /**
+     * Encode the termination of the Document Information Item.
+     *
+     */
     protected final void encodeDocumentTermination() throws IOException {
         encodeElementTermination();
         encodeTermination();
@@ -254,6 +390,10 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         _s.flush();
     }
 
+    /**
+     * Encode the termination of an Element Information Item.
+     *
+     */
     protected final void encodeElementTermination() throws IOException {
         _terminate = true;
         switch (_b) {
@@ -267,6 +407,10 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
+    /**
+     * Encode a termination if required.
+     *
+     */
     protected final void encodeTermination() throws IOException {
         if (_terminate) {
             write(_b);
@@ -274,6 +418,14 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
+    /**
+     * Encode a Attribute Information Item that is a namespace declaration.
+     *
+     * @param prefix the prefix of the namespace declaration, 
+     * if "" then there is no prefix for the namespace declaration.
+     * @param uri the URI of the namespace declaration,
+     * if "" then there is no URI for the namespace declaration.
+     */
     protected final void encodeNamespaceAttribute(String prefix, String uri) throws IOException {
         _b = EncodingConstants.NAMESPACE_ATTRIBUTE;
         if (prefix != "") {
@@ -298,17 +450,49 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
-    protected final void encodeCharacters(char[] ch, int start, int length) throws IOException {
+    /**
+     * Encode a chunk of Character Information Items.
+     *
+     * @param ch the array of characters.
+     * @param offset the offset into the array of characters.
+     * @param length the length of characters.
+     * @throws ArrayIndexOutOfBoundsException.
+     */
+    protected final void encodeCharacters(char[] ch, int offset, int length) throws IOException {
         final boolean addToTable = (length < characterContentChunkSizeContraint) ? true : false;
-        encodeNonIdentifyingStringOnThirdBit(ch, start, length, _v.characterContentChunk, addToTable, true);
+        encodeNonIdentifyingStringOnThirdBit(ch, offset, length, _v.characterContentChunk, addToTable, true);
     }
 
-    protected final void encodeCharactersNoClone(char[] ch, int start, int length) throws IOException {
+    /**
+     * Encode a chunk of Character Information Items.
+     *
+     * If the array of characters is to be indexed (as determined by 
+     * {@link Encoder#characterContentChunkSizeContraint}) then the array is not cloned
+     * when adding the array to the vocabulary.
+     * 
+     * @param ch the array of characters.
+     * @param offset the offset into the array of characters.
+     * @param length the length of characters.
+     * @throws ArrayIndexOutOfBoundsException.
+     */
+    protected final void encodeCharactersNoClone(char[] ch, int offset, int length) throws IOException {
         final boolean addToTable = (length < characterContentChunkSizeContraint) ? true : false;
-        encodeNonIdentifyingStringOnThirdBit(ch, start, length, _v.characterContentChunk, addToTable, false);
+        encodeNonIdentifyingStringOnThirdBit(ch, offset, length, _v.characterContentChunk, addToTable, false);
     }
     
-    protected final void encodeFourBitCharacters(int id, int[] table, char[] ch, int start, int length) throws FastInfosetException, IOException {
+    /**
+     * Encode a chunk of Character Information Items using a restricted 
+     * alphabet that results in the encoding of a character in 4 bits 
+     * (or two characters per octet).
+     *
+     * @param id the restricted alphabet identifier.
+     * @param table the table mapping characters to 4 bit values.
+     * @param ch the array of characters.
+     * @param offset the offset into the array of characters.
+     * @param length the length of characters.
+     * @throws ArrayIndexOutOfBoundsException.
+     */
+    protected final void encodeFourBitCharacters(int id, int[] table, char[] ch, int offset, int length) throws FastInfosetException, IOException {
         // This procedure assumes that id <= 64
         _b = (length < characterContentChunkSizeContraint) ?
             EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_RESTRICTED_ALPHABET_FLAG | EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG :
@@ -318,10 +502,23 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         // Encode bottom 6 bits of enoding algorithm id
         _b = id << 2;
 
-        encodeNonEmptyFourBitCharacterStringOnSeventhBit(table, ch, start, length);        
+        encodeNonEmptyFourBitCharacterStringOnSeventhBit(table, ch, offset, length);        
     }
     
-    protected final void encodeAlphabetCharacters(String alphabet, char[] ch, int start, int length) throws FastInfosetException, IOException {
+    /**
+     * Encode a chunk of Character Information Items using a restricted 
+     * alphabet table.
+     *
+     * @param alphabet the alphabet defining the mapping between characters and
+     *        integer values.
+     * @param ch the array of characters.
+     * @param offset the offset into the array of characters.
+     * @param length the length of characters.
+     * @throws ArrayIndexOutOfBoundsException.
+     * @throws FastInfosetException if the alphabet is not present in the 
+     *         vocabulary.
+     */
+    protected final void encodeAlphabetCharacters(String alphabet, char[] ch, int offset, int length) throws FastInfosetException, IOException {
         int id = _v.restrictedAlphabet.get(alphabet);
         if (id == KeyIntMap.NOT_PRESENT) {
             throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.restrictedAlphabetNotPresent"));
@@ -337,9 +534,15 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         // Encode bottom 6 bits of enoding algorithm id
         _b = (id & 0x3F) << 2;
 
-        encodeNonEmptyNBitCharacterStringOnSeventhBit(alphabet, ch, start, length);        
+        encodeNonEmptyNBitCharacterStringOnSeventhBit(alphabet, ch, offset, length);        
     }
             
+    /**
+     * Encode a Processing Instruction Information Item.
+     *
+     * @param target the target of the processing instruction.
+     * @param data the data of the processing instruction.
+     */
     protected final void encodeProcessingInstruction(String target, String data) throws IOException {
         write(EncodingConstants.PROCESSING_INSTRUCTION);
 
@@ -351,22 +554,53 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         encodeNonIdentifyingStringOnFirstBit(data, _v.otherString, addToTable);
     }
 
-    protected final void encodeComment(char[] ch, int start, int length) throws IOException {
+    /**
+     * Encode a Comment Information Item.
+     *
+     * @param ch the array of characters that is as comment.
+     * @param offset the offset into the array of characters.
+     * @param length the length of characters.
+     * @throws ArrayIndexOutOfBoundsException.
+     */
+    protected final void encodeComment(char[] ch, int offset, int length) throws IOException {
         write(EncodingConstants.COMMENT);
 
         boolean addToTable = (length < characterContentChunkSizeContraint) ? true : false;
-        encodeNonIdentifyingStringOnFirstBit(ch, start, length, _v.otherString, addToTable, true);
+        encodeNonIdentifyingStringOnFirstBit(ch, offset, length, _v.otherString, addToTable, true);
     }
 
-    protected final void encodeCommentNoClone(char[] ch, int start, int length) throws IOException {
+    /**
+     * Encode a Comment Information Item.
+     *
+     * If the array of characters that is a comment is to be indexed (as 
+     * determined by {@link Encoder#characterContentChunkSizeContraint}) then 
+     * the array is not cloned when adding the array to the vocabulary.
+     * 
+     * @param ch the array of characters.
+     * @param offset the offset into the array of characters.
+     * @param length the length of characters.
+     * @throws ArrayIndexOutOfBoundsException.
+     */
+    protected final void encodeCommentNoClone(char[] ch, int offset, int length) throws IOException {
         write(EncodingConstants.COMMENT);
 
         boolean addToTable = (length < characterContentChunkSizeContraint) ? true : false;
-        encodeNonIdentifyingStringOnFirstBit(ch, start, length, _v.otherString, addToTable, false);
+        encodeNonIdentifyingStringOnFirstBit(ch, offset, length, _v.otherString, addToTable, false);
     }
 
-    /*
-     * C.18
+    /**
+     * Encode a qualified name of an Element Informaiton Item on the third bit 
+     * of an octet.
+     * Implementation of clause C.18 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     *
+     * <p>
+     * The index of the qualified name will be encoded if the name is present
+     * in the vocabulary otherwise the qualified name will be encoded literally
+     * (see {@link #encodeLiteralElementQualifiedNameOnThirdBit}).
+     *
+     * @param namespaceURI the namespace URI of the qualified name.
+     * @param prefix the prefix of the qualified name.
+     * @param localName the local name of the qualified name.
      */
     protected final void encodeElementQualifiedNameOnThirdBit(String namespaceURI, String prefix, String localName) throws IOException {
         LocalNameQualifiedNamesMap.Entry entry = _v.elementName.obtainEntry(localName);
@@ -385,8 +619,14 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                 localName, entry);
     }
 
-    /*
-     * C.18
+    /**
+     * Encode a literal qualified name of an Element Informaiton Item on the
+     * third bit of an octet.
+     * Implementation of clause C.18 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     *
+     * @param namespaceURI the namespace URI of the qualified name.
+     * @param prefix the prefix of the qualified name.
+     * @param localName the local name of the qualified name.
      */
     protected final void encodeLiteralElementQualifiedNameOnThirdBit(String namespaceURI, String prefix, String localName,
             LocalNameQualifiedNamesMap.Entry entry) throws IOException {
@@ -434,8 +674,19 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
-    /*
-     * C.17
+    /**
+     * Encode a qualified name of an Attribute Informaiton Item on the third bit 
+     * of an octet.
+     * Implementation of clause C.17 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     *
+     * <p>
+     * The index of the qualified name will be encoded if the name is present
+     * in the vocabulary otherwise the qualified name will be encoded literally
+     * (see {@link #encodeLiteralAttributeQualifiedNameOnSecondBit}).
+     *
+     * @param namespaceURI the namespace URI of the qualified name.
+     * @param prefix the prefix of the qualified name.
+     * @param localName the local name of the qualified name.
      */
     protected final void encodeAttributeQualifiedNameOnSecondBit(String namespaceURI, String prefix, String localName) throws IOException {
         LocalNameQualifiedNamesMap.Entry entry = _v.attributeName.obtainEntry(localName);
@@ -454,8 +705,14 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                 localName, entry);
     }
 
-    /*
-     * C.17
+    /**
+     * Encode a literal qualified name of an Attribute Informaiton Item on the
+     * third bit of an octet.
+     * Implementation of clause C.17 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     *
+     * @param namespaceURI the namespace URI of the qualified name.
+     * @param prefix the prefix of the qualified name.
+     * @param localName the local name of the qualified name.
      */
     protected final boolean encodeLiteralAttributeQualifiedNameOnSecondBit(String namespaceURI, String prefix, String localName,
                 LocalNameQualifiedNamesMap.Entry entry) throws IOException {
@@ -515,8 +772,14 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         return true;
     }
 
-    /*
-     * C.14
+    /**
+     * Encode a non identifying string on the first bit of an octet.
+     * Implementation of clause C.14 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     *
+     * @param s the string to encode
+     * @param map the vocabulary table of strings to indexes.
+     * @param addToTable true if the string should be added to the vocabulary
+     *                   table (if not already present in the table).
      */
     protected final void encodeNonIdentifyingStringOnFirstBit(String s, StringIntMap map, boolean addToTable) throws IOException {
         if (s == null || s.length() == 0) {
@@ -538,8 +801,14 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
-    /*
-     * C.14
+    /**
+     * Encode a non identifying string on the first bit of an octet.
+     * Implementation of clause C.14 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     *
+     * @param s the string to encode
+     * @param map the vocabulary table of character arrays to indexes.
+     * @param addToTable true if the string should be added to the vocabulary
+     *                   table (if not already present in the table).
      */
     protected final void encodeNonIdentifyingStringOnFirstBit(String s, CharArrayIntMap map, boolean addToTable) throws IOException {
         if (s == null || s.length() == 0) {
@@ -563,32 +832,52 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
-    /*
-     * C.14
+    /**
+     * Encode a non identifying string on the first bit of an octet.
+     * Implementation of clause C.14 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     *
+     * @param ch the array of characters.
+     * @param offset the offset into the array of characters.
+     * @param length the length of characters.
+     * @param map the vocabulary table of character arrays to indexes.
+     * @param addToTable true if the string should be added to the vocabulary
+     *                   table (if not already present in the table).
+     * @param clone true if the array of characters should be cloned if added 
+     *              to the vocabulary table.
      */
-    protected final void encodeNonIdentifyingStringOnFirstBit(char[] array, int start, int length, CharArrayIntMap map,
+    protected final void encodeNonIdentifyingStringOnFirstBit(char[] ch, int offset, int length, CharArrayIntMap map,
             boolean addToTable, boolean clone) throws IOException {
         if (length == 0) {
             // C.26 an index (first bit '1') with seven '1' bits for an empty string
             write(0xFF);
         } else {
             if (addToTable) {
-                int index = map.obtainIndex(array, start, length, clone);
+                int index = map.obtainIndex(ch, offset, length, clone);
                 if (index == KeyIntMap.NOT_PRESENT) {
                     _b = EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG | _nonIdentifyingStringOnFirstBitCES;
-                    encodeNonEmptyCharacterStringOnFifthBit(array, start, length);
+                    encodeNonEmptyCharacterStringOnFifthBit(ch, offset, length);
                 } else {
                     encodeNonZeroIntegerOnSecondBitFirstBitOne(index);
                 }
             } else {
                 _b = _nonIdentifyingStringOnFirstBitCES;
-                encodeNonEmptyCharacterStringOnFifthBit(array, start, length);
+                encodeNonEmptyCharacterStringOnFifthBit(ch, offset, length);
             }
         }
     }
 
-    /*
-     * C.14
+    /**
+     * Encode a non identifying string on the first bit of an octet as binary
+     * data using an encoding algorithm.
+     * Implementation of clause C.14 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     *
+     * @param URI the encoding algorithm URI. If the URI == null then the
+     *            encoding algorithm identifier takes precendence.
+     * @param id the encoding algorithm identifier.
+     * @param data the data to be encoded using an encoding algorithm.
+     * @throws EncodingAlgorithmException if the encoding algorithm URI is not 
+     *         present in the vocabulary, or the encoding algorithm identifier
+     *         is not with the required range.
      */
     protected final void encodeNonIdentifyingStringOnFirstBit(String URI, int id, Object data) throws FastInfosetException, IOException {
         if (URI != null) {
@@ -600,7 +889,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
 
             EncodingAlgorithm ea = (EncodingAlgorithm)_registeredEncodingAlgorithms.get(URI);
             if (ea != null) {
-                encodeAIIObjectAlgorithmData(URI, id, data, ea);
+                encodeAIIObjectAlgorithmData(id, data, ea);
             } else {
                 if (data instanceof byte[]) {
                     byte[] d = (byte[])data;
@@ -658,7 +947,17 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
-    protected final void encodeAIIOctetAlgorithmData(int id, byte[] d, int start, int length) throws IOException {
+    /**
+     * Encode the [normalized value] of an Attribute Information Item using 
+     * using an encoding algorithm.
+     * Implementation of clause C.14 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     *
+     * @param id the encoding algorithm identifier.
+     * @param d the data, as an array of bytes, to be encoded.
+     * @param offset the offset into the array of bytes.
+     * @param length the length of bytes.
+     */
+    protected final void encodeAIIOctetAlgorithmData(int id, byte[] d, int offset, int length) throws IOException {
         // Encode identification and top four bits of encoding algorithm id
         write (EncodingConstants.NISTRING_ENCODING_ALGORITHM_FLAG |
                 ((id & 0xF0) >> 4));
@@ -669,10 +968,20 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         // Encode the length
         encodeNonZeroOctetStringLengthOnFifthBit(length);
 
-        write(d, start, length);
+        write(d, offset, length);
     }
 
-    protected final void encodeAIIObjectAlgorithmData(String URI, int id, Object data, EncodingAlgorithm ea) throws FastInfosetException, IOException {
+    /**
+     * Encode the [normalized value] of an Attribute Information Item using 
+     * using an encoding algorithm.
+     * Implementation of clause C.14 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     *
+     * @param id the encoding algorithm identifier.
+     * @param data the data to be encoded using an encoding algorithm.
+     * @param ea the encoding algorithm to use to encode the data into an
+     *           array of bytes.
+     */
+    protected final void encodeAIIObjectAlgorithmData(int id, Object data, EncodingAlgorithm ea) throws FastInfosetException, IOException {
         // Encode identification and top four bits of encoding algorithm id
         write (EncodingConstants.NISTRING_ENCODING_ALGORITHM_FLAG |
                 ((id & 0xF0) >> 4));
@@ -686,7 +995,19 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         write(_encodingBuffer, _encodingBufferIndex);
     }
 
-    protected final void encodeAIIBuiltInAlgorithmData(int id, Object o, int start, int length) throws IOException {
+    /**
+     * Encode the [normalized value] of an Attribute Information Item using 
+     * using a built in encoding algorithm.
+     * Implementation of clause C.14 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     *
+     * @param id the built in encoding algorithm identifier.
+     * @param data the data to be encoded using an encoding algorithm. The data
+     *        represents an array of items specified by the encoding algorithm 
+     *        identifier
+     * @param offset the offset into the array of bytes.
+     * @param length the length of bytes.
+     */
+    protected final void encodeAIIBuiltInAlgorithmData(int id, Object data, int offset, int length) throws IOException {
         // Encode identification and top four bits of encoding algorithm id
         write (EncodingConstants.NISTRING_ENCODING_ALGORITHM_FLAG |
                 ((id & 0xF0) >> 4));
@@ -701,33 +1022,56 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
 
         ensureSize(octetLength);
         BuiltInEncodingAlgorithmFactory.table[id].
-                encodeToBytes(o, start, length, _octetBuffer, _octetBufferIndex);
+                encodeToBytes(data, offset, length, _octetBuffer, _octetBufferIndex);
         _octetBufferIndex += octetLength;
     }
 
-    /*
-     * C.15
+    /**
+     * Encode a non identifying string on the third bit of an octet.
+     * Implementation of clause C.15 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     *
+     * @param ch the array of characters.
+     * @param offset the offset into the array of characters.
+     * @param length the length of characters.
+     * @param map the vocabulary table of character arrays to indexes.
+     * @param addToTable true if the array of characters should be added to the vocabulary
+     *                   table (if not already present in the table).
+     * @param clone true if the array of characters should be cloned if added 
+     *              to the vocabulary table.
      */
-    protected final void encodeNonIdentifyingStringOnThirdBit(char[] array, int start, int length,
+    protected final void encodeNonIdentifyingStringOnThirdBit(char[] ch, int offset, int length,
             CharArrayIntMap map, boolean addToTable, boolean clone) throws IOException {
         // length cannot be zero since sequence of CIIs has to be > 0
 
         if (addToTable) {
-            int index = map.obtainIndex(array, start, length, clone);
+            int index = map.obtainIndex(ch, offset, length, clone);
             if (index == KeyIntMap.NOT_PRESENT) {
                 _b = EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG | 
                         _nonIdentifyingStringOnThirdBitCES;
-                encodeNonEmptyCharacterStringOnSeventhBit(array, start, length);
+                encodeNonEmptyCharacterStringOnSeventhBit(ch, offset, length);
             } else {
                 _b = EncodingConstants.CHARACTER_CHUNK | 0x20;
                 encodeNonZeroIntegerOnFourthBit(index);
             }
         } else {
             _b = _nonIdentifyingStringOnThirdBitCES;
-            encodeNonEmptyCharacterStringOnSeventhBit(array, start, length);
+            encodeNonEmptyCharacterStringOnSeventhBit(ch, offset, length);
         }
     }
 
+    /**
+     * Encode a non identifying string on the third bit of an octet as binary
+     * data using an encoding algorithm.
+     * Implementation of clause C.15 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     *
+     * @param URI the encoding algorithm URI. If the URI == null then the
+     *            encoding algorithm identifier takes precendence.
+     * @param id the encoding algorithm identifier.
+     * @param data the data to be encoded using an encoding algorithm.
+     * @throws EncodingAlgorithmException if the encoding algorithm URI is not 
+     *         present in the vocabulary, or the encoding algorithm identifier
+     *         is not with the required range.
+     */
     protected final void encodeNonIdentifyingStringOnThirdBit(String URI, int id, Object data) throws FastInfosetException, IOException {
         if (URI != null) {
             id = _v.encodingAlgorithm.get(URI);
@@ -738,7 +1082,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
 
             EncodingAlgorithm ea = (EncodingAlgorithm)_registeredEncodingAlgorithms.get(URI);
             if (ea != null) {
-                encodeCIIObjectAlgorithmData(URI, id, data, ea);
+                encodeCIIObjectAlgorithmData(id, data, ea);
             } else {
                 if (data instanceof byte[]) {
                     byte[] d = (byte[])data;
@@ -795,7 +1139,21 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
-    protected final void encodeNonIdentifyingStringOnThirdBit(String URI, int id, byte[] b, int start, int length) throws FastInfosetException, IOException {
+    /**
+     * Encode a non identifying string on the third bit of an octet as binary
+     * data using an encoding algorithm.
+     * Implementation of clause C.15 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     *
+     * @param URI the encoding algorithm URI. If the URI == null then the
+     *            encoding algorithm identifier takes precendence.
+     * @param id the encoding algorithm identifier.
+     * @param d the data, as an array of bytes, to be encoded.
+     * @param offset the offset into the array of bytes.
+     * @param length the length of bytes.
+     * @throws EncodingAlgorithmException if the encoding algorithm URI is not 
+     *         present in the vocabulary.
+     */
+    protected final void encodeNonIdentifyingStringOnThirdBit(String URI, int id, byte[] d, int offset, int length) throws FastInfosetException, IOException {
         if (URI != null) {
             id = _v.encodingAlgorithm.get(URI);
             if (id == KeyIntMap.NOT_PRESENT) {
@@ -804,10 +1162,20 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
             id += EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START;
         }
 
-        encodeCIIOctetAlgorithmData(id, b, start, length);
+        encodeCIIOctetAlgorithmData(id, d, offset, length);
     }
 
-    protected final void encodeCIIOctetAlgorithmData(int id, byte[] d, int start, int length) throws IOException {
+    /**
+     * Encode a chunk of Character Information Items using 
+     * using an encoding algorithm.
+     * Implementation of clause C.15 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     *
+     * @param id the encoding algorithm identifier.
+     * @param d the data, as an array of bytes, to be encoded.
+     * @param offset the offset into the array of bytes.
+     * @param length the length of bytes.
+     */
+    protected final void encodeCIIOctetAlgorithmData(int id, byte[] d, int offset, int length) throws IOException {
         // Encode identification and top two bits of encoding algorithm id
         write (EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_ENCODING_ALGORITHM_FLAG |
                 ((id & 0xC0) >> 6));
@@ -818,10 +1186,20 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         // Encode the length
         encodeNonZeroOctetStringLengthOnSenventhBit(length);
 
-        write(d, start, length);
+        write(d, offset, length);
     }
 
-    protected final void encodeCIIObjectAlgorithmData(String URI, int id, Object data, EncodingAlgorithm ea) throws FastInfosetException, IOException {
+    /**
+     * Encode a chunk of Character Information Items using 
+     * using an encoding algorithm.
+     * Implementation of clause C.15 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     *
+     * @param id the encoding algorithm identifier.
+     * @param data the data to be encoded using an encoding algorithm.
+     * @param ea the encoding algorithm to use to encode the data into an
+     *           array of bytes.
+     */
+    protected final void encodeCIIObjectAlgorithmData(int id, Object data, EncodingAlgorithm ea) throws FastInfosetException, IOException {
         // Encode identification and top two bits of encoding algorithm id
         write (EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_ENCODING_ALGORITHM_FLAG |
                 ((id & 0xC0) >> 6));
@@ -835,7 +1213,19 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         write(_encodingBuffer, _encodingBufferIndex);
     }
 
-    protected final void encodeCIIBuiltInAlgorithmData(int id, Object o, int start, int length) throws FastInfosetException, IOException {
+    /**
+     * Encode a chunk of Character Information Items using 
+     * using an encoding algorithm.
+     * Implementation of clause C.15 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     *
+     * @param id the built in encoding algorithm identifier.
+     * @param data the data to be encoded using an encoding algorithm. The data
+     *        represents an array of items specified by the encoding algorithm 
+     *        identifier
+     * @param offset the offset into the array of bytes.
+     * @param length the length of bytes.
+     */
+    protected final void encodeCIIBuiltInAlgorithmData(int id, Object data, int offset, int length) throws FastInfosetException, IOException {
         // Encode identification and top two bits of encoding algorithm id
         write (EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_ENCODING_ALGORITHM_FLAG |
                 ((id & 0xC0) >> 6));
@@ -850,11 +1240,20 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
 
         ensureSize(octetLength);
         BuiltInEncodingAlgorithmFactory.table[id].
-                encodeToBytes(o, start, length, _octetBuffer, _octetBufferIndex);
+                encodeToBytes(data, offset, length, _octetBuffer, _octetBufferIndex);
         _octetBufferIndex += octetLength;
     }
 
-    protected final void encodeCIIBuiltInAlgorithmDataAsCDATA(char[] c, int start, int length) throws FastInfosetException, IOException {
+    /**
+     * Encode a chunk of Character Information Items using 
+     * using the CDATA built in encoding algorithm.
+     * Implementation of clause C.15 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     *
+     * @param ch the array of characters.
+     * @param offset the offset into the array of characters.
+     * @param length the length of characters.
+     */
+    protected final void encodeCIIBuiltInAlgorithmDataAsCDATA(char[] ch, int offset, int length) throws FastInfosetException, IOException {
         // Encode identification and top two bits of encoding algorithm id
         write (EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_ENCODING_ALGORITHM_FLAG);
 
@@ -862,13 +1261,18 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         _b = EncodingAlgorithmIndexes.CDATA << 2;
 
         
-        length = encodeUTF8String(c, start, length);
+        length = encodeUTF8String(ch, offset, length);
         encodeNonZeroOctetStringLengthOnSenventhBit(length);
         write(_encodingBuffer, length);
     }
     
-    /*
-     * C.13
+    /**
+     * Encode a non empty identifying string on the first bit of an octet.
+     * Implementation of clause C.13 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     *
+     * @param s the identifying string.
+     * @param map the vocabulary table to use to determin the index of the 
+     *        identifying string
      */
     protected final void encodeIdentifyingNonEmptyStringOnFirstBit(String s, StringIntMap map) throws IOException {
         int index = map.obtainIndex(s);
@@ -881,8 +1285,12 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
-    /*
-     * C.22
+    /**
+     * Encode a non empty string on the second bit of an octet using the UTF-8 
+     * encoding.
+     * Implementation of clause C.22 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     *
+     * @param s the string.
      */
     protected final void encodeNonEmptyOctetStringOnSecondBit(String s) throws IOException {
         final int length = encodeUTF8String(s);
@@ -890,8 +1298,11 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         write(_encodingBuffer, length);
     }
 
-    /*
-     * C.22
+    /**
+     * Encode the length of a UTF-8 encoded string on the second bit of an octet.
+     * Implementation of clause C.22 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     *
+     * @param length the length to encode.
      */
     protected final void encodeNonZeroOctetStringLengthOnSecondBit(int length) throws IOException {
         if (length < EncodingConstants.OCTET_STRING_LENGTH_2ND_BIT_SMALL_LIMIT) {
@@ -912,9 +1323,12 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
-
-    /*
-     * C.23
+    /**
+     * Encode a non empty string on the fifth bit of an octet using the UTF-8 
+     * or UTF-16 encoding.
+     * Implementation of clause C.23 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     *
+     * @param s the string.
      */
     protected final void encodeNonEmptyCharacterStringOnFifthBit(String s) throws IOException {
         final int length = (_encodingStringsAsUtf8) ? encodeUTF8String(s) : encodeUtf16String(s);
@@ -922,17 +1336,27 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         write(_encodingBuffer, length);
     }
 
-    /*
-     * C.23
+    /**
+     * Encode a non empty string on the fifth bit of an octet using the UTF-8 
+     * or UTF-16 encoding.
+     * Implementation of clause C.23 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     *
+     * @param ch the array of characters.
+     * @param offset the offset into the array of characters.
+     * @param length the length of characters.
      */
-    protected final void encodeNonEmptyCharacterStringOnFifthBit(char[] array, int start, int length) throws IOException {
-        length = (_encodingStringsAsUtf8) ? encodeUTF8String(array, start, length) : encodeUtf16String(array, start, length);
+    protected final void encodeNonEmptyCharacterStringOnFifthBit(char[] ch, int offset, int length) throws IOException {
+        length = (_encodingStringsAsUtf8) ? encodeUTF8String(ch, offset, length) : encodeUtf16String(ch, offset, length);
         encodeNonZeroOctetStringLengthOnFifthBit(length);
         write(_encodingBuffer, length);
     }
 
-    /*
-     * C.23
+    /**
+     * Encode the length of a UTF-8 or UTF-16 encoded string on the fifth bit
+     * of an octet.
+     * Implementation of clause C.23 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     *
+     * @param length the length to encode.
      */
     protected final void encodeNonZeroOctetStringLengthOnFifthBit(int length) throws IOException {
         if (length < EncodingConstants.OCTET_STRING_LENGTH_5TH_BIT_SMALL_LIMIT) {
@@ -953,19 +1377,33 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
-    /*
-     * C.24
+    /**
+     * Encode a non empty string on the seventh bit of an octet using the UTF-8 
+     * or UTF-16 encoding.
+     * Implementation of clause C.24 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     *
+     * @param ch the array of characters.
+     * @param offset the offset into the array of characters.
+     * @param length the length of characters.
      */
-    protected final void encodeNonEmptyCharacterStringOnSeventhBit(char[] array, int start, int length) throws IOException {
-        length = (_encodingStringsAsUtf8) ? encodeUTF8String(array, start, length) : encodeUtf16String(array, start, length);
+    protected final void encodeNonEmptyCharacterStringOnSeventhBit(char[] ch, int offset, int length) throws IOException {
+        length = (_encodingStringsAsUtf8) ? encodeUTF8String(ch, offset, length) : encodeUtf16String(ch, offset, length);
         encodeNonZeroOctetStringLengthOnSenventhBit(length);
         write(_encodingBuffer, length);
     }
 
-    /*
-     * C.24
+    /**
+     * Encode a non empty string on the seventh bit of an octet using a restricted 
+     * alphabet that results in the encoding of a character in 4 bits 
+     * (or two characters per octet).
+     * Implementation of clause C.24 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     *
+     * @param table the table mapping characters to 4 bit values.
+     * @param ch the array of characters.
+     * @param offset the offset into the array of characters.
+     * @param length the length of characters.
      */
-    protected final void encodeNonEmptyFourBitCharacterStringOnSeventhBit(int[] table, char[] ch, int start, int length) throws FastInfosetException, IOException {
+    protected final void encodeNonEmptyFourBitCharacterStringOnSeventhBit(int[] table, char[] ch, int offset, int length) throws FastInfosetException, IOException {
         final int octetPairLength = length / 2;
         final int octetSingleLength = length % 2;
         
@@ -976,7 +1414,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         // Encode all pairs
         int v = 0;
         for (int i = 0; i < octetPairLength; i++) {
-            v = (table[ch[start++]] << 4) | table[ch[start++]];
+            v = (table[ch[offset++]] << 4) | table[ch[offset++]];
             if (v < 0) {
                 throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.characterOutofAlphabetRange"));
             }
@@ -984,7 +1422,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
         // Encode single character at end with termination bits
         if (octetSingleLength == 1) {
-            v = (table[ch[start]] << 4) | 0x0F;
+            v = (table[ch[offset]] << 4) | 0x0F;
             if (v < 0) {
                 throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.characterOutofAlphabetRange"));
             }
@@ -992,10 +1430,18 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }        
     }
     
-    /*
-     * C.24
+    /**
+     * Encode a non empty string on the seventh bit of an octet using a restricted 
+     * alphabet table.
+     * Implementation of clause C.24 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     *
+     * @param alphabet the alphabet defining the mapping between characters and
+     *        integer values.
+     * @param ch the array of characters.
+     * @param offset the offset into the array of characters.
+     * @param length the length of characters.
      */
-    protected final void encodeNonEmptyNBitCharacterStringOnSeventhBit(String alphabet, char[] ch, int start, int length) throws FastInfosetException, IOException {
+    protected final void encodeNonEmptyNBitCharacterStringOnSeventhBit(String alphabet, char[] ch, int offset, int length) throws FastInfosetException, IOException {
         int bitsPerCharacter = 1;
         while ((1 << bitsPerCharacter) <= alphabet.length()) {
             bitsPerCharacter++;
@@ -1014,7 +1460,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         ensureSize(totalOctets);
         int v = 0;
         for (int i = 0; i < length; i++) {
-            final char c = ch[start + i];
+            final char c = ch[offset + i];
             // This is grotesquely slow, need to use hash table of character to int value
             for (v = 0; v < alphabet.length(); v++) {
                 if (c == alphabet.charAt(v)) {
@@ -1033,14 +1479,14 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
-    protected int _bitsLeftInOctet;
+    private int _bitsLeftInOctet;
     
-    public final void resetBits() {
+    private final void resetBits() {
         _bitsLeftInOctet = 8;
         _b = 0;
     }
     
-    protected final void writeBits(int bits, int v) throws IOException {
+    private final void writeBits(int bits, int v) throws IOException {
         while (bits > 0) {
             final int bit = (v & (1 << --bits)) > 0 ? 1 : 0;
             _b |= bit << (--_bitsLeftInOctet);
@@ -1052,8 +1498,12 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
     
-    /*
-     * C.24
+    /**
+     * Encode the length of a encoded string on the seventh bit
+     * of an octet.
+     * Implementation of clause C.24 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     *
+     * @param length the length to encode.
      */
     protected final void encodeNonZeroOctetStringLengthOnSenventhBit(int length) throws IOException {
         if (length < EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_LIMIT) {
@@ -1074,14 +1524,18 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
-    /*
-     * C.25 (with first bit set to 1)
+    /**
+     * Encode a non zero integer on the second bit of an octet, setting
+     * the first bit to 1.
+     * Implementation of clause C.24 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     * 
+     * <p>
+     * The first bit of the first octet is set, as specified in clause C.13 of 
+     * ITU-T Rec. X.891 | ISO/IEC 24824-1
      *
-     * i is a member of the interval [0, 1048575]
-     *
-     * In the specification the interval is [1, 1048576]
-     *
-     * The first bit of the first octet is set. As specified in C.13
+     * @param i The integer to encode, which is a member of the interval 
+     *          [0, 1048575]. In the specification the interval is [1, 1048576]
+     * 
      */
     protected final void encodeNonZeroIntegerOnSecondBitFirstBitOne(int i) throws IOException {
         if (i < EncodingConstants.INTEGER_2ND_BIT_SMALL_LIMIT) {
@@ -1105,14 +1559,18 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
-    /*
-     * C.25 (with first bit set to 0)
+    /**
+     * Encode a non zero integer on the second bit of an octet, setting
+     * the first bit to 0.
+     * Implementation of clause C.25 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     * 
+     * <p>
+     * The first bit of the first octet is set, as specified in clause C.13 of 
+     * ITU-T Rec. X.891 | ISO/IEC 24824-1
      *
-     * i is a member of the interval [0, 1048575]
-     *
-     * In the specification the interval is [1, 1048576]
-     *
-     * The first bit of the first octet is set. As specified in C.13
+     * @param i The integer to encode, which is a member of the interval 
+     *          [0, 1048575]. In the specification the interval is [1, 1048576]
+     * 
      */
     protected final void encodeNonZeroIntegerOnSecondBitFirstBitZero(int i) throws IOException {
         if (i < EncodingConstants.INTEGER_2ND_BIT_SMALL_LIMIT) {
@@ -1134,13 +1592,13 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
-    /*
-     * C.27
-     *
-     * i is a member of the interval [0, 1048575]
-     *
-     * In the specification the interval is [1, 1048576]
-     *
+    /**
+     * Encode a non zero integer on the third bit of an octet.
+     * Implementation of clause C.27 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     * 
+     * @param i The integer to encode, which is a member of the interval 
+     *          [0, 1048575]. In the specification the interval is [1, 1048576]
+     * 
      */
     protected final void encodeNonZeroIntegerOnThirdBit(int i) throws IOException {
         if (i < EncodingConstants.INTEGER_3RD_BIT_SMALL_LIMIT) {
@@ -1170,12 +1628,13 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
-    /*
-     * C.28
-     *
-     * i is a member of the interval [0, 1048575]
-     *
-     * In the specification the interval is [1, 1048576]
+    /**
+     * Encode a non zero integer on the fourth bit of an octet.
+     * Implementation of clause C.28 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
+     * 
+     * @param i The integer to encode, which is a member of the interval 
+     *          [0, 1048575]. In the specification the interval is [1, 1048576]
+     * 
      */
     protected final void encodeNonZeroIntegerOnFourthBit(int i) throws IOException {
         if (i < EncodingConstants.INTEGER_4TH_BIT_SMALL_LIMIT) {
@@ -1205,17 +1664,45 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
+    /**
+     * Encode a non empty string using the UTF-8 encoding.
+     * 
+     * @param b the current octet that is being written.
+     * @param s the string to be UTF-8 encoded.
+     * @param constants the array of constants to use when encoding to determin
+     *        how the length of the UTF-8 encoded string is encoded.
+     */
     protected final void encodeNonEmptyUTF8StringAsOctetString(int b, String s, int[] constants) throws IOException {
         final char[] ch = s.toCharArray();
         encodeNonEmptyUTF8StringAsOctetString(b, ch, 0, ch.length, constants);
     }
 
-    protected final void encodeNonEmptyUTF8StringAsOctetString(int b, char ch[], int start, int length, int[] constants) throws IOException {
-        length = encodeUTF8String(ch, start, length);
+    /**
+     * Encode a non empty string using the UTF-8 encoding.
+     * 
+     * @param b the current octet that is being written.
+     * @param ch the array of characters.
+     * @param offset the offset into the array of characters.
+     * @param length the length of characters.
+     *        how the length of the UTF-8 encoded string is encoded.
+     * @param constants the array of constants to use when encoding to determin
+     *        how the length of the UTF-8 encoded string is encoded.
+     */
+    protected final void encodeNonEmptyUTF8StringAsOctetString(int b, char ch[], int offset, int length, int[] constants) throws IOException {
+        length = encodeUTF8String(ch, offset, length);
         encodeNonZeroOctetStringLength(b, length, constants);
         write(_encodingBuffer, length);
     }
 
+    /**
+     * Encode the length of non empty UTF-8 encoded string.
+     * 
+     * @param b the current octet that is being written.
+     * @param length the length of the UTF-8 encoded string.
+     *        how the length of the UTF-8 encoded string is encoded.
+     * @param constants the array of constants to use when encoding to determin
+     *        how the length of the UTF-8 encoded string is encoded.
+     */
     protected final void encodeNonZeroOctetStringLength(int b, int length, int[] constants) throws IOException {
         if (length < constants[EncodingConstants.OCTET_STRING_LENGTH_SMALL_LIMIT]) {
             write(b | (length - 1));
@@ -1232,6 +1719,14 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
+    /**
+     * Encode a non zero integer.
+     * 
+     * @param b the current octet that is being written.
+     * @param i the non zero integer.
+     * @param constants the array of constants to use when encoding to determin
+     *        how the non zero integer is encoded.
+     */
     protected final void encodeNonZeroInteger(int b, int i, int[] constants) throws IOException {
         if (i < constants[EncodingConstants.INTEGER_SMALL_LIMIT]) {
             write(b | i);
@@ -1255,42 +1750,23 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
-
-
-
-
-
-
-    protected final int encodeUTF8String(String s) throws IOException {
-        final int length = s.length();
-        if (length < _charBuffer.length) {
-            s.getChars(0, length, _charBuffer, 0);
-            return encodeUTF8String(_charBuffer, 0, length);
-        } else {
-            char[] ch = s.toCharArray();
-            return encodeUTF8String(ch, 0, length);
-        }
-    }
-    
-    protected final int encodeUtf16String(String s) throws IOException {
-        final int length = s.length();
-        if (length < _charBuffer.length) {
-            s.getChars(0, length, _charBuffer, 0);
-            return encodeUtf16String(_charBuffer, 0, length);
-        } else {
-            char[] ch = s.toCharArray();
-            return encodeUtf16String(ch, 0, length);
-        }
-    }
-    
+    /**
+     * Mark the current position in the buffered stream.
+     */
     protected final void mark() throws IOException {
         _markIndex = _octetBufferIndex;
     }
 
+    /**
+     * Reset the marked position in the buffered stream.
+     */
     protected final void resetMark() throws IOException {
         _markIndex = -1;
     }
 
+    /**
+     * Write a byte to the buffered stream.
+     */
     protected final void write(int i) throws IOException {
         if (_octetBufferIndex < _octetBuffer.length) {
             _octetBuffer[_octetBufferIndex++] = (byte)i;
@@ -1306,54 +1782,67 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
+    /**
+     * Write an array of bytes to the buffered stream.
+     *
+     * @param b the array of bytes.
+     * @param length the length of bytes.
+     */
     protected final void write(byte[] b, int length) throws IOException {
         write(b, 0,  length);
     }
 
-    protected final void write(byte[] b, int start, int length) throws IOException {
+    /**
+     * Write an array of bytes to the buffered stream.
+     *
+     * @param b the array of bytes.
+     * @param offset the offset into the array of bytes.
+     * @param length the length of bytes.
+     */
+    protected final void write(byte[] b, int offset, int length) throws IOException {
         if ((_octetBufferIndex + length) < _octetBuffer.length) {
-            System.arraycopy(b, start, _octetBuffer, _octetBufferIndex, length);
+            System.arraycopy(b, offset, _octetBuffer, _octetBufferIndex, length);
             _octetBufferIndex += length;
         } else {
             if (_markIndex == -1) {
                 _s.write(_octetBuffer, 0, _octetBufferIndex);
-                _s.write(b, start, length);
+                _s.write(b, offset, length);
                 _octetBufferIndex = 0;
             } else {
                 resize((_octetBuffer.length + length) * 3 / 2 + 1);
-                System.arraycopy(b, start, _octetBuffer, _octetBufferIndex, length);
+                System.arraycopy(b, offset, _octetBuffer, _octetBufferIndex, length);
                 _octetBufferIndex += length;
             }
         }
     }
 
-    protected final void writeToBuffer(byte[] b, int length) {
-        ensureSize(length);
-
-        System.arraycopy(b, 0, _octetBuffer, _octetBufferIndex, length);
-        _octetBufferIndex += length;
-    }
-
-    protected final void ensureSize(int length) {
+    private void ensureSize(int length) {
         if ((_octetBufferIndex + length) > _octetBuffer.length) {
             resize((_octetBufferIndex + length) * 3 / 2 + 1);
         }
     }
 
-    protected final void resize(int length) {
+    private void resize(int length) {
         byte[] b = new byte[length];
         System.arraycopy(_octetBuffer, 0, b, 0, _octetBufferIndex);
         _octetBuffer = b;
     }
 
-    protected final void _flush() throws IOException {
+    private void _flush() throws IOException {
         if (_octetBufferIndex > 0) {
             _s.write(_octetBuffer, 0, _octetBufferIndex);
             _octetBufferIndex = 0;
         }
     }
 
-    protected class EncodingBufferOutputStream extends OutputStream {
+    
+    private EncodingBufferOutputStream _encodingBufferOutputStream = new EncodingBufferOutputStream();
+
+    private byte[] _encodingBuffer = new byte[512];
+
+    private int _encodingBufferIndex;
+    
+    private class EncodingBufferOutputStream extends OutputStream {
 
         public void write(int b) throws IOException {
             if (_encodingBufferIndex < _encodingBuffer.length) {
@@ -1393,29 +1882,46 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
-    protected EncodingBufferOutputStream _encodingBufferOutputStream = new EncodingBufferOutputStream();
-
-    protected byte[] _encodingBuffer = new byte[512];
-
-    protected int _encodingBufferIndex;
-
-    protected final void ensureEncodingBufferSizeForUtf8String(int length) {
+    /**
+     * Encode a string using the UTF-8 encoding.
+     *
+     * @param s the string to encode.
+     */
+    protected final int encodeUTF8String(String s) throws IOException {
+        final int length = s.length();
+        if (length < _charBuffer.length) {
+            s.getChars(0, length, _charBuffer, 0);
+            return encodeUTF8String(_charBuffer, 0, length);
+        } else {
+            char[] ch = s.toCharArray();
+            return encodeUTF8String(ch, 0, length);
+        }
+    }
+        
+    private void ensureEncodingBufferSizeForUtf8String(int length) {
         final int newLength = 4 * length;
         if (_encodingBuffer.length < newLength) {
             _encodingBuffer = new byte[newLength];
         }
     }
     
-    protected final int encodeUTF8String(char[] ch, int start, int length) throws IOException {
+    /**
+     * Encode a string using the UTF-8 encoding.
+     *
+     * @param ch the array of characters.
+     * @param offset the offset into the array of characters.
+     * @param length the length of characters.
+     */
+    protected final int encodeUTF8String(char[] ch, int offset, int length) throws IOException {
         int bpos = 0;
 
         // Make sure buffer is large enough
         ensureEncodingBufferSizeForUtf8String(length);
 
-        final int end = start + length;
+        final int end = offset + length;
         int c;
-        while (end != start) {
-            c = ch[start++];
+        while (end != offset) {
+            c = ch[offset++];
             if (c < 0x80) {
                 // 1 byte, 7 bits
                 _encodingBuffer[bpos++] = (byte) c;
@@ -1436,9 +1942,9 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                         (byte) (0x80 | (c & 0x3F));  // third 6
                 } else {
                     // 4 bytes, high and low surrogate
-                    encodeCharacterAsUtf8FourByte(c, ch, start, end, bpos);
+                    encodeCharacterAsUtf8FourByte(c, ch, offset, end, bpos);
                     bpos += 4;
-                    start++;
+                    offset++;
                 }
             }
         }
@@ -1446,7 +1952,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         return bpos;
     }
     
-    protected final void encodeCharacterAsUtf8FourByte(int c, char[] ch, int chpos, int chend, int bpos) throws IOException {
+    private void encodeCharacterAsUtf8FourByte(int c, char[] ch, int chpos, int chend, int bpos) throws IOException {
         if (chpos == chend) {
             throw new IOException("");
         }
@@ -1466,22 +1972,45 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         _encodingBuffer[bpos++] = (byte)(0x80 | ((uc >> 6) & 0x3F));
         _encodingBuffer[bpos++] = (byte)(0x80 | (uc & 0x3F));
     }
+
+    /**
+     * Encode a string using the UTF-16 encoding.
+     *
+     * @param s the string to encode.
+     */
+    protected final int encodeUtf16String(String s) throws IOException {
+        final int length = s.length();
+        if (length < _charBuffer.length) {
+            s.getChars(0, length, _charBuffer, 0);
+            return encodeUtf16String(_charBuffer, 0, length);
+        } else {
+            char[] ch = s.toCharArray();
+            return encodeUtf16String(ch, 0, length);
+        }
+    }
         
-    protected final void ensureEncodingBufferSizeForUtf16String(int length) {
+    private void ensureEncodingBufferSizeForUtf16String(int length) {
         final int newLength = 2 * length;
         if (_encodingBuffer.length < newLength) {
             _encodingBuffer = new byte[newLength];
         }
     }
 
-    protected final int encodeUtf16String(char[] ch, int start, int length) throws IOException {
+    /**
+     * Encode a string using the UTF-16 encoding.
+     *
+     * @param ch the array of characters.
+     * @param offset the offset into the array of characters.
+     * @param length the length of characters.
+     */
+    protected final int encodeUtf16String(char[] ch, int offset, int length) throws IOException {
         int byteLength = 0;
 
         // Make sure buffer is large enough
         ensureEncodingBufferSizeForUtf16String(length);
 
-        final int n = start + length;
-        for (int i = start; i < n; i++) {
+        final int n = offset + length;
+        for (int i = offset; i < n; i++) {
             final int c = (int) ch[i];
             _encodingBuffer[byteLength++] = (byte)(c >> 8);
             _encodingBuffer[byteLength++] = (byte)(c & 0xFF);
@@ -1490,6 +2019,12 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         return byteLength;
     }
     
+    /**
+     * Obtain the prefix from a qualified name.
+     *
+     * @param qName the qualified name
+     * @return the prefix, or "" if there is no prefix.
+     */
     public static String getPrefixFromQualifiedName(String qName) {
         int i = qName.indexOf(':');
         String prefix = "";

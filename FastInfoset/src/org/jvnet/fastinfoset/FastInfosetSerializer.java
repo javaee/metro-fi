@@ -35,8 +35,6 @@
  * http://www.apache.org/licenses/
  *
  */
-
-
 package org.jvnet.fastinfoset;
 
 import java.util.Map;
@@ -59,12 +57,12 @@ public interface FastInfosetSerializer {
     public final static int ATTRIBUTE_VALUE_SIZE_CONSTRAINT = 7;
     
     /**
-     * The character encoding scheme string for UTF-8
+     * The character encoding scheme string for UTF-8.
      */
     public static final String UTF_8 = "UTF-8";
     
     /**
-     * The character encoding scheme string for UTF-16BE
+     * The character encoding scheme string for UTF-16BE.
      */
     public static final String UTF_16BE = "UTF-16BE";
     

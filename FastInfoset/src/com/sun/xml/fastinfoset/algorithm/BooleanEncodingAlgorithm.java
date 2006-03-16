@@ -59,10 +59,7 @@ import com.sun.xml.fastinfoset.CommonResourceBundle;
  * @author Alan Hudson
  * @author Paul Sandoz
  *
- * @version
- *
  */
-
 public class BooleanEncodingAlgorithm extends BuiltInEncodingAlgorithm {
     
     /** Table for setting a particular bit of a byte */

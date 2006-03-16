@@ -54,7 +54,7 @@ import com.sun.xml.fastinfoset.CommonResourceBundle;
  * An encoder for handling Short values.  Suppports the builtin SHORT encoder.
  *
  * @author Alan Hudson
- * @version
+ * @author Paul Sandoz
  */
 public class ShortEncodingAlgorithm extends IntegerEncodingAlgorithm {
 

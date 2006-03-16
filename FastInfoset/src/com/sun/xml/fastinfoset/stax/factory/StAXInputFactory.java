@@ -71,7 +71,7 @@ public class StAXInputFactory extends XMLInputFactory {
 
   /**
    * Create a new XMLStreamReader from a reader
-   * @param reader the XML data to read from
+   * @param xmlfile the XML data to read from
    * @throws XMLStreamException 
    */
     public XMLStreamReader createXMLStreamReader(Reader xmlfile) throws XMLStreamException {
@@ -138,7 +138,7 @@ public class StAXInputFactory extends XMLInputFactory {
     /**
      * @param inputstream
      * @throws XMLStreamException
-     * @return
+     * @return XMLEventReader
      */
     public XMLEventReader createXMLEventReader(InputStream inputstream) throws XMLStreamException {
         return new StAXEventReader(createXMLStreamReader(inputstream));
@@ -167,7 +167,7 @@ public class StAXInputFactory extends XMLInputFactory {
     /** Create a new XMLEventReader from an XMLStreamReader.  After being used
      * to construct the XMLEventReader instance returned from this method
      * the XMLStreamReader must not be used.
-     * @param reader the XMLStreamReader to read from (may not be modified)
+     * @param streamReader the XMLStreamReader to read from (may not be modified)
      * @return a new XMLEventReader
      * @throws XMLStreamException
      */

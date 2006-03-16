@@ -35,8 +35,6 @@
  * http://www.apache.org/licenses/
  *
  */
-
-
 package com.sun.xml.fastinfoset;
 
 import com.sun.xml.fastinfoset.alphabet.BuiltInRestrictedAlphabets;

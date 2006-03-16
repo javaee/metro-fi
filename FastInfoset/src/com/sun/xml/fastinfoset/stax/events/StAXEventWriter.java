@@ -229,7 +229,7 @@ public class StAXEventWriter implements XMLEventWriter {
     * to setPrefix and setDefaultNamespace will bind namespaces using
     * the context passed to the method as the root context for resolving
     * namespaces.
-    * @param context the namespace context to use for this writer
+    * @param namespaceContext the namespace context to use for this writer
     * @throws XMLStreamException
     */
     public void setNamespaceContext(NamespaceContext namespaceContext) throws XMLStreamException {

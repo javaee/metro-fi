@@ -35,17 +35,18 @@
  * http://www.apache.org/licenses/
  *
  */ 
-
-
 package com.sun.xml.fastinfoset.stax.events;
+
 import javax.xml.stream.XMLStreamConstants;
 
+/** A Utility class for the StAX Events implementation.
+ */
 public class Util {
     
     /**
-     * a string is empty if it's null or contains nothing
+     * A string is empty if it's null or contains nothing
      *
-     * @param c The character to check.
+     * @param s The string to check.
      */
     public static boolean isEmptyString(String s) {
         if (s != null && !s.equals("")) 

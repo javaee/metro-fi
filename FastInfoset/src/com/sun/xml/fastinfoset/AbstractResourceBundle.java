@@ -1,11 +1,48 @@
 /*
+ * Fast Infoset ver. 0.1 software ("Software")
+ *
+ * Copyright, 2004-2005 Sun Microsystems, Inc. All Rights Reserved.
+ *
+ * Software is licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at:
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations.
+ *
+ *    Sun supports and benefits from the global community of open source
+ * developers, and thanks the community for its important contributions and
+ * open standards-based technology, which Sun has adopted into many of its
+ * products.
+ *
+ *    Please note that portions of Software may be provided with notices and
+ * open source licenses from such communities and third parties that govern the
+ * use of those portions, and any licenses granted hereunder do not alter any
+ * rights and obligations you may have under such open source licenses,
+ * however, the disclaimer of warranty and limitation of liability provisions
+ * in this License will apply to all Software in this distribution.
+ *
+ *    You acknowledge that the Software is not designed, licensed or intended
+ * for use in the design, construction, operation or maintenance of any nuclear
+ * facility.
+ *
+ * Apache License
+ * Version 2.0, January 2004
+ * http://www.apache.org/licenses/
+ *
+ */
+/*
  * ====================================================================
  *
  * This code is subject to the freebxml License, Version 1.1
  *
  * Copyright (c) 2001 - 2005 freebxml.org.  All rights reserved.
  *
- * $Header: /zpool01/javanet/scm/svn/tmp/cvs2svn/fi/FastInfoset/src/com/sun/xml/fastinfoset/AbstractResourceBundle.java,v 1.2 2005-05-17 20:53:19 joehw Exp $
+ * $Header: /zpool01/javanet/scm/svn/tmp/cvs2svn/fi/FastInfoset/src/com/sun/xml/fastinfoset/AbstractResourceBundle.java,v 1.3 2006-03-16 16:22:15 sandoz Exp $
  * ====================================================================
  */
 package com.sun.xml.fastinfoset;
@@ -17,7 +54,7 @@ import java.util.ResourceBundle;
 
 
 /**
- * This class contains methods common to all XXResourceBundle classes
+ * This class contains methods common to all *ResourceBundle classes
  *
  * @author  Paul Sterk / Sun Microsystems
  */
@@ -111,7 +148,7 @@ public abstract class AbstractResourceBundle extends ResourceBundle {
      * Implements java.util.ResourceBundle.handleGetObject; inherits that
      * javadoc information.
      *
-     * @see java.util.ResourceBundle.handleGetObject
+     * @see java.util.ResourceBundle#handleGetObject(String)
      */
     protected Object handleGetObject(String key) {
        return getBundle().getObject(key);
@@ -124,7 +161,7 @@ public abstract class AbstractResourceBundle extends ResourceBundle {
      * Implements java.util.ResourceBundle.getKeys; inherits that javadoc
      * information.
      *
-     * @see java.util.ResourceBundle.getKeys
+     * @see java.util.ResourceBundle#getKeys()
      */
     public final Enumeration getKeys() {
        return getBundle().getKeys();

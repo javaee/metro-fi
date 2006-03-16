@@ -111,7 +111,7 @@ public class StAXEventFactory extends XMLEventFactory {
   /**
    * Create a new Namespace
    * @param prefix the prefix of this namespace, may not be null
-   * @param namespaceUri the attribute value is set to this value, may not be null
+   * @param namespaceURI the attribute value is set to this value, may not be null
    * @return the Namespace with the specified values
    */
     public Namespace createNamespace(String prefix, String namespaceURI) {
@@ -301,7 +301,7 @@ public class StAXEventFactory extends XMLEventFactory {
     /** Creates a new instance of a EntityReference event
     *
     * @param name The name of the reference
-    * @param declaration the declaration for the event
+    * @param entityDeclaration the declaration for the event
     * @return an EntityReference event
     */
     public EntityReference createEntityReference(String name, EntityDeclaration entityDeclaration) {

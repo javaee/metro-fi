@@ -108,7 +108,7 @@ public class CharactersEvent extends EventBase implements Characters {
      * Return true if this is ignorableWhiteSpace.  If
      * this event is ignorableWhiteSpace its event type will
      * be SPACE.
-     * @return
+     * @return boolean true if this is ignorableWhiteSpace.
      */
     public boolean isIgnorableWhiteSpace() {
         return isIgnorable;
@@ -118,7 +118,7 @@ public class CharactersEvent extends EventBase implements Characters {
      * Returns true if this set of Characters are all whitespace.  Whitspace inside a document
      * is reported as CHARACTERS.  This method allows checking of CHARACTERS events to see 
      * if they are composed of only whitespace characters
-     * @return
+     * @return boolean true if this set of Characters are all whitespace
      */
     public boolean isWhiteSpace() {
         //no synchronization checks made.

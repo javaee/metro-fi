@@ -161,21 +161,21 @@ public abstract class EventBase implements XMLEvent {
     }
     
     /** A utility function to check if this event is an Attribute.
-     * @see Attribute
+     * @see javax.xml.stream.events.Attribute
      */
     public boolean isAttribute() {
         return _eventType == ATTRIBUTE;
     }
     
     /** A utility function to check if this event is Characters.
-     * @see Characters
+     * @see javax.xml.stream.events.Characters
      */
     public boolean isCharacters() {
         return _eventType == CHARACTERS;
     }
     
     /** A utility function to check if this event is a Namespace.
-     * @see Namespace
+     * @see javax.xml.stream.events.Namespace
      */
     public boolean isNamespace() {
         return _eventType == NAMESPACE;

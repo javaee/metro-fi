@@ -89,7 +89,7 @@ public class StAXEventAllocatorBase implements XMLEventAllocator {
    * This method allocates an event given the current state of the XMLStreamReader.  
    * If this XMLEventAllocator does not have a one-to-one mapping between reader state
    * and events this method will return null.  
-   * @param reader The XMLStreamReader to allocate from
+   * @param streamReader The XMLStreamReader to allocate from
    * @return the event corresponding to the current reader state
    */
     public XMLEvent allocate(XMLStreamReader streamReader) throws XMLStreamException {
@@ -102,7 +102,7 @@ public class StAXEventAllocatorBase implements XMLEventAllocator {
    * This method allocates an event or set of events given the current state of 
    * the XMLStreamReader and adds the event or set of events to the consumer that 
    * was passed in.  
-   * @param reader The XMLStreamReader to allocate from
+   * @param streamReader The XMLStreamReader to allocate from
    * @param consumer The XMLEventConsumer to add to.
    */
     public void allocate(XMLStreamReader streamReader, XMLEventConsumer consumer) throws XMLStreamException {

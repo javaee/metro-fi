@@ -66,7 +66,6 @@ public class NamespaceBase extends AttributeBase implements Namespace{
    * Create a new Namespace
    * @param prefix prefix of a namespace is the local name for an attribute
    * @param namespaceURI the uri reference of a namespace is the value for an attribute
-   * @return Namespace object
    */
     public NamespaceBase(String prefix, String namespaceURI){
         super(XMLNS_ATTRIBUTE, prefix, namespaceURI);
