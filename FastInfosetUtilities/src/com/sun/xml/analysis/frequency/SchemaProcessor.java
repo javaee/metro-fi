@@ -23,6 +23,7 @@ import com.sun.xml.xsom.XSType;
 import com.sun.xml.xsom.XSUnionSimpleType;
 import com.sun.xml.xsom.XSWildcard;
 import com.sun.xml.xsom.XSXPath;
+import com.sun.xml.xsom.XmlString;
 import com.sun.xml.xsom.parser.XSOMParser;
 import com.sun.xml.xsom.visitor.XSSimpleTypeVisitor;
 import com.sun.xml.xsom.visitor.XSTermVisitor;
@@ -41,6 +42,7 @@ import javax.xml.namespace.QName;
  * and attributes declared in a set of schema.
  *
  * TODO: add default values for attribute/element simple content.
+ *     : enums used for attribute/element simple content
  * @author Paul.Sandoz@Sun.Com
  */
 public class SchemaProcessor implements XSVisitor, XSSimpleTypeVisitor {
@@ -48,19 +50,29 @@ public class SchemaProcessor implements XSVisitor, XSSimpleTypeVisitor {
     /**
      * The set of elements declared in the schema
      */
-    public Set<QName> elements = new java.util.HashSet();
+    Set<QName> elements = new java.util.HashSet();
     /**
      * The set of attributes declared in the schema
      */
-    public Set<QName> attributes = new java.util.HashSet();
+    Set<QName> attributes = new java.util.HashSet();
     /**
      * The set of local names declared in the schema
      */
-    public Set<String> localNames = new java.util.HashSet();
+    Set<String> localNames = new java.util.HashSet();
     /**
      * The set of namespaces declared in the schema
      */
-    public Set<String> namespaces = new java.util.HashSet();
+    Set<String> namespaces = new java.util.HashSet();
+    /**
+     * The set of default values and enum values for attributes
+     * declared in the schema
+     */
+    Set<String> attributeValues = new java.util.HashSet();
+    /**
+     * The set of default values and enums values for text content 
+     * declared in the schema
+     */
+    Set<String> textContentValues = new java.util.HashSet();
     
     // The list of URLs to schema
     private List<URL> _schema;
@@ -102,12 +114,23 @@ public class SchemaProcessor implements XSVisitor, XSSimpleTypeVisitor {
     }
 
     public void attributeDecl(XSAttributeDecl xSAttributeDecl) {
+        if (xSAttributeDecl.getDefaultValue() != null) {
+            addAttributeValue(xSAttributeDecl.getDefaultValue().value);
+        }
+        
         addAttribute(xSAttributeDecl);
+
+        if (xSAttributeDecl.getType().isRestriction()) {
+            for (XSFacet f : xSAttributeDecl.getType().asRestriction().getDeclaredFacets(XSFacet.FACET_ENUMERATION)) {
+                addAttributeValue(f.getValue().value);
+            }
+        }                
     }
 
     public void attributeUse(XSAttributeUse use) {
         XSAttributeDecl decl = use.getDecl();
-        addAttribute(decl);        
+        
+        attributeDecl(decl);
     }
 
     public void complexType(XSComplexType type) {
@@ -177,6 +200,16 @@ public class SchemaProcessor implements XSVisitor, XSSimpleTypeVisitor {
     }
 
     public void facet(XSFacet facet) {
+        /*
+         * TODO
+         * Need to tell if this facet of the simple type is associated with an
+         * attribute value or an text content of an element.
+         * For the moment add the enumeration value to both sets.
+         */
+        if (facet.getName().equals(XSFacet.FACET_ENUMERATION)) {
+            addAttributeValue(facet.getValue().value);
+            addTextContentValue(facet.getValue().value);
+        }        
     }
 
     public void notation(XSNotation xSNotation) {
@@ -203,6 +236,17 @@ public class SchemaProcessor implements XSVisitor, XSSimpleTypeVisitor {
     }
 
     public void elementDecl(XSElementDecl type) {
+        if (type.getDefaultValue() != null) {
+            addTextContentValue(type.getDefaultValue().value);
+        }
+        
+        if (type.getType().isSimpleType() && type.getType().asSimpleType().isRestriction()) {
+            XSSimpleType s = type.getType().asSimpleType();
+            for (XSFacet f : s.asRestriction().getDeclaredFacets(XSFacet.FACET_ENUMERATION)) {
+                addTextContentValue(f.getValue().value);
+            }
+        }
+        
         addElement(type);        
     }
 
@@ -241,7 +285,7 @@ public class SchemaProcessor implements XSVisitor, XSSimpleTypeVisitor {
 
     public void unionSimpleType(XSUnionSimpleType type) {
         final int len = type.getMemberSize();
-       for (int i = 0; i < len; i++) {
+        for (int i = 0; i < len; i++) {
             XSSimpleType member = type.getMember(i);
             if (member.isLocal()) {
                 simpleType(member);
@@ -304,6 +348,14 @@ public class SchemaProcessor implements XSVisitor, XSSimpleTypeVisitor {
         }
     }
     
+    private void addAttributeValue(String s) {
+        attributeValues.add(s);
+    }
+    
+    private void addTextContentValue(String s) {
+        textContentValues.add(s);
+    }
+    
     private QName getQName(XSDeclaration d) {
         String n = d.getTargetNamespace();
         String l = d.getName();
@@ -330,5 +382,4 @@ public class SchemaProcessor implements XSVisitor, XSSimpleTypeVisitor {
         v.process();
         v.print();
     }
-
 }
