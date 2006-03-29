@@ -60,10 +60,15 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 /**
+ * Generate a Fast Infoset parser and serializer vocabulary from a 
+ * {@link FrequencyBasedLists}.
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public class VocabularyGenerator {
+    /**
+     * Constants for the various XML-based APIs
+     */
     public static enum XmlApi {
         SAX, StAX, DOM;
     };
@@ -74,10 +79,22 @@ public class VocabularyGenerator {
     
     private ParserVocabulary _parserVocabulary;
     
+    /**
+     * @param flb the set of frequency-based lists.
+     * @param xapi the XML API that the parser and serializer vocabulary 
+     * will be used with.
+     */
     public VocabularyGenerator(FrequencyBasedLists fbl, XmlApi xapi) {
         this(new SerializerVocabulary(), new ParserVocabulary(), fbl, xapi);
     }
     
+    /**
+     * @param serializerVocabulary the serializer vocabualry to use
+     * @param parserVocabulary the parser vocabulary to use
+     * @param flb the set of frequency-based lists.
+     * @param xapi the XML API that the parser and serializer vocabulary 
+     * will be used with.
+     */
     public VocabularyGenerator(SerializerVocabulary serializerVocabulary, ParserVocabulary parserVocabulary,
             FrequencyBasedLists fbl, XmlApi xapi) {
         _serializerVocabulary = serializerVocabulary;
@@ -87,10 +104,20 @@ public class VocabularyGenerator {
         generate(fbl);
     }
 
+    /**
+     * Get the generated serializer vocabulary.
+     *
+     * @return the serializer vocabulary.
+     */
     public SerializerVocabulary getSerializerVocabulary() {
         return _serializerVocabulary;
     }
 
+    /**
+     * Get the generated parser vocabulary.
+     *
+     * @return the parser vocabulary.
+     */
     public ParserVocabulary getParserVocabulary() {
         return _parserVocabulary;
     }
