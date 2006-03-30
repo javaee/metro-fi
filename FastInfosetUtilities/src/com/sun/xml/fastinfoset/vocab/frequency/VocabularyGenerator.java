@@ -37,7 +37,7 @@
  */ 
 package com.sun.xml.fastinfoset.vocab.frequency;
 
-import com.sun.xml.analysis.frequency.FrequenceHandler;
+import com.sun.xml.analysis.frequency.FrequencyHandler;
 import com.sun.xml.analysis.frequency.FrequencyBasedLists;
 import com.sun.xml.analysis.frequency.SchemaProcessor;
 import com.sun.xml.fastinfoset.QualifiedName;
@@ -144,7 +144,7 @@ public class VocabularyGenerator {
         for (QName attribute : fbl.attributes) {
             addToNameTable(attribute, _serializerVocabulary.attributeName, _parserVocabulary.attributeName, true);
         }
-        
+                
         for (String textContentValue : fbl.textContentValues) {
             addToTable(textContentValue, _serializerVocabulary.characterContentChunk,
                     _parserVocabulary.characterContentChunk);
@@ -232,14 +232,14 @@ public class VocabularyGenerator {
      * args[1] to args[n] are the paths to XML documents.
      */
     public static void main(String[] args) throws Exception {
-        SchemaProcessor sp = new SchemaProcessor(new File(args[0]).toURL());
+        SchemaProcessor sp = new SchemaProcessor(new File(args[0]).toURL(), true);
         sp.process();
         
         SAXParserFactory spf = SAXParserFactory.newInstance();
         spf.setNamespaceAware(true);
         SAXParser p = spf.newSAXParser();
         
-        FrequenceHandler fh = new FrequenceHandler(sp);
+        FrequencyHandler fh = new FrequencyHandler(sp);
         for (int i = 1; i < args.length; i++) {
             p.parse(new File(args[i]), fh);
         }

@@ -39,7 +39,6 @@ package com.sun.xml.analysis.frequency;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.xml.namespace.QName;
@@ -48,12 +47,12 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * A SAX-based handler to collect the frequence of occurences of properties
+ * A SAX-based handler to collect the frequency of occurences of properties
  * of information items in one or more infosets.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public class FrequenceHandler extends DefaultHandler {
+public class FrequencyHandler extends DefaultHandler {
     private Map<String, Set<QName>> namespacesToElements = new HashMap();
     private Map<String, Set<QName>> namespacesToAttributes = new HashMap();
     
@@ -68,7 +67,7 @@ public class FrequenceHandler extends DefaultHandler {
     /**
      * The default frequency handler.
      */
-    public FrequenceHandler() {
+    public FrequencyHandler() {
     }
 
     /**
@@ -77,7 +76,7 @@ public class FrequenceHandler extends DefaultHandler {
      *
      * @param sp the schema processor.
      */
-    public FrequenceHandler(SchemaProcessor sp) {
+    public FrequencyHandler(SchemaProcessor sp) {
         for (String s : sp.localNames) {
             localNames.add0(s);
         }
@@ -102,6 +101,10 @@ public class FrequenceHandler extends DefaultHandler {
      * @return the frequency based lists.
      */
     public FrequencyBasedLists getLists() {
+        // TODO if elements/attributes are empty then
+        // need to obtain prefixes for namespaces from some other
+        // external source
+        
         return  new FrequencyBasedLists(
             prefixes.createFrequencyBasedList(),
             namespaces.createFrequencyBasedList(),
@@ -110,6 +113,16 @@ public class FrequenceHandler extends DefaultHandler {
             attributes.createFrequencyBasedList(),
             textContentValues.createFrequencyBasedList(),
             attributeValues.createFrequencyBasedList());
+    }
+    
+    private void addQNamesWithGeneratedPrefix(FrequencySet<QName> s, Map<String, Set<QName>> m) {        
+        int i = 1;
+        for (Map.Entry<String,Set<QName>> e : m.entrySet()) {
+            String prefix = ""; //n" + i;
+            for (QName qInSet : e.getValue()) {
+                s.add0(new QName(qInSet.getNamespaceURI(), qInSet.getLocalPart(), prefix));
+            }
+        }
     }
     
     private void bucketQNamesToNamespace(Set<QName> s, Map<String, Set<QName>> m) {

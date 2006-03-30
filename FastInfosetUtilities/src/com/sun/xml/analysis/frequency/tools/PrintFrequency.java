@@ -59,14 +59,14 @@ public class PrintFrequency {
      * args[1] to args[n] are the paths to XML documents.
      */
     public static void main(String[] args) throws Exception {
-        SchemaProcessor sp = new SchemaProcessor(new File(args[0]).toURL());
+        SchemaProcessor sp = new SchemaProcessor(new File(args[0]).toURL(), true);
         sp.process();
         
         SAXParserFactory spf = SAXParserFactory.newInstance();
         spf.setNamespaceAware(true);
         SAXParser p = spf.newSAXParser();
         
-        FrequenceHandler fh = new FrequenceHandler(sp);
+        FrequencyHandler fh = new FrequencyHandler(sp);
         for (int i = 1; i < args.length; i++) {
             p.parse(new File(args[i]), fh);
         }

@@ -23,19 +23,26 @@ import com.sun.xml.xsom.XSType;
 import com.sun.xml.xsom.XSUnionSimpleType;
 import com.sun.xml.xsom.XSWildcard;
 import com.sun.xml.xsom.XSXPath;
-import com.sun.xml.xsom.XmlString;
 import com.sun.xml.xsom.parser.XSOMParser;
 import com.sun.xml.xsom.visitor.XSSimpleTypeVisitor;
 import com.sun.xml.xsom.visitor.XSTermVisitor;
 import com.sun.xml.xsom.visitor.XSVisitor;
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * A Schema processor that collects the namespaces, local names, elements
@@ -47,53 +54,93 @@ import javax.xml.namespace.QName;
  */
 public class SchemaProcessor implements XSVisitor, XSSimpleTypeVisitor {
 
+    private class StringComparator implements Comparator {
+        public int compare(Object o1, Object o2) {
+            String s1 = (String)o1;
+            String s2 = (String)o2;
+            return s1.compareTo(s2);
+        }
+    };
+    private StringComparator _stringComparator = new StringComparator();
+    
+    private class QNameComparator implements Comparator {
+        public int compare(Object o1, Object o2) {
+            QName q1 = (QName)o1;
+            QName q2 = (QName)o2;
+            
+            if (q1.getNamespaceURI() == null 
+                    && q2.getNamespaceURI() == null) {
+                return q1.getLocalPart().compareTo(q2.getLocalPart());
+            } else if (q1.getNamespaceURI() == null) {
+                return 1;
+            } else if (q2.getNamespaceURI() == null) {
+                return -1;
+            } else {
+                int c = q1.getNamespaceURI().compareTo(q2.getNamespaceURI());
+                if (c != 0) return c;
+                return q1.getLocalPart().compareTo(q2.getLocalPart());                
+            }
+        }
+    };
+    private QNameComparator _qNameComparator = new QNameComparator();
+    
     /**
      * The set of elements declared in the schema
      */
-    Set<QName> elements = new java.util.HashSet();
+    Set<QName> elements = new java.util.TreeSet(_qNameComparator);
     /**
      * The set of attributes declared in the schema
      */
-    Set<QName> attributes = new java.util.HashSet();
+    Set<QName> attributes = new java.util.TreeSet(_qNameComparator);
     /**
      * The set of local names declared in the schema
      */
-    Set<String> localNames = new java.util.HashSet();
+    Set<String> localNames = new java.util.TreeSet(_stringComparator);
     /**
      * The set of namespaces declared in the schema
      */
-    Set<String> namespaces = new java.util.HashSet();
+    Set<String> namespaces = new java.util.TreeSet(_stringComparator);
     /**
      * The set of default values and enum values for attributes
      * declared in the schema
      */
-    Set<String> attributeValues = new java.util.HashSet();
+    Set<String> attributeValues = new java.util.TreeSet(_stringComparator);
     /**
      * The set of default values and enums values for text content 
      * declared in the schema
      */
-    Set<String> textContentValues = new java.util.HashSet();
+    Set<String> textContentValues = new java.util.TreeSet(_stringComparator);
     
     // The list of URLs to schema
     private List<URL> _schema;
 
+    // True if if default values and enums of elements 
+    // and attributes should be collected
+    private boolean _collectValues;
+    
     /*
      * Construct a schema processor given a URL to a schema.
      * 
      * @param schema the URL to the schema.
+     * @param collectValues true if default values and enums of elements
+     *        and attributes should be collected.
      */
-    public SchemaProcessor(URL schema) {
+    public SchemaProcessor(URL schema, boolean collectValues) {
         _schema = new ArrayList();
         _schema.add(schema);
+        _collectValues = collectValues;
     }
     
     /*
      * Construct a schema processor given a list URLs to schema.
      * 
      * @param schema the list URLs to schema.
+     * @param collectValues true if default values and enums of elements
+     *        and attributes should be collected.
      */
-    public SchemaProcessor(List<URL> schema) {
+    public SchemaProcessor(List<URL> schema, boolean collectValues) {
         _schema = schema;
+        _collectValues = collectValues;
     }
     
     // XSVisitor, XSSimpleTypeVisitor
@@ -308,7 +355,26 @@ public class SchemaProcessor implements XSVisitor, XSSimpleTypeVisitor {
             facet((XSFacet) itr.next());
         }
     }
-    
+
+    private class EntityResolverImpl implements EntityResolver {
+        URL _u;
+        Set<String> ids = new HashSet();
+        
+        EntityResolverImpl(URL u) {
+            _u = u;
+        }
+        
+        public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+            if (!ids.contains(systemId)) {
+                ids.add(systemId);
+                String path = _u.getPath();
+                File f = new File(new File(path).getParent(), systemId);
+                return new InputSource(new BufferedInputStream(new FileInputStream(f)));
+            } else {
+                return null;
+            }
+        }
+    };
     
     /**
      * Process the schema to produce the set of properties of
@@ -317,6 +383,7 @@ public class SchemaProcessor implements XSVisitor, XSSimpleTypeVisitor {
     public void process() throws Exception {        
         for (URL u : _schema) {
             XSOMParser parser = new XSOMParser();
+            parser.setEntityResolver(new EntityResolverImpl(u));
             parser.parse(u.openStream());
 
             XSSchemaSet sset = parser.getResult();
@@ -349,11 +416,11 @@ public class SchemaProcessor implements XSVisitor, XSSimpleTypeVisitor {
     }
     
     private void addAttributeValue(String s) {
-        attributeValues.add(s);
+        if (_collectValues) attributeValues.add(s);
     }
     
     private void addTextContentValue(String s) {
-        textContentValues.add(s);
+        if (_collectValues) textContentValues.add(s);
     }
     
     private QName getQName(XSDeclaration d) {
@@ -378,7 +445,7 @@ public class SchemaProcessor implements XSVisitor, XSSimpleTypeVisitor {
     }
     
     public static void main(String[] args) throws Exception {
-        SchemaProcessor v = new SchemaProcessor(new File(args[0]).toURL());
+        SchemaProcessor v = new SchemaProcessor(new File(args[0]).toURL(), true);
         v.process();
         v.print();
     }
