@@ -62,7 +62,7 @@ import javax.xml.parsers.SAXParserFactory;
 /**
  * Generate a Fast Infoset parser and serializer vocabulary from a 
  * {@link FrequencyBasedLists}.
- *
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public class VocabularyGenerator {

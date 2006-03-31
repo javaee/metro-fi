@@ -25,9 +25,9 @@ import com.sun.xml.xsom.XSWildcard;
 import com.sun.xml.xsom.XSXPath;
 import com.sun.xml.xsom.parser.XSOMParser;
 import com.sun.xml.xsom.visitor.XSSimpleTypeVisitor;
-import com.sun.xml.xsom.visitor.XSTermVisitor;
 import com.sun.xml.xsom.visitor.XSVisitor;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -53,7 +53,8 @@ import org.xml.sax.SAXException;
  * @author Paul.Sandoz@Sun.Com
  */
 public class SchemaProcessor implements XSVisitor, XSSimpleTypeVisitor {
-
+    private static byte[] EMPTY_SCHEMA = "<schema xmlns='http://www.w3.org/2001/XMLSchema'></schema>".getBytes();
+    
     private class StringComparator implements Comparator {
         public int compare(Object o1, Object o2) {
             String s1 = (String)o1;
@@ -181,6 +182,7 @@ public class SchemaProcessor implements XSVisitor, XSSimpleTypeVisitor {
     }
 
     public void complexType(XSComplexType type) {
+        
         if (type.getContentType().asSimpleType() != null) {
             XSType baseType = type.getBaseType();
             
@@ -204,9 +206,9 @@ public class SchemaProcessor implements XSVisitor, XSSimpleTypeVisitor {
                         && (type.getName().compareTo(baseType.getName()) == 0)) {
                     baseType.visit(this);
                 }
-
                 type.getExplicitContent().visit(this);
             }
+            type.getContentType().visit(this);
         }
         
         Iterator itr = type.iterateAttGroups();
@@ -298,26 +300,7 @@ public class SchemaProcessor implements XSVisitor, XSSimpleTypeVisitor {
     }
 
     public void particle(XSParticle part) {
-        final XSVisitor localThis = this;
-        
-        part.getTerm().visit(new XSTermVisitor() {
-            public void elementDecl(XSElementDecl decl) {
-                if (decl.isLocal()) {
-                    localThis.elementDecl(decl);
-                }
-            }
-
-            public void modelGroupDecl(XSModelGroupDecl decl) {
-                // reference
-            }
-
-            public void modelGroup(XSModelGroup group) {
-                localThis.modelGroup(group);
-            }
-
-            public void wildcard(XSWildcard wc) {
-            }
-        });    
+        part.getTerm().visit(this);
     }
 
     public void empty(XSContentType xSContentType) {
@@ -371,7 +354,7 @@ public class SchemaProcessor implements XSVisitor, XSSimpleTypeVisitor {
                 File f = new File(new File(path).getParent(), systemId);
                 return new InputSource(new BufferedInputStream(new FileInputStream(f)));
             } else {
-                return null;
+                return new InputSource(new ByteArrayInputStream(EMPTY_SCHEMA));
             }
         }
     };
@@ -430,17 +413,29 @@ public class SchemaProcessor implements XSVisitor, XSSimpleTypeVisitor {
     }
     
     private void print() {
+        System.out.println("Namespaces");
+        System.out.println("----------");
+        int i = 1;
         for (String s : namespaces) {
-            System.out.println(s);
+            System.out.println((i++) + ": " + s);
         }
+        System.out.println("LocaNames");
+        System.out.println("---------");
+        i = 1;
         for (String s : localNames) {
-            System.out.println(s);
+            System.out.println((i++) + ": " + s);
         }
+        System.out.println("Elements");
+        System.out.println("--------");
+        i = 1;
         for (QName q : elements) {
-            System.out.println(q);
+            System.out.println((i++) + ": " + q);
         }
+        System.out.println("Attributes");
+        System.out.println("----------");
+        i = 1;
         for (QName q : attributes) {
-            System.out.println(q);
+            System.out.println((i++) + ": " + q);
         }
     }
     

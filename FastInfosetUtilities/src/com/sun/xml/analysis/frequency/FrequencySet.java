@@ -48,6 +48,7 @@ import java.util.TreeSet;
 /**
  * A Set that manages how many occurances of a value occurs in the set.
  *
+ * TODO: Sort entries lexically for set of values with 0 occurences.
  * @author Paul.Sandoz@Sun.Com
  */
 public class FrequencySet<T> extends HashMap<T, Integer> {
