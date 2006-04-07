@@ -23,31 +23,22 @@ import com.sun.xml.xsom.XSType;
 import com.sun.xml.xsom.XSUnionSimpleType;
 import com.sun.xml.xsom.XSWildcard;
 import com.sun.xml.xsom.XSXPath;
-import com.sun.xml.xsom.parser.JAXPParser;
-import com.sun.xml.xsom.parser.XMLParser;
 import com.sun.xml.xsom.parser.XSOMParser;
 import com.sun.xml.xsom.visitor.XSSimpleTypeVisitor;
 import com.sun.xml.xsom.visitor.XSVisitor;
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
-import org.xml.sax.helpers.XMLFilterImpl;
 
 /**
  * A Schema processor that collects the namespaces, local names, elements
