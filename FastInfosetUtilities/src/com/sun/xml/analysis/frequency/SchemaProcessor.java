@@ -23,11 +23,12 @@ import com.sun.xml.xsom.XSType;
 import com.sun.xml.xsom.XSUnionSimpleType;
 import com.sun.xml.xsom.XSWildcard;
 import com.sun.xml.xsom.XSXPath;
+import com.sun.xml.xsom.parser.JAXPParser;
+import com.sun.xml.xsom.parser.XMLParser;
 import com.sun.xml.xsom.parser.XSOMParser;
 import com.sun.xml.xsom.visitor.XSSimpleTypeVisitor;
 import com.sun.xml.xsom.visitor.XSVisitor;
 import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -40,9 +41,13 @@ import java.util.List;
 import java.util.Set;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
+import org.xml.sax.ContentHandler;
 import org.xml.sax.EntityResolver;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.helpers.XMLFilterImpl;
 
 /**
  * A Schema processor that collects the namespaces, local names, elements
@@ -338,44 +343,43 @@ public class SchemaProcessor implements XSVisitor, XSSimpleTypeVisitor {
             facet((XSFacet) itr.next());
         }
     }
+    
+    private class ErrorHandlerImpl implements ErrorHandler {
+        public void warning(SAXParseException e) throws SAXException {
+            System.out.println("WARNING");
+            e.printStackTrace();
+        }
 
-    private class EntityResolverImpl implements EntityResolver {
-        URL _u;
-        Set<String> ids = new HashSet();
-        
-        EntityResolverImpl(URL u) {
-            _u = u;
+        public void error(SAXParseException e) throws SAXException {
+            System.out.println("ERROR");
+            e.printStackTrace();
         }
-        
-        public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
-            if (!ids.contains(systemId)) {
-                ids.add(systemId);
-                String path = _u.getPath();
-                File f = new File(new File(path).getParent(), systemId);
-                return new InputSource(new BufferedInputStream(new FileInputStream(f)));
-            } else {
-                return new InputSource(new ByteArrayInputStream(EMPTY_SCHEMA));
-            }
+
+        public void fatalError(SAXParseException e) throws SAXException {
+            System.out.println("FATAL ERROR");
+            e.printStackTrace();
         }
-    };
+    }
     
     /**
      * Process the schema to produce the set of properties of
      * information items.
      */
-    public void process() throws Exception {        
+    public void process() throws Exception {
+        XSOMParser parser = new XSOMParser();
+        parser.setErrorHandler(new ErrorHandlerImpl());
+        
         for (URL u : _schema) {
-            XSOMParser parser = new XSOMParser();
-            parser.setEntityResolver(new EntityResolverImpl(u));
-            parser.parse(u.openStream());
-
-            XSSchemaSet sset = parser.getResult();
-
-            Iterator<XSSchema> is = sset.iterateSchema();
-            while (is.hasNext()) {
-                XSSchema s = is.next();
-                s.visit(this);
-            }
+            InputSource s = new InputSource(u.openStream());
+            s.setSystemId(u.toString());
+            parser.parse(s);
+        }
+        
+        XSSchemaSet sset = parser.getResult();
+        Iterator<XSSchema> is = sset.iterateSchema();
+        while (is.hasNext()) {
+            XSSchema s = is.next();
+            s.visit(this);
         }
     }
     
