@@ -49,7 +49,6 @@ import org.xml.sax.SAXParseException;
  * @author Paul.Sandoz@Sun.Com
  */
 public class SchemaProcessor implements XSVisitor, XSSimpleTypeVisitor {
-    private static byte[] EMPTY_SCHEMA = "<schema xmlns='http://www.w3.org/2001/XMLSchema'></schema>".getBytes();
     
     private class StringComparator implements Comparator {
         public int compare(Object o1, Object o2) {
