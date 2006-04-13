@@ -194,6 +194,12 @@
   <!-- The package distribution directory -->
   <property name="pkg.release.dir"    value="${basedir}/pkg-dist"/>
 
+  <!-- The hpux build directory -->
+  <property name="hpux.build.dir"    value="${build.home}/hpux/fi"/>
+
+  <!-- The hpux distribution directory -->
+  <property name="hpux.release.dir"    value="${basedir}/hpux-dist"/>
+
   <!-- The rpm build directory -->
   <property name="rpm.build.dir"    value="${build.home}/rpm/FASTINFOSET"/>
 
@@ -379,6 +385,44 @@
     </copy>
 
   </target>
+
+
+ <!-- =======================
+       HPUX FILE DISTRIBUTION 
+      ======================= -->
+  <!-- assumes the dist target has been called -->
+	<target name="create.hpux" description="Create JAX-WS HPUX package" >
+
+    <!-- copy template spec file to spec file in build dir and replace variables -->
+    <copy tofile="${hpux.build.dir}/sun-fastinfoset.psf" file="${basedir}/hpux/sun-fastinfoset.psf.tmpl" overwrite="yes"/>
+
+    <!-- replace fastinfoset version -->
+    <replace file="${hpux.build.dir}/sun-fastinfoset.psf" value="${release.impl.version}">
+      <replacetoken>@fi.version@</replacetoken>
+    </replace>
+
+    <!-- replace date stamp... 1st specify correct format  -->
+    <tstamp>
+      <format property="pkg.datestamp" pattern="yyyy.MM.dd.hh.mm"/>
+    </tstamp>
+    <replace file="${hpux.build.dir}/sun-fastinfoset.psf" value="${pkg.datestamp}">
+      <replacetoken>@datestamp@</replacetoken>
+    </replace>
+
+    <!-- replace libdir  -->
+    <replace file="${hpux.build.dir}/sun-fastinfoset.psf" value="${dist.home}">
+      <replacetoken>@libdir@</replacetoken>
+    </replace>
+
+    <!-- make output directory -->
+    <mkdir dir="${hpux.release.dir}/sun-fastinfoset"/>
+
+    <!--  -->
+	<exec  executable="/usr/sbin/swpackage" failonerror="true">
+      <arg line="-x follow_symlinks=true -x compression_type=gzip -x compress_cmd=/usr/contrib/bin/gzip -x uncompress_files=false -x compress_files=true -x reinstall_files=true -x package_in_place=false -x target_type=directory -x write_remote_files=true -x run_as_superuser=false -s ${hpux.build.dir}/sun-fastinfoset.psf @ ${hpux.release.dir}/sun-fastinfoset"/>
+	 </exec>
+
+   </target>
 
 
   <!-- =======================
