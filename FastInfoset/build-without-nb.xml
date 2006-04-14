@@ -178,6 +178,7 @@
   <property name="pkg.version" value="${release.impl.version}"/>
   <property name="rpm.version" value="${release.impl.version}"/>
   <property name="rpm.release" value="2"/>
+  <property name="zip.release" value="1"/>
 
   <!-- The package name -->
   <property name="pkg.fastinfoset"    value="SUNWfastinfoset"/>
@@ -435,6 +436,28 @@
     <mkdir dir="${zip.build.dir}"/>
     <mkdir dir="${zip.release.dir}"/>
 
+    <copy todir="${zip.build.dir}" overwrite="yes">
+      <fileset dir="${basedir}/zip">
+        <include name="filelist.txt"/>
+        <include name="version"/>
+      </fileset>
+    </copy>
+
+    <!-- replace parameters in version file  -->
+    <replace file="${zip.build.dir}/version" value="${release.impl.version}">
+      <replacetoken>@fi.version@</replacetoken>
+    </replace>
+    <!-- replace date stamp... 1st specify correct format  -->
+    <tstamp>
+      <format property="pkg.datestamp" pattern="yyyyMMdd"/>
+    </tstamp>
+    <replace file="${zip.build.dir}/version" value="${pkg.datestamp}">
+      <replacetoken>@datestamp@</replacetoken>
+    </replace>
+    <replace file="${zip.build.dir}/version" value="${zip.release}">
+      <replacetoken>@zip.release@</replacetoken>
+    </replace>
+
     <!-- copy FastInfoset specific jar files into the right directory structure -->
     <copy todir="${zip.build.dir}/fastinfoset/lib" overwrite="yes">
       <fileset dir="${dist.home}">
@@ -442,16 +465,8 @@
       </fileset>
     </copy>
 
-    <!-- copy FastInfoset dependent jar files into the right directory structure 
-    <copy todir="${zip.build.dir}/fastinfoset/lib" overwrite="yes">
-      <fileset dir="${sjsxp.build}/lib">
-        <include name="jsr173_api.jar"/>
-      </fileset>
-    </copy>
-    -->
-
     <!-- make zip file -->
-    <zip destfile="${zip.release.dir}/FASTINFOSET-${pkg.version}.zip" basedir="${zip.build.dir}" whenempty="fail"/>
+    <zip destfile="${zip.release.dir}/fastinfoset.zip" basedir="${zip.build.dir}" whenempty="fail"/>
 
 
   </target>
