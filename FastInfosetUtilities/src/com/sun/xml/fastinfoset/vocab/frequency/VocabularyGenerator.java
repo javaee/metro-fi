@@ -80,7 +80,7 @@ public class VocabularyGenerator {
     private ParserVocabulary _parserVocabulary;
     
     /**
-     * @param flb the set of frequency-based lists.
+     * @param fbl the set of frequency-based lists.
      * @param xapi the XML API that the parser and serializer vocabulary 
      * will be used with.
      */
@@ -91,7 +91,7 @@ public class VocabularyGenerator {
     /**
      * @param serializerVocabulary the serializer vocabualry to use
      * @param parserVocabulary the parser vocabulary to use
-     * @param flb the set of frequency-based lists.
+     * @param fbl the set of frequency-based lists.
      * @param xapi the XML API that the parser and serializer vocabulary 
      * will be used with.
      */
