@@ -121,7 +121,7 @@
     <target name="doc" depends="dist">
         <javadoc source="1.4"
 		sourcepath="src"
-		packagenames="com.sun.xml.fastinfoset.*"
+		packagenames="com.sun.xml.fastinfoset.*, org.jvnet.fastinfoset.*"
 		destdir="${dist.dir}/javadoc"
 		version="true">
             <classpath refid="compile.class.path"/>
