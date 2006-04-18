@@ -1,0 +1,50 @@
+<project name="FastInfosetUtilities" default="dist" basedir=".">
+
+    <!-- initialize build properties -->
+    <property file="${basedir}/build.properties" />
+
+    <property name="app.jar" value="${ant.project.name}.jar"/>
+
+    <path id="compile.class.path">
+        <pathelement location="${FastInfoset.jar}"/>
+        <pathelement location="${xsom.jar}"/>
+    </path>
+
+    <target name="prepare">
+        <mkdir dir="${build.dir}/classes"/>
+        <mkdir dir="${dist.dir}"/>
+    </target>
+
+    <target name="clean">
+        <delete quiet="true" dir="${dist.dir}"/>
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <target name="compile" depends="prepare">
+        <javac source="1.5" srcdir="src" destdir="${build.dir}/classes"
+            debug="on" optimize="on" deprecation="on">
+            <classpath refid="compile.class.path"/>
+        </javac>
+    </target>
+
+    <target name="dist" depends="compile">
+        <jar jarfile="${dist.dir}/${app.jar}"
+		basedir="${build.dir}/classes"/>
+	<zip destfile="${dist.dir}/FastInfosetUtilities.src.zip">
+            <fileset dir="src">
+                <include name="**/*"/>
+            </fileset>
+	</zip>
+    </target>
+
+    <target name="doc" depends="dist">
+        <javadoc source="1.5"
+		sourcepath="src"
+		packagenames="com.sun.xml.fastinfoset.*"
+		destdir="${dist.dir}/javadoc"
+		version="true">
+            <classpath refid="compile.class.path"/>
+	</javadoc>
+    </target>
+
+</project>
