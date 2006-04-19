@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 #set env:
 #FIRTT_HOME 
-#TIMESTAMP=`date '+%m%d%y_%H%M'`
+TIMESTAMP=`date '+%m%d%y_%H%M'`
 
 export FI_HOME=${FIRTT_HOME}/../FastInfoset
 export FIRTT_DATA=${FIRTT_HOME}/data
