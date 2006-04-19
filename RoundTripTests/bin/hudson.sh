@@ -29,7 +29,8 @@ ${FIRTT_HOME}/bin/allRoundtripTests.sh ${REPORT_XBC}
 mv ${FIRTT_DATA}/${REPORT_TS} ${RESULT_HOME}
 mv ${FIRTT_DATA}/${REPORT_XBC} ${RESULT_HOME}
 
-LOGFILE=${FIRTT_HOME}/report/roundtrip_${TIMESTAMP}.log
+LOGFILE=${FIRTT_HOME}/report/roundtrip.log
+rm ${LOGFILE}
 
 echo ""                                                                 >> ${LOGFILE}
 echo "RountTripTests results"                                  >> ${LOGFILE}
