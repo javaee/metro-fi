@@ -29,14 +29,14 @@ ${FIRTT_HOME}/bin/allRoundtripTests.sh ${REPORT_XBC}
 mv ${FIRTT_DATA}/${REPORT_TS} ${RESULT_HOME}
 mv ${FIRTT_DATA}/${REPORT_XBC} ${RESULT_HOME}
 
-LOGFILE=${FIRTT_HOME}/report/roundtrip.log
+LOGFILE=${FIRTT_HOME}/report/roundtrip.html
 rm ${LOGFILE}
 
 echo ""                                                                 >> ${LOGFILE}
 echo "RountTripTests results"                                  >> ${LOGFILE}
 echo "-------------------------------------------"                      >> ${LOGFILE}
 echo "Test results for well-formed files from XML TS:"         >>${LOGFILE}
-echo "${REPORT_TS}" >> ${LOGFILE}
+echo "<a href=${REPORT_TS}>XMLTS result<\/>" >> ${LOGFILE}
 echo "-------------------------------------------"                      >> ${LOGFILE}
 echo "Test results for files from XBC test corpus:"         >>${LOGFILE}
-echo "${REPORT_XBC}" >> ${LOGFILE}
+echo "<a href=${REPORT_XBC}>XBC result<\/>" >> ${LOGFILE}
