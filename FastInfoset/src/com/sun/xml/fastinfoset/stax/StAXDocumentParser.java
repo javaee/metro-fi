@@ -679,13 +679,25 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
             throw new IllegalStateException(CommonResourceBundle.getInstance().getString("message.invalidCallingGetAttributeValue"));
         }
         
+        if (localName == null)
+            throw new IllegalArgumentException();
+        
         // Search for the attributes in _attributes
-        for (int i = 0; i < _attributes.getLength(); i++) {
-            if (_attributes.getLocalName(i).equals(localName) &&
-                    _attributes.getURI(i).equals(namespaceURI)) {
-                return _attributes.getValue(i);
+        if (namespaceURI != null) {
+            for (int i = 0; i < _attributes.getLength(); i++) {
+                if (_attributes.getLocalName(i).equals(localName) &&
+                        _attributes.getURI(i).equals(namespaceURI)) {
+                    return _attributes.getValue(i);
+                }
+            }
+        } else {
+            for (int i = 0; i < _attributes.getLength(); i++) {
+                if (_attributes.getLocalName(i).equals(localName)) {
+                    return _attributes.getValue(i);
+                }
             }
         }
+        
         return null;
     }
     
