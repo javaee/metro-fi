@@ -3,7 +3,7 @@
 #FIRTT_HOME 
 
 export FI_HOME=${FIRTT_HOME}/../FastInfoset
-export FIRTT_DATA=${FIRTT_HOME}/data
+export FIRTT_DATA=${FIRTT_HOME}/report
 export RESULT_HOME=${FIRTT_HOME}/report
 
 
@@ -17,11 +17,11 @@ ant -f ${FIRTT_HOME}/build-without-nb.xml dist
 chmod 755 ${FIRTT_HOME}/bin/*
 chmod 755 ${FI_HOME}/bin/*
 
-cd $FIRTT_DATA/xmlconf/eduni/errata-2e
+cd $FIRTT_HOME/data/xmlconf/eduni/errata-2e
 REPORT_TS=xmlts.html
 ${FIRTT_HOME}/bin/allRoundtripTests.sh ${REPORT_TS}
 
-cd ${FIRTT_DATA}/XBC/Docbook
+cd ${FIRTT_HOME}/data/XBC/Docbook
 REPORT_XBC=xbc.html
 ${FIRTT_HOME}/bin/allRoundtripTests.sh ${REPORT_XBC}
 
