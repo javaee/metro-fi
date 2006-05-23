@@ -71,7 +71,6 @@ public class StAXEventReader implements javax.xml.stream.XMLEventReader{
             _streamReader.next();
             _currentEvent =_eventAllocator.allocate(_streamReader);
             events[0] = _currentEvent;
-            System.out.println("current event:" + _currentEvent);
             hasEvent = true;
         } else {
             throw new XMLStreamException(CommonResourceBundle.getInstance().getString("message.noElement"));
