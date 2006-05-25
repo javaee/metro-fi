@@ -43,6 +43,21 @@ import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.DefaultHandler;
 
+/**
+ * Default base class for SAX event handlers of a {@link FastInfosetReader}.
+ * <p>
+ * This class is available as a convenience for applications: it provides 
+ * default implementations for all of the callbacks of the following:
+ * <UL>
+ *   <LI>{@link DefaultHandler}</LI>
+ *   <LI>{@link LexicalHandler}</LI>
+ *   <LI>{@link EncodingAlgorithmContentHandler}</LI>
+ *   <LI>{@link PrimitiveTypeContentHandler}</LI>
+ * </UL>
+ * Application writers can extend this class when they need to implement only 
+ * part of an interface; parser writers can instantiate this class to provide
+ * default handlers when the application has not supplied its own.
+ */
 public class FastInfosetDefaultHandler extends DefaultHandler implements
         LexicalHandler, EncodingAlgorithmContentHandler, PrimitiveTypeContentHandler {
 
