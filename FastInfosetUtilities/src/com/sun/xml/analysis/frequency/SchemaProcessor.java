@@ -387,7 +387,9 @@ public class SchemaProcessor implements XSVisitor, XSSimpleTypeVisitor {
     
     private void addNamespaceAndLocalName(QName q) {
         localNames.add(q.getLocalPart());
-        if (q.getNamespaceURI() != XMLConstants.NULL_NS_URI) {
+        if (q.getNamespaceURI() != XMLConstants.NULL_NS_URI &&
+                !q.getNamespaceURI().equals("http://www.w3.org/XML/1998/namespace")) {
+            // Ignore the XML namespace
             namespaces.add(q.getNamespaceURI());
         }
     }
