@@ -48,7 +48,7 @@ package org.jvnet.fastinfoset;
 public class ExternalVocabulary extends Vocabulary {
   
     /**
-     * A URI that refers to the externcal vocabulary.
+     * A URI that refers to the external vocabulary.
      */
     public final String URI;
     
