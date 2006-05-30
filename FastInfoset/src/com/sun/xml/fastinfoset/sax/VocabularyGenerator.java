@@ -56,32 +56,51 @@ import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.DefaultHandler;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
+import java.util.Set;
 import org.jvnet.fastinfoset.FastInfosetSerializer;
 
 public class VocabularyGenerator extends DefaultHandler implements LexicalHandler {
     
     protected SerializerVocabulary _serializerVocabulary;
     protected ParserVocabulary _parserVocabulary;
+    protected org.jvnet.fastinfoset.Vocabulary _v;    
     
     protected int attributeValueSizeConstraint = FastInfosetSerializer.ATTRIBUTE_VALUE_SIZE_CONSTRAINT;
     
     protected int characterContentChunkSizeContraint = FastInfosetSerializer.CHARACTER_CONTENT_CHUNK_SIZE_CONSTRAINT;
     
     /** Creates a new instance of VocabularyGenerator */
+    public VocabularyGenerator() {
+        _serializerVocabulary = new SerializerVocabulary();
+        _parserVocabulary = new ParserVocabulary();
+        
+        _v = new org.jvnet.fastinfoset.Vocabulary();
+    }
+    
     public VocabularyGenerator(SerializerVocabulary serializerVocabulary) {
         _serializerVocabulary = serializerVocabulary;
         _parserVocabulary = new ParserVocabulary();
+        
+        _v = new org.jvnet.fastinfoset.Vocabulary();
     }
 
     public VocabularyGenerator(ParserVocabulary parserVocabulary) {
         _serializerVocabulary = new SerializerVocabulary();
         _parserVocabulary = parserVocabulary;
+        
+        _v = new org.jvnet.fastinfoset.Vocabulary();
     }
     
     /** Creates a new instance of VocabularyGenerator */
     public VocabularyGenerator(SerializerVocabulary serializerVocabulary, ParserVocabulary parserVocabulary) {
         _serializerVocabulary = serializerVocabulary;
         _parserVocabulary = parserVocabulary;
+        
+        _v = new org.jvnet.fastinfoset.Vocabulary();
+    }
+    
+    public org.jvnet.fastinfoset.Vocabulary getVocabulary() {
+        return _v;
     }
     
     public void setCharacterContentChunkSizeLimit(int size) {
@@ -117,22 +136,24 @@ public class VocabularyGenerator extends DefaultHandler implements LexicalHandle
     }
     
     public void startPrefixMapping(String prefix, String uri) throws SAXException {
-        addToTable(prefix, _serializerVocabulary.prefix, _parserVocabulary.prefix);
-        addToTable(uri, _serializerVocabulary.namespaceName, _parserVocabulary.namespaceName);
+        addToTable(prefix, _v.prefixes, _serializerVocabulary.prefix, _parserVocabulary.prefix);
+        addToTable(uri, _v.namespaceNames, _serializerVocabulary.namespaceName, _parserVocabulary.namespaceName);
     }
 
     public void endPrefixMapping(String prefix) throws SAXException {
     }
 
     public void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException {
-        addToNameTable(namespaceURI, qName, localName, _serializerVocabulary.elementName, _parserVocabulary.elementName, false);
+        addToNameTable(namespaceURI, qName, localName, 
+                _v.elements, _serializerVocabulary.elementName, _parserVocabulary.elementName, false);
         
         for (int a = 0; a < atts.getLength(); a++) {            
-            addToNameTable(atts.getURI(a), atts.getQName(a), atts.getLocalName(a), _serializerVocabulary.attributeName, _parserVocabulary.attributeName, true);
+            addToNameTable(atts.getURI(a), atts.getQName(a), atts.getLocalName(a), 
+                    _v.attributes, _serializerVocabulary.attributeName, _parserVocabulary.attributeName, true);
         
             String value = atts.getValue(a);
             if (value.length() < attributeValueSizeConstraint) {
-                addToTable(value, _serializerVocabulary.attributeValue, _parserVocabulary.attributeValue);
+                addToTable(value, _v.attributeValues, _serializerVocabulary.attributeValue, _parserVocabulary.attributeValue);
             }
         }
     }
@@ -184,7 +205,7 @@ public class VocabularyGenerator extends DefaultHandler implements LexicalHandle
     }
 
     
-    public void addToTable(String s, StringIntMap m, StringArray a) {
+    public void addToTable(String s, Set v, StringIntMap m, StringArray a) {
         if (s == "") {
             return;
         }
@@ -192,9 +213,11 @@ public class VocabularyGenerator extends DefaultHandler implements LexicalHandle
         if (m.obtainIndex(s) == KeyIntMap.NOT_PRESENT) {
             a.add(s);
         }
+        
+        v.add(s);
     }
 
-    public void addToTable(String s, StringIntMap m, PrefixArray a) {
+    public void addToTable(String s, Set v, StringIntMap m, PrefixArray a) {
         if (s == "") {
             return;
         }
@@ -202,16 +225,20 @@ public class VocabularyGenerator extends DefaultHandler implements LexicalHandle
         if (m.obtainIndex(s) == KeyIntMap.NOT_PRESENT) {
             a.add(s);
         }
+        
+        v.add(s);
     }
     
     public void addToCharArrayTable(CharArray c) {
         if (_serializerVocabulary.characterContentChunk.obtainIndex(c.ch, c.start, c.length, false) == KeyIntMap.NOT_PRESENT) {
             _parserVocabulary.characterContentChunk.add(c.ch, c.length);
-        }        
+        }
+        
+        _v.characterContentChunks.add(c.toString());
     }
 
     public void addToNameTable(String namespaceURI, String qName, String localName, 
-            LocalNameQualifiedNamesMap m, QualifiedNameArray a,
+            Set v, LocalNameQualifiedNamesMap m, QualifiedNameArray a,
             boolean isAttribute) throws SAXException {        
         LocalNameQualifiedNamesMap.Entry entry = m.obtainEntry(qName);
         if (entry._valueIndex > 0) {
@@ -256,6 +283,8 @@ public class VocabularyGenerator extends DefaultHandler implements LexicalHandle
         }
         entry.addQualifiedName(name);
         a.add(name);
+        
+        v.add(name.getQName());
     }
         
     public static String getPrefixFromQualifiedName(String qName) {

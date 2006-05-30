@@ -297,7 +297,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         // Create internal serializer vocabulary
         _v = new SerializerVocabulary();
         // Set the external vocabulary
-        SerializerVocabulary ev = new SerializerVocabulary(v,
+        SerializerVocabulary ev = new SerializerVocabulary(v.vocabulary,
                 _useLocalNameAsKeyForQualifiedNameLookup);
         _v.setExternalVocabulary(v.URI,
                 ev, false);

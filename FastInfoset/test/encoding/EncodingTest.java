@@ -49,6 +49,7 @@ import java.net.URL;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import junit.framework.*;
+import org.jvnet.fastinfoset.ExternalVocabulary;
 
 public class EncodingTest extends TestCase {
     
@@ -104,6 +105,30 @@ public class EncodingTest extends TestCase {
                 externalVocabulary, false);
 
         _finfDocument = parse();
+        FileOutputStream foas = new FileOutputStream("new-UBL-example-refvocab.finf");
+        foas.write(_finfDocument);
+        
+        compare(obtainBytesFromStream(_finfRefVocabDocumentURL.openStream()));
+    }
+    
+    public void testEncodeWithJVNETVocabulary() throws Exception {
+        VocabularyGenerator vocabularyGenerator = new VocabularyGenerator();
+        vocabularyGenerator.setCharacterContentChunkSizeLimit(0);
+        vocabularyGenerator.setAttributeValueSizeLimit(0);
+        _saxParser.parse(_xmlDocumentURL.openStream(), vocabularyGenerator);
+        
+        ExternalVocabulary ev = new ExternalVocabulary(
+                EXTERNAL_VOCABULARY_URI_STRING,
+                vocabularyGenerator.getVocabulary());
+        _ds.setExternalVocabulary(ev);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        _ds.setOutputStream(baos);
+
+        _saxParser.parse(_xmlDocumentURL.openStream(), _ds);
+        
+        _finfDocument = baos.toByteArray();
+        
         FileOutputStream foas = new FileOutputStream("new-UBL-example-refvocab.finf");
         foas.write(_finfDocument);
         

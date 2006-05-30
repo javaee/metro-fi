@@ -57,6 +57,7 @@ import javax.xml.parsers.SAXParserFactory;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import org.jvnet.fastinfoset.ExternalVocabulary;
 import org.jvnet.fastinfoset.FastInfosetParser;
 
 public class DecodingTest extends TestCase {
@@ -124,6 +125,36 @@ public class DecodingTest extends TestCase {
         compare(finfDocument, obtainBytesFromStream(_finfRefVocabDocumentURL.openStream()));
     }
 
+    public void testDecodeWithJVNETVocabulary() throws Exception {
+        VocabularyGenerator vocabularyGenerator = new VocabularyGenerator();
+        vocabularyGenerator.setCharacterContentChunkSizeLimit(0);
+        vocabularyGenerator.setAttributeValueSizeLimit(0);
+        _saxParser.parse(_xmlDocumentURL.openStream(), vocabularyGenerator);
+
+        ExternalVocabulary ev = new ExternalVocabulary(
+                EXTERNAL_VOCABULARY_URI_STRING,
+                vocabularyGenerator.getVocabulary());
+        
+        Map externalVocabularies = new HashMap();
+        externalVocabularies.put(ev.URI, ev);
+                
+        SAXDocumentSerializer documentSerializer = new SAXDocumentSerializer();
+        documentSerializer.setCharacterContentChunkSizeLimit(6);
+        documentSerializer.setAttributeValueSizeLimit(6);
+        documentSerializer.setExternalVocabulary(ev);        
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        documentSerializer.setOutputStream(baos);
+
+        SAXDocumentParser documentParser = new SAXDocumentParser();
+        documentParser.setProperty(FastInfosetParser.EXTERNAL_VOCABULARIES_PROPERTY, externalVocabularies);
+        documentParser.setContentHandler(documentSerializer);
+        documentParser.parse(_finfRefVocabDocumentURL.openStream());        
+
+        
+        byte[] finfDocument = baos.toByteArray();
+        compare(finfDocument, obtainBytesFromStream(_finfRefVocabDocumentURL.openStream()));
+    }
+    
     public void testDecodeWithoutVocabulary() throws Exception {
         SerializerVocabulary initialVocabulary = new SerializerVocabulary();
 

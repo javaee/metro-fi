@@ -52,7 +52,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -481,10 +480,10 @@ public abstract class Decoder implements FastInfosetParser {
         if (o instanceof ParserVocabulary) {
             _v.setReferencedVocabulary(externalVocabularyURI, 
                     (ParserVocabulary)o, false);
-        } else if (o instanceof org.jvnet.fastinfoset.Vocabulary) {
-            org.jvnet.fastinfoset.Vocabulary v = 
-                    (org.jvnet.fastinfoset.Vocabulary)o;
-            ParserVocabulary pv = new ParserVocabulary(v);
+        } else if (o instanceof org.jvnet.fastinfoset.ExternalVocabulary) {
+            org.jvnet.fastinfoset.ExternalVocabulary v = 
+                    (org.jvnet.fastinfoset.ExternalVocabulary)o;
+            ParserVocabulary pv = new ParserVocabulary(v.vocabulary);
             
             _externalVocabularies.put(externalVocabularyURI, pv);
             _v.setReferencedVocabulary(externalVocabularyURI, 
