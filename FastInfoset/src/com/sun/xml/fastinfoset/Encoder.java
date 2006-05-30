@@ -55,7 +55,6 @@ import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
 import org.jvnet.fastinfoset.ExternalVocabulary;
 import org.jvnet.fastinfoset.FastInfosetException;
 import org.jvnet.fastinfoset.FastInfosetSerializer;
-import org.jvnet.fastinfoset.InitialVocabulary;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
