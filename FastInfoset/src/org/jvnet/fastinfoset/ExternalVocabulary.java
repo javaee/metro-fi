@@ -41,7 +41,7 @@ package org.jvnet.fastinfoset;
 /**
  * An external vocabulary.
  * <p>
- * An externcal vocabulary has a URI that refers to the external vocabulary.
+ * An external vocabulary has a URI that refers to the external vocabulary.
  *
  * @author Paul.Sandoz@Sun.Com
  */

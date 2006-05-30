@@ -140,14 +140,7 @@ public interface FastInfosetSerializer {
     public int getAttributeValueSizeLimit();
 
     /**
-     * Set the initial vocabulary that shall be used when serializing.
-     * 
-     * @param v the vocabulary. 
-     */
-    // public void setInitialVocabulary(InitialVocabulary v);    
-    
-    /**
-     * Set the externcal vocabulary that shall be used when serializing.
+     * Set the external vocabulary that shall be used when serializing.
      * 
      * @param v the vocabulary. 
      */
