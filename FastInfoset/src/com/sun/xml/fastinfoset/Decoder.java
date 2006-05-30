@@ -52,13 +52,12 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.jvnet.fastinfoset.FastInfosetException;
 import org.jvnet.fastinfoset.FastInfosetParser;
-import org.jvnet.fastinfoset.ReferencedVocabulary;
-import org.jvnet.fastinfoset.Vocabulary;
 
 /**
  * Abstract decoder for developing concrete encoders.
@@ -328,7 +327,13 @@ public abstract class Decoder implements FastInfosetParser {
      * {@inheritDoc}
      */
     public void setExternalVocabularies(Map referencedVocabualries) {
-        _externalVocabularies = referencedVocabualries;
+        if (referencedVocabualries != null) {
+            // Clone the input map
+            _externalVocabularies = new HashMap();
+            _externalVocabularies.putAll(referencedVocabualries);
+        } else {
+            _externalVocabularies = null;
+        }
     }
 
     /**
@@ -337,28 +342,6 @@ public abstract class Decoder implements FastInfosetParser {
     public Map getExternalVocabularies() {
         return _externalVocabularies;
     }
-
-    /*
-    public void setDynamicVocabulary(Vocabulary v) {
-        throw new UnsupportedOperationException();
-    }
-
-    public ReferencedVocabulary getExternalVocabulary() {
-        throw new UnsupportedOperationException();
-    }
-
-    public Vocabulary getIntitialVocabulary() {
-        throw new UnsupportedOperationException();
-    }
-
-    public Vocabulary getDynamicVocabulary() {
-        throw new UnsupportedOperationException();
-    }
-
-    public Vocabulary getFinalVocabulary() {
-        throw new UnsupportedOperationException();
-    }
-    */
     
     // End FastInfosetParser interface
     
@@ -487,17 +470,30 @@ public abstract class Decoder implements FastInfosetParser {
 
     private void decodeExternalVocabularyURI() throws FastInfosetException, IOException {
         if (_externalVocabularies == null) {
-            throw new IOException(CommonResourceBundle.getInstance().getString("message.noExternalVocabularies"));
+            throw new IOException(CommonResourceBundle.
+                    getInstance().getString("message.noExternalVocabularies"));
         }
 
-        String externalVocabularyURI = decodeNonEmptyOctetStringOnSecondBitAsUtf8String();
-        ParserVocabulary externalVocabulary =
-            (ParserVocabulary) _externalVocabularies.get(externalVocabularyURI);
-        if (externalVocabulary == null) {
-            throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.externalVocabularyNotRegistered", new Object[]{externalVocabularyURI}));
-        }
-
-        _v.setReferencedVocabulary(externalVocabularyURI, externalVocabulary, false);
+        String externalVocabularyURI = 
+                decodeNonEmptyOctetStringOnSecondBitAsUtf8String();
+        
+        Object o = _externalVocabularies.get(externalVocabularyURI);
+        if (o instanceof ParserVocabulary) {
+            _v.setReferencedVocabulary(externalVocabularyURI, 
+                    (ParserVocabulary)o, false);
+        } else if (o instanceof org.jvnet.fastinfoset.Vocabulary) {
+            org.jvnet.fastinfoset.Vocabulary v = 
+                    (org.jvnet.fastinfoset.Vocabulary)o;
+            ParserVocabulary pv = new ParserVocabulary(v);
+            
+            _externalVocabularies.put(externalVocabularyURI, pv);
+            _v.setReferencedVocabulary(externalVocabularyURI, 
+                    pv, false);
+        } else {            
+            throw new FastInfosetException(CommonResourceBundle.getInstance().
+                    getString("message.externalVocabularyNotRegistered", 
+                    new Object[]{externalVocabularyURI}));
+        }        
     }
 
     private void decodeTableItems(StringArray array) throws FastInfosetException, IOException {

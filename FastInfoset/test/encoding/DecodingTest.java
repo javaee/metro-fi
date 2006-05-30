@@ -103,7 +103,6 @@ public class DecodingTest extends TestCase {
                 EXTERNAL_VOCABULARY_URI_STRING,
                 serializerExternalVocabulary, false);
 
-        // Map<String, ParserVocabulary> externalVocabularies = new HashMap<String, ParserVocabulary>();
         Map externalVocabularies = new HashMap();
         externalVocabularies.put(EXTERNAL_VOCABULARY_URI_STRING, parserExternalVocabulary);
         

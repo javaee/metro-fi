@@ -38,29 +38,83 @@
 
 package org.jvnet.fastinfoset;
 
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import javax.xml.namespace.QName;
 
-public interface Vocabulary {
-    public static final int RESTRICTED_ALPHABET     = 0;
-    public static final int ENCODING_ALGORITHM      = 1;
-    public static final int PREFIX                  = 2;
-    public static final int NAMESPACE_NAME          = 3;
-    public static final int LOCAL_NAME              = 4;
-    public static final int OTHER_NCNAME            = 5;
-    public static final int OTHER_URI               = 6;
-    public static final int ATTRIBUTE_VALUE         = 7;
-    public static final int OTHER_STRING            = 8;
-    public static final int CHARACTER_CONTENT_CHUNK = 9;
-    public static final int ELEMENT_NAME            = 10;
-    public static final int ATTRIBUTE_NAME          = 11;
-        
-    public void setTableFromArray(int type, Object array);
-
-    public void setTableFromList(int type, List array);
-
-    public Object getTableAsArray(int type);
-
-    public List getTableAsList(int type);
+/**
+ * A canonical representation of a vocabulary.
+ * <p>
+ * Each vocabulary table is represented as a Set. A vocabulary table entry is
+ * represented as an item in the Set.
+ * <p>
+ * The 1st item contained in a Set is assigned the smallest index value, 
+ * n say (where n >= 0). The 2nd item is assigned an index value of n + 1. The kth
+ * item is aggined an index value of n + (k - 1).
+ * <p>
+ * A Fast Infoset parser/serializer implementation will tranform the canonical 
+ * representation of a Vocabulary instance into a more optimal form suitable 
+ * for the efficient usage according to the API implemented by the parsers and
+ * serialziers.
+ */
+public class Vocabulary {
+    /**
+     * The restricted alphabet table, containing String objects.
+     */
+    public final Set restrictedAlphabets = new LinkedHashSet();
     
-    public void clear();
+    /**
+     * The encoding algorithm table, containing String objects.
+     */
+    public final Set encodingAlgorithms = new LinkedHashSet();
+    
+    /**
+     * The prefix table, containing String objects.
+     */
+    public final Set prefixes = new LinkedHashSet();
+    
+    /**
+     * The namespace name table, containing String objects.
+     */
+    public final Set namespaceNames = new LinkedHashSet();
+    
+    /**
+     * The local name table, containing String objects.
+     */
+    public final Set localNames = new LinkedHashSet();
+    
+    /**
+     * The "other NCName" table, containing String objects.
+     */
+    public final Set otherNCNames = new LinkedHashSet();
+    
+    /**
+     * The "other URI" table, containing String objects.
+     */
+    public final Set otherURIs = new LinkedHashSet();
+    
+    /**
+     * The "attribute value" table, containing String objects.
+     */
+    public final Set attributeValues = new LinkedHashSet();
+    
+    /**
+     * The "other string" table, containing String objects.
+     */
+    public final Set otherStrings = new LinkedHashSet();
+    
+    /**
+     * The "character content chunk" table, containing String objects.
+     */
+    public final Set characterContentChunks = new LinkedHashSet();
+    
+    /**
+     * The element table, containing QName objects.
+     */
+    public final Set elements = new LinkedHashSet();
+    
+    /**
+     * The attribute table, containing QName objects.
+     */
+    public final Set attributes = new LinkedHashSet();    
 }

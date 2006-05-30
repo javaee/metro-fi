@@ -52,10 +52,10 @@ import java.util.Map;
 import org.jvnet.fastinfoset.EncodingAlgorithm;
 import org.jvnet.fastinfoset.EncodingAlgorithmException;
 import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
+import org.jvnet.fastinfoset.ExternalVocabulary;
 import org.jvnet.fastinfoset.FastInfosetException;
 import org.jvnet.fastinfoset.FastInfosetSerializer;
-import org.jvnet.fastinfoset.ReferencedVocabulary;
-import org.jvnet.fastinfoset.Vocabulary;
+import org.jvnet.fastinfoset.InitialVocabulary;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
@@ -106,6 +106,15 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
+    /**
+     * True, if the local name string is used as the key to find the
+     * associated set of qualified names.
+     * <p>
+     * False,  if the <prefix>:<local name> string is used as the key
+     * to find the associated set of qualified names.
+     */
+    private boolean _useLocalNameAsKeyForQualifiedNameLookup;
+            
     /**
      * True if strings for text content and attribute values will be
      * UTF-8 encoded otherwise they will be UTF-16 encoded.
@@ -195,7 +204,12 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
      * Default constructor for the Encoder.
      */
     protected Encoder() {
-        setCharacterEncodingScheme(_characterEncodingSchemeSystemDefault);
+        setCharacterEncodingScheme(_characterEncodingSchemeSystemDefault);        
+    }
+    
+    protected Encoder(boolean useLocalNameAsKeyForQualifiedNameLookup) {
+        setCharacterEncodingScheme(_characterEncodingSchemeSystemDefault);        
+        _useLocalNameAsKeyForQualifiedNameLookup = useLocalNameAsKeyForQualifiedNameLookup;
     }
     
     
@@ -275,31 +289,23 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     public int getAttributeValueSizeLimit() {
         return attributeValueSizeConstraint;
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void setExternalVocabulary(ExternalVocabulary v) {
+        // Create internal serializer vocabulary
+        _v = new SerializerVocabulary();
+        // Set the external vocabulary
+        SerializerVocabulary ev = new SerializerVocabulary(v,
+                _useLocalNameAsKeyForQualifiedNameLookup);
+        _v.setExternalVocabulary(v.URI,
+                ev, false);
         
-    /*
-    public void setExternalVocabulary(ReferencedVocabulary referencedVocabulary) {
-        throw new UnsupportedOperationException();
+        _vIsInternal = true;
     }
-
-    public void setIntitialVocabulary(Vocabulary initialVocabulary) {
-        throw new UnsupportedOperationException();
-    }
-
-    public void setDynamicVocabulary(Vocabulary dynamicVocabulary) {
-        throw new UnsupportedOperationException();
-    }
-
-    public Vocabulary getDynamicVocabulary() {
-        throw new UnsupportedOperationException();
-    }
-
-    public Vocabulary getFinalVocabulary() {
-        throw new UnsupportedOperationException();
-    }
-    */
     
     // End of FastInfosetSerializer interface
-    
     
     /**
      * Reset the encoder for reuse encoding another XML infoset.
@@ -1487,7 +1493,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     }
 
     private int _bitsLeftInOctet;
-    
+
     private final void resetBits() {
         _bitsLeftInOctet = 8;
         _b = 0;

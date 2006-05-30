@@ -34,20 +34,29 @@
  * Version 2.0, January 2004
  * http://www.apache.org/licenses/
  *
- */
-
+ */ 
 
 package org.jvnet.fastinfoset;
 
-public abstract class VocabularyFactory {
+/**
+ * An external vocabulary.
+ * <p>
+ * An externcal vocabulary has a URI that refers to the external vocabulary.
+ *
+ * @author Paul.Sandoz@Sun.Com
+ */
+public class ExternalVocabulary extends Vocabulary {
+  
+    /**
+     * A URI that refers to the externcal vocabulary.
+     */
+    public final String URI;
     
-    protected VocabularyFactory() {
+    public ExternalVocabulary(String URI) {
+        if (URI == null) {
+            throw new IllegalArgumentException();
+        }
+        
+        this.URI = URI;
     }
-    
-    public static VocabularyFactory newInstance() {
-        // return implementation based on system property
-        return null;
-    }
-    
-    public abstract Vocabulary newVocabulary();    
 }

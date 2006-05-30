@@ -137,6 +137,8 @@ public interface FastInfosetParser {
 
     /**
      * Set the map of referenced external vocabularies.
+     * <p>
+     * The map (but not the keys and values) be cloned.
      *
      * @param referencedVocabualries the map of URI to vocabulary.
      */
@@ -146,28 +148,11 @@ public interface FastInfosetParser {
      * Get the map of referenced external vocabularies.
      *
      * @return the map of URI to vocabulary.
+     * @deprecated
+     *     The map returned will not be the same instance and contain
+     *     the same entries as the map set by {@link #setExternalVocabularies} 
+     *     method.
      */
     public Map getExternalVocabularies();
     
-    /*
-    
-    TODO
-    // Vocabulary methods
-    
-    // Before parsing 
-    
-    public void setDynamicVocabulary(Vocabulary v);
-    
-    
-    // After parsing
-    
-    public ReferencedVocabulary getExternalVocabulary();
-    
-    public Vocabulary getIntitialVocabulary();
-
-    public Vocabulary getDynamicVocabulary();
-
-    public Vocabulary getFinalVocabulary();
-     
-    */ 
 }

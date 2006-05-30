@@ -44,6 +44,7 @@ import org.jvnet.fastinfoset.FastInfosetException;
 import org.jvnet.fastinfoset.FastInfosetParser;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
+import org.xml.sax.ext.DeclHandler;
 import org.xml.sax.ext.LexicalHandler;
 
 /**
@@ -200,6 +201,27 @@ public interface FastInfosetReader extends XMLReader, FastInfosetParser {
      */
     public LexicalHandler getLexicalHandler();
    
+    /**
+     * Allow an application to register a DTD declaration handler.
+     *
+     * <p>Applications may register a new or different handler in the
+     * middle of a parse, and the SAX parser must begin using the new
+     * handler immediately.</p>
+     *
+     * @param handler The DTD declaration handler.
+     * @see #getLexicalHandler
+     */
+    public void setDeclHandler(DeclHandler handler);
+
+    /**
+     * Return the current DTD declaration handler.
+     *
+     * @return The current DTD declaration handler, or null if none
+     *         has been registered.
+     * @see #setLexicalHandler
+     */
+    public DeclHandler getDeclHandler();
+    
     /**
      * Allow an application to register an encoding algorithm handler.
      *

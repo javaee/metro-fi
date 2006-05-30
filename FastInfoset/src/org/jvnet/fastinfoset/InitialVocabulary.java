@@ -36,23 +36,30 @@
  *
  */ 
 
-
 package org.jvnet.fastinfoset;
 
-public class ReferencedVocabulary {
-    private final String URI;
-    private final Vocabulary vocabulary;
+/**
+ * An initial vocabulary.
+ * <p>
+ * An initial vocabulary may have an external vocabulary.
+ *
+ * @author Paul.Sandoz@Sun.Com
+ */
+public class InitialVocabulary extends Vocabulary {
+
+    /**
+     * The external vocabulary.
+     * <p>
+     * If null then the initial vocabulary does not have an external
+     * vocabulary.
+     */
+    public final ExternalVocabulary externalVocabulary;
+
+    public InitialVocabulary() {
+        externalVocabulary = null;
+    }
     
-    public ReferencedVocabulary(String URI, Vocabulary vocabulary) {
-        this.URI = URI;
-        this.vocabulary = vocabulary; 
-    }
-
-    public String getURI() {
-        return URI;
-    }
-
-    public Vocabulary getVocabulary() {
-        return vocabulary;
+    public InitialVocabulary(ExternalVocabulary externalVocabulary) {
+        this.externalVocabulary = externalVocabulary;
     }
 }

@@ -104,14 +104,17 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
     protected String[] _namespacesArray = new String[2 * 8];
     protected int _namespacesArrayIndex = 0;
     
-    public StAXDocumentSerializer() {    
+    public StAXDocumentSerializer() {
+        super(true);
     }
     
     public StAXDocumentSerializer(OutputStream outputStream) {
+        super(true);
         setOutputStream(outputStream);
     }
 
     public StAXDocumentSerializer(OutputStream outputStream, StAXManager manager) {
+        super(true);
         setOutputStream(outputStream);
         _manager = manager;
     }

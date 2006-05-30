@@ -138,23 +138,18 @@ public interface FastInfosetSerializer {
      * @return The attribute value size limit.
      */
     public int getAttributeValueSizeLimit();
-    
-    /*
-    
-    TODO
-    // Before serializing
-    
-    public void setExternalVocabulary(ReferencedVocabulary referencedVocabulary);
-    
-    public void setIntitialVocabulary(Vocabulary initialVocabulary);
-    
-    public void setDynamicVocabulary(Vocabulary dynamicVocabulary);
 
+    /**
+     * Set the initial vocabulary that shall be used when serializing.
+     * 
+     * @param v the vocabulary. 
+     */
+    // public void setInitialVocabulary(InitialVocabulary v);    
     
-    // After serializing
-
-    public Vocabulary getDynamicVocabulary();
-
-    public Vocabulary getFinalVocabulary();    
-    */
+    /**
+     * Set the externcal vocabulary that shall be used when serializing.
+     * 
+     * @param v the vocabulary. 
+     */
+    public void setExternalVocabulary(ExternalVocabulary v);    
 }
