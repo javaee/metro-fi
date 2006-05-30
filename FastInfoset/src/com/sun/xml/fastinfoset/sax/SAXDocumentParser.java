@@ -70,6 +70,7 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.DefaultHandler;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
+import org.xml.sax.ext.DeclHandler;
 
 public class SAXDocumentParser extends Decoder implements FastInfosetReader {
 
@@ -89,6 +90,27 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         public void startCDATA() { }
         public void endCDATA() { }
     };
+    
+    /*
+     * Empty DTD declaration handler used by default to report
+     * DTD declaration-based events
+     */
+    private static final class DeclHandlerImpl implements DeclHandler {
+        public void elementDecl(String name, String model) throws SAXException {
+        }
+
+        public void attributeDecl(String eName, String aName, 
+                String type, String mode, String value) throws SAXException {
+        }
+
+        public void internalEntityDecl(String name, 
+                String value) throws SAXException {
+        }
+
+        public void externalEntityDecl(String name, 
+                String publicId, String systemId) throws SAXException {
+        }
+    }
     
     /**
      * SAX Namespace attributes features
@@ -120,6 +142,11 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
      */
     protected LexicalHandler _lexicalHandler;
     
+    /**
+     * Reference to DTD declaration handler.
+     */
+    protected DeclHandler _declHandler;
+    
     protected EncodingAlgorithmContentHandler _algorithmHandler;
     
     protected PrimitiveTypeContentHandler _primitiveHandler;
@@ -144,7 +171,8 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         _dtdHandler = handler;
         _contentHandler = handler;
         _errorHandler = handler;
-        _lexicalHandler = new LexicalHandlerImpl();        
+        _lexicalHandler = new LexicalHandlerImpl();
+        _declHandler = new DeclHandlerImpl();
     }
     
     protected void resetOnError() {
@@ -196,6 +224,8 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
     throws SAXNotRecognizedException, SAXNotSupportedException {
         if (name.equals(Properties.LEXICAL_HANDLER_PROPERTY)) {
             return getLexicalHandler();
+        } else if (name.equals(Properties.DTD_DECLARATION_HANDLER_PROPERTY)) {
+            return getDeclHandler();
         } else if (name.equals(FastInfosetReader.EXTERNAL_VOCABULARIES_PROPERTY)) {
             return getExternalVocabularies();
         } else if (name.equals(FastInfosetReader.REGISTERED_ENCODING_ALGORITHMS_PROPERTY)) {
@@ -218,6 +248,12 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             } else {
                 throw new SAXNotSupportedException(Properties.LEXICAL_HANDLER_PROPERTY);
             }
+        } else if (name.equals(Properties.DTD_DECLARATION_HANDLER_PROPERTY)) {
+            if (value instanceof DeclHandler) {
+                setDeclHandler((DeclHandler)value);
+            } else {
+                throw new SAXNotSupportedException(Properties.LEXICAL_HANDLER_PROPERTY);
+            }            
         } else if (name.equals(FastInfosetReader.EXTERNAL_VOCABULARIES_PROPERTY)) {
             if (value instanceof Map) {
                 setExternalVocabularies((Map)value);
@@ -329,6 +365,14 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
     
     public LexicalHandler getLexicalHandler() {
         return _lexicalHandler;
+    }
+    
+    public void setDeclHandler(DeclHandler handler) {
+        _declHandler = handler;
+    }
+    
+    public DeclHandler getDeclHandler() {
+        return _declHandler;
     }
     
     public void setEncodingAlgorithmContentHandler(EncodingAlgorithmContentHandler handler) {
