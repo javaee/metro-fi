@@ -1,31 +1,31 @@
 /*
  * Fast Infoset ver. 0.1 software ("Software")
- * 
- * Copyright, 2004-2005 Sun Microsystems, Inc. All Rights Reserved. 
- * 
+ *
+ * Copyright, 2004-2005 Sun Microsystems, Inc. All Rights Reserved.
+ *
  * Software is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License. You may
  * obtain a copy of the License at:
- * 
+ *
  *        http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  *    Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations.
- * 
+ *
  *    Sun supports and benefits from the global community of open source
  * developers, and thanks the community for its important contributions and
  * open standards-based technology, which Sun has adopted into many of its
  * products.
- * 
+ *
  *    Please note that portions of Software may be provided with notices and
  * open source licenses from such communities and third parties that govern the
  * use of those portions, and any licenses granted hereunder do not alter any
  * rights and obligations you may have under such open source licenses,
  * however, the disclaimer of warranty and limitation of liability provisions
  * in this License will apply to all Software in this distribution.
- * 
+ *
  *    You acknowledge that the Software is not designed, licensed or intended
  * for use in the design, construction, operation or maintenance of any nuclear
  * facility.
@@ -34,7 +34,7 @@
  * Version 2.0, January 2004
  * http://www.apache.org/licenses/
  *
- */ 
+ */
 package com.sun.xml.fastinfoset.vocab.frequency;
 
 import com.sun.xml.analysis.frequency.FrequencyHandler;
@@ -60,9 +60,10 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 /**
- * Generate a Fast Infoset parser and serializer vocabulary from a 
+ * Generate a Fast Infoset parser and serializer vocabulary from a
  * {@link FrequencyBasedLists}.
- * 
+ *
+ * @deprecated
  * @author Paul.Sandoz@Sun.Com
  */
 public class VocabularyGenerator {
@@ -81,7 +82,7 @@ public class VocabularyGenerator {
     
     /**
      * @param fbl the set of frequency-based lists.
-     * @param xapi the XML API that the parser and serializer vocabulary 
+     * @param xapi the XML API that the parser and serializer vocabulary
      * will be used with.
      */
     public VocabularyGenerator(FrequencyBasedLists fbl, XmlApi xapi) {
@@ -92,7 +93,7 @@ public class VocabularyGenerator {
      * @param serializerVocabulary the serializer vocabualry to use
      * @param parserVocabulary the parser vocabulary to use
      * @param fbl the set of frequency-based lists.
-     * @param xapi the XML API that the parser and serializer vocabulary 
+     * @param xapi the XML API that the parser and serializer vocabulary
      * will be used with.
      */
     public VocabularyGenerator(SerializerVocabulary serializerVocabulary, ParserVocabulary parserVocabulary,
@@ -103,7 +104,7 @@ public class VocabularyGenerator {
         
         generate(fbl);
     }
-
+    
     /**
      * Get the generated serializer vocabulary.
      *
@@ -112,7 +113,7 @@ public class VocabularyGenerator {
     public SerializerVocabulary getSerializerVocabulary() {
         return _serializerVocabulary;
     }
-
+    
     /**
      * Get the generated parser vocabulary.
      *
@@ -125,7 +126,7 @@ public class VocabularyGenerator {
     private void generate(FrequencyBasedLists fbl) {
         for (String prefix : fbl.prefixes) {
             addToTable(prefix, _serializerVocabulary.prefix,
-                    _parserVocabulary.prefix);        
+                    _parserVocabulary.prefix);
         }
         
         for (String namespace : fbl.namespaces) {
@@ -144,7 +145,7 @@ public class VocabularyGenerator {
         for (QName attribute : fbl.attributes) {
             addToNameTable(attribute, _serializerVocabulary.attributeName, _parserVocabulary.attributeName, true);
         }
-                
+        
         for (String textContentValue : fbl.textContentValues) {
             addToTable(textContentValue, _serializerVocabulary.characterContentChunk,
                     _parserVocabulary.characterContentChunk);
@@ -156,25 +157,40 @@ public class VocabularyGenerator {
         }
     }
     
-    private void addToNameTable(QName n, 
+    private void addToNameTable(QName n,
             LocalNameQualifiedNamesMap m, QualifiedNameArray a,
             boolean isAttribute) {
-                
+        
         int namespaceURIIndex = -1;
         int prefixIndex = -1;
         if (n.getNamespaceURI().length() > 0) {
-            namespaceURIIndex = _serializerVocabulary.namespaceName.get(n.getNamespaceURI());
+            namespaceURIIndex = _serializerVocabulary.namespaceName.obtainIndex(
+                    n.getNamespaceURI());
+            if (namespaceURIIndex == KeyIntMap.NOT_PRESENT) {
+                namespaceURIIndex = _parserVocabulary.namespaceName.getSize();
+                _parserVocabulary.namespaceName.add(n.getNamespaceURI());
+            }
             
             if (n.getPrefix().length() > 0) {
-                prefixIndex = _serializerVocabulary.prefix.get(n.getPrefix());
+                prefixIndex = _serializerVocabulary.prefix.obtainIndex(
+                        n.getPrefix());
+                if (prefixIndex == KeyIntMap.NOT_PRESENT) {
+                    prefixIndex = _parserVocabulary.prefix.getSize();
+                    _parserVocabulary.prefix.add(n.getPrefix());
+                }
             }
         }
         
-        int localNameIndex = _serializerVocabulary.localName.obtainIndex(n.getLocalPart());
-        _parserVocabulary.localName.add(n.getLocalPart());
+        int localNameIndex = _serializerVocabulary.localName.obtainIndex(
+                n.getLocalPart());
+        if (localNameIndex == KeyIntMap.NOT_PRESENT) {
+            localNameIndex = _parserVocabulary.localName.getSize();
+            _parserVocabulary.localName.add(n.getLocalPart());
+        }
         
-        QualifiedName name = new QualifiedName(n.getPrefix(), n.getNamespaceURI(), n.getLocalPart(),
-                m.getNextIndex(), 
+        QualifiedName name = new QualifiedName(
+                n.getPrefix(), n.getNamespaceURI(), n.getLocalPart(),
+                m.getNextIndex(),
                 prefixIndex, namespaceURIIndex, localNameIndex);
         if (isAttribute) {
             name.createAttributeValues(DuplicateAttributeVerifier.MAP_SIZE);
@@ -185,13 +201,13 @@ public class VocabularyGenerator {
             entry = m.obtainEntry(n.getLocalPart());
         } else {
             String qName = (prefixIndex == -1)
-                ? n.getLocalPart() 
-                : n.getPrefix() + ":" + n.getLocalPart();
+            ? n.getLocalPart()
+            : n.getPrefix() + ":" + n.getLocalPart();
             entry = m.obtainEntry(qName);
         }
         
         entry.addQualifiedName(name);
-        a.add(name);        
+        a.add(name);
     }
     
     private void addToTable(String s, StringIntMap m, StringArray a) {
@@ -202,7 +218,7 @@ public class VocabularyGenerator {
         m.obtainIndex(s);
         a.add(s);
     }
-
+    
     private void addToTable(String s, StringIntMap m, PrefixArray a) {
         if (s.length() == 0) {
             return;
@@ -222,11 +238,6 @@ public class VocabularyGenerator {
         a.add(c, c.length);
     }
     
-    private void addToCharArrayTable(CharArray c) {
-        _serializerVocabulary.characterContentChunk.obtainIndex(c.ch, c.start, c.length, false);
-        _parserVocabulary.characterContentChunk.add(c.ch, c.length);
-    }
-    
     /**
      * @param args the command line arguments. arg[0] is the path to a schema,
      * args[1] to args[n] are the paths to XML documents.
@@ -243,9 +254,13 @@ public class VocabularyGenerator {
         for (int i = 1; i < args.length; i++) {
             p.parse(new File(args[i]), fh);
         }
-
+        
         VocabularyGenerator vg = new VocabularyGenerator(fh.getLists(), VocabularyGenerator.XmlApi.SAX);
         PrintTable.printVocabulary(vg.getParserVocabulary());
+        
+        org.jvnet.fastinfoset.Vocabulary v = fh.getVocabulary();
+        ParserVocabulary pv = new ParserVocabulary(v);
+        System.out.println("");
+        PrintTable.printVocabulary(pv);        
     }
-    
 }

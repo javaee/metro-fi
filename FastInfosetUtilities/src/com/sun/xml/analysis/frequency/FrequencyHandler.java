@@ -42,6 +42,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.xml.namespace.QName;
+import org.jvnet.fastinfoset.Vocabulary;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -99,6 +100,7 @@ public class FrequencyHandler extends DefaultHandler {
      * Get the frequency based lists of properties of information items.
      *
      * @return the frequency based lists.
+     * @deprecated
      */
     public FrequencyBasedLists getLists() {
         // TODO if elements/attributes are empty then
@@ -113,6 +115,34 @@ public class FrequencyHandler extends DefaultHandler {
             attributes.createFrequencyBasedList(),
             textContentValues.createFrequencyBasedList(),
             attributeValues.createFrequencyBasedList());
+    }
+    
+    /**
+     * Get the vocabulary
+     *
+     * @return the vocabulary.
+     */
+    public Vocabulary getVocabulary() {
+        // TODO if elements/attributes are empty then
+        // need to obtain prefixes for namespaces from some other
+        // external source
+
+        Vocabulary v = new Vocabulary();
+        addAll(v.prefixes, prefixes.createFrequencyBasedSet());
+        addAll(v.namespaceNames, namespaces.createFrequencyBasedSet());
+        addAll(v.localNames, localNames.createFrequencyBasedSet());
+        addAll(v.elements, elements.createFrequencyBasedSet());
+        addAll(v.attributes, attributes.createFrequencyBasedSet());
+        addAll(v.characterContentChunks, textContentValues.createFrequencyBasedSet());
+        addAll(v.attributeValues, attributeValues.createFrequencyBasedSet());
+        
+        return v;
+    }
+    
+    private void addAll(Set to, Set<?> from) {
+        for(Object o : from) {
+            to.add(o);
+        }
     }
     
     private void addQNamesWithGeneratedPrefix(FrequencySet<QName> s, Map<String, Set<QName>> m) {        

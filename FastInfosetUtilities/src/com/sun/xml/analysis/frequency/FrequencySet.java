@@ -40,6 +40,7 @@ package com.sun.xml.analysis.frequency;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -111,5 +112,24 @@ public class FrequencySet<T> extends HashMap<T, Integer> {
         }
     
         return java.util.Collections.unmodifiableList(l);
+    }    
+    
+    /**
+     * Create an ordered set of values in the order of decreasing frequency
+     * of occurence.
+     *
+     * @return the set of values in the order of decreasing frequency
+     *         of occurence.
+     */
+    public Set<T> createFrequencyBasedSet() {
+        Set<Map.Entry<T, Integer>> s = new TreeSet(new FrequencyComparator());
+        s.addAll(entrySet());
+
+        Set<T> l = new LinkedHashSet<T>();
+        for (Map.Entry<T, Integer> e : s) {
+            l.add(e.getKey());
+        }
+    
+        return java.util.Collections.unmodifiableSet(l);
     }    
 }

@@ -43,7 +43,7 @@ import javax.xml.namespace.QName;
 /**
  * A container for frequency based lists of values in the order of decreasing
  * frequency.
- *
+ * @deprecated
  * @author Paul.Sandoz@Sun.Com
  */
 public class FrequencyBasedLists {
