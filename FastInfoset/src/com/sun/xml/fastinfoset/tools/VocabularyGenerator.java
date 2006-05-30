@@ -37,7 +37,7 @@
  */ 
 
 
-package com.sun.xml.fastinfoset.sax;
+package com.sun.xml.fastinfoset.tools;
 
 import com.sun.xml.fastinfoset.QualifiedName;
 import com.sun.xml.fastinfoset.util.CharArray;
