@@ -106,6 +106,21 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     }
 
     /**
+     * True if comments shall be ignored.
+     */
+    private boolean _ignoreComments;
+    
+    /**
+     * True if procesing instructions shall be ignored.
+     */
+    private boolean _ignoreProcessingInstructions;
+    
+    /**
+     * True if white space characters for text content shall be ignored.
+     */
+    private boolean _ignoreWhiteSpaceTextContent;
+    
+    /**
      * True, if the local name string is used as the key to find the
      * associated set of qualified names.
      * <p>
@@ -214,6 +229,49 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     
     // FastInfosetSerializer interface
     
+    /**
+     * {@inheritDoc}
+     */
+    public final void setIgnoreComments(boolean ignoreComments) {
+        _ignoreComments = ignoreComments;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public final boolean getIgnoreComments() {
+        return _ignoreComments;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public final void setIgnoreProcesingInstructions(boolean 
+            ignoreProcesingInstructions) {
+        _ignoreProcessingInstructions = ignoreProcesingInstructions;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public final boolean getIgnoreProcesingInstructions() {
+        return _ignoreProcessingInstructions;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public final void setIgnoreWhiteSpaceTextContent(boolean ignoreWhiteSpaceTextContent) {        
+        _ignoreWhiteSpaceTextContent = ignoreWhiteSpaceTextContent;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public final boolean getIgnoreWhiteSpaceTextContent() {
+        return _ignoreWhiteSpaceTextContent;
+    }
+        
     /**
      * {@inheritDoc}
      */
@@ -2044,5 +2102,22 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
             prefix = qName.substring(0, i);
         }
         return prefix;
+    }
+    
+    /**
+     * Check if character array contains characters that are all white space.
+     *
+     * @param ch the character array
+     * @param start the starting character index into the array to check from
+     * @param length the number of characters to check
+     * @return true if all characters are white space, false otherwise
+     */
+    public static boolean isWhiteSpace(final char[] ch, int start, final int length) {
+        if (!XMLChar.isSpace(ch[start])) return false;
+        
+        final int end = start + length;
+        start++;
+        while(start < end && XMLChar.isSpace(ch[start++]));
+        return start == end;
     }
 }

@@ -42,6 +42,7 @@ package com.sun.xml.fastinfoset.sax;
 import com.sun.xml.fastinfoset.Encoder;
 import com.sun.xml.fastinfoset.EncodingConstants;
 import com.sun.xml.fastinfoset.QualifiedName;
+import com.sun.xml.fastinfoset.org.apache.xerces.util.XMLChar;
 import org.jvnet.fastinfoset.sax.FastInfosetWriter;
 import com.sun.xml.fastinfoset.util.LocalNameQualifiedNamesMap;
 import java.io.IOException;
@@ -198,6 +199,9 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
         if (length <= 0) {
             return;
         }
+        
+        if (getIgnoreWhiteSpaceTextContent() && 
+                isWhiteSpace(ch, start, length)) return;
 
         try {
             encodeTermination();
@@ -215,13 +219,18 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
     }
 
     public final void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
+        if (getIgnoreWhiteSpaceTextContent()) return;
+        
         characters(ch, start, length);
     }
 
     public final void processingInstruction(String target, String data) throws SAXException {
         try {
+            if (getIgnoreProcesingInstructions()) return;
+            
             if (target == "") {
-                throw new SAXException(CommonResourceBundle.getInstance().getString("message.processingInstructionTargetIsEmpty"));
+                throw new SAXException(CommonResourceBundle.getInstance().
+                        getString("message.processingInstructionTargetIsEmpty"));
             }
             encodeTermination();
 
@@ -243,6 +252,8 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
 
     public final void comment(char[] ch, int start, int length) throws SAXException {
         try {
+            if (getIgnoreComments()) return;
+            
             encodeTermination();
 
             encodeComment(ch, start, length);

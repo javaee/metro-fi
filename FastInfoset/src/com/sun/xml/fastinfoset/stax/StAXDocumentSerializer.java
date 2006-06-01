@@ -52,6 +52,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
 import org.xml.sax.helpers.NamespaceSupport;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
+import com.sun.xml.fastinfoset.org.apache.xerces.util.XMLChar;
 
 public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
     protected StAXManager _manager;
@@ -382,6 +383,8 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
     
     public void writeComment(String data) throws XMLStreamException {
         try {
+            if (getIgnoreComments()) return;
+            
             encodeTerminationAndCurrentElement(true);
 
             // TODO: avoid array copy here
@@ -402,6 +405,8 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         throws XMLStreamException
     {
         try {
+            if (getIgnoreProcesingInstructions()) return;
+            
             encodeTerminationAndCurrentElement(true);
 
             encodeProcessingInstruction(target, data);
@@ -429,14 +434,20 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
             if (length == 0) {
                 return;
             } else if (length < _charBuffer.length) {
+                text.getChars(0, length, _charBuffer, 0);
+                if (getIgnoreWhiteSpaceTextContent() && 
+                        isWhiteSpace(_charBuffer, 0, length)) return;
+                
                 encodeTerminationAndCurrentElement(true);
                 
-                text.getChars(0, length, _charBuffer, 0);
                 encodeCharacters(_charBuffer, 0, length);
             } else {
+                final char ch[] = text.toCharArray();
+                if (getIgnoreWhiteSpaceTextContent() && 
+                        isWhiteSpace(ch, 0, length)) return;
+                
                 encodeTerminationAndCurrentElement(true);
                 
-                final char ch[] = text.toCharArray();
                 encodeCharactersNoClone(ch, 0, length);
             }
         }
@@ -449,10 +460,13 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         throws XMLStreamException
     {
          try {
-            if (len == 0) {
+            if (len <= 0) {
                 return;
             }
 
+            if (getIgnoreWhiteSpaceTextContent() && 
+                    isWhiteSpace(text, start, len)) return;
+            
             encodeTerminationAndCurrentElement(true);
 
             encodeCharacters(text, start, len);

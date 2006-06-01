@@ -51,6 +51,57 @@ import java.util.Map;
  */
 public interface FastInfosetSerializer {
     /**
+     * The feature to ignore comments.
+     * <p>
+     * The default value is false. If true a serializer shall ignore comments
+     * and shall not serialize them.
+     */
+    public static final String IGNORE_COMMENTS_FEATURE = 
+        "http://jvnet.org/fastinfoset/serializer/feature/ignore/comments";
+
+    /**
+     * The feature to ignore processing instructions.
+     * <p>
+     * The default value is false. If true a serializer shall ignore processing
+     * instructions and shall not serialize them.
+     */
+    public static final String IGNORE_PROCESSING_INSTRUCTIONS_FEATURE = 
+        "http://jvnet.org/fastinfoset/serializer/feature/ignore/processingInstructions";
+    
+    /**
+     * The feature to ignore text content that consists completely of white
+     * space characters.
+     * <p>
+     * The default value is false. If true a serializer shall ignore text
+     * content that consists completely of white space characters.
+     */
+    public static final String IGNORE_WHITE_SPACE_TEXT_CONTENT_FEATURE = 
+        "http://jvnet.org/fastinfoset/serializer/feature/ignore/whiteSpaceTextContent";
+    
+    /**
+     * The property name to be used for getting and setting the buffer size
+     * of a parser.
+     */
+    public static final String BUFFER_SIZE_PROPERTY = 
+        "http://jvnet.org/fastinfoset/parser/properties/buffer-size";
+
+    /**
+     * The property name to be used for getting and setting the 
+     * Map containing encoding algorithms.
+     *
+     */    
+    public static final String REGISTERED_ENCODING_ALGORITHMS_PROPERTY =
+        "http://jvnet.org/fastinfoset/parser/properties/registered-encoding-algorithms";
+    
+   /**
+     * The property name to be used for getting and setting the 
+     * Map containing external vocabularies.
+     *
+     */    
+    public static final String EXTERNAL_VOCABULARIES_PROPERTY =
+        "http://jvnet.org/fastinfoset/parser/properties/external-vocabularies";
+    
+    /**
      * The default value for the limit on the size of character content chunks
      * that will be indexed.
      */
@@ -71,6 +122,42 @@ public interface FastInfosetSerializer {
      * The character encoding scheme string for UTF-16BE.
      */
     public static final String UTF_16BE = "UTF-16BE";
+    
+    /**
+     * Set the {@link #IGNORE_COMMENTS_FEATURE}.
+     * @param ignoreComments true if the feature shall be ignored.
+     */
+    public void setIgnoreComments(boolean ignoreComments);
+    
+    /**
+     * Get the {@link #IGNORE_COMMENTS_FEATURE}.
+     * @return true if the feature is ignored, false otherwise.
+     */
+    public boolean getIgnoreComments();
+    
+    /**
+     * Set the {@link #IGNORE_PROCESSING_INSTRUCTIONS_FEATURE}.
+     * @param ignoreProcesingInstructions true if the feature shall be ignored.
+     */
+    public void setIgnoreProcesingInstructions(boolean ignoreProcesingInstructions);
+    
+    /**
+     * Get the {@link #IGNORE_PROCESSING_INSTRUCTIONS_FEATURE}.
+     * @return true if the feature is ignored, false otherwise.
+     */
+    public boolean getIgnoreProcesingInstructions();
+    
+    /**
+     * Set the {@link #IGNORE_WHITE_SPACE_TEXT_CONTENT_FEATURE}.
+     * @param ignoreWhiteSpaceTextContent true if the feature shall be ignored.
+     */
+    public void setIgnoreWhiteSpaceTextContent(boolean ignoreWhiteSpaceTextContent);
+    
+    /**
+     * Get the {@link #IGNORE_WHITE_SPACE_TEXT_CONTENT_FEATURE}.
+     * @return true if the feature is ignored, false otherwise.
+     */
+    public boolean getIgnoreWhiteSpaceTextContent();
     
     /**
      * Sets the character encoding scheme.

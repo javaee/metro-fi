@@ -222,12 +222,18 @@ public class DOMDocumentSerializer extends Encoder {
         if (length == 0) {
             return;
         } else if (length < _charBuffer.length) {
-            encodeTermination();
             text.getChars(0, length, _charBuffer, 0);
+            if (getIgnoreWhiteSpaceTextContent() && 
+                    isWhiteSpace(_charBuffer, 0, length)) return;
+            
+            encodeTermination();
             encodeCharacters(_charBuffer, 0, length);
         } else {
-            encodeTermination();
             final char ch[] = text.toCharArray();
+            if (getIgnoreWhiteSpaceTextContent() && 
+                    isWhiteSpace(ch, 0, length)) return;
+            
+            encodeTermination();
             encodeCharactersNoClone(ch, 0, length);
         }
     }
@@ -239,8 +245,11 @@ public class DOMDocumentSerializer extends Encoder {
         if (length == 0) {
             return;
         } else {
-            encodeTermination();
             final char ch[] = text.toCharArray();
+            if (getIgnoreWhiteSpaceTextContent() && 
+                    isWhiteSpace(ch, 0, length)) return;
+            
+            encodeTermination();
             try {
                 encodeCIIBuiltInAlgorithmDataAsCDATA(ch, 0, length);
             } catch (FastInfosetException e) {
@@ -250,6 +259,8 @@ public class DOMDocumentSerializer extends Encoder {
     }
     
     protected final void serializeComment(Node c) throws IOException {
+        if (getIgnoreComments()) return;
+            
         encodeTermination();
         
         final String comment = c.getNodeValue();
@@ -267,6 +278,8 @@ public class DOMDocumentSerializer extends Encoder {
     }
     
     protected final void serializeProcessingInstruction(Node pi) throws IOException {
+        if (getIgnoreProcesingInstructions()) return;
+        
         encodeTermination();
         
         final String target = pi.getNodeName();
