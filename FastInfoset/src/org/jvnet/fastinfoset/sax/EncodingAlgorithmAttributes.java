@@ -45,7 +45,7 @@ import org.xml.sax.Attributes;
  * Interface for a list of XML attributes that may contain encoding algorithm
  * data.
  * <p>
- * Implementations shall ensure that the {@link Attributes#getValue{int)} method
+ * Implementations shall ensure that the {@link Attributes#getValue(int)} method
  * correctly returns a String object even if the attribute is represented by
  * as algorithm data.
  * <p>
