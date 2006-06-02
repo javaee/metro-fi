@@ -36,7 +36,6 @@
  *
  */
 
-
 package com.sun.xml.fastinfoset.stax;
 
 import com.sun.xml.fastinfoset.Decoder;
@@ -47,7 +46,6 @@ import com.sun.xml.fastinfoset.algorithm.BuiltInEncodingAlgorithmFactory;
 import com.sun.xml.fastinfoset.sax.AttributesHolder;
 import com.sun.xml.fastinfoset.util.CharArray;
 import com.sun.xml.fastinfoset.util.CharArrayString;
-import com.sun.xml.fastinfoset.stax.EventLocation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
@@ -64,6 +62,16 @@ import org.jvnet.fastinfoset.FastInfosetException;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
 import com.sun.xml.fastinfoset.org.apache.xerces.util.XMLChar;
 
+/**
+ * The Fast Infoset StAX parser.
+ * <p>
+ * Instantiate this parser to parse a fast infoset document in accordance 
+ * with the StAX API.
+ * 
+ * <p>
+ * More than one fast infoset document may be decoded from the 
+ * {@link java.io.InputStream}.
+ */
 public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     protected static final int INTERNAL_STATE_START_DOCUMENT = 0;
     protected static final int INTERNAL_STATE_START_ELEMENT_TERMINATE = 1;

@@ -36,7 +36,6 @@
  *
  */
 
-
 package com.sun.xml.fastinfoset.sax;
 
 import com.sun.xml.fastinfoset.Decoder;
@@ -72,6 +71,16 @@ import org.xml.sax.helpers.DefaultHandler;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
 import org.xml.sax.ext.DeclHandler;
 
+/**
+ * The Fast Infoset SAX parser.
+ * <p>
+ * Instantiate this parser to parse a fast infoset document in accordance 
+ * with the SAX API.
+ * 
+ * <p>
+ * More than one fast infoset document may be decoded from the 
+ * {@link java.io.InputStream}.
+ */
 public class SAXDocumentParser extends Decoder implements FastInfosetReader {
 
     /*

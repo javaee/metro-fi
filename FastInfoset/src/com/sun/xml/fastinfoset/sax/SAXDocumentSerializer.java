@@ -41,7 +41,6 @@ package com.sun.xml.fastinfoset.sax;
 import com.sun.xml.fastinfoset.Encoder;
 import com.sun.xml.fastinfoset.EncodingConstants;
 import com.sun.xml.fastinfoset.QualifiedName;
-import com.sun.xml.fastinfoset.org.apache.xerces.util.XMLChar;
 import org.jvnet.fastinfoset.sax.FastInfosetWriter;
 import com.sun.xml.fastinfoset.util.LocalNameQualifiedNamesMap;
 import java.io.IOException;
@@ -54,6 +53,22 @@ import org.xml.sax.SAXException;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 
+/**
+ * The Fast Infoset SAX serializer.
+ * <p>
+ * Instantiate this serializer to serialize a fast infoset document in accordance 
+ * with the SAX API.
+ * <p>
+ * This utilizes the SAX API in a reverse manner to that of parsing. It is the
+ * responsibility of the client to call the appropriate event methods on the 
+ * SAX handlers, and to ensure that such a sequence of methods calls results 
+ * in the production well-formed fast infoset documents. The 
+ * SAXDocumentSerializer performs no well-formed checks.
+ * 
+ * <p>
+ * More than one fast infoset document may be encoded to the 
+ * {@link java.io.OutputStream}.
+ */
 public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter {
     protected boolean _elementHasNamespaces = false;
 

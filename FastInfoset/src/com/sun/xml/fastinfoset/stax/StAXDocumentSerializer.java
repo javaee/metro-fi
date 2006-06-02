@@ -34,8 +34,7 @@
  * Version 2.0, January 2004
  * http://www.apache.org/licenses/
  *
- */ 
-
+ */
 
 package com.sun.xml.fastinfoset.stax;
 
@@ -52,8 +51,17 @@ import javax.xml.stream.XMLStreamWriter;
 import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
 import org.xml.sax.helpers.NamespaceSupport;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
-import com.sun.xml.fastinfoset.org.apache.xerces.util.XMLChar;
 
+/**
+ * The Fast Infoset StAX serializer.
+ * <p>
+ * Instantiate this serializer to serialize a fast infoset document in accordance 
+ * with the StAX API.
+ * 
+ * <p>
+ * More than one fast infoset document may be encoded to the 
+ * {@link java.io.OutputStream}.
+ */
 public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
     protected StAXManager _manager;
     

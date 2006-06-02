@@ -49,11 +49,20 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+/**
+ * The Fast Infoset DOM serializer.
+ * <p>
+ * Instantiate this serializer to serialize a fast infoset document in accordance 
+ * with the DOM API.
+ *
+ */
 public class DOMDocumentSerializer extends Encoder {
-    
-    public DOMDocumentSerializer() {
-    }
-    
+
+    /**
+     * Serialize a {@link Node}.
+     *
+     * @param n the node to serialize.
+     */
     public final void serialize(Node n) throws IOException {
         switch (n.getNodeType()) {
             case Node.DOCUMENT_NODE:
@@ -70,6 +79,11 @@ public class DOMDocumentSerializer extends Encoder {
         }
     }
     
+    /**
+     * Serialize a {@link Document}.
+     *
+     * @param d the document to serialize.
+     */
     public final void serialize(Document d) throws IOException {
         reset();
         encodeHeader(false);

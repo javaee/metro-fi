@@ -36,7 +36,6 @@
  *
  */
 
-
 package com.sun.xml.fastinfoset.dom;
 
 import com.sun.xml.fastinfoset.Decoder;
@@ -58,7 +57,13 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
 
-
+/**
+ * The Fast Infoset DOM parser.
+ * <p>
+ * Instantiate this parser to parse a fast infoset document in accordance 
+ * with the DOM API.
+ * 
+ */
 public class DOMDocumentParser extends Decoder {
     protected Document _document;
     
@@ -74,6 +79,15 @@ public class DOMDocumentParser extends Decoder {
     
     protected int _namespacePrefixesIndex;
 
+    /**
+     * Parse a fast infoset document into a {@link Document} instance.
+     * <p>
+     * {@link Node}s will be created and appended to the {@link Document} 
+     * instance.
+     *
+     * @param d the {@link Document} instance.
+     * @param s the input stream containing the fast infoset document.
+     */
     public void parse(Document d, InputStream s) throws FastInfosetException, IOException {        
         _currentNode = _document = d;
         _namespaceAttributesIndex = 0;
