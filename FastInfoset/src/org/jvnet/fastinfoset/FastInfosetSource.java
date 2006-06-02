@@ -70,8 +70,6 @@ import com.sun.xml.fastinfoset.sax.SAXDocumentParser;
  *        the getXMLReader method.</LI>
  *   </UL>
  *  </P>
- *
- * @version 0.1
  */
 public class FastInfosetSource extends SAXSource {
    

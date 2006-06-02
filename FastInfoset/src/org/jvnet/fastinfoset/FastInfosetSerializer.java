@@ -37,6 +37,7 @@
  */
 package org.jvnet.fastinfoset;
 
+import java.io.OutputStream;
 import java.util.Map;
 
 /**
@@ -231,5 +232,18 @@ public interface FastInfosetSerializer {
      * 
      * @param v the vocabulary. 
      */
-    public void setExternalVocabulary(ExternalVocabulary v);    
+    public void setExternalVocabulary(ExternalVocabulary v);
+    
+    /**
+     * Reset the serializer for reuse serializing another XML infoset.
+     */
+    public void reset();
+        
+    /**
+     * Set the OutputStream to serialize the XML infoset to a 
+     * fast infoset document.
+     *
+     * @param s the OutputStream where the fast infoset document is written to.
+     */
+    public void setOutputStream(OutputStream s);
 }

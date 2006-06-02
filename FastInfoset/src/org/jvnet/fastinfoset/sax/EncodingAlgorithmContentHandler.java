@@ -65,7 +65,6 @@ import org.xml.sax.SAXException;
  * {@link org.jvnet.fastinfoset.sax.FastInfosetReader#setEncodingAlgorithmContentHandler 
  *  setEncodingAlgorithmContentHandler} method.<p>
  *
- * @version 0.1
  * @see org.jvnet.fastinfoset.sax.PrimitiveTypeContentHandler
  * @see org.jvnet.fastinfoset.sax.FastInfosetReader
  * @see org.xml.sax.XMLReader

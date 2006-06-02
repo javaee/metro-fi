@@ -44,8 +44,14 @@ import org.xml.sax.Attributes;
 /**
  * Interface for a list of XML attributes that may contain encoding algorithm
  * data.
+ * <p>
+ * Implementations shall ensure that the {@link Attributes#getValue{int)} method
+ * correctly returns a String object even if the attribute is represented by
+ * as algorithm data.
+ * <p>
+ * If an attribute has algorithm data then the {@link #getAlgorithmData} method
+ * shall return a non <code>null</code> value.
  *
- * @version 0.1
  * @see org.jvnet.fastinfoset.sax.FastInfosetReader
  * @see org.xml.sax.XMLReader
  */

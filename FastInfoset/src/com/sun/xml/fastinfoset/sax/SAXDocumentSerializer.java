@@ -36,7 +36,6 @@
  *
  */
 
-
 package com.sun.xml.fastinfoset.sax;
 
 import com.sun.xml.fastinfoset.Encoder;
@@ -112,7 +111,8 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
 
     public final void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException {
         // TODO consider using buffer for encoding of attributes, then pre-counting is not necessary
-        final int attributeCount = (atts.getLength() > 0) ? countAttributes(atts) : 0;
+        final int attributeCount = (atts != null && atts.getLength() > 0) 
+                ? countAttributes(atts) : 0;
         try {
             if (_elementHasNamespaces) {
                 _elementHasNamespaces = false;
@@ -144,13 +144,15 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
                     final EncodingAlgorithmAttributes eAtts = (EncodingAlgorithmAttributes)atts;
                     for (int i = 0; i < eAtts.getLength(); i++) {
                         if (encodeAttribute(atts.getURI(i), atts.getQName(i), atts.getLocalName(i))) {
-                            value = eAtts.getValue(i);
-                            if (value != null) {
+                            final Object data = eAtts.getAlgorithmData(i);
+                            // If data is null then there is no algorithm data
+                            if (data == null) {
+                                value = eAtts.getValue(i);
                                 addToTable = (value.length() < attributeValueSizeConstraint) ? true : false;
                                 encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
                             } else {
                                 encodeNonIdentifyingStringOnFirstBit(eAtts.getAlgorithmURI(i),
-                                        eAtts.getAlgorithmIndex(i), eAtts.getAlgorithmData(i));
+                                        eAtts.getAlgorithmIndex(i), data);
                             }
                         }
                     }

@@ -63,7 +63,6 @@ import com.sun.xml.fastinfoset.sax.SAXDocumentSerializer;
  *     <LI>setSystemId</LI>
  *   </UL>
  *  </P>
- * @version 0.1
  */
 public class FastInfosetResult extends SAXResult {
    

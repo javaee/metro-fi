@@ -74,7 +74,7 @@ import org.xml.sax.SAXException;
  *
  * <p>The application must not attempt to read from the array
  * outside of the specified range.</p>
- * @version 0.1
+ *
  * @see org.jvnet.fastinfoset.sax.EncodingAlgorithmContentHandler
  * @see org.jvnet.fastinfoset.sax.FastInfosetReader
  * @see org.xml.sax.XMLReader
