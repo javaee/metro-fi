@@ -42,7 +42,7 @@ import com.sun.xml.fastinfoset.sax.SAXDocumentSerializer;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import org.jvnet.fastinfoset.sax.FastInfosetDefaultHandler;
+import org.jvnet.fastinfoset.sax.helpers.FastInfosetDefaultHandler;
 import org.jvnet.fastinfoset.sax.FastInfosetReader;
 import org.jvnet.fastinfoset.sax.FastInfosetWriter;
 import org.xml.sax.ContentHandler;
@@ -100,7 +100,7 @@ public class PrimitiveTypesWithElementContentSample {
     void parseFIDocumentUsingPTC(InputStream in) throws Exception {
         FastInfosetReader r = new SAXDocumentParser();
 
-        // Create a handler that will receive events for primitive types
+        // Create a default FI handler that will receive events for primitive types
         FastInfosetDefaultHandler h = new FastInfosetDefaultHandler() {
             public void bytes(byte[] bs, int start, int length) throws SAXException {
                 for (int i = 0; i < length; i++) {
