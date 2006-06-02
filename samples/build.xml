@@ -104,7 +104,7 @@
     </target>
 
     <!-- transform samples -->
-    <target name="XMLToFI_SAX" depends="compile">
+    <target name="XMLToFastInfosetSAXSerializer" depends="compile">
         <java dir="." fork="true" classname="samples.transform.XMLToFastInfosetSAXSerializer">
             <classpath path="${run.classpath}"/>
             <arg line="${xml-file}"/>
@@ -112,7 +112,7 @@
         </java>
     </target>
 
-    <target name="XMLToFI_StAX" depends="compile">
+    <target name="XMLToFastInfosetStAXSerializer" depends="compile">
         <java dir="." fork="true" classname="samples.transform.XMLToFastInfosetStAXSerializer">
             <classpath path="${run.classpath}"/>
             <arg line="${xml-file}"/>
@@ -138,6 +138,14 @@
 
     <target name="StAXSerializingSample" depends="compile">
         <java dir="." fork="true" classname="samples.stax.StAXSerializingSample">
+            <classpath path="${run.classpath}"/>
+            <arg line="${serializer-finf-file}"/>
+        </java>
+    </target>
+    
+    <!-- Typed samples -->
+    <target name="PrimitiveTypesWithElementContentSample" depends="compile">
+        <java dir="." fork="true" classname="samples.typed.PrimitiveTypesWithElementContentSample">
             <classpath path="${run.classpath}"/>
             <arg line="${serializer-finf-file}"/>
         </java>
