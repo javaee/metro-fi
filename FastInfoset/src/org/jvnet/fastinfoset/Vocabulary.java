@@ -50,7 +50,7 @@ import javax.xml.namespace.QName;
  * <p>
  * The 1st item contained in a Set is assigned the smallest index value, 
  * n say (where n >= 0). The 2nd item is assigned an index value of n + 1. The kth
- * item is aggined an index value of n + (k - 1).
+ * item is assigned an index value of n + (k - 1).
  * <p>
  * A Fast Infoset parser/serializer implementation will tranform the canonical 
  * representation of a Vocabulary instance into a more optimal form suitable 
