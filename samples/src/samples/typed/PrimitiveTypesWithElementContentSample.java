@@ -61,12 +61,13 @@ import org.xml.sax.helpers.DefaultHandler;
 public class PrimitiveTypesWithElementContentSample {
 
     /**
-     * Create an FI document.
+     * Create an FI document with binary encoded content.
      */
     byte[] createFIDocument() throws SAXException {
         // Instantiate a new FastInfosetWriter
         FastInfosetWriter fiw = new SAXDocumentSerializer();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        // Set the OutputStream to write the document to
         fiw.setOutputStream(baos);
         
         // Serialize the infoset
@@ -102,6 +103,8 @@ public class PrimitiveTypesWithElementContentSample {
 
         // Create a default FI handler that will receive events for primitive types
         FastInfosetDefaultHandler h = new FastInfosetDefaultHandler() {
+            
+            // Recieve events for an array of byte[]
             public void bytes(byte[] bs, int start, int length) throws SAXException {
                 for (int i = 0; i < length; i++) {
                     if (i > 0) System.out.print(" ");
@@ -110,6 +113,7 @@ public class PrimitiveTypesWithElementContentSample {
                 System.out.println();
             }
 
+            // Recieve events for an array of int[]
             public void ints(int[] is, int start, int length) throws SAXException {
                 for (int i = 0; i < length; i++) {
                     if (i > 0) System.out.print(" ");
@@ -118,6 +122,7 @@ public class PrimitiveTypesWithElementContentSample {
                 System.out.println();
             }
 
+            // Recieve events for an array of float[]
             public void floats(float[] fs, int start, int length) throws SAXException {
                 for (int i = 0; i < length; i++) {
                     if (i > 0) System.out.print(" ");
@@ -127,9 +132,11 @@ public class PrimitiveTypesWithElementContentSample {
             }            
         };
         
+        // Set the handlers
         r.setContentHandler(h);
         r.setPrimitiveTypeContentHandler(h);
         
+        // Parse the document
         r.parse(in);
     }
     
@@ -146,7 +153,7 @@ public class PrimitiveTypesWithElementContentSample {
     void parseFIDocument(InputStream in) throws Exception {
         FastInfosetReader r = new SAXDocumentParser();
 
-        // Create a handler that will receive events for primitive types
+        // Create a handler that will receive standard SAX events
         ContentHandler h = new DefaultHandler() {
             public void characters (char ch[], int start, int length) throws SAXException {
                 String s = new String(ch, start, length);
@@ -162,8 +169,13 @@ public class PrimitiveTypesWithElementContentSample {
     public static void main(String[] args) throws Exception {
         PrimitiveTypesWithElementContentSample pt = new PrimitiveTypesWithElementContentSample();
         
+        // Create an FI document with binary encoded content.
         byte[] b = pt.createFIDocument();
+        
+        // Parse the document using a PrimitiveTypeContentHandler
         pt.parseFIDocumentUsingPTC(new ByteArrayInputStream(b));
+        
+        // Parse the document using a ContentHandler
         pt.parseFIDocument(new ByteArrayInputStream(b));
     }
 }
