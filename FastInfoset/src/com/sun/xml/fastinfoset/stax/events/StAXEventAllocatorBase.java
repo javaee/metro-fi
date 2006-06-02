@@ -70,7 +70,7 @@ public class StAXEventAllocatorBase implements XMLEventAllocator {
     public StAXEventAllocatorBase() {
         if (System.getProperty("javax.xml.stream.XMLEventFactory")==null) {
             System.setProperty("javax.xml.stream.XMLEventFactory", 
-                       "com.sun.xml.fastinfoset.stax.StAXEventFactory");
+                       "com.sun.xml.fastinfoset.stax.factory.StAXEventFactory");
         }
         factory = XMLEventFactory.newInstance();
     }
