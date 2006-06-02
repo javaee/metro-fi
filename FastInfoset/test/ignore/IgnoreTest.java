@@ -11,7 +11,7 @@ import java.io.ByteArrayOutputStream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import junit.framework.TestCase;
-import org.jvnet.fastinfoset.sax.FastInfosetDefaultHandler;
+import org.jvnet.fastinfoset.sax.helpers.FastInfosetDefaultHandler;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;

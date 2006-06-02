@@ -37,8 +37,9 @@
  */
 
 
-package org.jvnet.fastinfoset.sax;
+package org.jvnet.fastinfoset.sax.helpers;
 
+import org.jvnet.fastinfoset.sax.*;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.DefaultHandler;

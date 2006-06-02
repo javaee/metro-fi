@@ -67,7 +67,7 @@ import junit.framework.*;
 import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
 import org.jvnet.fastinfoset.FastInfosetParser;
 import org.jvnet.fastinfoset.sax.EncodingAlgorithmAttributes;
-import org.jvnet.fastinfoset.sax.FastInfosetDefaultHandler;
+import org.jvnet.fastinfoset.sax.helpers.FastInfosetDefaultHandler;
 import org.w3c.dom.Document;
 import org.w3c.dom.Text;
 import org.xml.sax.Attributes;

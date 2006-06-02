@@ -52,7 +52,7 @@ import java.util.HashMap;
 import java.util.Map;
 import junit.framework.*;
 import org.jvnet.fastinfoset.FastInfosetParser;
-import org.jvnet.fastinfoset.sax.FastInfosetDefaultHandler;
+import org.jvnet.fastinfoset.sax.helpers.FastInfosetDefaultHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
