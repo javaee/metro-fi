@@ -1,31 +1,31 @@
 /*
  * Fast Infoset ver. 0.1 software ("Software")
- * 
- * Copyright, 2004-2005 Sun Microsystems, Inc. All Rights Reserved. 
- * 
+ *
+ * Copyright, 2004-2005 Sun Microsystems, Inc. All Rights Reserved.
+ *
  * Software is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License. You may
  * obtain a copy of the License at:
- * 
+ *
  *        http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  *    Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations.
- * 
+ *
  *    Sun supports and benefits from the global community of open source
  * developers, and thanks the community for its important contributions and
  * open standards-based technology, which Sun has adopted into many of its
  * products.
- * 
+ *
  *    Please note that portions of Software may be provided with notices and
  * open source licenses from such communities and third parties that govern the
  * use of those portions, and any licenses granted hereunder do not alter any
  * rights and obligations you may have under such open source licenses,
  * however, the disclaimer of warranty and limitation of liability provisions
  * in this License will apply to all Software in this distribution.
- * 
+ *
  *    You acknowledge that the Software is not designed, licensed or intended
  * for use in the design, construction, operation or maintenance of any nuclear
  * facility.
@@ -34,28 +34,34 @@
  * Version 2.0, January 2004
  * http://www.apache.org/licenses/
  *
- */ 
+ */
 
 package samples.sax;
-import java.io.*;
 
-import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
 import com.sun.xml.fastinfoset.sax.SAXDocumentParser;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /** <p>Parses a FI document using SAXDocumentParser.</p>
- *  The sample parses data/inv1a.finf as specified in the build.xml and handles SAX events 
- *  to display corresponding content in XML format. The sample class entends DefaultHandler 
- *  interface making itself a ContentHandler. Since the FastInfoset SAX package does not 
+ *  The sample parses data/inv1a.finf as specified in the build.xml and handles SAX events
+ *  to display corresponding content in XML format. The sample class entends DefaultHandler
+ *  interface making itself a ContentHandler. Since the FastInfoset SAX package does not
  *  implement factory, a document parser is instantiated directly. The sample class implements
- *  some major event-handling methods as defined in the ContentHandler,  such as startDocument, 
- *  endDocument, startElement, 
+ *  some major event-handling methods as defined in the ContentHandler,  such as startDocument,
+ *  endDocument, startElement,
  *  endElement, and characters. In this sample, these methods simply write out the content
  *  to System.out.
  */
-public class FastInfosetParser extends DefaultHandler {
+public class SAXParsingSample extends DefaultHandler {
     static private Writer  out;
-
+    
     StringBuffer textBuffer;
     
     /** Starts the sample. The sample takes a FI document and parses it using SAXDocumentParser in
@@ -63,20 +69,19 @@ public class FastInfosetParser extends DefaultHandler {
      *
      * @param argv FI document filename
      */
-    public static void main(String argv[])
-    {
+    public static void main(String argv[]) {
         if (argv.length != 1) {
             System.err.println("Usage: FastInfosetParser filename");
             System.exit(1);
         }
         
         // instantiate event handler
-        DefaultHandler handler = new FastInfosetParser();
-      
+        DefaultHandler handler = new SAXParsingSample();
+        
         try {
             // Set up output stream
             out = new OutputStreamWriter(System.out, "UTF8");
-
+            
             // Create an inputstream
             InputStream in = new BufferedInputStream(new FileInputStream(argv[0]));
             
@@ -85,7 +90,7 @@ public class FastInfosetParser extends DefaultHandler {
             parser.setContentHandler(handler);
             // Start parsing
             parser.parse(in);
-
+            
         } catch (Throwable t) {
             t.printStackTrace();
         }
@@ -94,26 +99,26 @@ public class FastInfosetParser extends DefaultHandler {
     
     private static void displayUsageAndExit() {
         System.err.println("Usage: ant FISAXParser or samples.sax.FIParser FI_input_file>");
-        System.exit(1);        
+        System.exit(1);
     }
-
+    
     /** Creates a new instance of FIParser */
-    public FastInfosetParser() {
+    public SAXParsingSample() {
     }
-
+    
     //===========================================================
     // SAX DocumentHandler methods
     //===========================================================
     /** Handles startDocument event and prints out file header.
-     * 
+     *
      */
     public void startDocument() throws SAXException {
         display("<?xml version='1.0' encoding='UTF-8'?>");
         displayNewLine();
     }
-
+    
     /** Handles endDocument event
-     * 
+     *
      */
     public void endDocument() throws SAXException {
         try {
@@ -123,8 +128,8 @@ public class FastInfosetParser extends DefaultHandler {
             throw new SAXException("I/O error", e);
         }
     }
-
-    /** Handles startElement event. Prints out any text accumulated 
+    
+    /** Handles startElement event. Prints out any text accumulated
      *  from the characters event before the element, the element name, and
      *  attributes if any.
      *
@@ -133,12 +138,12 @@ public class FastInfosetParser extends DefaultHandler {
      *  @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
      *  @param attributes The specified or defaulted attributes.
      */
-    public void startElement(String namespaceURI, String localName, 
-        String qName, Attributes attributes) throws SAXException {
+    public void startElement(String namespaceURI, String localName,
+            String qName, Attributes attributes) throws SAXException {
         
         // Print out text accumulated from the characters event
         flushText();
-
+        
         String name = null;
         
         if (localName.equals("")) {
@@ -146,65 +151,65 @@ public class FastInfosetParser extends DefaultHandler {
         } else {
             name = localName;
         }
-
+        
         // Print out element name and attributes if any
         display("<" + name);
-
+        
         if (attributes != null) {
             for (int i = 0; i < attributes.getLength(); i++) {
-                String aName = attributes.getLocalName(i); 
-
+                String aName = attributes.getLocalName(i);
+                
                 if ("".equals(aName)) {
                     aName = attributes.getQName(i);
                 }
-
+                
                 display(" " + aName + "=\"" + attributes.getValue(i) + "\"");
             }
         }
-
+        
         display(">");
     }
-
-    /** Handles endElement event. Prints out any text accumulated 
+    
+    /** Handles endElement event. Prints out any text accumulated
      *  from the characters event within the element, and then the end element name.
      *
      *  @param namespaceURI namespace URI
      *  @param localName The local name (without prefix), or the empty string if Namespace processing is not being performed.
      *  @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
      */
-    public void endElement(String namespaceURI, String localName, String qName ) 
-        throws SAXException {
+    public void endElement(String namespaceURI, String localName, String qName )
+    throws SAXException {
         
         // Print out text accumulated from the characters event
         flushText();
-
-        String name = localName; 
-
+        
+        String name = localName;
+        
         if ("".equals(name)) {
             name = qName;
         }
-
+        
         // Print out end element
         display("</" + name + ">");
     }
-
+    
     /** Handles characters event. Save the text in a buffer for print-out in start/end element.
      *
      *  @param ch The characters
      *  @param start The start position in the character array.
-     *  @param length The number of characters to use from the character array. 
+     *  @param length The number of characters to use from the character array.
      */
     public void characters(char[] ch, int start, int length)
-        throws SAXException {
+    throws SAXException {
         String s = new String(ch, start, length);
-
+        
         if (textBuffer == null) {
             textBuffer = new StringBuffer(s);
         } else {
             textBuffer.append(s);
         }
     }
-
+    
     //===========================================================
     // Utility Methods ...
     //===========================================================
@@ -213,11 +218,11 @@ public class FastInfosetParser extends DefaultHandler {
         if (textBuffer == null) {
             return;
         }
-
+        
         display(textBuffer.toString());
         textBuffer = null;
     }
-
+    
     // Wrap I/O exceptions in SAX exceptions, to
     // suit handler signature requirements
     private void display(String s) throws SAXException {
@@ -228,7 +233,7 @@ public class FastInfosetParser extends DefaultHandler {
             throw new SAXException("I/O error", e);
         }
     }
-
+    
     // Displays a new line
     private void displayNewLine() throws SAXException {
         try {
@@ -236,5 +241,5 @@ public class FastInfosetParser extends DefaultHandler {
         } catch (IOException e) {
             throw new SAXException("I/O error", e);
         }
-    }    
+    }
 }

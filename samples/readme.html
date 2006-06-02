@@ -9,53 +9,42 @@ To try out the samples, please follow the following steps:
 <li> Get FastInfoset source and build the package. A FastInfoset.jar will be generated 
 under &lt;FastInfoset home&gt;/dist.  The Ant tasks for the samples have dependency on 
 the jar file.</li>
-<li> Get the source and data files for the sampless. Make sure to check out the whole samples package. All 
+<li> Get the source and data files for the samples. Make sure to check out the whole samples package. All 
 sources are under /src directory and XML files used in the samples are under /data directory.
 </li>
 <li> To run a sample, go to the samples directory and type ant &lt;target&gt;</li>
 </ol>
-
-Note that due to the fact that there might be some minor modifications to the specification 
-of the encoding of Fast Infoset, FI files for the samples are not checked in. The ant targets 
-for those samples that have dependencies on FI files, therefore, are set to run XMLToFI target 
-first to generate FI files from XML files before the targeted tasks are run. For more details, 
-you may run the JavaDoc target (ant doc) to generate JavaDocs under dist/javadoc/ and then 
-browse index.html. 
 <br>
 <br>
 
 <table border=1>
 <tr><th>Category</th><th>Samples</th><th>Description</th><th>Ant target</th></tr>
 <tr><td rowspan=2>SAX</td>
-    <td>FastInfosetParser</td>
+    <td>SAXParsingSample</td>
     <td>The sample parses data/inv1a.finf as specified in the build.xml and handle SAX events 
         to display corresponding XML content.</td>
-    <td>SAXParser</td>
+    <td>SAXParsingSample</td>
 </tr>
 <tr>
-    <td>FastInfosetSerializer</td>
+    <td>SAXSerializingSample</td>
     <td>Directly using the FastInfoset SAX Serializer, the sample writes a small piece of XML 
         infoset taken from inv1a.xml into a 
         FastInfoset file called data/inv1c.finf. For details of the XML infoset, please refer to 
         <a href="dist/javadoc/index.html">samples JavaDoc</a>.</td>
-    <td>SAXSerializer</td>
+    <td>SAXSerializingSample</td>
 </tr>
 <tr><td rowspan=3>StAX</td>
-    <td>EventReader</td>
+    <td>StAXEventReadingSample</td>
     <td>Demonstrate the use of FI StAX EventReader to read FI and XML files. The sample
         reads data/inv1a.xml and data/inv1a.finf and displays event types as it goes through
         the documents.<br>
         To try the sample with other xml files, edit the build.xml and change the "simple-xml-file" and 
-         "simple-finf-file" properties to point to the files you may want to test. **Note that due to modifications 
-        to the specification of the encoding of Fast Infoset, finf files have been removed from the repository. For 
-        your convinence, an utility called XMLToFI is attached to this target so that when the target is called, 
-        the xml file specified in property "simple-xml-file" is automatically transformed to create the finf file 
-        specified in property "simple-finf-file".    
+         "simple-finf-file" properties to point to the files you may want to test.
     </td>
-    <td>EventReader</td>
+    <td>StAXEventReadingSample</td>
 </tr>
 <tr>
-    <td>StreamReader</td>
+    <td>StAXParsingSample</td>
     <td>Demonstrate the use of FI StAX StreamReader to read FI files. The sample reads 
         data/inv1.finf and displays contents as it goes through the document.<br>
     
@@ -63,15 +52,15 @@ browse index.html.
         change the "simple-xml-file" and "simple-finf-file" properties to point to the files you may want to test. 
         The finf file specified will be generated automatically.
     </td>
-    <td>StreamReader</td>
+    <td>StAXParsingSample</td>
 </tr>
 <tr>
-    <td>FastInfosetSerializer</td>
+    <td>StAXSerializingSample</td>
     <td>Directly using the FastInfoset StAX Serializer, the sample writes a small piece of XML 
         infoset taken from inv1a.xml into a 
         FastInfoset file called data/inv1c.finf. For details of the XML infoset, please refer to 
         <a href="dist/javadoc/index.html">samples JavaDoc</a>.</td>
-    <td>StAXSerializer</td>
+    <td>StAXSerializingSample</td>
 </tr>
 <tr><td rowspan=2>Transform</td>
     <td>XMLToFastInfosetSAXSerializer</td>
