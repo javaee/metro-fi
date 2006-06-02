@@ -46,7 +46,7 @@ import org.xml.sax.Attributes;
  * data.
  * <p>
  * Implementations shall ensure that the {@link Attributes#getValue(int)} method
- * correctly returns a String object even if the attribute is represented by
+ * correctly returns a String object even if the attribute is represented
  * as algorithm data.
  * <p>
  * If an attribute has algorithm data then the {@link #getAlgorithmData} method
