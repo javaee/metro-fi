@@ -44,7 +44,6 @@
 	    <format property="TSTAMP" pattern="hhmmss"/>
 	</tstamp>
         <mkdir dir="${build.dir}/classes"/>
-        <mkdir dir="${runtime.build.dir}/classes"/>
         <mkdir dir="${dist.dir}"/>
         <mkdir dir="${package.dir}"/>
     </target>
@@ -52,7 +51,6 @@
     <target name="clean">
         <delete quiet="true" dir="${dist.dir}"/>
         <delete dir="${build.dir}"/>
-        <delete dir="${runtime.build.dir}"/>
     </target>
 
     <target name="compile" depends="prepare">
@@ -67,12 +65,6 @@
 		<include name="*.properties"/>
 	    </fileset>
 	</copy>
-        
-        <!-- Compile the FI runtime classes -->
-        <javac source="1.4" target="1.4" srcdir="${runtime.src.dir}" 
-            destdir="${runtime.build.dir}/classes"
-            debug="on" optimize="on" deprecation="on">
-        </javac>
     </target>
 
     <target name="dist" depends="compile">
@@ -89,20 +81,6 @@
                 <include name="**/*"/>
             </fileset>
 	</zip>
-        
-        <!-- Build the FI runtime jar -->
-	<createManifest version="${runtime.release.impl.version}"
-                manifestDir="${runtime.manifest.root}" 
-                file="${runtime.build.dir}/manifest.rt"
-                extensionName="com.sun.fastinfoset.runtime" />
-        <jar jarfile="${dist.dir}/fastinfoset-runtime.jar"
-		basedir="${runtime.build.dir}/classes"
-                manifest="${runtime.build.dir}/manifest.rt"/>
-	<zip destfile="${dist.dir}/fastinfoset-runtime.src.zip">
-            <fileset dir="${runtime.src.dir}">
-                <include name="**/*"/>
-            </fileset>
-	</zip>        
     </target>    
     
     
@@ -145,53 +123,14 @@
 		</fileset>
 	    </batchtest>
 	</junit>
-    </target>        
-        
-    <path id="compile-runtime-test.class.path">
-        <path refid="compile.class.path"/>
-        <pathelement location="${dist.dir}/fastinfoset-runtime-j2se.jar"/>
-        <pathelement location="${junit.jar}"/>
-    </path>
-        
-    <target name="prepare-runtime-test">
-        <mkdir dir="${runtime.build.dir}/test/classes"/>
-        <mkdir dir="${runtime.build.dir}/test/results"/>
     </target>
-        
-    <target name="compile-runtime-test" depends="prepare-runtime-test, dist-for-j2se">
-        <javac source="1.4" srcdir="runtime/test" destdir="${runtime.build.dir}/test/classes"
-		debug="on" optimize="on" deprecation="on">
-            <classpath refid="compile-runtime-test.class.path"/>
-        </javac>
-    </target>
-
-    <path id="runtime-test.class.path">
-        <path refid="compile.class.path"/>
-        <pathelement location="${dist.dir}/${app.jar}"/>
-        <pathelement location="${dist.dir}/fastinfoset-runtime.jar"/>
-        <pathelement location="${runtime.build.dir}/test/classes"/>
-    </path>
-    
-    <target name="runtime-test" depends="compile-runtime-test">
-	<junit printsummary="yes" fork="yes" dir="runtime/test">
-            <classpath refid="runtime-test.class.path"/>
-            <formatter type="plain"/>
-	    <batchtest todir="${runtime.build.dir}/test/results">
-		<fileset dir="runtime/test">
-		    <include name="**/*Test*.java"/>
-		</fileset>
-	    </batchtest>
-	</junit>
-    </target>        
-    
-    <target name="testAll" depends="test, runtime-test"/>
-    
     
     <target name="dist-for-j2se" depends="dist">
         <mkdir dir="build-j2se/classes"/>
         <copy todir="build-j2se/classes/1.0">
             <fileset dir="build/classes">
-                <include name="**/*.class"/>
+                <include name="com/sun/xml/fastinfoset/**/*.class"/>
+                <include name="org/jvnet/fastinfoset/**/*.class"/>
                 <exclude name="com/sun/xml/fastinfoset/stax/events/*.class"/>
                 <exclude name="com/sun/xml/fastinfoset/stax/factory/*.class"/>
                 <exclude name="com/sun/xml/fastinfoset/stax/util/*.class"/>
@@ -199,43 +138,37 @@
                 <exclude name="org/jvnet/fastinfoset/sax/helpers/*.class"/>
             </fileset>
         </copy>
-        <jar jarfile="${dist.dir}/${ant.project.name}-j2se.jar"
-		basedir="build-j2se/classes"/>
-        <delete dir="build-j2se"/>
-        
-        <mkdir dir="build-j2se-runtime/classes"/>
-        <copy todir="build-j2se-runtime/classes">
-            <fileset dir="${runtime.build.dir}/classes">
-                <include name="**/*.class"/>
+        <copy todir="build-j2se/classes/">
+            <fileset dir="build/classes">
+                <include name="com/sun/fastinfoset/runtime/**/*.class"/>
             </fileset>
         </copy>
-        <copy todir="build-j2se-runtime/classes/com/sun/fastinfoset/runtime" 
+        <copy todir="build-j2se/classes/com/sun/fastinfoset/runtime" 
                 file="runtime/etc/runtime.properties"/>
-        <jar jarfile="${dist.dir}/fastinfoset-runtime-j2se.jar"
-		basedir="build-j2se-runtime/classes"/>
-        <delete dir="build-j2se-runtime"/>
+        <jar jarfile="${dist.dir}/${ant.project.name}-j2se.jar"
+		basedir="build-j2se/classes"/>
+        <delete dir="build-j2se"/>        
     </target>
     
     <path id="j2se-runtime-test.class.path">
         <path refid="compile.class.path"/>
-        <pathelement location="${dist.dir}/fastinfoset-runtime-j2se.jar"/>
         <pathelement location="${dist.dir}/FastInfoset-j2se.jar"/>
-        <pathelement location="${runtime.build.dir}/test/classes"/>
+        <pathelement location="${build.dir}/test/classes"/>
     </path>
         
-    <target name="j2se-runtime-test" depends="compile-runtime-test">
+    <target name="j2se-runtime-test" depends="compile-test, dist-for-j2se">
 	<junit printsummary="yes" fork="yes" dir="runtime/test">
             <classpath refid="j2se-runtime-test.class.path"/>
             <formatter type="plain"/>
-	    <batchtest todir="${runtime.build.dir}/test/results">
-		<fileset dir="runtime/test">
-		    <include name="**/*Test*.java"/>
+	    <batchtest todir="${build.dir}/test/results">
+		<fileset dir="test">
+		    <include name="runtime/*Test*.java"/>
 		</fileset>
 	    </batchtest>
 	</junit>
     </target>        
 
-    <target name="testAll-j2se" depends="testAll, j2se-runtime-test"/>
+    <target name="testAll" depends="test, j2se-runtime-test"/>
     
     
     <target name="doc" depends="dist">
