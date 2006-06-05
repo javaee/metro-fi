@@ -49,7 +49,7 @@ import java.util.Vector;
  *
  * @author Kohsuke Kawaguchi
  */
-public class MaskingClassLoader extends ClassLoader {
+final class MaskingClassLoader extends ClassLoader {
     
     private final String[] prefixList;
     

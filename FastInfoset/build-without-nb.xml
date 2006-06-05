@@ -157,7 +157,7 @@
     </path>
         
     <target name="j2se-runtime-test" depends="compile-test, dist-for-j2se">
-	<junit printsummary="yes" fork="yes" dir="runtime/test">
+	<junit printsummary="yes" fork="yes" dir="test">
             <classpath refid="j2se-runtime-test.class.path"/>
             <formatter type="plain"/>
 	    <batchtest todir="${build.dir}/test/results">

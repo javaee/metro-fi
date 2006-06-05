@@ -38,18 +38,11 @@
 package com.sun.fastinfoset.runtime;
 
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
 /**
  * Fast Infoset runtime class to obtain a class loader that hides the location
@@ -79,8 +72,9 @@ public final class FastInfosetRuntime {
     private static String sideDirectory;
             
     /**
-     * Get the class loader using the classloader of {@link FastInfoset}
-     * that loads the Fast Infoset implementation classes.
+     * Get the class loader that loads the Fast Infoset implementation
+     * classes, using the class load of {@link FastInfosetRuntime} as the
+     * parent class loader.
      */
     public static ClassLoader getClassLoader() {
         return getClassLoader(
@@ -91,23 +85,20 @@ public final class FastInfosetRuntime {
      * Get the class loader that loads the Fast Infoset implementation
      * classes.
      * <p>
-     * This method will utilize the {@link MaskingClassLoader} and the 
-     * {@link ParallelWorldClassLoader} iff there is a 
-     * "com.sun.fastinfoset.runtime.runtime.properties" file present that 
-     * contains the property "sideDirectory", otherwise the parent class loader
-     * is returned.
+     * If there is a properties file "runtime.properties" in the location
+     * "com.sun.fastinfoset.runtime" that contains the property "sideDirectory"
+     * then a class loader will be returned that will load the classes from
+     * the side directory that is specified by value of the "sideDirectory"
+     * property.
      * <p>
-     * The value of the property "sideDirectory" will be the side directory from 
-     * which the {@link ParallelWorldClassLoader} will load the Fast Infoset
-     * implementation classes. The {@link MaskingClassLoader} will ensure that
-     * the side loaded Fast Infoset implementation and a non-side loaded
-     * implementation can co-exist within the same JVM.
+     * If a Fast Infoset implementation is under a side directory then the
+     * implementation is essentially hidden from the parent class loader,
+     * which is passed as an argument to this method.
      *
      * @param parent the parent class loader of the child class loader return.
      *        The child returned may be the same instance as the parent.
      */
-    // public static synchronized ClassLoader getClassLoader(ClassLoader parent) {
-    public static ClassLoader getClassLoader(ClassLoader parent) {
+    public static synchronized ClassLoader getClassLoader(ClassLoader parent) {
         // Check to see if a class loader that is a child of this
         // parent has previously been created
         ClassLoader child = (ClassLoader)loaders.get(parent);
