@@ -1,6 +1,7 @@
 <project name="FastInfosetPackage" default="dist" basedir=".">
     
     <property name="FastInfoset.dir" value="FastInfoset"/>
+    <property name="FastInfosetRuntime.dir" value="FastInfoset/runtime"/>
     <property name="FastInfosetUtilities.dir" value="FastInfosetUtilities"/>
     <property name="samples.dir" value="samples"/>
     
@@ -78,6 +79,7 @@
                 <include name="bin/*"/>
                 <include name="lib/*.jar"/>
                 <include name="dist/FastInfoset.jar"/>
+                <include name="dist/fastinfoset-runtime.jar"/>
             </fileset>
             <fileset dir="${FastInfosetUtilities.dir}">
                 <include name="lib/*.jar"/>
@@ -113,6 +115,12 @@
             <artifact
             jar="FastInfoset/dist/FastInfoset.jar"
             pom="etc/poms/FastInfoset.pom" />
+        </maven-repository-importer>
+        <maven-repository-importer
+            destdir="build/maven-repo" version="${runtime.release.impl.version}">
+            <artifact
+            jar="FastInfoset/dist/fastinfoset-runtime.jar"
+            pom="etc/poms/fastinfoset-runtime.pom" />
         </maven-repository-importer>
     </target>
 
