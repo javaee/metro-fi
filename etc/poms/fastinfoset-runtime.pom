@@ -1,7 +1,0 @@
-<project>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.sun.fastinfoset.runtime</groupId>
-  <artifactId>fastinfoset-runtime</artifactId>
-  <version>@VERSION@</version>
-</project>
-
