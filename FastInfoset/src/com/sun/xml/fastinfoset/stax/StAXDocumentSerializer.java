@@ -442,12 +442,16 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
             if (length == 0) {
                 return;
             } else if (length < _charBuffer.length) {
-                text.getChars(0, length, _charBuffer, 0);
                 if (getIgnoreWhiteSpaceTextContent() && 
-                        isWhiteSpace(_charBuffer, 0, length)) return;
+                        isWhiteSpace(text)) return;
                 
+                // Warning: this method must be called before any state
+                // is modified, such as the _charBuffer contents,
+                // so the characters of text cannot be copied to _charBuffer
+                // before this call
                 encodeTerminationAndCurrentElement(true);
                 
+                text.getChars(0, length, _charBuffer, 0);
                 encodeCharacters(_charBuffer, 0, length);
             } else {
                 final char ch[] = text.toCharArray();

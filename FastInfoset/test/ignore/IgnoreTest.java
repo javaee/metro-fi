@@ -21,6 +21,8 @@ import org.xml.sax.SAXException;
  * @author Paul.Sandoz@Sun.Com
  */
 public class IgnoreTest extends TestCase {
+
+    private static String _notws = "AAAA";
     
     public void testIgnoreSAXSerialization() throws Exception {
         _testIgnoreSAXSerialization(true);
@@ -52,8 +54,7 @@ public class IgnoreTest extends TestCase {
         ss.endElement("", "e", "e");
 
         ss.startElement("", "e", "e", attributes);
-        String notws = "AAAA";
-        ss.characters(notws.toCharArray(), 0, notws.length());
+        ss.characters(_notws.toCharArray(), 0, _notws.length());
         ss.endElement("", "e", "e");
 
         ss.endElement("", "root", "root");
@@ -95,8 +96,11 @@ public class IgnoreTest extends TestCase {
         ss.writeEndElement();
         
         ss.writeStartElement("e");
-        String notws = "AAAA";
-        ss.writeCharacters(ws.toCharArray(), 0, ws.length());
+        ss.writeCharacters(_notws);
+        ss.writeEndElement();
+
+        ss.writeStartElement("e");
+        ss.writeCharacters(_notws.toCharArray(), 0, _notws.length());
         ss.writeEndElement();
         
         ss.writeEndElement();
@@ -134,7 +138,7 @@ public class IgnoreTest extends TestCase {
         
         e = d.createElement("e");
         root.appendChild(e);
-        e.appendChild(d.createTextNode("AAAA"));
+        e.appendChild(d.createTextNode(_notws));
         
         DOMDocumentSerializer ds = new DOMDocumentSerializer();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -163,6 +167,9 @@ public class IgnoreTest extends TestCase {
             public void characters (char ch[], int start, int length) throws SAXException {
                 if (XMLChar.isSpace(ch[start])) {
                     assertTrue(assertValue);
+                } else {
+                    String s = new String(ch, start, length);
+                    assertEquals(_notws, s);
                 }
             }
 

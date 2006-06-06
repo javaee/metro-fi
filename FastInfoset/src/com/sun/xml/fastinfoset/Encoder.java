@@ -2120,4 +2120,19 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         while(start < end && XMLChar.isSpace(ch[start++]));
         return start == end;
     }
+    
+    /**
+     * Check if a String contains characters that are all white space.
+     *
+     * @param ch the string
+     * @return true if all characters are white space, false otherwise
+     */
+    public static boolean isWhiteSpace(String s) {
+        if (!XMLChar.isSpace(s.charAt(0))) return false;
+        
+        final int end = s.length();
+        int start = 1;
+        while(start < end && XMLChar.isSpace(s.charAt(start++)));
+        return start == end;
+    }
 }
