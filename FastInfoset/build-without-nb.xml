@@ -127,7 +127,7 @@
     
     <target name="dist-for-j2se" depends="dist">
         <mkdir dir="build-j2se/classes"/>
-        <copy todir="build-j2se/classes/1.0">
+        <copy todir="build-j2se/classes/com/sun/fastinfoset/impl">
             <fileset dir="build/classes">
                 <include name="com/sun/xml/fastinfoset/**/*.class"/>
                 <include name="org/jvnet/fastinfoset/**/*.class"/>
