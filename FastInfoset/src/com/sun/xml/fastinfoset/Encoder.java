@@ -2124,7 +2124,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     /**
      * Check if a String contains characters that are all white space.
      *
-     * @param ch the string
+     * @param s the string
      * @return true if all characters are white space, false otherwise
      */
     public static boolean isWhiteSpace(String s) {
