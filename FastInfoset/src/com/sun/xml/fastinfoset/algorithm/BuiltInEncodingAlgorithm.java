@@ -61,13 +61,15 @@ public abstract class BuiltInEncodingAlgorithm implements EncodingAlgorithm {
     public void matchWhiteSpaceDelimnatedWords(CharBuffer cb, WordListener wl) {
         Matcher m = SPACE_PATTERN.matcher(cb);
         int i = 0;
+        int s = 0;
         while(m.find()) {
-            int s = m.start();
+            s = m.start();
             if (s != i) {
                 wl.word(i, s);
             }
             i = m.end();
         }
+        wl.word(i, cb.length());
     }
     
     public StringBuffer removeWhitespace(char[] ch, int start, int length) {
@@ -75,15 +77,15 @@ public abstract class BuiltInEncodingAlgorithm implements EncodingAlgorithm {
         int firstNonWS = 0;
         int idx = 0;
         for (; idx < length; ++idx) {
-            if (Character.isWhitespace(ch[idx])) {
+            if (Character.isWhitespace(ch[idx + start])) {
                 if (firstNonWS < idx) {
-                    buf.append(ch, firstNonWS, idx - firstNonWS);
+                    buf.append(ch, firstNonWS + start, idx - firstNonWS);
                 }
                 firstNonWS = idx + 1;
             }
         }
         if (firstNonWS < idx) {
-            buf.append(ch, firstNonWS, idx - firstNonWS);
+            buf.append(ch, firstNonWS + start, idx - firstNonWS);
         }
         return buf;
     }
