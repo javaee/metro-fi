@@ -264,7 +264,7 @@ public class EncodingAlgorithmAttributesImpl implements EncodingAlgorithmAttribu
      * @param algorithmID The algorithm ID.
      * @param algorithmData The algorithm data.
      */
-    public void replaceAttributeAlgorithmData(int index,
+    public void replaceWithAttributeAlgorithmData(int index,
             String algorithmURI, int algorithmID, Object algorithmData) {
         if (index < 0 || index >= _length) return;
         
