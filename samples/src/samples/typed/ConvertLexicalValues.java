@@ -55,14 +55,14 @@ public class ConvertLexicalValues {
                             byte[] b = (byte[])BuiltInEncodingAlgorithmFactory.
                                     base64EncodingAlgorithm.
                                     convertFromCharacters(ch, 0, ch.length);
-                            atts.replaceAttributeAlgorithmData(index, 
+                            atts.replaceWithAttributeAlgorithmData(index, 
                                     null, EncodingAlgorithmIndexes.BASE64, b);
                             return;
                         case FLOAT:
                             float[] f = (float[])BuiltInEncodingAlgorithmFactory.
                                     floatEncodingAlgorithm.
                                     convertFromCharacters(ch, 0, ch.length);
-                            atts.replaceAttributeAlgorithmData(index, 
+                            atts.replaceWithAttributeAlgorithmData(index, 
                                     null, EncodingAlgorithmIndexes.FLOAT, f);
                             return;
                         default:
