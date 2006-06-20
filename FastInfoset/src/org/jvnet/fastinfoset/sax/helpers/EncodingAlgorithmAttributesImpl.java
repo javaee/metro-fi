@@ -410,7 +410,7 @@ public class EncodingAlgorithmAttributesImpl implements EncodingAlgorithmAttribu
     public final String getValue(String qName) {
         int index = getIndex(qName);
         if (index >= 0) {
-            return _data[index * SIZE + VALUE_OFFSET];
+            return getValue(index);
         } else {
             return null;
         }
@@ -438,7 +438,7 @@ public class EncodingAlgorithmAttributesImpl implements EncodingAlgorithmAttribu
     public final String getValue(String uri, String localName) {
         int index = getIndex(uri, localName);
         if (index >= 0) {
-            return _data[index * SIZE + VALUE_OFFSET];
+            return getValue(index);
         } else {
             return null;
         }
