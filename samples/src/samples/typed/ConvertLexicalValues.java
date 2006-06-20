@@ -48,7 +48,7 @@ public class ConvertLexicalValues {
             if (attributeTypes == null) return;
             
             char[] ch = atts.getValue(index).toCharArray();
-            for (XSDataType dt : _textContent) {
+            for (XSDataType dt : attributeTypes) {
                 try {
                     switch(dt) {
                         case BASE64BINARY:
