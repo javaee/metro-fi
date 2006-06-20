@@ -69,8 +69,8 @@ public interface EncodingAlgorithmAttributes extends Attributes {
      * <p>If {@link #getAlgorithmData(int)} returns null then the result of 
      *    this method is undefined.<p>
      *
-     * @param index The attribute index (zero-based).
-     * @return The URI.
+     * @param index The attribute index (zero-based). 
+     * @return The URI. If the index is out of range then null is returned.
      */
     public String getAlgorithmURI(int index);
  
@@ -81,7 +81,7 @@ public interface EncodingAlgorithmAttributes extends Attributes {
      *    this method is undefined.<p>
      *
      * @param index The attribute index (zero-based).
-     * @return The index
+     * @return The algorithm index. If index is out of range then -1 is returned.
      * @see org.jvnet.fastinfoset.EncodingAlgorithmIndexes       
      */
     public int getAlgorithmIndex(int index);
@@ -102,7 +102,7 @@ public interface EncodingAlgorithmAttributes extends Attributes {
      *    <code>null</code> is returned.<p>
      *
      * @param index The attribute index (zero-based).
-     * @return The data
+     * @return The data. If the index is out of range then null is returned.
      */
     public Object getAlgorithmData(int index);    
 }
