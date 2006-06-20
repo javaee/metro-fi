@@ -1,3 +1,40 @@
+/*
+ * Fast Infoset ver. 0.1 software ("Software")
+ * 
+ * Copyright, 2004-2005 Sun Microsystems, Inc. All Rights Reserved. 
+ * 
+ * Software is licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at:
+ * 
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ *    Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations.
+ * 
+ *    Sun supports and benefits from the global community of open source
+ * developers, and thanks the community for its important contributions and
+ * open standards-based technology, which Sun has adopted into many of its
+ * products.
+ * 
+ *    Please note that portions of Software may be provided with notices and
+ * open source licenses from such communities and third parties that govern the
+ * use of those portions, and any licenses granted hereunder do not alter any
+ * rights and obligations you may have under such open source licenses,
+ * however, the disclaimer of warranty and limitation of liability provisions
+ * in this License will apply to all Software in this distribution.
+ * 
+ *    You acknowledge that the Software is not designed, licensed or intended
+ * for use in the design, construction, operation or maintenance of any nuclear
+ * facility.
+ *
+ * Apache License
+ * Version 2.0, January 2004
+ * http://www.apache.org/licenses/
+ *
+ */ 
 package com.sun.xml.analysis.types;
 
 import com.sun.xml.xsom.XSAnnotation;
@@ -43,179 +80,188 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-public class SchemaProcessor implements XSVisitor, XSSimpleTypeVisitor {
-    
-    // XSVisitor, XSSimpleTypeVisitor
-    
-    public void annotation(XSAnnotation xSAnnotation) {
-    }
-
-    public void attGroupDecl(XSAttGroupDecl decl) {
-        for (XSAttGroupDecl groupDecl : decl.getAttGroups()) {
-            groupDecl.visit(this);
+/**
+ * A Schema processor that collects the XSD simple types of elements and 
+ * attributes declarations.
+ * <p>
+ * Maps of element/attribute local name to a set of XSDataType are created
+ * when a schema is processed. 
+ *
+ * @author Paul.Sandoz@Sun.Com
+ */
+public class SchemaProcessor {
+        
+    private class InternalSchemaProcessor implements XSVisitor, XSSimpleTypeVisitor {
+            
+        public void annotation(XSAnnotation xSAnnotation) {
         }
-        
-        for (XSAttributeUse use : decl.getAttributeUses()) {
-            use.visit(this);
-        }        
-    }
 
-    public void attributeDecl(XSAttributeDecl xSAttributeDecl) {
-        _attribute = qname(xSAttributeDecl);
-        _element = null;
-        
-        XSSimpleType s = xSAttributeDecl.getType();
-        s.visit((XSSimpleTypeVisitor)this);
-    }
-
-    public void attributeUse(XSAttributeUse use) {
-        XSAttributeDecl decl = use.getDecl();        
-        decl.visit(this);
-    }
-
-    public void complexType(XSComplexType type) {
-
-        if (type.getContentType().asSimpleType() != null) {
-            XSType baseType = type.getBaseType();
-            
-            if (type.getDerivationMethod() != XSType.RESTRICTION) {
-                // check if have redefine tag
-                if (type.getName() != null &&
-                        (type.getTargetNamespace().compareTo(
-                        baseType.getTargetNamespace()) ==
-                        0)
-                        && (type.getName().compareTo(baseType.getName()) == 0)) {
-                    baseType.visit(this);
-                }
+        public void attGroupDecl(XSAttGroupDecl decl) {
+            for (XSAttGroupDecl groupDecl : decl.getAttGroups()) {
+                groupDecl.visit(this);
             }
-            
-            XSSimpleType s = type.getContentType().asSimpleType();
-            // processSimpleType(s);
+
+            for (XSAttributeUse use : decl.getAttributeUses()) {
+                use.visit(this);
+            }        
+        }
+
+        public void attributeDecl(XSAttributeDecl xSAttributeDecl) {
+            _attribute = qname(xSAttributeDecl);
+            _element = null;
+
+            XSSimpleType s = xSAttributeDecl.getType();
             s.visit((XSSimpleTypeVisitor)this);
-        } else {
-            XSComplexType baseType = type.getBaseType().asComplexType();
+        }
 
-            if (type.getDerivationMethod() != XSType.RESTRICTION) {
-                // check if have redefine tag
-                if (type.getName() != null && 
-                        type.getTargetNamespace().compareTo(
-                            baseType.getTargetNamespace()) == 0 && 
-                        type.getName().compareTo(baseType.getName()) == 0) {
-                    baseType.visit(this);
+        public void attributeUse(XSAttributeUse use) {
+            XSAttributeDecl decl = use.getDecl();        
+            decl.visit(this);
+        }
+
+        public void complexType(XSComplexType type) {
+
+            if (type.getContentType().asSimpleType() != null) {
+                XSType baseType = type.getBaseType();
+
+                if (type.getDerivationMethod() != XSType.RESTRICTION) {
+                    // check if have redefine tag
+                    if (type.getName() != null &&
+                            (type.getTargetNamespace().compareTo(
+                            baseType.getTargetNamespace()) ==
+                            0)
+                            && (type.getName().compareTo(baseType.getName()) == 0)) {
+                        baseType.visit(this);
+                    }
                 }
-                type.getExplicitContent().visit(this);
+
+                XSSimpleType s = type.getContentType().asSimpleType();
+                // processSimpleType(s);
+                s.visit((XSSimpleTypeVisitor)this);
+            } else {                
+                XSComplexType baseType = type.getBaseType().asComplexType();
+
+                if (type.getDerivationMethod() != XSType.RESTRICTION) {
+                    // check if have redefine tag
+                    if (type.getName() != null && 
+                            type.getTargetNamespace().compareTo(
+                                baseType.getTargetNamespace()) == 0 && 
+                            type.getName().compareTo(baseType.getName()) == 0) {
+                        baseType.visit(this);
+                    }
+                    type.getExplicitContent().visit(this);
+                }
+                type.getContentType().visit(this);
             }
-            type.getContentType().visit(this);
-        }
-        
-        for (XSAttGroupDecl a : type.getAttGroups()) {
-            a.visit(this);
-        }
-        
-        for (XSAttributeUse a : type.getDeclaredAttributeUses()) {
-            a.visit(this);
-        }
-    }
 
-    public void schema(XSSchema s) {
-        for (XSAttGroupDecl groupDecl : s.getAttGroupDecls().values()) {
-            attGroupDecl(groupDecl);
-        }
-
-        for (XSAttributeDecl attrDecl : s.getAttributeDecls().values()) {
-            attributeDecl(attrDecl);
-        }
-
-        for (XSComplexType complexType : s.getComplexTypes().values()) {
-            complexType(complexType);
-        }
-        
-        for (XSElementDecl elementDecl : s.getElementDecls().values()) {
-            elementDecl(elementDecl);
-        }
-
-        for (XSModelGroupDecl modelGroupDecl : s.getModelGroupDecls().values()) {
-            modelGroupDecl(modelGroupDecl);
-        }
-    }
-
-    public void facet(XSFacet facet) {
-    }
-
-    public void notation(XSNotation xSNotation) {
-    }
-
-    public void identityConstraint(XSIdentityConstraint xSIdentityConstraint) {
-    }
-
-    public void xpath(XSXPath xSXPath) {
-    }
-
-    public void wildcard(XSWildcard xSWildcard) {
-    }
-
-    public void modelGroupDecl(XSModelGroupDecl decl) {
-       modelGroup(decl.getModelGroup());
-    }
-
-    public void modelGroup(XSModelGroup group) {
-        final int len = group.getSize();
-        for (int i = 0; i < len; i++) {
-            particle(group.getChild(i));
-        }
-    }
-
-    private Set<XSElementDecl> seen = new HashSet<XSElementDecl>();
-    
-    public void elementDecl(XSElementDecl type) {
-        if (seen.contains(type)) return;
-        seen.add(type);
-
-        _element = qname(type);
-        type.getType().visit(this);
-    }
-
-    public void particle(XSParticle part) {
-        part.getTerm().visit(this);
-    }
-
-    public void empty(XSContentType xSContentType) {
-    }    
-    
-    
-    
-    public void simpleType(XSSimpleType type) {
-        type.visit((XSSimpleTypeVisitor)this);
-    }
-
-    public void listSimpleType(XSListSimpleType xSListSimpleType) {
-        if (_isListSimpleType) return;
-        
-        _isListSimpleType = true;
-        simpleType(xSListSimpleType.getItemType());
-    }
-
-    public void unionSimpleType(XSUnionSimpleType type) {
-    }
-
-    public void restrictionSimpleType(XSRestrictionSimpleType type) {
-        if (type.getTargetNamespace().equals("http://www.w3.org/2001/XMLSchema")) {
-            if (_element != null) {
-                addToMap(_elementMap, _element.getLocalPart(), type.getName());
-            } else if (_attribute != null) {
-                addToMap(_attributeMap, _attribute.getLocalPart(), type.getName());
+            for (XSAttGroupDecl a : type.getAttGroups()) {
+                a.visit(this);
             }
-        } else {
-            XSSimpleType baseType = type.getSimpleBaseType();
-            
-            if (baseType == null) return;
-            if (baseType.isLocal()) simpleType(baseType);
+
+            for (XSAttributeUse a : type.getDeclaredAttributeUses()) {
+                a.visit(this);
+            }
         }
-        
-        reset();
+
+        public void schema(XSSchema s) {
+            for (XSAttGroupDecl groupDecl : s.getAttGroupDecls().values()) {
+                attGroupDecl(groupDecl);
+            }
+
+            for (XSAttributeDecl attrDecl : s.getAttributeDecls().values()) {
+                attributeDecl(attrDecl);
+            }
+
+            for (XSComplexType complexType : s.getComplexTypes().values()) {
+                complexType(complexType);
+            }
+
+            for (XSElementDecl elementDecl : s.getElementDecls().values()) {
+                elementDecl(elementDecl);
+            }
+
+            for (XSModelGroupDecl modelGroupDecl : s.getModelGroupDecls().values()) {
+                modelGroupDecl(modelGroupDecl);
+            }
+        }
+
+        public void facet(XSFacet facet) {
+        }
+
+        public void notation(XSNotation xSNotation) {
+        }
+
+        public void identityConstraint(XSIdentityConstraint xSIdentityConstraint) {
+        }
+
+        public void xpath(XSXPath xSXPath) {
+        }
+
+        public void wildcard(XSWildcard xSWildcard) {
+        }
+
+        public void modelGroupDecl(XSModelGroupDecl decl) {
+           modelGroup(decl.getModelGroup());
+        }
+
+        public void modelGroup(XSModelGroup group) {
+            final int len = group.getSize();
+            for (int i = 0; i < len; i++) {
+                particle(group.getChild(i));
+            }
+        }
+
+        private Set<XSElementDecl> seen = new HashSet<XSElementDecl>();
+
+        public void elementDecl(XSElementDecl type) {
+            if (seen.contains(type)) return;
+            seen.add(type);
+
+            _element = qname(type);
+            type.getType().visit(this);
+        }
+
+        public void particle(XSParticle part) {
+            part.getTerm().visit(this);
+        }
+
+        public void empty(XSContentType xSContentType) {
+        }    
+
+
+
+        public void simpleType(XSSimpleType type) {
+            type.visit((XSSimpleTypeVisitor)this);
+        }
+
+        public void listSimpleType(XSListSimpleType xSListSimpleType) {
+            if (_isListSimpleType) return;
+
+            _isListSimpleType = true;
+            simpleType(xSListSimpleType.getItemType());
+        }
+
+        public void unionSimpleType(XSUnionSimpleType type) {
+        }
+
+        public void restrictionSimpleType(XSRestrictionSimpleType type) {
+            if (type.getTargetNamespace().equals("http://www.w3.org/2001/XMLSchema")) {
+                if (_element != null) {
+                    addToMap(_elementMap, _element.getLocalPart(), type.getName());
+                } else if (_attribute != null) {
+                    addToMap(_attributeMap, _attribute.getLocalPart(), type.getName());
+                }
+            } else {
+                XSSimpleType baseType = type.getSimpleBaseType();
+
+                if (baseType == null) return;
+                if (baseType.isLocal()) simpleType(baseType);
+            }
+
+            reset();
+        }
+    
     }
-    
-    
     
     private class ErrorHandlerImpl implements ErrorHandler {
         public void warning(SAXParseException e) throws SAXException {
@@ -271,13 +317,37 @@ public class SchemaProcessor implements XSVisitor, XSSimpleTypeVisitor {
         _schema = schema;
     }
     
+    /*
+     * Get the element to XS data type map.
+     * 
+     * @return the element to XS data type map.
+     */
+    public Map<String, Set<XSDataType>> getElementToXSDataTypeMap() {
+        return new HashMap<String, Set<XSDataType>>(_elementMap);
+    }
+    
+    /*
+     * Get the attribute to XS data type map.
+     * 
+     * @return the attribute to XS data type map.
+     */
+    public Map<String, Set<XSDataType>> getAttributeToXSDataTypeMap() {
+        return new HashMap<String, Set<XSDataType>>(_attributeMap);
+    }
+    
     /**
+     * Process the schema.
      */
     public void process() throws Exception {
         process(null);
     }
     
     /**
+     * Process the schema.
+     * <p>
+     * @param filter if not null only include elements/attributes with simple
+     * types if it is present in the Set of XS data type. Otherwise all 
+     * elements/attributes with simple types are included.
      */
     public void process(Set<XSDataType> filter) throws Exception {
         _filter = filter;
@@ -295,7 +365,7 @@ public class SchemaProcessor implements XSVisitor, XSSimpleTypeVisitor {
         Iterator<XSSchema> is = sset.iterateSchema();
         while (is.hasNext()) {
             XSSchema s = is.next();
-            s.visit(this);
+            s.visit(new InternalSchemaProcessor());
         }
     }
     
