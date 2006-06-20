@@ -253,6 +253,29 @@ public class EncodingAlgorithmAttributesImpl implements EncodingAlgorithmAttribu
     }
     
     /**
+     * Replace an attribute value with algorithm data.
+     *
+     * <p>For the sake of speed, this method does no checking
+     * to see if the attribute is already in the list: that is
+     * the responsibility of the application.</p>
+     *
+     * @param index The index of the attribute whose value is to be replaced
+     * @param algorithmURI The algorithm URI, or null if a built in algorithm
+     * @param algorithmID The algorithm ID.
+     * @param algorithmData The algorithm data.
+     */
+    public void replaceAttributeAlgorithmData(int index,
+            String algorithmURI, int algorithmID, Object algorithmData) {
+        if (index < 0 || index >= _length) return;
+        
+        int i = index * SIZE;
+        _data[i + VALUE_OFFSET] = null;
+        _data[i + ALGORITHMURI_OFFSET] = algorithmURI;
+        _algorithmIds[index] = algorithmID;
+        _algorithmData[index] = algorithmData;
+    }
+    
+    /**
      * Copy an entire Attributes object.
      *
      * @param atts The attributes to copy.
