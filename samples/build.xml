@@ -73,7 +73,7 @@
     <property name="simple-finf-file" value="data/inv1a.finf"/>
     <property name="serializer-finf-file" value="data/inv1c.finf"/>
 
-    <target name="run" depends="XMLToFI">
+    <target name="runSamples" depends="XMLToFI">
         <java dir="." fork="true" classname="samples.stax.StreamReader">
             <classpath path="${run.classpath}"/>
             <arg line="${simple-finf-file}"/>
