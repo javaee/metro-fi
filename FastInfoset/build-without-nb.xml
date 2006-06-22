@@ -72,7 +72,7 @@
 	    description="prepare renamed source code for J2SE integration">
 	<taskdef name="prename" classname="com.sun.wts.tools.ant.PackageRenameTask">
 	    <classpath>
-		<pathelement path="../tools/lib/package-rename-task.jar" />
+		<pathelement path="tools/lib/package-rename-task.jar" />
 	    </classpath>
 	</taskdef>
 
@@ -149,7 +149,7 @@
     
     <target name="integrate-package-rename-task">
 	<get src="http://kohsuke.sfbay/hudson/job/package-rename-task/lastSuccessfulBuild/artifact/target/package-rename-task-1.0.jar"
-		dest="../tools/lib/package-rename-task.jar"/>
+		dest="tools/lib/package-rename-task.jar"/>
     </target>
 
 
