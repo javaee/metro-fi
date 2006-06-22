@@ -101,7 +101,7 @@ public class PrintTable {
         System.out.println(title);
 
         for (int i = 0; i < a.getSize(); i++) {
-            System.out.println("" + (i + 1) + ": " + a.get(i).toString());
+            System.out.println("" + (i + 1) + ": " + a.getString(i));
         }        
     }
 

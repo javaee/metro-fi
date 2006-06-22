@@ -467,16 +467,16 @@ public class DOMDocumentParser extends Decoder {
                 }
                 case DecoderStateTables.CII_INDEX_SMALL:
                 {
-                    final CharArray ca = _characterContentChunkTable.get(_b & EncodingConstants.INTEGER_4TH_BIT_SMALL_MASK);
+                    final String s = _characterContentChunkTable.getString(_b & EncodingConstants.INTEGER_4TH_BIT_SMALL_MASK);
                     
-                    _currentNode.appendChild(_document.createTextNode(ca.toString()));
+                    _currentNode.appendChild(_document.createTextNode(s));
                     break;
                 }
                 case DecoderStateTables.CII_INDEX_MEDIUM:
                 {
                     final int index = (((_b & EncodingConstants.INTEGER_4TH_BIT_MEDIUM_MASK) << 8) | read())
                         + EncodingConstants.INTEGER_4TH_BIT_SMALL_LIMIT;
-                    final String s = _characterContentChunkTable.get(index).toString();
+                    final String s = _characterContentChunkTable.getString(index);
                     
                     _currentNode.appendChild(_document.createTextNode(s));
                     break;
@@ -487,7 +487,7 @@ public class DOMDocumentParser extends Decoder {
                         (read() << 8) |
                         read();
                     index += EncodingConstants.INTEGER_4TH_BIT_MEDIUM_LIMIT;
-                    final String s = _characterContentChunkTable.get(index).toString();
+                    final String s = _characterContentChunkTable.getString(index);
                     
                     _currentNode.appendChild(_document.createTextNode(s));
                     break;
@@ -498,7 +498,7 @@ public class DOMDocumentParser extends Decoder {
                         (read() << 8) |
                         read();
                     index += EncodingConstants.INTEGER_4TH_BIT_LARGE_LIMIT;
-                    final String s = _characterContentChunkTable.get(index).toString();
+                    final String s = _characterContentChunkTable.getString(index);
                     
                     _currentNode.appendChild(_document.createTextNode(s));
                     break;

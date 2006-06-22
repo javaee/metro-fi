@@ -123,7 +123,6 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
      */
     protected char[] _characters;
     protected int _charactersOffset;
-    protected int _charactersLength;
 
     protected String _algorithmURI;
     protected int _algorithmId;
@@ -302,25 +301,11 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 case DecoderStateTables.CII_UTF8_SMALL_LENGTH:
                     _octetBufferLength = (b & EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_MASK)
                             + 1;
-                    decodeUtf8StringAsCharBuffer();
-                    if ((b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _characterContentChunkTable.add(_charBuffer, _charBufferLength);
-                    }
-                    
-                    _characters = _charBuffer;
-                    _charactersOffset = 0;
-                    _charactersLength = _charBufferLength;
+                    processUtf8CharacterString(b);
                     return _eventType = CHARACTERS;
                 case DecoderStateTables.CII_UTF8_MEDIUM_LENGTH:
                     _octetBufferLength = read() + EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_LIMIT;
-                    decodeUtf8StringAsCharBuffer();
-                    if ((b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _characterContentChunkTable.add(_charBuffer, _charBufferLength);
-                    }
-                    
-                    _characters = _charBuffer;
-                    _charactersOffset = 0;
-                    _charactersLength = _charBufferLength;
+                    processUtf8CharacterString(b);
                     return _eventType = CHARACTERS;
                 case DecoderStateTables.CII_UTF8_LARGE_LENGTH:
                     _octetBufferLength = ((read() << 24) |
@@ -328,37 +313,16 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                             (read() << 8) |
                             read())
                             + EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_MEDIUM_LIMIT;
-                    decodeUtf8StringAsCharBuffer();
-                    if ((b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _characterContentChunkTable.add(_charBuffer, _charBufferLength);
-                    }
-                    
-                    _characters = _charBuffer;
-                    _charactersOffset = 0;
-                    _charactersLength = _charBufferLength;
+                    processUtf8CharacterString(b);
                     return _eventType = CHARACTERS;
                 case DecoderStateTables.CII_UTF16_SMALL_LENGTH:
                     _octetBufferLength = (b & EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_MASK)
                     + 1;
-                    decodeUtf16StringAsCharBuffer();
-                    if ((b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _characterContentChunkTable.add(_charBuffer, _charBufferLength);
-                    }
-                    
-                    _characters = _charBuffer;
-                    _charactersOffset = 0;
-                    _charactersLength = _charBufferLength;
+                    processUtf16CharacterString(b);
                     return _eventType = CHARACTERS;
                 case DecoderStateTables.CII_UTF16_MEDIUM_LENGTH:
                     _octetBufferLength = read() + EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_LIMIT;
-                    decodeUtf16StringAsCharBuffer();
-                    if ((b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _characterContentChunkTable.add(_charBuffer, _charBufferLength);
-                    }
-                    
-                    _characters = _charBuffer;
-                    _charactersOffset = 0;
-                    _charactersLength = _charBufferLength;
+                    processUtf16CharacterString(b);
                     return _eventType = CHARACTERS;
                 case DecoderStateTables.CII_UTF16_LARGE_LENGTH:
                     _octetBufferLength = ((read() << 24) |
@@ -366,14 +330,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                             (read() << 8) |
                             read())
                             + EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_MEDIUM_LIMIT;
-                    decodeUtf16StringAsCharBuffer();
-                    if ((b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _characterContentChunkTable.add(_charBuffer, _charBufferLength);
-                    }
-                    
-                    _characters = _charBuffer;
-                    _charactersOffset = 0;
-                    _charactersLength = _charBufferLength;
+                    processUtf16CharacterString(b);
                     return _eventType = CHARACTERS;
                 case DecoderStateTables.CII_RA:
                 {
@@ -388,12 +345,12 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     decodeRestrictedAlphabetAsCharBuffer();
                     
                     if (addToTable) {
-                        _characterContentChunkTable.add(_charBuffer, _charBufferLength);
+                        _charactersOffset = _characterContentChunkTable.add(_charBuffer, _charBufferLength);
+                        _characters = _characterContentChunkTable._array;
+                    } else {
+                        _characters = _charBuffer;
+                        _charactersOffset = 0;                        
                     }
-                    
-                    _characters = _charBuffer;
-                    _charactersOffset = 0;
-                    _charactersLength = _charBufferLength;
                     return _eventType = CHARACTERS;
                 }
                 case DecoderStateTables.CII_EA:
@@ -415,20 +372,22 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 case DecoderStateTables.CII_INDEX_SMALL:
                 {
                     final int index = b & EncodingConstants.INTEGER_4TH_BIT_SMALL_MASK;
+                    _characterContentChunkTable._cachedIndex = index;
                     
                     _characters = _characterContentChunkTable._array;
                     _charactersOffset = _characterContentChunkTable._offset[index];
-                    _charactersLength = _characterContentChunkTable._length[index];
+                    _charBufferLength = _characterContentChunkTable._length[index];
                     return _eventType = CHARACTERS;
                 }
                 case DecoderStateTables.CII_INDEX_MEDIUM:
                 {
                     final int index = (((b & EncodingConstants.INTEGER_4TH_BIT_MEDIUM_MASK) << 8) | read())
                             + EncodingConstants.INTEGER_4TH_BIT_SMALL_LIMIT;
+                    _characterContentChunkTable._cachedIndex = index;
                     
                     _characters = _characterContentChunkTable._array;
                     _charactersOffset = _characterContentChunkTable._offset[index];
-                    _charactersLength = _characterContentChunkTable._length[index];
+                    _charBufferLength = _characterContentChunkTable._length[index];
                     return _eventType = CHARACTERS;
                 }
                 case DecoderStateTables.CII_INDEX_LARGE:
@@ -437,10 +396,11 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                             (read() << 8) |
                             read())
                             + EncodingConstants.INTEGER_4TH_BIT_MEDIUM_LIMIT;
+                    _characterContentChunkTable._cachedIndex = index;
                     
                     _characters = _characterContentChunkTable._array;
                     _charactersOffset = _characterContentChunkTable._offset[index];
-                    _charactersLength = _characterContentChunkTable._length[index];
+                    _charBufferLength = _characterContentChunkTable._length[index];
                     return _eventType = CHARACTERS;
                 }
                 case DecoderStateTables.CII_INDEX_LARGE_LARGE:
@@ -449,10 +409,11 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                             (read() << 8) |
                             read())
                             + EncodingConstants.INTEGER_4TH_BIT_LARGE_LIMIT;
+                    _characterContentChunkTable._cachedIndex = index;
                     
                     _characters = _characterContentChunkTable._array;
                     _charactersOffset = _characterContentChunkTable._offset[index];
-                    _charactersLength = _characterContentChunkTable._length[index];
+                    _charBufferLength = _characterContentChunkTable._length[index];
                     return _eventType = CHARACTERS;
                 }
                 case DecoderStateTables.COMMENT_II:
@@ -463,17 +424,9 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                     return _eventType;
                 case DecoderStateTables.UNEXPANDED_ENTITY_REFERENCE_II:
                 {
-                    /*
-                     * TODO
-                     * How does StAX report such events?
-                     */
-                    String entity_reference_name = decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherNCName);
-                    
-                    String system_identifier = ((b & EncodingConstants.UNEXPANDED_ENTITY_SYSTEM_IDENTIFIER_FLAG) > 0)
-                    ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
-                    String public_identifier = ((b & EncodingConstants.UNEXPANDED_ENTITY_PUBLIC_IDENTIFIER_FLAG) > 0)
-                    ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
-                    return _eventType;
+                    processUnexpandedEntityReference(b);
+                    // Skip the reference
+                    return next();
                 }
                 case DecoderStateTables.TERMINATOR_DOUBLE:
                     if (_stackCount != -1) {
@@ -517,6 +470,28 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         }
     }
     
+    private final void processUtf8CharacterString(final int b) throws IOException {
+        decodeUtf8StringAsCharBuffer();
+        if ((b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
+            _charactersOffset = _characterContentChunkTable.add(_charBuffer, _charBufferLength);
+            _characters = _characterContentChunkTable._array;
+        } else {
+            _characters = _charBuffer;
+            _charactersOffset = 0;
+        }
+    }
+    
+    private final void processUtf16CharacterString(final int b) throws IOException {
+        decodeUtf16StringAsCharBuffer();
+        if ((b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
+            _charactersOffset = _characterContentChunkTable.add(_charBuffer, _charBufferLength);
+            _characters = _characterContentChunkTable._array;
+        } else {
+            _characters = _charBuffer;
+            _charactersOffset = 0;
+        }
+    }
+        
     private final void popStack() {
         // Pop information off the stack
         _qualifiedName = _qNameStack[_stackCount];
@@ -800,10 +775,12 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         if (_characters == null) {
             checkTextState();
         }
-        
-        return new String(_characters,
-                _charactersOffset,
-                _charactersLength);
+
+        if (_characters == _characterContentChunkTable._array) {
+            return _characterContentChunkTable.getString(_characterContentChunkTable._cachedIndex);
+        } else {
+            return new String(_characters, _charactersOffset, _charBufferLength);
+        }
     }
     
     public final char[] getTextCharacters() {
@@ -827,7 +804,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
             checkTextState();
         }
         
-        return _charactersLength;
+        return _charBufferLength;
     }
     
     public final int getTextCharacters(int sourceStart, char[] target,
@@ -1474,7 +1451,6 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 
                 _characters = _charBuffer;
                 _charactersOffset = 0;
-                _charactersLength = _charBufferLength;
                 break;
             case NISTRING_ENCODING_ALGORITHM:
                 throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.commentIIAlgorithmNotSupported"));
@@ -1483,12 +1459,12 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 
                 _characters = ca.ch;
                 _charactersOffset = ca.start;
-                _charactersLength = ca.length;
+                _charBufferLength = ca.length;
                 break;
             case NISTRING_EMPTY_STRING:
                 _characters = _charBuffer;
                 _charactersOffset = 0;
-                _charactersLength = 0;
+                _charBufferLength = 0;
                 break;
         }
     }
@@ -1514,6 +1490,21 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 _piData = "";
                 break;
         }
+    }
+    
+    protected final void processUnexpandedEntityReference(final int b) throws FastInfosetException, IOException {
+        _eventType = ENTITY_REFERENCE;
+        
+        /*
+         * TODO
+         * How does StAX report such events?
+         */
+        String entity_reference_name = decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherNCName);
+
+        String system_identifier = ((b & EncodingConstants.UNEXPANDED_ENTITY_SYSTEM_IDENTIFIER_FLAG) > 0)
+        ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
+        String public_identifier = ((b & EncodingConstants.UNEXPANDED_ENTITY_PUBLIC_IDENTIFIER_FLAG) > 0)
+        ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
     }
     
     protected final void processCIIEncodingAlgorithm() throws FastInfosetException, IOException {
@@ -1569,7 +1560,6 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
             
             _characters = _charBuffer;
             _charactersOffset = 0;
-            _charactersLength = _charBufferLength;
             return;
         } else if (_algorithmId >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
             final EncodingAlgorithm ea = (EncodingAlgorithm)_registeredEncodingAlgorithms.get(_algorithmURI);
@@ -1585,7 +1575,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         _characters = new char[buffer.length()];
         buffer.getChars(0, buffer.length(), _characters, 0);
         _charactersOffset = 0;
-        _charactersLength = _characters.length;                    
+        _charBufferLength = _characters.length;                    
     }
     
     protected class NamespaceContextImpl implements NamespaceContext {
