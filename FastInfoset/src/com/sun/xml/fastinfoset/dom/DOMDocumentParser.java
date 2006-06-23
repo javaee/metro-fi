@@ -158,7 +158,8 @@ public class DOMDocumentParser extends Decoder {
                 case DecoderStateTables.EII_LITERAL:
                 {
                     final QualifiedName qn = processLiteralQualifiedName(
-                                _b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK);
+                                _b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK,
+                                _elementNameTable.getNext());
                     _elementNameTable.add(qn);
                     processEII(qn, (_b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
                     firstElementHasOccured = true;
@@ -346,7 +347,8 @@ public class DOMDocumentParser extends Decoder {
                 case DecoderStateTables.EII_LITERAL:
                 {
                     final QualifiedName qn = processLiteralQualifiedName(
-                                _b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK);
+                                _b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK,
+                                _elementNameTable.getNext());
                     _elementNameTable.add(qn);
                     processEII(qn, (_b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
                     break;
@@ -358,23 +360,13 @@ public class DOMDocumentParser extends Decoder {
                 {
                     _octetBufferLength = (_b & EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_MASK) 
                         + 1;
-                    String v = decodeUtf8StringAsString();
-                    if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _characterContentChunkTable.add(_charBuffer, _charBufferLength);
-                    }
-                    
-                    _currentNode.appendChild(_document.createTextNode(v));
+                    processUtf8CharacterString();
                     break;
                 }
                 case DecoderStateTables.CII_UTF8_MEDIUM_LENGTH:
                 {
                     _octetBufferLength = read() + EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_LIMIT;
-                    String v = decodeUtf8StringAsString();
-                    if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _characterContentChunkTable.add(_charBuffer, _charBufferLength);
-                    }
-                    
-                    _currentNode.appendChild(_document.createTextNode(v));
+                    processUtf8CharacterString();
                     break;
                 }
                 case DecoderStateTables.CII_UTF8_LARGE_LENGTH:
@@ -384,12 +376,7 @@ public class DOMDocumentParser extends Decoder {
                         (read() << 8) |
                         read();
                     _octetBufferLength += EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_MEDIUM_LIMIT;
-                    String v = decodeUtf8StringAsString();
-                    if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _characterContentChunkTable.add(_charBuffer, _charBufferLength);
-                    }
-                    
-                    _currentNode.appendChild(_document.createTextNode(v));
+                    processUtf8CharacterString();
                     break;
                 }
                 case DecoderStateTables.CII_UTF16_SMALL_LENGTH:
@@ -537,6 +524,21 @@ public class DOMDocumentParser extends Decoder {
         _currentNode = parentCurrentNode;
     }
 
+    private final void processUtf8CharacterString() throws FastInfosetException, IOException {
+        if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
+            _characterContentChunkTable.ensureSize(_octetBufferLength);
+            final int charactersOffset = _characterContentChunkTable._arrayIndex;
+            decodeUtf8StringAsCharBuffer(_characterContentChunkTable._array, charactersOffset);
+            _characterContentChunkTable.add(_charBufferLength);
+            _currentNode.appendChild(_document.createTextNode(
+                    _characterContentChunkTable.getString(_characterContentChunkTable._cachedIndex)));
+        } else {
+            decodeUtf8StringAsCharBuffer();
+            _currentNode.appendChild(_document.createTextNode(
+                    new String(_charBuffer, 0, _charBufferLength)));
+        }
+    }
+    
     protected final void processEIIWithNamespaces() throws FastInfosetException, IOException {
         final boolean hasAttributes = (_b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0;
 
@@ -637,7 +639,8 @@ public class DOMDocumentParser extends Decoder {
             case DecoderStateTables.EII_LITERAL:
             {
                 final QualifiedName qn = processLiteralQualifiedName(
-                            _b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK);
+                            _b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK,
+                            _elementNameTable.getNext());
                 _elementNameTable.add(qn);
                 processEII(qn, hasAttributes);
                 break;
@@ -653,7 +656,51 @@ public class DOMDocumentParser extends Decoder {
         
     }
 
-    protected final QualifiedName processLiteralQualifiedName(int state) throws FastInfosetException, IOException {
+    protected final QualifiedName processLiteralQualifiedName(int state, QualifiedName q)
+    throws FastInfosetException, IOException {
+        if (q == null) q = new QualifiedName();
+        
+        switch (state) {
+            // no prefix, no namespace
+            case 0:
+                return q.set(
+                        null, 
+                        null, 
+                        decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName),
+                        -1,
+                        -1,
+                        _identifier,
+                        null);
+            // no prefix, namespace
+            case 1:
+                return q.set(
+                        null,
+                        decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(false), 
+                        decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName),
+                        -1,
+                        _namespaceNameIndex,
+                        _identifier,
+                        null);
+            // prefix, no namespace
+            case 2:
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.qNameMissingNamespaceName"));
+            // prefix, namespace
+            case 3:
+                return q.set(
+                        decodeIdentifyingNonEmptyStringIndexOnFirstBitAsPrefix(true), 
+                        decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(true), 
+                        decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName),
+                        _prefixIndex,
+                        _namespaceNameIndex, 
+                        _identifier,
+                        _charBuffer);
+            default:
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.decodingEII"));                
+        }        
+    }
+
+    protected final QualifiedName processLiteralQualifiedName(int state)
+    throws FastInfosetException, IOException {
         switch (state) {
             // no prefix, no namespace
             case 0:
@@ -692,7 +739,7 @@ public class DOMDocumentParser extends Decoder {
                 throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.decodingEII"));                
         }        
     }
-
+    
     protected final void processAIIs() throws FastInfosetException, IOException {
         QualifiedName name;
         int b;
@@ -725,7 +772,8 @@ public class DOMDocumentParser extends Decoder {
                 }
                 case DecoderStateTables.AII_LITERAL:
                     name = processLiteralQualifiedName(
-                            b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK);
+                            b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK,
+                            _attributeNameTable.getNext());
                     name.createAttributeValues(_duplicateAttributeVerifier.MAP_SIZE);
                     _attributeNameTable.add(name);
                     break;

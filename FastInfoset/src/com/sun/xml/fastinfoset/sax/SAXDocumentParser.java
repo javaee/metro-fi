@@ -474,7 +474,8 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 case DecoderStateTables.EII_LITERAL:
                 {
                     final QualifiedName qn = decodeLiteralQualifiedName(
-                                _b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK);
+                                _b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK,
+                                _elementNameTable.getNext());
                     _elementNameTable.add(qn);
                     processEII(qn, (_b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
                     firstElementHasOccured = true;
@@ -677,7 +678,8 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 case DecoderStateTables.EII_LITERAL:
                 {
                     final QualifiedName qn = decodeLiteralQualifiedName(
-                                _b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK);
+                                _b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK,
+                                _elementNameTable.getNext());
                     _elementNameTable.add(qn);
                     processEII(qn, (_b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
                     break;
@@ -688,29 +690,11 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 case DecoderStateTables.CII_UTF8_SMALL_LENGTH:
                     _octetBufferLength = (_b & EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_MASK)
                     + 1;
-                    decodeUtf8StringAsCharBuffer();
-                    if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _characterContentChunkTable.add(_charBuffer, _charBufferLength);
-                    }
-                    
-                    try {
-                        _contentHandler.characters(_charBuffer, 0, _charBufferLength);
-                    } catch (SAXException e) {
-                        throw new FastInfosetException("processCII", e);
-                    }
+                    processUtf8CharacterString();
                     break;
                 case DecoderStateTables.CII_UTF8_MEDIUM_LENGTH:
                     _octetBufferLength = read() + EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_LIMIT;
-                    decodeUtf8StringAsCharBuffer();
-                    if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _characterContentChunkTable.add(_charBuffer, _charBufferLength);
-                    }
-                    
-                    try {
-                        _contentHandler.characters(_charBuffer, 0, _charBufferLength);
-                    } catch (SAXException e) {
-                        throw new FastInfosetException("processCII", e);
-                    }
+                    processUtf8CharacterString();
                     break;
                 case DecoderStateTables.CII_UTF8_LARGE_LENGTH:
                     _octetBufferLength = ((read() << 24) |
@@ -718,16 +702,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                             (read() << 8) |
                             read())
                             + EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_MEDIUM_LIMIT;
-                    decodeUtf8StringAsCharBuffer();
-                    if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-                        _characterContentChunkTable.add(_charBuffer, _charBufferLength);
-                    }
-                    
-                    try {
-                        _contentHandler.characters(_charBuffer, 0, _charBufferLength);
-                    } catch (SAXException e) {
-                        throw new FastInfosetException("processCII", e);
-                    }
+                    processUtf8CharacterString();
                     break;
                 case DecoderStateTables.CII_UTF16_SMALL_LENGTH:
                     _octetBufferLength = (_b & EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_MASK)
@@ -919,6 +894,27 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         }
     }
     
+    private final void processUtf8CharacterString() throws FastInfosetException, IOException {
+        if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
+            _characterContentChunkTable.ensureSize(_octetBufferLength);
+            final int charactersOffset = _characterContentChunkTable._arrayIndex;
+            decodeUtf8StringAsCharBuffer(_characterContentChunkTable._array, charactersOffset);
+            _characterContentChunkTable.add(_charBufferLength);
+            try {
+                _contentHandler.characters(_characterContentChunkTable._array, charactersOffset, _charBufferLength);
+            } catch (SAXException e) {
+                throw new FastInfosetException("processCII", e);
+            }
+        } else {
+            decodeUtf8StringAsCharBuffer();
+            try {
+                _contentHandler.characters(_charBuffer, 0, _charBufferLength);
+            } catch (SAXException e) {
+                throw new FastInfosetException("processCII", e);
+            }
+        }
+    }
+    
     protected final void processEIIWithNamespaces() throws FastInfosetException, IOException {
         final boolean hasAttributes = (_b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0;
         
@@ -1015,7 +1011,8 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             case DecoderStateTables.EII_LITERAL:
             {
                 final QualifiedName qn = decodeLiteralQualifiedName(
-                            _b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK);
+                            _b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK,
+                            _elementNameTable.getNext());
                 _elementNameTable.add(qn);
                 processEII(qn, hasAttributes);
                 break;
@@ -1072,7 +1069,8 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 }
                 case DecoderStateTables.AII_LITERAL:
                     name = decodeLiteralQualifiedName(
-                            b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK);
+                            b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK,
+                            _attributeNameTable.getNext());
                     name.createAttributeValues(_duplicateAttributeVerifier.MAP_SIZE);
                     _attributeNameTable.add(name);
                     break;

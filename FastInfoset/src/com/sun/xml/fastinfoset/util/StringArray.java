@@ -46,17 +46,20 @@ public class StringArray extends ValueArray {
     
     private StringArray _readOnlyArray;
 
-    public StringArray(int initialCapacity, int maximumCapacity) {
+    private boolean _clear;
+    
+    public StringArray(int initialCapacity, int maximumCapacity, boolean clear) {
         _array = new String[initialCapacity];
         _maximumCapacity = maximumCapacity;
+        _clear = clear;
     }
 
     public StringArray() {
-        this(DEFAULT_CAPACITY, MAXIMUM_CAPACITY);
+        this(DEFAULT_CAPACITY, MAXIMUM_CAPACITY, false);
     }
 
     public final void clear() {
-        for (int i = _readOnlyArraySize; i < _size; i++) {
+        if (_clear) for (int i = _readOnlyArraySize; i < _size; i++) {
             _array[i] = null;
         }
         _size = _readOnlyArraySize;

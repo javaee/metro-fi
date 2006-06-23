@@ -670,11 +670,13 @@ public abstract class Decoder implements FastInfosetParser {
         return _v.elementName._array[i];
     }
 
-    protected final QualifiedName decodeLiteralQualifiedName(int state) throws FastInfosetException, IOException {
+    protected final QualifiedName decodeLiteralQualifiedName(int state, QualifiedName q) 
+    throws FastInfosetException, IOException {
+        if (q == null) q = new QualifiedName();
         switch (state) {
             // no prefix, no namespace
             case 0:
-                return new QualifiedName(
+                return q.set(
                         "", 
                         "", 
                         decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName),
@@ -684,7 +686,7 @@ public abstract class Decoder implements FastInfosetParser {
                         null);
             // no prefix, namespace
             case 1:
-                return new QualifiedName(
+                return q.set(
                         "",
                         decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(false), 
                         decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName),
@@ -697,7 +699,7 @@ public abstract class Decoder implements FastInfosetParser {
                 throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.qNameMissingNamespaceName"));
             // prefix, namespace
             case 3:
-                return new QualifiedName(
+                return q.set(
                         decodeIdentifyingNonEmptyStringIndexOnFirstBitAsPrefix(true), 
                         decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(true), 
                         decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName),
@@ -1347,6 +1349,11 @@ public abstract class Decoder implements FastInfosetParser {
         decodeUtf8StringIntoCharBuffer();
     }
 
+    protected final void decodeUtf8StringAsCharBuffer(char[] ch, int offset) throws IOException {
+        ensureOctetBufferSize();
+        decodeUtf8StringIntoCharBuffer(ch, offset);
+    }
+    
     protected final String decodeUtf8StringAsString() throws IOException {
         decodeUtf8StringAsCharBuffer();
         return new String(_charBuffer, 0, _charBufferLength);
@@ -1423,6 +1430,21 @@ public abstract class Decoder implements FastInfosetParser {
         }        
     }
 
+    protected final void decodeUtf8StringIntoCharBuffer(char[] ch, int offset) throws IOException {
+        _charBufferLength = offset;
+        final int end = _octetBufferLength + _octetBufferOffset;
+        int b1;
+        while (end != _octetBufferOffset) {
+            b1 = _octetBuffer[_octetBufferOffset++] & 0xFF;
+            if (DecoderStateTables.UTF8[b1] == DecoderStateTables.UTF8_ONE_BYTE) {
+                ch[_charBufferLength++] = (char) b1;
+            } else {
+                decodeTwoToFourByteUtf8Character(ch, b1, end);
+            }
+        }
+        _charBufferLength -= offset;
+    }
+    
     private void decodeTwoToFourByteUtf8Character(int b1, int end) throws IOException {
         switch(DecoderStateTables.UTF8[b1]) {
             case DecoderStateTables.UTF8_TWO_BYTES:
@@ -1458,6 +1480,51 @@ public abstract class Decoder implements FastInfosetParser {
                 if (XMLChar.isContent(supplemental)) {
                     _charBuffer[_charBufferLength++] = _utf8_highSurrogate;
                     _charBuffer[_charBufferLength++] = _utf8_lowSurrogate;
+                } else {
+                    decodeUtf8StringIllegalState();
+                }
+                break;
+            }
+            default:
+                decodeUtf8StringIllegalState();
+        }
+    }
+    
+    private void decodeTwoToFourByteUtf8Character(char ch[], int b1, int end) throws IOException {
+        switch(DecoderStateTables.UTF8[b1]) {
+            case DecoderStateTables.UTF8_TWO_BYTES:
+            {
+                // Decode byte 2
+                if (end == _octetBufferOffset) {
+                    decodeUtf8StringLengthTooSmall();
+                }
+                final int b2 = _octetBuffer[_octetBufferOffset++] & 0xFF;
+                if ((b2 & 0xC0) != 0x80) {
+                    decodeUtf8StringIllegalState();
+                }
+
+                // Character guaranteed to be in [0x20, 0xD7FF] range
+                // since a character encoded in two bytes will be in the 
+                // range [0x80, 0x1FFF]
+                ch[_charBufferLength++] = (char) (
+                    ((b1 & 0x1F) << 6)
+                    | (b2 & 0x3F));
+                break;
+            }
+            case DecoderStateTables.UTF8_THREE_BYTES:
+                final char c = decodeUtf8ThreeByteChar(end, b1);
+                if (XMLChar.isContent(c)) {
+                    ch[_charBufferLength++] = c;
+                    break;
+                } else {
+                    decodeUtf8StringIllegalState();
+                }
+            case DecoderStateTables.UTF8_FOUR_BYTES:
+            {
+                final int supplemental = decodeUtf8FourByteChar(end, b1);
+                if (XMLChar.isContent(supplemental)) {
+                    ch[_charBufferLength++] = _utf8_highSurrogate;
+                    ch[_charBufferLength++] = _utf8_lowSurrogate;
                 } else {
                     decodeUtf8StringIllegalState();
                 }

@@ -58,9 +58,6 @@ public class QualifiedNameArray extends ValueArray {
     }
     
     public final void clear() {
-        for (int i = _readOnlyArraySize; i < _size; i++) {
-            _array[i] = null;
-        }
         _size = _readOnlyArraySize;
     }
 
@@ -102,8 +99,8 @@ public class QualifiedNameArray extends ValueArray {
         }
     }
  
-    public final QualifiedName get(int i) {
-        return _array[i];
+    public final QualifiedName getNext() {
+        return (_size == _array.length) ? null : _array[_size];
     }
     
     public final void add(QualifiedName s) {

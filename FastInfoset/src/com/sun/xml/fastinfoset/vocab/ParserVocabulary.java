@@ -90,7 +90,7 @@ public class ParserVocabulary extends Vocabulary {
     }
     
     public final CharArrayArray restrictedAlphabet = new CharArrayArray(ValueArray.DEFAULT_CAPACITY, 256);
-    public final StringArray encodingAlgorithm = new StringArray(ValueArray.DEFAULT_CAPACITY, 256);
+    public final StringArray encodingAlgorithm = new StringArray(ValueArray.DEFAULT_CAPACITY, 256, true);
 
     public final StringArray namespaceName;
     public final PrefixArray prefix;
@@ -111,12 +111,12 @@ public class ParserVocabulary extends Vocabulary {
     
     /** Creates a new instance of ParserVocabulary */
     public ParserVocabulary() {
-        namespaceName = new StringArray(ValueArray.DEFAULT_CAPACITY, IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS);
+        namespaceName = new StringArray(ValueArray.DEFAULT_CAPACITY, IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS, false);
         prefix = new PrefixArray(ValueArray.DEFAULT_CAPACITY, IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS);
-        localName = new StringArray(ValueArray.DEFAULT_CAPACITY, IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS);
-        otherNCName = new StringArray(ValueArray.DEFAULT_CAPACITY, IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS);
-        otherURI = new StringArray(ValueArray.DEFAULT_CAPACITY, IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS);
-        attributeValue = new StringArray(ValueArray.DEFAULT_CAPACITY, NON_IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS);
+        localName = new StringArray(ValueArray.DEFAULT_CAPACITY, IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS, false);
+        otherNCName = new StringArray(ValueArray.DEFAULT_CAPACITY, IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS, false);
+        otherURI = new StringArray(ValueArray.DEFAULT_CAPACITY, IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS, true);
+        attributeValue = new StringArray(ValueArray.DEFAULT_CAPACITY, NON_IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS, true);
         otherString = new CharArrayArray(ValueArray.DEFAULT_CAPACITY, NON_IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS);
 
         characterContentChunk = new ContiguousCharArrayArray(ValueArray.DEFAULT_CAPACITY, 

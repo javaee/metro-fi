@@ -290,7 +290,8 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 case DecoderStateTables.EII_LITERAL:
                 {
                     final QualifiedName qn = processLiteralQualifiedName(
-                                b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK);
+                                b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK,
+                            _elementNameTable.getNext());
                     _elementNameTable.add(qn);
                     processEII(qn, (b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
                     return _eventType;
@@ -471,11 +472,14 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     }
     
     private final void processUtf8CharacterString(final int b) throws IOException {
-        decodeUtf8StringAsCharBuffer();
         if ((b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
-            _charactersOffset = _characterContentChunkTable.add(_charBuffer, _charBufferLength);
+            _characterContentChunkTable.ensureSize(_octetBufferLength);
             _characters = _characterContentChunkTable._array;
+            _charactersOffset = _characterContentChunkTable._arrayIndex;
+            decodeUtf8StringAsCharBuffer(_characterContentChunkTable._array, _charactersOffset);
+            _characterContentChunkTable.add(_charBufferLength);
         } else {
+            decodeUtf8StringAsCharBuffer();
             _characters = _charBuffer;
             _charactersOffset = 0;
         }
@@ -1142,7 +1146,8 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
             case DecoderStateTables.EII_LITERAL:
             {
                 final QualifiedName qn = processLiteralQualifiedName(
-                            b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK);
+                            b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK,
+                        _elementNameTable.getNext());
                 _elementNameTable.add(qn);
                 processEII(qn, hasAttributes);
                 break;
@@ -1223,7 +1228,8 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 }
                 case DecoderStateTables.AII_LITERAL:
                     name = processLiteralQualifiedName(
-                            b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK);
+                            b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK,
+                            _attributeNameTable.getNext());
                     name.createAttributeValues(_duplicateAttributeVerifier.MAP_SIZE);
                     _attributeNameTable.add(name);
                     break;
@@ -1397,11 +1403,14 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         return _elementNameTable._array[i];
     }
     
-    protected final QualifiedName processLiteralQualifiedName(int state) throws FastInfosetException, IOException {
+    protected final QualifiedName processLiteralQualifiedName(int state, QualifiedName q) 
+    throws FastInfosetException, IOException {
+        if (q == null) q = new QualifiedName();
+        
         switch (state) {
             // no prefix, no namespace
             case 0:
-                return new QualifiedName(
+                return q.set(
                         "", 
                         "", 
                         decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName),
@@ -1412,7 +1421,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                         _identifier);
             // no prefix, namespace
             case 1:
-                return new QualifiedName(
+                return q.set(
                         "",
                         decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(false), 
                         decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName),
@@ -1426,7 +1435,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
                 throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.qNameMissingNamespaceName"));
             // prefix, namespace
             case 3:
-                return new QualifiedName(
+                return q.set(
                         decodeIdentifyingNonEmptyStringIndexOnFirstBitAsPrefix(true), 
                         decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(true), 
                         decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName),

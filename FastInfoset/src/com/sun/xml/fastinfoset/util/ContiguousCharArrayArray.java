@@ -161,6 +161,24 @@ public class ContiguousCharArrayArray extends ValueArray {
         return _cachedStrings[i] = new String(_array, _offset[i], _length[i]);
     }
     
+    public final void ensureSize(int l) {
+        if (_arrayIndex + l >= _array.length) {
+            resizeArray(_arrayIndex + l);
+        }        
+    }
+    
+    public final void add(int l) {
+        if (_size == _offset.length) {
+            resize();
+        }
+        
+        _cachedIndex = _size;
+        _offset[_size] = _arrayIndex;
+        _length[_size++] = l;
+                
+        _arrayIndex += l;
+    }
+    
     public final int add(char[] c, int l) {
         if (_size == _offset.length) {
             resize();
