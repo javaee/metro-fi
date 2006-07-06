@@ -144,11 +144,13 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     
     public StAXDocumentParser() {
         reset();
+        _manager = new StAXManager(StAXManager.CONTEXT_READER);
     }
     
     public StAXDocumentParser(InputStream s) {
         this();
         setInputStream(s);
+        _manager = new StAXManager(StAXManager.CONTEXT_READER);
     }
     
     public StAXDocumentParser(InputStream s, StAXManager manager) {

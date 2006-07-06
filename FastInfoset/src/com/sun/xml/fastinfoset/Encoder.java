@@ -484,6 +484,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     protected final void encodeTermination() throws IOException {
         if (_terminate) {
             write(_b);
+            _b = 0;
             _terminate = false;
         }
     }

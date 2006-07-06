@@ -115,11 +115,13 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
     
     public StAXDocumentSerializer() {
         super(true);
+        _manager = new StAXManager(StAXManager.CONTEXT_WRITER);
     }
     
     public StAXDocumentSerializer(OutputStream outputStream) {
         super(true);
         setOutputStream(outputStream);
+        _manager = new StAXManager(StAXManager.CONTEXT_WRITER);
     }
 
     public StAXDocumentSerializer(OutputStream outputStream, StAXManager manager) {
