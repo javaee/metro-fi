@@ -52,6 +52,16 @@ import java.util.Map;
  */
 public interface FastInfosetSerializer {
     /**
+     * The feature to ignore the document type declaration and the 
+     * internal subset.
+     * <p>
+     * The default value is false. If true a serializer shall ignore document
+     * type declaration and the internal subset.
+     */
+    public static final String IGNORE_DTD_FEATURE = 
+        "http://jvnet.org/fastinfoset/serializer/feature/ignore/DTD";
+    
+    /**
      * The feature to ignore comments.
      * <p>
      * The default value is false. If true a serializer shall ignore comments
@@ -123,6 +133,18 @@ public interface FastInfosetSerializer {
      * The character encoding scheme string for UTF-16BE.
      */
     public static final String UTF_16BE = "UTF-16BE";
+    
+    /**
+     * Set the {@link #IGNORE_DTD_FEATURE}.
+     * @param ignoreDTD true if the feature shall be ignored.
+     */
+    public void setIgnoreDTD(boolean ignoreDTD);
+    
+    /**
+     * Get the {@link #IGNORE_DTD_FEATURE}.
+     * @return true if the feature is ignored, false otherwise.
+     */
+    public boolean getIgnoreDTD();
     
     /**
      * Set the {@link #IGNORE_COMMENTS_FEATURE}.

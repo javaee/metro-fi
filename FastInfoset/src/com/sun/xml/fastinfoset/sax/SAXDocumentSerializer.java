@@ -52,7 +52,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
 
-
 /**
  * The Fast Infoset SAX serializer.
  * <p>
@@ -208,7 +207,7 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
         try {
             encodeElementTermination();
         } catch (IOException e) {
-            throw new SAXException("startElement", e);
+            throw new SAXException("endElement", e);
         }
     }
 
@@ -288,6 +287,16 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
     }
 
     public final void startDTD(String name, String publicId, String systemId) throws SAXException {
+        if (getIgnoreDTD()) return;
+        
+        try {
+            encodeTermination();
+            
+            encodeDocumentTypeDeclaration(publicId, systemId);
+            encodeElementTermination();
+        } catch (IOException e) {
+            throw new SAXException("startDTD", e);
+        }
     }
 
     public final void endDTD() throws SAXException {
@@ -299,9 +308,9 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
     public final void endEntity(String name) throws SAXException {
     }
 
-
+    
     // EncodingAlgorithmContentHandler
-
+    
     public final void octets(String URI, int id, byte[] b, int start, int length)  throws SAXException {
         if (length <= 0) {
             return;

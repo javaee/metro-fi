@@ -106,6 +106,11 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     }
 
     /**
+     * True if DTD and internal subset shall be ignored.
+     */
+    private boolean _ignoreDTD;
+    
+    /**
      * True if comments shall be ignored.
      */
     private boolean _ignoreComments;
@@ -228,6 +233,20 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     
     
     // FastInfosetSerializer interface
+    
+    /**
+     * {@inheritDoc}
+     */
+    public final void setIgnoreDTD(boolean ignoreDTD) {
+        _ignoreDTD = ignoreDTD;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public final boolean getIgnoreDTD() {
+        return _ignoreDTD;
+    }
     
     /**
      * {@inheritDoc}
@@ -625,6 +644,30 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         encodeNonIdentifyingStringOnFirstBit(data, _v.otherString, addToTable);
     }
 
+    /**
+     * Encode a Document Type Declaration.
+     *
+     * @param systemId the system identifier of the external subset.
+     * @param publicId the public identifier of the external subset.
+     */
+    protected final void encodeDocumentTypeDeclaration(String systemId, String publicId) throws IOException {
+        _b = EncodingConstants.DOCUMENT_TYPE_DECLARATION;
+        if (systemId != null && systemId.length() > 0) {
+            _b |= EncodingConstants.DOCUMENT_TYPE_SYSTEM_IDENTIFIER_FLAG;
+        }
+        if (publicId != null && publicId.length() > 0) {
+            _b |= EncodingConstants.DOCUMENT_TYPE_PUBLIC_IDENTIFIER_FLAG;
+        }
+        write(_b);
+        
+        if (systemId != null && systemId.length() > 0) {
+            encodeIdentifyingNonEmptyStringOnFirstBit(systemId, _v.otherURI);
+        }
+        if (publicId != null && publicId.length() > 0) {
+            encodeIdentifyingNonEmptyStringOnFirstBit(publicId, _v.otherURI);
+        }        
+    }
+    
     /**
      * Encode a Comment Information Item.
      *

@@ -522,8 +522,8 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                         _terminate = true;
                     }
                     
-                    _notations.clear();
-                    _unparsedEntities.clear();
+                    if (_notations != null) _notations.clear();
+                    if (_unparsedEntities != null) _unparsedEntities.clear();
                     /*
                      * TODO
                      * Report All events associated with DTD, PIs, notations etc
