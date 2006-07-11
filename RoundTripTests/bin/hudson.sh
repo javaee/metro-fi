@@ -9,7 +9,7 @@ export RESULT_HOME=${FIRTT_HOME}/report
 
 #.bashrc on fi.eastsource /projects/fws/.bashrc
 #source ${HOME}/.bashrc
-export PATH=${FIRTT_HOME}/bin:${FI_HOME}/bin:.:$PATH
+export PATH=${JAVA_HOME}/bin:${FIRTT_HOME}/bin:${FI_HOME}/bin:.:$PATH
 
 # Get sources from java.net, compile FastInfoset and RoundTripTests
 ant -f ${FI_HOME}/build-without-nb.xml clean dist
