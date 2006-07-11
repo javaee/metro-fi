@@ -12,6 +12,7 @@ export RESULT_HOME=${FIRTT_HOME}/report
 export PATH=${FIRTT_HOME}/bin:${FI_HOME}/bin:.:$PATH
 
 # Get sources from java.net, compile FastInfoset and RoundTripTests
+ant -f ${FI_HOME}/build-without-nb.xml clean dist
 ant -f ${FIRTT_HOME}/build-without-nb.xml dist
 
 chmod 755 ${FIRTT_HOME}/bin/*
