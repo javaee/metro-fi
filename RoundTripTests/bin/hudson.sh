@@ -26,3 +26,4 @@ cd ${FIRTT_HOME}/data/XBC/Docbook
 REPORT_XBC=xbc.html
 ${FIRTT_HOME}/bin/allRoundtripTests.sh ${REPORT_XBC}
 
+cleandiff.sh ${FIRTT_HOME}/data

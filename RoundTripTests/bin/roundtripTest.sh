@@ -43,7 +43,7 @@ reportname=$2
 for file in *
 do
     if [ -d "$file" ]; then
-        echo $file is directory
+        #echo $file is directory
         handle_dir "$file"
     else
         echo $file is file, perform Xerces test
@@ -51,7 +51,7 @@ do
     fi
 done 
 
+
 removeUnusedFiles.sh ent -d
 removeUnusedFiles.sh dtd -d
 
-cleandiff.sh
