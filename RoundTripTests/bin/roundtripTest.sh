@@ -46,7 +46,7 @@ do
         #echo $file is directory
         handle_dir "$file"
     else
-        echo $file is file, perform Xerces test
+        #echo $file is file, perform Xerces test
 #        handle_file "$file"
     fi
 done 
