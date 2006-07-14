@@ -18,11 +18,11 @@ ant -f ${FIRTT_HOME}/build-without-nb.xml dist
 chmod 755 ${FIRTT_HOME}/bin/*
 chmod 755 ${FI_HOME}/bin/*
 
-cd $FIRTT_HOME/data/xmlconf/eduni/errata-2e
+cd $FIRTT_HOME/data/xmlconf
 REPORT_TS=xmlts.html
 ${FIRTT_HOME}/bin/allRoundtripTests.sh ${REPORT_TS}
 
-cd ${FIRTT_HOME}/data/XBC/Docbook
+cd ${FIRTT_HOME}/data/XBC
 REPORT_XBC=xbc.html
 ${FIRTT_HOME}/bin/allRoundtripTests.sh ${REPORT_XBC}
 
