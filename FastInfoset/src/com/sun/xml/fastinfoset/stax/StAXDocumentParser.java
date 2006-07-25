@@ -983,6 +983,54 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
     }
     
 
+    /**
+     * Peek at the next event.
+     * 
+     * @return the event, which will be the same as that returned from 
+     *         {@link #next}.
+     */
+    public int peekNext() throws XMLStreamException {
+        try {
+            switch(DecoderStateTables.EII[peak()]) {
+                case DecoderStateTables.EII_NO_AIIS_INDEX_SMALL:
+                case DecoderStateTables.EII_AIIS_INDEX_SMALL:
+                case DecoderStateTables.EII_INDEX_MEDIUM:
+                case DecoderStateTables.EII_INDEX_LARGE:
+                case DecoderStateTables.EII_LITERAL:
+                case DecoderStateTables.EII_NAMESPACES:
+                    return START_ELEMENT;
+                case DecoderStateTables.CII_UTF8_SMALL_LENGTH:
+                case DecoderStateTables.CII_UTF8_MEDIUM_LENGTH:
+                case DecoderStateTables.CII_UTF8_LARGE_LENGTH:
+                case DecoderStateTables.CII_UTF16_SMALL_LENGTH:
+                case DecoderStateTables.CII_UTF16_MEDIUM_LENGTH:
+                case DecoderStateTables.CII_UTF16_LARGE_LENGTH:
+                case DecoderStateTables.CII_RA:
+                case DecoderStateTables.CII_EA:
+                case DecoderStateTables.CII_INDEX_SMALL:
+                case DecoderStateTables.CII_INDEX_MEDIUM:
+                case DecoderStateTables.CII_INDEX_LARGE:
+                case DecoderStateTables.CII_INDEX_LARGE_LARGE:
+                    return CHARACTERS;
+                case DecoderStateTables.COMMENT_II:
+                    return COMMENT;
+                case DecoderStateTables.PROCESSING_INSTRUCTION_II:
+                    return PROCESSING_INSTRUCTION;
+                case DecoderStateTables.UNEXPANDED_ENTITY_REFERENCE_II:
+                    return ENTITY_REFERENCE;
+                case DecoderStateTables.TERMINATOR_DOUBLE:
+                case DecoderStateTables.TERMINATOR_SINGLE:
+                    return (_stackCount != -1) ? END_ELEMENT : END_DOCUMENT;
+                default:
+                    throw new FastInfosetException(
+                            CommonResourceBundle.getInstance().getString("message.IllegalStateDecodingEII"));
+            }
+        } catch (IOException e) {
+            throw new XMLStreamException(e);
+        } catch (FastInfosetException e) {
+            throw new XMLStreamException(e);
+        }
+    }
     
     //
     
