@@ -76,6 +76,7 @@ public class QualifiedName {
         this.prefixIndex = 0;
         this.namespaceNameIndex = 0;        
         this.localNameIndex = -1;
+        this.qNameObject = null;
     }    
     
     public QualifiedName(String prefix, String namespaceName, String localName, String qName, int index) {
@@ -98,6 +99,7 @@ public class QualifiedName {
         this.prefixIndex = 0;
         this.namespaceNameIndex = 0;        
         this.localNameIndex = -1;
+        this.qNameObject = null;
         return this;
     }    
     
@@ -123,6 +125,7 @@ public class QualifiedName {
         this.prefixIndex = prefixIndex + 1;
         this.namespaceNameIndex = namespaceNameIndex + 1;
         this.localNameIndex = localNameIndex;
+        this.qNameObject = null;
         return this;
     }    
     
@@ -146,6 +149,7 @@ public class QualifiedName {
         this.prefixIndex = 0;
         this.namespaceNameIndex = 0;        
         this.localNameIndex = -1;
+        this.qNameObject = null;
         return this;
     }    
     
@@ -205,6 +209,7 @@ public class QualifiedName {
         this.namespaceNameIndex = namespaceNameIndex + 1;
         this.localNameIndex = localNameIndex;
         this.index = -1;
+        this.qNameObject = null;
         return this;
     }    
     
@@ -228,6 +233,7 @@ public class QualifiedName {
         this.prefixIndex = 0;
         this.namespaceNameIndex = 0;        
         this.localNameIndex = -1;
+        this.qNameObject = null;
         return this;
     }    
     
@@ -253,6 +259,7 @@ public class QualifiedName {
         this.prefixIndex = prefixIndex + 1;
         this.namespaceNameIndex = namespaceNameIndex + 1;
         this.localNameIndex = localNameIndex;
+        this.qNameObject = null;
         return this;
     }    
     
@@ -277,6 +284,7 @@ public class QualifiedName {
         this.prefixIndex = 0;
         this.namespaceNameIndex = 0;       
         this.localNameIndex = -1;
+        this.qNameObject = null;
         return this;
     }
     
