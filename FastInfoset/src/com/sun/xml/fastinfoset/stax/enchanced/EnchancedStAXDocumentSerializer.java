@@ -230,6 +230,8 @@ final public class EnchancedStAXDocumentSerializer extends StAXDocumentSerialize
         if (length == 0)
             return;
         
+        encodeTermination();
+        
         if (length < _charBuffer.length) {
             text.getChars(0, length, _charBuffer, 0);
             encodeCharacters(_charBuffer, 0, length);
