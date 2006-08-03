@@ -36,7 +36,7 @@
  *
  */
 
-package com.sun.xml.fastinfoset.stax.enchanced;
+package com.sun.xml.fastinfoset.stax.enhanced;
 
 import com.sun.xml.fastinfoset.EncodingConstants;
 import java.io.IOException;
@@ -47,11 +47,11 @@ import com.sun.xml.fastinfoset.stax.StAXDocumentSerializer;
 import com.sun.xml.fastinfoset.util.LocalNameQualifiedNamesMap;
 
 /**
- * Enchanced Fast Infoset StAX serializer.
+ * Enhanced Fast Infoset StAX serializer.
  * <p>
  * This class provides additional stream-based serialization methods for the
  * case where an application is in specific control of the serialization
- * process and has the knowledge to call the enchanced methods in the required
+ * process and has the knowledge to call the enhanced methods in the required
  * order.
  * <p>
  * For example, the application may be able to perform efficient information 
@@ -100,7 +100,7 @@ import com.sun.xml.fastinfoset.util.LocalNameQualifiedNamesMap;
  * to indexes as provided by the {@link StAXDocumentSerializer}. For such methods
  * it is the responsibility of the application to manage indexes.
  */
-final public class EnchancedStAXDocumentSerializer extends StAXDocumentSerializer {
+final public class EnhancedStAXDocumentSerializer extends StAXDocumentSerializer {
     
     /**
      * Initiate enhanced streaming of an element fragment.
