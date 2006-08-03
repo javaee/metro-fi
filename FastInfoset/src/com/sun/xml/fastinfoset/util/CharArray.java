@@ -36,7 +36,6 @@
  *
  */ 
 
-
 package com.sun.xml.fastinfoset.util;
 
 public class CharArray implements CharSequence {
@@ -90,6 +89,8 @@ public class CharArray implements CharSequence {
     }
 
     public static final int hashCode(char[] ch, int start, int length) {
+        // Same hash code algorithm as used for String
+        // s[0]*31^(n-1) + s[1]*31^(n-2) + ... + s[n-1]
         int hash = 0;
         for (int i = start; i < start + length; i++) {
             hash = 31*hash + ch[i];

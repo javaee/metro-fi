@@ -36,8 +36,8 @@
  *
  */ 
 
-
 package com.sun.xml.fastinfoset.util;
+
 import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class CharArrayIntMap extends KeyIntMap {

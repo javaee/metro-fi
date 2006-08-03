@@ -42,7 +42,8 @@ package com.sun.xml.fastinfoset.util;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class StringIntMap extends KeyIntMap {
-
+    protected static Entry NULL_ENTRY = new Entry(null, 0, -1, null);
+    
     protected StringIntMap _readOnlyMap;
     
     protected static class Entry extends BaseEntry {
@@ -56,7 +57,11 @@ public class StringIntMap extends KeyIntMap {
         }
     }
     
+    protected Entry _lastEntry = NULL_ENTRY;
+    
     protected Entry[] _table;
+    
+    protected int _index;
     
     public StringIntMap(int initialCapacity, float loadFactor) {
         super(initialCapacity, loadFactor);
@@ -76,7 +81,9 @@ public class StringIntMap extends KeyIntMap {
         for (int i = 0; i < _table.length; i++) {
             _table[i] = null;
         }
+        _lastEntry = NULL_ENTRY;
         _size = 0;
+        _index = _readOnlyMapSize;
     }
 
     public void setReadOnlyMap(KeyIntMap readOnlyMap, boolean clear) {
@@ -92,13 +99,19 @@ public class StringIntMap extends KeyIntMap {
         _readOnlyMap = readOnlyMap;
         if (_readOnlyMap != null) {
             _readOnlyMapSize = _readOnlyMap.size();
+            _index = _size + _readOnlyMapSize;
             
             if (clear) {
                 clear();
             }
         }  else {
             _readOnlyMapSize = 0;
+            _index = _size;
         }     
+    }
+    
+    public final int getNextIndex() {
+        return _index++;
     }
     
     public final int obtainIndex(String key) {
@@ -118,17 +131,20 @@ public class StringIntMap extends KeyIntMap {
             }
         }
 
-        addEntry(key, hash, _size + _readOnlyMapSize, tableIndex);        
+        addEntry(key, hash, tableIndex);        
         return NOT_PRESENT;
     }
 
     public final void add(String key) {
         final int hash = hashHash(key.hashCode());
         final int tableIndex = indexFor(hash, _table.length);
-        addEntry(key, hash, _size + _readOnlyMapSize, tableIndex);
+        addEntry(key, hash, tableIndex);
     }
 
     public final int get(String key) {
+        if (key == _lastEntry._key)
+            return _lastEntry._value;
+        
         return get(key, hashHash(key.hashCode()));
     }
     
@@ -143,6 +159,7 @@ public class StringIntMap extends KeyIntMap {
         final int tableIndex = indexFor(hash, _table.length);
         for (Entry e = _table[tableIndex]; e != null; e = e._next) {
             if (e._hash == hash && eq(key, e._key)) {
+                _lastEntry = e;
                 return e._value;
             }
         }
@@ -151,9 +168,9 @@ public class StringIntMap extends KeyIntMap {
     }
 
 
-    private final void addEntry(String key, int hash, int value, int bucketIndex) {
+    private final void addEntry(String key, int hash, int bucketIndex) {
 	Entry e = _table[bucketIndex];
-        _table[bucketIndex] = new Entry(key, hash, value, e);
+        _table[bucketIndex] = new Entry(key, hash, _index++, e);
         if (_size++ >= _threshold) {
             resize(2 * _table.length);
         }

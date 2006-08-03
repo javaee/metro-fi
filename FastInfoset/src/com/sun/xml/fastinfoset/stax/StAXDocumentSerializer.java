@@ -43,13 +43,10 @@ import com.sun.xml.fastinfoset.EncodingConstants;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.EmptyStackException;
-import java.util.Enumeration;
-import java.util.Iterator;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
-import org.xml.sax.helpers.NamespaceSupport;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 /**
@@ -97,15 +94,14 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
     protected String[] _attributesArray = new String[4 * 16];
     protected int _attributesArrayIndex = 0;
     
-    /**
-     * Mapping between uris and prefixes.
-     */
-    protected NamespaceSupport _nsSupport = new NamespaceSupport();
-    
     protected boolean[] _nsSupportContextStack = new boolean[32];
     protected int _stackCount = -1;    
     
-    protected NamespaceContext _nsContext = new NamespaceContextImpl();
+    /**
+     * Mapping between uris and prefixes.
+     */
+    protected NamespaceContextImplementation _nsContext = 
+            new NamespaceContextImplementation();
 
     /**
      * List of namespaces defined in the current element.
@@ -135,7 +131,8 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         
         _attributesArrayIndex = 0;
         _namespacesArrayIndex = 0;
-        _nsSupport.reset();
+        
+        _nsContext.reset();
         _stackCount = -1;
                 
         _currentUri = _currentPrefix = null;
@@ -232,7 +229,6 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         }
         
         _nsSupportContextStack[_stackCount] = false;
-        // _nsSupport.pushContext();
     }
     
     public void writeEmptyElement(String localName)
@@ -266,7 +262,6 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         }
         
         _nsSupportContextStack[_stackCount] = false;
-        //_nsSupport.pushContext();
     }
         
     public void writeEndElement() throws XMLStreamException {
@@ -277,7 +272,7 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         try {            
             encodeElementTermination();
             if (_nsSupportContextStack[_stackCount--] == true) {
-                _nsSupport.popContext();
+                _nsContext.popContext();
             }
         }
         catch (IOException e) {
@@ -302,7 +297,7 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         
         // Find prefix for attribute, ignoring default namespace
         if (namespaceURI.length() > 0) {            
-            prefix = _nsSupport.getPrefix(namespaceURI);
+            prefix = _nsContext.getPrefix(namespaceURI);
 
             // Undeclared prefix or ignorable default ns?
             if (prefix == null || prefix.length() == 0) {
@@ -491,7 +486,7 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
     }
 
     public String getPrefix(String uri) throws XMLStreamException {
-        return _nsSupport.getPrefix(uri);
+        return _nsContext.getPrefix(uri);
     }
     
     public void setPrefix(String prefix, String uri) 
@@ -499,10 +494,10 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
     {
         if (_stackCount > -1 && _nsSupportContextStack[_stackCount] == false) {
             _nsSupportContextStack[_stackCount] = true;
-            _nsSupport.pushContext();
+            _nsContext.pushContext();
         }
         
-        _nsSupport.declarePrefix(prefix, uri);
+        _nsContext.declarePrefix(prefix, uri);
     }
     
     public void setDefaultNamespace(String uri) throws XMLStreamException {
@@ -550,33 +545,6 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         _encoding = encoding;
     }
     
-    protected class NamespaceContextImpl implements NamespaceContext {
-        public final String getNamespaceURI(String prefix) {
-            return _nsSupport.getURI(prefix);
-        }
-  
-        public final String getPrefix(String namespaceURI) {
-            return _nsSupport.getPrefix(namespaceURI);
-        }
-
-        public final Iterator getPrefixes(String namespaceURI) {
-            final Enumeration e = _nsSupport.getPrefixes(namespaceURI);
-            
-            return new Iterator() {
-                    public boolean hasNext() {
-                        return e.hasMoreElements();
-                    }
-
-                    public Object next() {
-                        return e.nextElement();
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }                    
-                };
-        }
-    }
 
     public void writeOctets(byte[] b, int start, int len)
         throws XMLStreamException
@@ -619,9 +587,8 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
                     _b = 0;
                 }
 
-                // Encode element and its attributes
                 encodeElementQualifiedNameOnThirdBit(_currentUri, _currentPrefix, _currentLocalName);
-
+                
                 for (int i = 0; i < _attributesArrayIndex;) {
                     encodeAttributeQualifiedNameOnSecondBit(
                             _attributesArray[i++], _attributesArray[i++], _attributesArray[i++]);
@@ -640,7 +607,7 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
                 if (_isEmptyElement) {
                     encodeElementTermination();
                     if (_nsSupportContextStack[_stackCount--] == true) {
-                        _nsSupport.popContext();
+                        _nsContext.popContext();
                     }
                     
                     _isEmptyElement = false;
@@ -653,5 +620,5 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
         } catch (IOException e) {
             throw new XMLStreamException(e);
         }
-    }    
+    }
 }

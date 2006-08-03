@@ -55,6 +55,7 @@ import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
 import org.jvnet.fastinfoset.ExternalVocabulary;
 import org.jvnet.fastinfoset.FastInfosetException;
 import org.jvnet.fastinfoset.FastInfosetSerializer;
+import org.jvnet.fastinfoset.VocabularyApplicationData;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
@@ -160,6 +161,11 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
      */
     protected SerializerVocabulary _v;
 
+    /**
+     * The vocabulary application data that is used by the encoder
+     */
+    protected VocabularyApplicationData _vData;
+    
     /**
      * True if the vocubulary is internal to the encoder
      */
@@ -381,6 +387,20 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         _vIsInternal = true;
     }
     
+    /**
+     * {@inheritDoc}
+     */
+    public void setVocabularyApplicationData(VocabularyApplicationData data) {
+        _vData = data;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public VocabularyApplicationData getVocabularyApplicationData() {
+        return _vData;
+    }
+    
     // End of FastInfosetSerializer interface
     
     /**
@@ -434,9 +454,13 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
             _vIsInternal = true;
         } else if (_vIsInternal) {
             _v.clear();
+            if (_vData != null)
+                _vData.clear();
         }
-
-        if (_v.hasInitialVocabulary()) {
+        
+        if (!_v.hasInitialVocabulary() && !_v.hasExternalVocabulary()) {
+            write(0);
+        } else if (_v.hasInitialVocabulary()) {
             _b = EncodingConstants.DOCUMENT_INITIAL_VOCABULARY_FLAG;
             write(_b);
 
@@ -463,8 +487,6 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
             write(0);
 
             encodeNonEmptyOctetStringOnSecondBit(_v.getExternalVocabularyURI().toString());
-        } else {
-            write(0);
         }
     }
 
@@ -1139,7 +1161,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                 encodeToBytes(data, offset, length, _octetBuffer, _octetBufferIndex);
         _octetBufferIndex += octetLength;
     }
-
+    
     /**
      * Encode a non identifying string on the third bit of an octet.
      * Implementation of clause C.15 of ITU-T Rec. X.891 | ISO/IEC 24824-1.
@@ -1662,7 +1684,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
             // _b = 0xC0 | (i >> 8); // 010 00000
             write(_b);
             write(i & 0xFF);
-        } else {
+        } else if (i < EncodingConstants.INTEGER_2ND_BIT_LARGE_LIMIT) {
             // [8257, 1048576] ( [8256, 1048575] ) 20 bits
             i -= EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT;
             _b = (0x80 | EncodingConstants.INTEGER_2ND_BIT_LARGE_FLAG) | (i >> 16); // 0110 0000
@@ -1670,6 +1692,10 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
             write(_b);
             write((i >> 8) & 0xFF);
             write(i & 0xFF);
+        } else {
+            throw new IOException(
+                    CommonResourceBundle.getInstance().getString("message.integerMaxSize", 
+                    new Object[]{new Integer(EncodingConstants.INTEGER_2ND_BIT_LARGE_LIMIT)}));
         }
     }
 
@@ -1867,17 +1893,25 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     /**
      * Mark the current position in the buffered stream.
      */
-    protected final void mark() throws IOException {
+    protected final void mark() {
         _markIndex = _octetBufferIndex;
     }
 
     /**
      * Reset the marked position in the buffered stream.
      */
-    protected final void resetMark() throws IOException {
+    protected final void resetMark() {
         _markIndex = -1;
     }
 
+    /**
+     * @return true if the mark has been set, otherwise false if the mark
+     *         has not been set.
+     */
+    protected final boolean hasMark() {
+        return _markIndex != -1;
+    }
+    
     /**
      * Write a byte to the buffered stream.
      */

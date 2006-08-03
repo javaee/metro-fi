@@ -257,6 +257,20 @@ public interface FastInfosetSerializer {
     public void setExternalVocabulary(ExternalVocabulary v);
     
     /**
+     * Set the application data to be associated with the serializer vocabulary.
+     * 
+     * @param data the application data. 
+     */
+    public void setVocabularyApplicationData(VocabularyApplicationData data);
+    
+    /**
+     * Get the application data associated with the serializer vocabulary.
+     * 
+     * @return the application data. 
+     */
+    public VocabularyApplicationData getVocabularyApplicationData();
+    
+    /**
      * Reset the serializer for reuse serializing another XML infoset.
      */
     public void reset();

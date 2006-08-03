@@ -51,7 +51,7 @@ public class FixedEntryStringIntMap extends StringIntMap {
         // Add the fixed entry
         final int hash = hashHash(fixedEntry.hashCode());
         final int tableIndex = indexFor(hash, _table.length);
-        _table[tableIndex] = _fixedEntry = new Entry(fixedEntry, hash, 0, null);
+        _table[tableIndex] = _fixedEntry = new Entry(fixedEntry, hash, _index++, null);
         if (_size++ >= _threshold) {
             resize(2 * _table.length);
         }
@@ -69,11 +69,17 @@ public class FixedEntryStringIntMap extends StringIntMap {
         for (int i = 0; i < _table.length; i++) {
             _table[i] = null;
         }
+        _lastEntry = NULL_ENTRY;
+        
         if (_fixedEntry != null) {
             final int tableIndex = indexFor(_fixedEntry._hash, _table.length);
             _table[tableIndex] = _fixedEntry;
             _fixedEntry._next = null;
             _size = 1;
+            _index = _readOnlyMapSize + 1;
+        } else {
+            _size = 0;
+            _index = _readOnlyMapSize;
         }
     }
 
