@@ -165,6 +165,16 @@ public class ConvertLexicalValues {
         }
     }
         
+    /**
+     * Parse an XML document and convert to an FI document while using the schema
+     * to convert lexical values that are base64 or floating point values to
+     * binary representations.
+     * <p>
+     * Arg 0 is the path to the schema (XSD or RNG).
+     * <p>
+     * Arg 1 is the path to the XML document to be converted.
+     * <p>
+     */
     public static void main(String[] args) throws Exception {
         /**
          * Process the schema to obtain a mapping of attribute/element
