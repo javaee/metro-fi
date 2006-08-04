@@ -984,7 +984,7 @@ public abstract class Decoder implements FastInfosetParser {
                 if (namespaceNamePresent) {
                     _prefixIndex = 0;
                     // Peak at next byte and check the index of the XML namespace name
-                    if (DecoderStateTables.ISTRING_PREFIX_NAMESPACE[peak()] 
+                    if (DecoderStateTables.ISTRING_PREFIX_NAMESPACE[peek()] 
                             != DecoderStateTables.ISTRING_PREFIX_NAMESPACE_INDEX_ZERO) {
                         throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.wrongNamespaceName"));
                     }
@@ -1018,7 +1018,7 @@ public abstract class Decoder implements FastInfosetParser {
                 if (namespaceNamePresent) {
                     _prefixIndex = 0;
                     // Peak at next byte and check the index of the XML namespace name
-                    if (DecoderStateTables.ISTRING_PREFIX_NAMESPACE[peak()] 
+                    if (DecoderStateTables.ISTRING_PREFIX_NAMESPACE[peek()] 
                             != DecoderStateTables.ISTRING_PREFIX_NAMESPACE_INDEX_ZERO) {
                         throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.wrongNamespaceName"));
                     }
@@ -1788,7 +1788,7 @@ public abstract class Decoder implements FastInfosetParser {
         }
     }
 
-    protected final int peak() throws IOException {
+    protected final int peek() throws IOException {
         if (_octetBufferOffset < _octetBufferEnd) {
             return _octetBuffer[_octetBufferOffset] & 0xFF;
         } else {
@@ -1844,7 +1844,7 @@ public abstract class Decoder implements FastInfosetParser {
 
     protected final boolean _isFastInfosetDocument() throws IOException {
         // Fill up the octet buffer
-        peak();
+        peek();
         
         _octetBufferLength = EncodingConstants.BINARY_HEADER.length;
         ensureOctetBufferSize();

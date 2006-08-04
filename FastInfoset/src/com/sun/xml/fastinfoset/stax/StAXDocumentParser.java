@@ -991,7 +991,7 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
      */
     public int peekNext() throws XMLStreamException {
         try {
-            switch(DecoderStateTables.EII[peak()]) {
+            switch(DecoderStateTables.EII[peek()]) {
                 case DecoderStateTables.EII_NO_AIIS_INDEX_SMALL:
                 case DecoderStateTables.EII_AIIS_INDEX_SMALL:
                 case DecoderStateTables.EII_INDEX_MEDIUM:
@@ -1030,6 +1030,36 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
         } catch (FastInfosetException e) {
             throw new XMLStreamException(e);
         }
+    }
+    
+    // Faster access methods without checks
+    
+    public final int _getNamespaceCount() {
+        return (_currentNamespaceAIIsEnd > 0) ? (_currentNamespaceAIIsEnd - _currentNamespaceAIIsStart) : 0;
+    }
+    
+    public final String _getLocalName() {
+        return _qualifiedName.localName;
+    }
+        
+    public final String _getNamespaceURI() {
+        return _qualifiedName.namespaceName;
+    }
+    
+    public final String _getPrefix() {
+        return _qualifiedName.prefix;
+    }
+    
+    public final char[] _getTextCharacters() {
+        return _characters;
+    }
+    
+    public final int _getTextStart() {
+        return _charactersOffset;
+    }
+    
+    public final int _getTextLength() {
+        return _charBufferLength;
     }
     
     //
