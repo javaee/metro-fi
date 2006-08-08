@@ -1,4 +1,4 @@
-<project name="FastInfoset" default="dist" basedir=".">
+<project name="FastInfoset-1.2.x" default="dist" basedir=".">
 
     <!-- initialize build properties -->
     <property file="${basedir}/build.properties" />
