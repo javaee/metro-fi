@@ -3,7 +3,7 @@
     <!-- initialize build properties -->
     <property file="${basedir}/build.properties" />
 
-    <property name="app.jar" value="${ant.project.name}.jar"/>
+    <property name="app.jar" value="FastInfoset.jar"/>
 
     <path id="compile.class.path">
         <pathelement location="${jsr173_api.jar}"/>
