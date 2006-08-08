@@ -61,6 +61,7 @@ import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
 import org.jvnet.fastinfoset.FastInfosetException;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
 import com.sun.xml.fastinfoset.org.apache.xerces.util.XMLChar;
+import org.jvnet.fastinfoset.stax.FastInfosetStreamReader;
 
 /**
  * The Fast Infoset StAX parser.
@@ -72,7 +73,8 @@ import com.sun.xml.fastinfoset.org.apache.xerces.util.XMLChar;
  * More than one fast infoset document may be decoded from the 
  * {@link java.io.InputStream}.
  */
-public class StAXDocumentParser extends Decoder implements XMLStreamReader {
+public class StAXDocumentParser extends Decoder 
+        implements XMLStreamReader, FastInfosetStreamReader {
     protected static final int INTERNAL_STATE_START_DOCUMENT = 0;
     protected static final int INTERNAL_STATE_START_ELEMENT_TERMINATE = 1;
     protected static final int INTERNAL_STATE_SINGLE_TERMINATE_ELEMENT_WITH_NAMESPACES = 2;
@@ -981,7 +983,81 @@ public class StAXDocumentParser extends Decoder implements XMLStreamReader {
             throw new XMLStreamException(e);
         }
     }
+
+    // FastInfosetStreamReader impl
     
+    public final int peekNext() throws XMLStreamException {
+        try {
+            switch(DecoderStateTables.EII[peek()]) {
+                case DecoderStateTables.EII_NO_AIIS_INDEX_SMALL:
+                case DecoderStateTables.EII_AIIS_INDEX_SMALL:
+                case DecoderStateTables.EII_INDEX_MEDIUM:
+                case DecoderStateTables.EII_INDEX_LARGE:
+                case DecoderStateTables.EII_LITERAL:
+                case DecoderStateTables.EII_NAMESPACES:
+                    return START_ELEMENT;
+                case DecoderStateTables.CII_UTF8_SMALL_LENGTH:
+                case DecoderStateTables.CII_UTF8_MEDIUM_LENGTH:
+                case DecoderStateTables.CII_UTF8_LARGE_LENGTH:
+                case DecoderStateTables.CII_UTF16_SMALL_LENGTH:
+                case DecoderStateTables.CII_UTF16_MEDIUM_LENGTH:
+                case DecoderStateTables.CII_UTF16_LARGE_LENGTH:
+                case DecoderStateTables.CII_RA:
+                case DecoderStateTables.CII_EA:
+                case DecoderStateTables.CII_INDEX_SMALL:
+                case DecoderStateTables.CII_INDEX_MEDIUM:
+                case DecoderStateTables.CII_INDEX_LARGE:
+                case DecoderStateTables.CII_INDEX_LARGE_LARGE:
+                    return CHARACTERS;
+                case DecoderStateTables.COMMENT_II:
+                    return COMMENT;
+                case DecoderStateTables.PROCESSING_INSTRUCTION_II:
+                    return PROCESSING_INSTRUCTION;
+                case DecoderStateTables.UNEXPANDED_ENTITY_REFERENCE_II:
+                    return ENTITY_REFERENCE;
+                case DecoderStateTables.TERMINATOR_DOUBLE:
+                case DecoderStateTables.TERMINATOR_SINGLE:
+                    return (_stackCount != -1) ? END_ELEMENT : END_DOCUMENT;
+                default:
+                    throw new FastInfosetException(
+                            CommonResourceBundle.getInstance().getString("message.IllegalStateDecodingEII"));
+            }
+        } catch (IOException e) {
+            throw new XMLStreamException(e);
+        } catch (FastInfosetException e) {
+            throw new XMLStreamException(e);
+        }
+    }
+    
+    // Faster access methods without checks
+    
+    public final int accessNamespaceCount() {
+        return (_currentNamespaceAIIsEnd > 0) ? (_currentNamespaceAIIsEnd - _currentNamespaceAIIsStart) : 0;
+    }
+    
+    public final String accessLocalName() {
+        return _qualifiedName.localName;
+    }
+        
+    public final String accessNamespaceURI() {
+        return _qualifiedName.namespaceName;
+    }
+    
+    public final String accessPrefix() {
+        return _qualifiedName.prefix;
+    }
+    
+    public final char[] accessTextCharacters() {
+        return _characters;
+    }
+    
+    public final int accessTextStart() {
+        return _charactersOffset;
+    }
+    
+    public final int accessTextLength() {
+        return _charBufferLength;
+    }
     
     //
     

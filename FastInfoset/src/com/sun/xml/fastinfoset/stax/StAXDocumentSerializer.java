@@ -48,6 +48,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
+import com.sun.xml.fastinfoset.QualifiedName;
+import com.sun.xml.fastinfoset.util.LocalNameQualifiedNamesMap;
+import org.jvnet.fastinfoset.stax.LowLevelFastInfosetStreamWriter;
 
 /**
  * The Fast Infoset StAX serializer.
@@ -59,7 +62,8 @@ import com.sun.xml.fastinfoset.CommonResourceBundle;
  * More than one fast infoset document may be encoded to the 
  * {@link java.io.OutputStream}.
  */
-public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
+public class StAXDocumentSerializer extends Encoder 
+        implements XMLStreamWriter, LowLevelFastInfosetStreamWriter {
     protected StAXManager _manager;
     
     protected String _encoding;
@@ -621,4 +625,192 @@ public class StAXDocumentSerializer extends Encoder implements XMLStreamWriter {
             throw new XMLStreamException(e);
         }
     }
+
+    
+    // LowLevelFastInfosetSerializer
+    
+    public final void initiateLowLevelWriting() throws XMLStreamException {
+        encodeTerminationAndCurrentElement(false);
+    }
+        
+    public final int getNextElementIndex() {
+        return _v.elementName.getNextIndex();
+    }
+
+    public final int getNextAttributeIndex() {
+        return _v.attributeName.getNextIndex();
+    }
+    
+    public final int getNextLocalNameIndex() {
+        return _v.localName.getNextIndex();
+    }
+
+    public final void writeLowLevelTerminationAndMark() throws IOException {
+        encodeTermination();
+        mark();
+    }
+
+    public final void writeLowLevelStartElementIndexed(int type, int index) throws IOException {
+        _b = type;
+        encodeNonZeroIntegerOnThirdBit(index);
+    }
+    
+    public final void writeLowLevelStartElement(int type, String prefix, String localName,
+            String namespaceURI) throws IOException {
+        if (!encodeElement(type, namespaceURI, prefix, localName))
+            encodeLiteral(type | EncodingConstants.ELEMENT_LITERAL_QNAME_FLAG,
+                    namespaceURI, prefix, localName);
+    }
+                
+    public final void writeLowLevelStartNamespaces() throws IOException {
+        write(EncodingConstants.ELEMENT | EncodingConstants.ELEMENT_NAMESPACES_FLAG);
+    }
+    
+    public final void writeLowLevelNamespace(String prefix, String namespaceName) 
+        throws IOException {
+        encodeNamespaceAttribute(prefix, namespaceName);
+    }
+    
+    public final void writeLowLevelEndNamespaces() throws IOException {
+        write(EncodingConstants.TERMINATOR);
+    }
+    
+    public final void writeLowLevelStartAttributes() throws IOException {
+        if (hasMark()) {
+            _octetBuffer[_markIndex] |= EncodingConstants.ELEMENT_ATTRIBUTE_FLAG;
+            resetMark();
+        }
+    }
+        
+    public final void writeLowLevelAttributeIndexed(int index) throws IOException {
+        encodeNonZeroIntegerOnSecondBitFirstBitZero(index);
+    }
+    
+    public final void writeLowLevelAttribute(String prefix, String namespaceURI, String localName) throws IOException {
+        if (!encodeAttribute(namespaceURI, prefix, localName))
+            encodeLiteral(EncodingConstants.ATTRIBUTE_LITERAL_QNAME_FLAG, 
+                    namespaceURI, prefix, localName);
+    }
+                
+    public final void writeLowLevelAttributeValue(String value) throws IOException
+    {
+        final boolean addToTable = (value.length() < attributeValueSizeConstraint) ? true : false;
+        encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
+    }
+    
+    public final void writeLowLevelStartNameLiteral(int type, String prefix, byte[] utf8LocalName, 
+            String namespaceURI) throws IOException {
+        encodeLiteralHeader(type, namespaceURI, prefix);
+        encodeNonZeroOctetStringLengthOnSecondBit(utf8LocalName.length);
+        write(utf8LocalName, 0, utf8LocalName.length);
+    }
+    
+    public final void writeLowLevelStartNameLiteral(int type, String prefix, int localNameIndex, 
+            String namespaceURI) throws IOException {
+        encodeLiteralHeader(type, namespaceURI, prefix);
+        encodeNonZeroIntegerOnSecondBitFirstBitOne(localNameIndex);
+    }
+     
+    public final void writeLowLevelEndStartElement() throws IOException {
+        if (hasMark()) {
+            resetMark();
+        } else {
+            // Terminate the attributes
+            _b = EncodingConstants.TERMINATOR;
+            _terminate = true;
+        }
+    }
+    
+    public final void writeLowLevelEndElement() throws IOException {
+        encodeElementTermination();
+    }
+    
+    public final void writeLowLevelText(char[] text, int length) throws IOException {
+        if (length == 0)
+            return;
+        
+        encodeTermination();
+        
+        encodeCharacters(text, 0, length);
+    }
+    
+    public final void writeLowLevelText(String text) throws IOException {
+        final int length = text.length();
+        if (length == 0)
+            return;
+        
+        encodeTermination();
+        
+        if (length < _charBuffer.length) {
+            text.getChars(0, length, _charBuffer, 0);
+            encodeCharacters(_charBuffer, 0, length);
+        } else {
+            final char ch[] = text.toCharArray();
+            encodeCharactersNoClone(ch, 0, length);
+        }
+    }
+    
+    public final void writeLowLevelOctets(byte[] octets, int length) throws IOException {
+        if (length == 0)
+            return;
+        
+        encodeTermination();
+        
+        encodeCIIOctetAlgorithmData(EncodingAlgorithmIndexes.BASE64, octets, 0, length);
+    }
+
+    private boolean encodeElement(int type, String namespaceURI, String prefix, String localName) throws IOException {
+        final LocalNameQualifiedNamesMap.Entry entry = _v.elementName.obtainEntry(localName);
+        for (int i = 0; i < entry._valueIndex; i++) {
+            final QualifiedName name = entry._value[i];
+            if ((prefix == name.prefix || prefix.equals(name.prefix))
+                    && (namespaceURI == name.namespaceName || namespaceURI.equals(name.namespaceName))) {
+                _b = type;
+                encodeNonZeroIntegerOnThirdBit(name.index);
+                return true;
+            }
+        }
+
+        entry.addQualifiedName(new QualifiedName(prefix, namespaceURI, localName, "", _v.elementName.getNextIndex()));
+        return false;
+    }
+        
+    private boolean encodeAttribute(String namespaceURI, String prefix, String localName) throws IOException {
+        final LocalNameQualifiedNamesMap.Entry entry = _v.attributeName.obtainEntry(localName);
+        for (int i = 0; i < entry._valueIndex; i++) {
+            final QualifiedName name = entry._value[i];
+            if ((prefix == name.prefix || prefix.equals(name.prefix))
+                    && (namespaceURI == name.namespaceName || namespaceURI.equals(name.namespaceName))) {
+                encodeNonZeroIntegerOnSecondBitFirstBitZero(name.index);
+                return true;
+            }
+        }
+
+        entry.addQualifiedName(new QualifiedName(prefix, namespaceURI, localName, "", _v.attributeName.getNextIndex()));
+        return false;
+    }
+
+    private void encodeLiteralHeader(int type, String namespaceURI, String prefix) throws IOException {
+        if (namespaceURI != "") {
+            type |= EncodingConstants.LITERAL_QNAME_NAMESPACE_NAME_FLAG;
+            if (prefix != "")
+                type |= EncodingConstants.LITERAL_QNAME_PREFIX_FLAG;
+                        
+            write(type);
+            if (prefix != "")
+                encodeNonZeroIntegerOnSecondBitFirstBitOne(_v.prefix.get(prefix));
+            encodeNonZeroIntegerOnSecondBitFirstBitOne(_v.namespaceName.get(namespaceURI));
+        } else
+            write(type);
+    }
+        
+    private void encodeLiteral(int type, String namespaceURI, String prefix, String localName) throws IOException {
+        encodeLiteralHeader(type, namespaceURI, prefix);
+        
+        final int localNameIndex = _v.localName.obtainIndex(localName);
+        if (localNameIndex == -1) {
+            encodeNonEmptyOctetStringOnSecondBit(localName);
+        } else
+            encodeNonZeroIntegerOnSecondBitFirstBitOne(localNameIndex);
+    }    
 }
