@@ -2194,8 +2194,8 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         if (!XMLChar.isSpace(ch[start])) return false;
         
         final int end = start + length;
-        start++;
-        while(start < end && XMLChar.isSpace(ch[start++]));
+        while(++start < end && XMLChar.isSpace(ch[start]));
+        
         return start == end;
     }
     
