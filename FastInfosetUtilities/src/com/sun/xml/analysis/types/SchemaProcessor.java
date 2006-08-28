@@ -37,6 +37,7 @@
  */ 
 package com.sun.xml.analysis.types;
 
+import com.sun.xml.fastinfoset.types.XSDataType;
 import com.sun.xml.xsom.XSAnnotation;
 import com.sun.xml.xsom.XSAttGroupDecl;
 import com.sun.xml.xsom.XSAttributeDecl;

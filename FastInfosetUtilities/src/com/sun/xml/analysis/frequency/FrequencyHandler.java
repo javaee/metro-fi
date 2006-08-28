@@ -145,16 +145,6 @@ public class FrequencyHandler extends DefaultHandler {
         }
     }
     
-    private void addQNamesWithGeneratedPrefix(FrequencySet<QName> s, Map<String, Set<QName>> m) {        
-        int i = 1;
-        for (Map.Entry<String,Set<QName>> e : m.entrySet()) {
-            String prefix = ""; //n" + i;
-            for (QName qInSet : e.getValue()) {
-                s.add0(new QName(qInSet.getNamespaceURI(), qInSet.getLocalPart(), prefix));
-            }
-        }
-    }
-    
     private void bucketQNamesToNamespace(Set<QName> s, Map<String, Set<QName>> m) {
         for (QName q : s) {
             Set<QName> subs = m.get(q.getNamespaceURI());

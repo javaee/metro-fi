@@ -59,7 +59,7 @@ public class PrintFrequency {
      * args[1] to args[n] are the paths to XML documents.
      */
     public static void main(String[] args) throws Exception {
-        SchemaProcessor sp = new SchemaProcessor(new File(args[0]).toURL(), true);
+        SchemaProcessor sp = new SchemaProcessor(new File(args[0]).toURL(), true, false);
         sp.process();
         
         SAXParserFactory spf = SAXParserFactory.newInstance();

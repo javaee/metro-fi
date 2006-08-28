@@ -243,7 +243,7 @@ public class VocabularyGenerator {
      * args[1] to args[n] are the paths to XML documents.
      */
     public static void main(String[] args) throws Exception {
-        SchemaProcessor sp = new SchemaProcessor(new File(args[0]).toURL(), true);
+        SchemaProcessor sp = new SchemaProcessor(new File(args[0]).toURL(), true, false);
         sp.process();
         
         SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -257,10 +257,10 @@ public class VocabularyGenerator {
         
         VocabularyGenerator vg = new VocabularyGenerator(fh.getLists(), VocabularyGenerator.XmlApi.SAX);
         PrintTable.printVocabulary(vg.getParserVocabulary());
-        
+                
         org.jvnet.fastinfoset.Vocabulary v = fh.getVocabulary();
         ParserVocabulary pv = new ParserVocabulary(v);
         System.out.println("");
-        PrintTable.printVocabulary(pv);        
+        PrintTable.printVocabulary(pv);
     }
 }

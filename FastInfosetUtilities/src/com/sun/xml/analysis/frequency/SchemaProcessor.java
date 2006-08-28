@@ -30,8 +30,10 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
@@ -97,6 +99,10 @@ public class SchemaProcessor {
      */
     Set<String> namespaces = new java.util.TreeSet(_stringComparator);
     /**
+     * The set of generated prefixes
+     */
+    Set<String> prefixes = new java.util.TreeSet(_stringComparator);
+    /**
      * The set of default values and enum values for attributes
      * declared in the schema
      */
@@ -110,9 +116,25 @@ public class SchemaProcessor {
     // The list of URLs to schema
     private List<URL> _schema;
 
-    // True if if default values and enums of elements 
+    // True if default values and enums of elements 
     // and attributes should be collected
     private boolean _collectValues;
+    
+    // True if prefixes should be generated
+    private boolean _generatePrefixes;
+    
+    // Map of namespaces to generated prefixes
+    private Map<String, String> _namespaceToPrefix = new HashMap<String, String>();
+    
+    // Next generated prefix to use
+    private String _generatedPrefix = "a";
+    
+    /*
+     * Construct a schema processor given a URL to a schema.
+     */
+    public SchemaProcessor(URL schema) {
+        this(schema, false, false);
+    }
     
     /*
      * Construct a schema processor given a URL to a schema.
@@ -120,11 +142,22 @@ public class SchemaProcessor {
      * @param schema the URL to the schema.
      * @param collectValues true if default values and enums of elements
      *        and attributes should be collected.
+     * @param generatePrefixes true if prefixes should be generated and
+     *        associated with namespaces.
      */
-    public SchemaProcessor(URL schema, boolean collectValues) {
+    public SchemaProcessor(URL schema, boolean collectValues, 
+            boolean generatePrefixes) {
         _schema = new ArrayList();
         _schema.add(schema);
         _collectValues = collectValues;
+        _generatePrefixes = generatePrefixes;
+    }
+    
+    /*
+     * Construct a schema processor given a list URLs to schema.
+     */ 
+    public SchemaProcessor(List<URL> schema) {
+        this(schema, false, false);
     }
     
     /*
@@ -133,10 +166,14 @@ public class SchemaProcessor {
      * @param schema the list URLs to schema.
      * @param collectValues true if default values and enums of elements
      *        and attributes should be collected.
+     * @param generatePrefixes true if prefixes should be generated and
+     *        associated with namespaces.
      */
-    public SchemaProcessor(List<URL> schema, boolean collectValues) {
+    public SchemaProcessor(List<URL> schema, boolean collectValues, 
+            boolean generatePrefixes) {
         _schema = schema;
         _collectValues = collectValues;
+        _generatePrefixes = generatePrefixes;
     }
     
     // XSVisitor, XSSimpleTypeVisitor
@@ -379,21 +416,24 @@ public class SchemaProcessor {
     private void addAttribute(XSDeclaration d) {
         QName q = getQName(d);
         attributes.add(q);
-        addNamespaceAndLocalName(q);
+        addNamespaceLocalNameAndPrefix(q);
     }
     
     private void addElement(XSDeclaration d) {
         QName q = getQName(d);
         elements.add(q);
-        addNamespaceAndLocalName(q);
+        addNamespaceLocalNameAndPrefix(q);
     }
     
-    private void addNamespaceAndLocalName(QName q) {
+    private void addNamespaceLocalNameAndPrefix(QName q) {
         localNames.add(q.getLocalPart());
-        if (q.getNamespaceURI() != XMLConstants.NULL_NS_URI &&
-                !q.getNamespaceURI().equals("http://www.w3.org/XML/1998/namespace")) {
-            // Ignore the XML namespace
-            namespaces.add(q.getNamespaceURI());
+        final String namespaceURI = q.getNamespaceURI();
+        if (hasProcessibleNamespaceURI(namespaceURI)) {
+            namespaces.add(namespaceURI);
+            final String prefix = q.getPrefix();
+            if (prefix != null) {
+                prefixes.add(prefix);
+            }
         }
     }
     
@@ -408,13 +448,47 @@ public class SchemaProcessor {
     private QName getQName(XSDeclaration d) {
         String n = d.getTargetNamespace();
         String l = d.getName();
-        return new QName(n, l);
+        
+        if (_generatePrefixes && hasProcessibleNamespaceURI(n)) {
+            String p = _namespaceToPrefix.get(n);
+            if (p == null) {
+                p = _generatedPrefix;
+                _namespaceToPrefix.put(n, p);
+                nextGeneratedPrefix();
+            }
+            
+            return new QName(n, l, p);
+        } else {
+            return new QName(n, l);
+        }
+    }
+    
+    private void nextGeneratedPrefix() {
+        char c = _generatedPrefix.charAt(0);
+        c++;
+        
+        if (c < 'z') {
+            _generatedPrefix = c + _generatedPrefix.substring(1);
+        } else {
+            _generatedPrefix = "a" + _generatedPrefix;
+        }
+    }
+    
+    private boolean hasProcessibleNamespaceURI(String namespaceURI) {
+        return (namespaceURI != XMLConstants.NULL_NS_URI &&
+                !namespaceURI.equals("http://www.w3.org/XML/1998/namespace"));
     }
     
     private void print() {
-        System.out.println("Namespaces");
+        System.out.println("Prefixes");
         System.out.println("----------");
         int i = 1;
+        for (String s : prefixes) {
+            System.out.println((i++) + ": " + s);
+        }
+        System.out.println("Namespaces");
+        System.out.println("----------");
+        i = 1;
         for (String s : namespaces) {
             System.out.println((i++) + ": " + s);
         }
@@ -439,7 +513,7 @@ public class SchemaProcessor {
     }
     
     public static void main(String[] args) throws Exception {
-        SchemaProcessor v = new SchemaProcessor(new File(args[0]).toURL(), true);
+        SchemaProcessor v = new SchemaProcessor(new File(args[0]).toURL(), true, true);
         v.process();
         v.print();
     }
