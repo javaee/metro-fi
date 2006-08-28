@@ -73,6 +73,10 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
 
     protected boolean _charactersAsCDATA = false;
     
+    protected SAXDocumentSerializer(boolean v) {
+        super(v);
+    }
+    
     public SAXDocumentSerializer() {
     }
 
@@ -104,7 +108,7 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
         }
     }
 
-    public final void startPrefixMapping(String prefix, String uri) throws SAXException {
+    public void startPrefixMapping(String prefix, String uri) throws SAXException {
         try {
             if (_elementHasNamespaces == false) {
                 encodeTermination();
@@ -568,12 +572,13 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
 
     
 
-    protected final void encodeElement(String namespaceURI, String qName, String localName) throws IOException {
+    protected void encodeElement(String namespaceURI, String qName, String localName) throws IOException {
         LocalNameQualifiedNamesMap.Entry entry = _v.elementName.obtainEntry(qName);
         if (entry._valueIndex > 0) {
             QualifiedName[] names = entry._value;
             for (int i = 0; i < entry._valueIndex; i++) {
-                if ((namespaceURI == names[i].namespaceName || namespaceURI.equals(names[i].namespaceName))) {
+                final QualifiedName n = names[i];
+                if ((namespaceURI == n.namespaceName || namespaceURI.equals(n.namespaceName))) {
                     encodeNonZeroIntegerOnThirdBit(names[i].index);
                     return;
                 }
@@ -584,7 +589,7 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
                 localName, entry);
     }
 
-    protected final boolean encodeAttribute(String namespaceURI, String qName, String localName) throws IOException {
+    protected boolean encodeAttribute(String namespaceURI, String qName, String localName) throws IOException {
         LocalNameQualifiedNamesMap.Entry entry = _v.attributeName.obtainEntry(qName);
         if (entry._valueIndex > 0) {
             QualifiedName[] names = entry._value;
@@ -598,5 +603,5 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
 
         return encodeLiteralAttributeQualifiedNameOnSecondBit(namespaceURI, getPrefixFromQualifiedName(qName),
                 localName, entry);
-    }
+    }    
 }
