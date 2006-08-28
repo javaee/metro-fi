@@ -88,6 +88,10 @@ public class EncodingAlgorithmAttributesImpl implements EncodingAlgorithmAttribu
     
     private Object[] _algorithmData;
     
+    private String[] _alphabets;
+    
+    private boolean[] _toIndex;
+    
     /**
      * Construct a new, empty EncodingAlgorithmAttributesImpl object.
      */
@@ -122,6 +126,8 @@ public class EncodingAlgorithmAttributesImpl implements EncodingAlgorithmAttribu
         _data = new String[DEFAULT_CAPACITY * SIZE];
         _algorithmIds = new int[DEFAULT_CAPACITY];
         _algorithmData = new Object[DEFAULT_CAPACITY];
+        _alphabets = new String[DEFAULT_CAPACITY];
+        _toIndex = new boolean[DEFAULT_CAPACITY];
         
         _registeredEncodingAlgorithms = registeredEncodingAlgorithms;
         
@@ -175,6 +181,46 @@ public class EncodingAlgorithmAttributesImpl implements EncodingAlgorithmAttribu
         _data[i++] = replaceNull(qName);
         _data[i++] = replaceNull(type);
         _data[i++] = replaceNull(value);
+        _toIndex[_length] = false;
+        _alphabets[_length] = null;
+        
+        _length++;
+    }
+    
+    /**
+     * Add an attribute to the end of the list.
+     *
+     * <p>For the sake of speed, this method does no checking
+     * to see if the attribute is already in the list: that is
+     * the responsibility of the application.</p>
+     *
+     * @param uri The Namespace URI, or the empty string if
+     *        none is available or Namespace processing is not
+     *        being performed.
+     * @param localName The local name, or the empty string if
+     *        Namespace processing is not being performed.
+     * @param qName The qualified (prefixed) name, or the empty string
+     *        if qualified names are not available.
+     * @param type The attribute type as a string.
+     * @param value The attribute value.
+     * @param index True if attribute should be indexed.
+     * @param index The alphabet associated with the attribute value, 
+     *              may be null if there is no associated alphabet.
+     */
+    public void addAttribute(String URI, String localName, String qName,
+            String type, String value, boolean index, String alphabet) {
+        if (_length >= _algorithmData.length) {
+            resize();
+        }
+        
+        int i = _length * SIZE;
+        _data[i++] = replaceNull(URI);
+        _data[i++] = replaceNull(localName);
+        _data[i++] = replaceNull(qName);
+        _data[i++] = replaceNull(type);
+        _data[i++] = replaceNull(value);
+        _toIndex[_length] = index;
+        _alphabets[_length] = alphabet;
         
         _length++;
     }
@@ -211,6 +257,8 @@ public class EncodingAlgorithmAttributesImpl implements EncodingAlgorithmAttribu
         _data[i++] = null;
         _algorithmIds[_length] = builtInAlgorithmID;
         _algorithmData[_length] = algorithmData;
+        _toIndex[_length] = false;
+        _alphabets[_length] = null;
         
         _length++;
     }
@@ -248,6 +296,8 @@ public class EncodingAlgorithmAttributesImpl implements EncodingAlgorithmAttribu
         _data[i++] = algorithmURI;
         _algorithmIds[_length] = algorithmID;
         _algorithmData[_length] = algorithmData;
+        _toIndex[_length] = false;
+        _alphabets[_length] = null;
         
         _length++;
     }
@@ -273,6 +323,8 @@ public class EncodingAlgorithmAttributesImpl implements EncodingAlgorithmAttribu
         _data[i + ALGORITHMURI_OFFSET] = algorithmURI;
         _algorithmIds[index] = algorithmID;
         _algorithmData[index] = algorithmData;
+        _toIndex[index] = false;
+        _alphabets[index] = null;
     }
     
     /**
@@ -296,6 +348,8 @@ public class EncodingAlgorithmAttributesImpl implements EncodingAlgorithmAttribu
                 _data[index++] = atts.getType(i);
                 _data[index++] = atts.getValue(i);
                 index++;
+                _toIndex[i] = false;
+                _alphabets[i] = null;
             }
         }
     }
@@ -323,6 +377,8 @@ public class EncodingAlgorithmAttributesImpl implements EncodingAlgorithmAttribu
                 _data[index++] = atts.getAlgorithmURI(i);
                 _algorithmIds[i] = atts.getAlgorithmIndex(i);
                 _algorithmData[i] = atts.getAlgorithmData(i);
+                _toIndex[i] = false;
+                _alphabets[i] = null;
             }
         }
     }
@@ -470,6 +526,23 @@ public class EncodingAlgorithmAttributesImpl implements EncodingAlgorithmAttribu
         }
     }
     
+    // ExtendedAttributes
+    
+    public final String getAlpababet(int index) {
+        if (index >= 0 && index < _length) {
+            return _alphabets[index];
+        } else {
+            return null;
+        }
+    }
+    
+    public final boolean getToIndex(int index) {
+        if (index >= 0 && index < _length) {
+            return _toIndex[index];
+        } else {
+            return false;
+        }
+    }
     
     // -----
     
@@ -491,14 +564,20 @@ public class EncodingAlgorithmAttributesImpl implements EncodingAlgorithmAttribu
         String[] data = new String[newLength * SIZE];
         int[] algorithmIds = new int[newLength];
         Object[] algorithmData = new Object[newLength];
+        String[] alphabets = new String[newLength];
+        boolean[] toIndex = new boolean[newLength];
         
         System.arraycopy(_data, 0, data, 0, _length * SIZE);
         System.arraycopy(_algorithmIds, 0, algorithmIds, 0, _length);
         System.arraycopy(_algorithmData, 0, algorithmData, 0, _length);
+        System.arraycopy(_alphabets, 0, alphabets, 0, _length);
+        System.arraycopy(_toIndex, 0, toIndex, 0, _length);
         
         _data = data;
         _algorithmIds = algorithmIds;
         _algorithmData = algorithmData;
+        _alphabets = alphabets;
+        _toIndex = toIndex;
     }
     
     private final StringBuffer convertEncodingAlgorithmDataToString(
