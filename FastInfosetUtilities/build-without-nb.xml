@@ -8,6 +8,10 @@
     <path id="compile.class.path">
         <pathelement location="${FastInfoset.jar}"/>
         <pathelement location="${xsom.jar}"/>
+        <pathelement location="${relaxngDatatype.jar}"/>
+        <pathelement location="${jsr173_api.jar.jar}"/>
+        <pathelement location="${stax-ex.jar}"/>
+        <pathelement location="${streambuffer.jar}"/>
     </path>
 
     <target name="prepare">
