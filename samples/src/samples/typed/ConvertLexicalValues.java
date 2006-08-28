@@ -1,7 +1,7 @@
 package samples.typed;
 
 import com.sun.xml.analysis.types.SchemaProcessor;
-import com.sun.xml.analysis.types.XSDataType;
+import com.sun.xml.fastinfoset.types.XSDataType;
 import com.sun.xml.fastinfoset.algorithm.BuiltInEncodingAlgorithmFactory;
 import com.sun.xml.fastinfoset.sax.SAXDocumentParser;
 import com.sun.xml.fastinfoset.sax.SAXDocumentSerializer;
