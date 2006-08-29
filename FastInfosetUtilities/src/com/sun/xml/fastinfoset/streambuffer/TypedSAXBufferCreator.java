@@ -106,9 +106,19 @@ public class TypedSAXBufferCreator extends AbstractCreator
             XMLReader reader, 
             InputStream in) 
             throws SAXException,IOException, ParserConfigurationException {
+        return createNewBufferFromXMLReader(elements, attributes, reader, in, null);
+    }
+    
+    public static XMLStreamBuffer createNewBufferFromXMLReader(
+            Map<String, Set<XSDataType>> elements, 
+            Map<String, Set<XSDataType>> attributes, 
+            XMLReader reader, 
+            InputStream in,
+            String systemId) 
+            throws SAXException,IOException, ParserConfigurationException {
         TypedSAXBufferCreator t = new TypedSAXBufferCreator(elements, attributes);
         
-        return t.create(reader, in);
+        return t.create(reader, in, systemId);
     }
     
     public TypedSAXBufferCreator(Map<String, Set<XSDataType>> elements, 
@@ -126,6 +136,11 @@ public class TypedSAXBufferCreator extends AbstractCreator
     }
     
     public MutableXMLStreamBuffer create(XMLReader reader, InputStream in) throws IOException, SAXException {
+        return create(reader, in, null);
+    }
+    
+    public MutableXMLStreamBuffer create(XMLReader reader, InputStream in, 
+            String systemId) throws IOException, SAXException {
         if (_buffer == null) {
             createBuffer();
         }
@@ -138,7 +153,13 @@ public class TypedSAXBufferCreator extends AbstractCreator
         } catch (SAXException e) {
         }
         
-        reader.parse(new InputSource(in));
+        if (systemId != null) {
+            InputSource s = new InputSource(systemId);
+            s.setByteStream(in);
+            reader.parse(s);
+        } else {
+            reader.parse(new InputSource(in));
+        }
         
         return getXMLStreamBuffer();
     }

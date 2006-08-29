@@ -99,12 +99,12 @@ public class LexicalSpaceConvertor {
                 } else {
                     if (dt == XSDataType.ANYURI) {
                         return (preference == LexicalPreference.string) ?
-                            new ValueInstance(new String(ch)) :
-                            new ValueInstance(ch);
+                            new ValueInstance(new String(ch, start, length)) :
+                            new ValueInstance(new String(ch, start, length).toCharArray());
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                // e.printStackTrace();
                 // If conversion failed try the next type
             }
         }
