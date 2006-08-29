@@ -70,14 +70,26 @@ public class PrintFrequency {
         for (int i = 1; i < args.length; i++) {
             p.parse(new File(args[i]), fh);
         }
-
+        fh.generateQNamesWithPrefix();
+        
         FrequencyBasedLists l = fh.getLists();
-        System.out.println("Elements");
-        for (QName q : l.elements) {
-            System.out.println(q.getPrefix() + " " + q);
+        System.out.println("Prefixes");
+        for (String s : l.prefixes) {
+            System.out.println(s);
         }
         
-        System.out.println("Attributes");
+        System.out.println("Local names: " + l.localNames.size());
+        for (String s : l.localNames) {
+            System.out.println(s);
+        }
+        
+        int i = 0;
+        System.out.println("Elements: " + l.elements.size());
+        for (QName q : l.elements) {
+            System.out.println(q.getPrefix() + " " + q + " " + (i++));
+        }
+        
+        System.out.println("Attributes" + l.attributes.size());
         for (QName q : l.attributes) {
             System.out.println(q.getPrefix() + " " + q);
         }

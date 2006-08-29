@@ -167,7 +167,8 @@ public class VocabularyGenerator {
             namespaceURIIndex = _serializerVocabulary.namespaceName.obtainIndex(
                     n.getNamespaceURI());
             if (namespaceURIIndex == KeyIntMap.NOT_PRESENT) {
-                namespaceURIIndex = _parserVocabulary.namespaceName.getSize();
+                namespaceURIIndex = _serializerVocabulary.namespaceName.get(
+                        n.getNamespaceURI());
                 _parserVocabulary.namespaceName.add(n.getNamespaceURI());
             }
             
@@ -175,7 +176,8 @@ public class VocabularyGenerator {
                 prefixIndex = _serializerVocabulary.prefix.obtainIndex(
                         n.getPrefix());
                 if (prefixIndex == KeyIntMap.NOT_PRESENT) {
-                    prefixIndex = _parserVocabulary.prefix.getSize();
+                    prefixIndex = _serializerVocabulary.prefix.get(
+                            n.getPrefix());
                     _parserVocabulary.prefix.add(n.getPrefix());
                 }
             }
@@ -184,7 +186,8 @@ public class VocabularyGenerator {
         int localNameIndex = _serializerVocabulary.localName.obtainIndex(
                 n.getLocalPart());
         if (localNameIndex == KeyIntMap.NOT_PRESENT) {
-            localNameIndex = _parserVocabulary.localName.getSize();
+            localNameIndex = _serializerVocabulary.localName.get(
+                    n.getLocalPart());
             _parserVocabulary.localName.add(n.getLocalPart());
         }
         

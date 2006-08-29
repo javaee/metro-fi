@@ -87,7 +87,7 @@ public class FrequencySet<T> extends HashMap<T, Integer> {
                 if (e1.getKey().equals(e2.getKey())) {
                     return 0;
                 } else {
-                    return -1;
+                    return 1;
                 }
             } else {
                 return diff;

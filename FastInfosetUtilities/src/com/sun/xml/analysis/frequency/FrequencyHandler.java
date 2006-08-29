@@ -57,6 +57,8 @@ public class FrequencyHandler extends DefaultHandler {
     private Map<String, Set<QName>> namespacesToElements = new HashMap();
     private Map<String, Set<QName>> namespacesToAttributes = new HashMap();
     
+    private Map<String, String> namespaceURIToPrefix = new HashMap();
+    
     private FrequencySet<String> prefixes = new FrequencySet<String>();
     private FrequencySet<String> namespaces = new FrequencySet<String>();
     private FrequencySet<String> localNames = new FrequencySet<String>();
@@ -139,6 +141,39 @@ public class FrequencyHandler extends DefaultHandler {
         return v;
     }
     
+    /**
+     * Generate qualified names that have not been processed.
+     * <p>
+     * Prefixes are automatically chosen.
+     * <p>
+     * TODO: check for clashes with prefixes generated and prefixes
+     * that have already occured.
+     */
+    public void generateQNamesWithPrefix() {
+        Set<String> namespaceURIs = new HashSet<String>();
+        namespaceURIs.addAll(namespacesToElements.keySet());
+        namespaceURIs.addAll(namespacesToAttributes.keySet());
+        
+        // Generate prefixes for namespace URIs
+        for (String namespaceURI : namespaceURIs) {
+            if (namespaceURI.length() == 0) {
+                namespaceURIToPrefix.put(namespaceURI, "");
+            } else {
+                String prefix = getNewPrefix();
+                namespaceURIToPrefix.put(namespaceURI, prefix);
+            }
+        }
+        
+        // Add qNames for elements
+        generateQNamesWithPrefix(namespacesToElements, elements, namespaceURIToPrefix);
+        // Add qNames for attributes
+        generateQNamesWithPrefix(namespacesToAttributes, attributes, namespaceURIToPrefix);
+    }
+     
+    public Map<String, String> getNamespaceURIToPrefixMap() {
+        return namespaceURIToPrefix;
+    }
+    
     private void addAll(Set to, Set<?> from) {
         for(Object o : from) {
             to.add(o);
@@ -219,5 +254,36 @@ public class FrequencyHandler extends DefaultHandler {
         } else {
             return new QName(localName);
         }
+    }
+    
+    private void generateQNamesWithPrefix(Map<String, Set<QName>> m, FrequencySet<QName> fhm, 
+            Map<String, String> namespaceURIToPrefix) {
+        for (String namespaceURI : m.keySet()) {
+            String prefix = namespaceURIToPrefix.get(namespaceURI);
+            for (QName qInSet : m.get(namespaceURI)) {
+                fhm.add0(new QName(namespaceURI, qInSet.getLocalPart(), prefix));
+            }
+        }
+    }
+    
+    private StringBuilder prefixBuilder;
+    private char prefixCharacter = 'a';
+    
+    private String getNewPrefix() {
+        if (prefixBuilder == null) {
+            prefixBuilder = new StringBuilder();
+            prefixBuilder.append(prefixCharacter);
+            return prefixBuilder.toString();
+        }
+        
+        prefixCharacter++;
+        if (prefixCharacter > 'z') {
+            prefixCharacter = 'a';
+            prefixBuilder.append(prefixCharacter);
+        } else {
+            prefixBuilder.setCharAt(prefixBuilder.length() - 1, prefixCharacter);
+        }
+        
+        return prefixBuilder.toString();
     }
 }
