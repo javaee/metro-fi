@@ -34,8 +34,7 @@
  * Version 2.0, January 2004
  * http://www.apache.org/licenses/
  *
- */ 
-
+ */
 
 package com.sun.xml.fastinfoset.util;
 
@@ -285,13 +284,13 @@ public class PrefixArray extends ValueArray {
         System.arraycopy(_array, 0, newArray, 0, _size);
         _array = newArray;
 
-        newSize += _readOnlyArraySize;
-        final NamespaceEntry[] newInScopeNamespaces = new NamespaceEntry[newSize + 2];
-        System.arraycopy(_inScopeNamespaces, 0, newInScopeNamespaces, 0, _readOnlyArraySize + _size + 2);
+        newSize += 2;
+        final NamespaceEntry[] newInScopeNamespaces = new NamespaceEntry[newSize];
+        System.arraycopy(_inScopeNamespaces, 0, newInScopeNamespaces, 0, _inScopeNamespaces.length);
         _inScopeNamespaces = newInScopeNamespaces;
 
-        final int[] newCurrentInScope = new int[newSize + 2];
-        System.arraycopy(_currentInScope, 0, newCurrentInScope, 0, _readOnlyArraySize + _size + 2);
+        final int[] newCurrentInScope = new int[newSize];
+        System.arraycopy(_currentInScope, 0, newCurrentInScope, 0, _currentInScope.length);
         _currentInScope = newCurrentInScope;            
     }
     

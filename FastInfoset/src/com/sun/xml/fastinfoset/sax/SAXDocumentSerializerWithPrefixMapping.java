@@ -40,7 +40,9 @@ package com.sun.xml.fastinfoset.sax;
 
 import com.sun.xml.fastinfoset.EncodingConstants;
 import com.sun.xml.fastinfoset.QualifiedName;
+import com.sun.xml.fastinfoset.util.KeyIntMap;
 import com.sun.xml.fastinfoset.util.LocalNameQualifiedNamesMap;
+import com.sun.xml.fastinfoset.util.StringIntMap;
 import java.io.IOException;
 import java.util.HashMap;
 import org.xml.sax.SAXException;
@@ -67,15 +69,20 @@ public class SAXDocumentSerializerWithPrefixMapping extends SAXDocumentSerialize
     protected String _lastCheckedNamespace;
     protected String _lastCheckedPrefix;
     
+    protected StringIntMap _declaredNamespaces;
+    
     public SAXDocumentSerializerWithPrefixMapping(Map namespaceToPrefixMapping) {
         // Use the local name to look up elements/attributes
         super(true);
         _namespaceToPrefixMapping = new HashMap(namespaceToPrefixMapping);
+        // Empty prefix
         _namespaceToPrefixMapping.put("", "");
+        // 'xml' prefix
+        _namespaceToPrefixMapping.put(EncodingConstants.XML_NAMESPACE_NAME, EncodingConstants.XML_NAMESPACE_PREFIX);
+        
+        _declaredNamespaces = new StringIntMap(4);
     }
     
-    // ContentHandler
-
     public final void startPrefixMapping(String prefix, String uri) throws SAXException {
         try {
             if (_elementHasNamespaces == false) {
@@ -87,13 +94,19 @@ public class SAXDocumentSerializerWithPrefixMapping extends SAXDocumentSerialize
 
                 // Write out Element byte with namespaces
                 write(EncodingConstants.ELEMENT | EncodingConstants.ELEMENT_NAMESPACES_FLAG);
+            
+                _declaredNamespaces.clear();
+                _declaredNamespaces.obtainIndex(uri);
+            } else {
+                if (_declaredNamespaces.obtainIndex(uri) != KeyIntMap.NOT_PRESENT)
+                    return;
             }
 
             final String p = getPrefix(uri);
-            if (p != null)
+            if (p != null) {
                 encodeNamespaceAttribute(p, uri);
-            else {
-                _namespaceToPrefixMapping.put(uri, prefix);
+            } else {
+                putPrefix(uri, prefix);
                 encodeNamespaceAttribute(prefix, uri);
             }
             
@@ -109,7 +122,7 @@ public class SAXDocumentSerializerWithPrefixMapping extends SAXDocumentSerialize
             for (int i = 0; i < entry._valueIndex; i++) {
                 final QualifiedName n = names[i];
                 if (namespaceURI == n.namespaceName || namespaceURI.equals(n.namespaceName)) {
-                    encodeNonZeroIntegerOnThirdBit(names[i].index);
+                    encodeNonZeroIntegerOnThirdBit(n.index);
                     return;
                 }
             }
@@ -140,5 +153,12 @@ public class SAXDocumentSerializerWithPrefixMapping extends SAXDocumentSerialize
         
         _lastCheckedNamespace = namespaceURI;
         return _lastCheckedPrefix = (String)_namespaceToPrefixMapping.get(namespaceURI);
+    }
+    
+    protected final void putPrefix(String namespaceURI, String prefix) {
+        _namespaceToPrefixMapping.put(namespaceURI, prefix);
+        
+        _lastCheckedNamespace = namespaceURI;
+        _lastCheckedPrefix = prefix;
     }
 }
