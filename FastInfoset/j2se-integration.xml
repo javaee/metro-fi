@@ -1,0 +1,35 @@
+<project name="FastInfoset" default="j2se-integration" basedir=".">
+
+    <!-- initialize build properties -->
+    <property file="${basedir}/build.properties" />
+
+    <property name="app.jar" value="${ant.project.name}.jar"/>
+
+    <path id="compile.class.path">
+        <pathelement location="${jsr173_api.jar}"/>
+    </path>
+
+    <target name="j2se-integration"
+	    description="prepare renamed source code for J2SE integration">
+	<taskdef name="prename" classname="com.sun.wts.tools.ant.PackageRenameTask">
+	    <classpath>
+		<pathelement path="tools/lib/package-rename-task.jar" />
+	    </classpath>
+	</taskdef>
+
+        <delete dir="j2se-integration"/>
+
+	<prename srcdir="src" destdir="j2se-integration/src">
+	    <pattern from="com.sun.xml.fastinfoset" to="com.sun.xml.internal.fastinfoset" />
+	    <pattern from="org.jvnet.fastinfoset" to="com.sun.xml.internal.org.jvnet.fastinfoset" />
+	</prename>
+
+	<!-- sanity test -->
+	<mkdir dir="${build.dir}/j2se-integration/classes"/>
+        <javac source="1.4" target="1.4" srcdir="j2se-integration/src" destdir="${build.dir}/j2se-integration/classes"
+            debug="on" optimize="on" deprecation="on">
+            <classpath refid="compile.class.path"/>
+        </javac>
+    </target>
+
+</project>
