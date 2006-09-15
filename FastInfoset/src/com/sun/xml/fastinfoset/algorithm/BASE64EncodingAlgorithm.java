@@ -47,7 +47,7 @@ import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class BASE64EncodingAlgorithm extends BuiltInEncodingAlgorithm {
     
-    protected static final char encodeBase64[] = {
+    /* package */ static final char encodeBase64[] = {
         'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
         'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
@@ -55,7 +55,7 @@ public class BASE64EncodingAlgorithm extends BuiltInEncodingAlgorithm {
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'
     };
 
-    protected static final int decodeBase64[] = {
+    /* package */ static final int decodeBase64[] = {
         /*'+'*/ 62,
         -1, -1, -1,
         /*'/'*/ 63,

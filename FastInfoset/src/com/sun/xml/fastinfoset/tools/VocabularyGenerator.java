@@ -206,7 +206,7 @@ public class VocabularyGenerator extends DefaultHandler implements LexicalHandle
 
     
     public void addToTable(String s, Set v, StringIntMap m, StringArray a) {
-        if (s == "") {
+        if (s.length() == 0) {
             return;
         }
         
@@ -218,7 +218,7 @@ public class VocabularyGenerator extends DefaultHandler implements LexicalHandle
     }
 
     public void addToTable(String s, Set v, StringIntMap m, PrefixArray a) {
-        if (s == "") {
+        if (s.length() == 0) {
             return;
         }
         
@@ -255,14 +255,14 @@ public class VocabularyGenerator extends DefaultHandler implements LexicalHandle
         int namespaceURIIndex = -1;
         int prefixIndex = -1;
         int localNameIndex = -1;
-        if (namespaceURI != "") {
+        if (namespaceURI.length() > 0) {
             namespaceURIIndex = _serializerVocabulary.namespaceName.get(namespaceURI);
             if (namespaceURIIndex == KeyIntMap.NOT_PRESENT) {
                 throw new SAXException(CommonResourceBundle.getInstance().
                         getString("message.namespaceURINotIndexed", new Object[]{Integer.valueOf(namespaceURIIndex)}));
             }
             
-            if (prefix != "") {
+            if (prefix.length() > 0) {
                 prefixIndex = _serializerVocabulary.prefix.get(prefix);
                 if (prefixIndex == KeyIntMap.NOT_PRESENT) {
                     throw new SAXException(CommonResourceBundle.getInstance().

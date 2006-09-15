@@ -574,10 +574,10 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
      */
     protected final void encodeNamespaceAttribute(String prefix, String uri) throws IOException {
         _b = EncodingConstants.NAMESPACE_ATTRIBUTE;
-        if (prefix != "") {
+        if (prefix.length() > 0) {
             _b |= EncodingConstants.NAMESPACE_ATTRIBUTE_PREFIX_FLAG;
         }
-        if (uri != "") {
+        if (uri.length() > 0) {
             _b |= EncodingConstants.NAMESPACE_ATTRIBUTE_NAME_FLAG;
         }
 
@@ -588,10 +588,10 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
 
         write(_b);
 
-        if (prefix != "") {
+        if (prefix.length() > 0) {
             encodeIdentifyingNonEmptyStringOnFirstBit(prefix, _v.prefix);
         }
-        if (uri != "") {
+        if (uri.length() > 0) {
             encodeIdentifyingNonEmptyStringOnFirstBit(uri, _v.namespaceName);
         }
     }
@@ -816,13 +816,13 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
 
         int namespaceURIIndex = KeyIntMap.NOT_PRESENT;
         int prefixIndex = KeyIntMap.NOT_PRESENT;
-        if (namespaceURI != "") {
+        if (namespaceURI.length() > 0) {
             namespaceURIIndex = _v.namespaceName.get(namespaceURI);
             if (namespaceURIIndex == KeyIntMap.NOT_PRESENT) {
                 throw new IOException(CommonResourceBundle.getInstance().getString("message.namespaceURINotIndexed", new Object[]{namespaceURI}));
             }
 
-            if (prefix != "") {
+            if (prefix.length() > 0) {
                 prefixIndex = _v.prefix.get(prefix);
                 if (prefixIndex == KeyIntMap.NOT_PRESENT) {
                     throw new IOException(CommonResourceBundle.getInstance().getString("message.prefixNotIndexed", new Object[]{prefix}));
@@ -899,7 +899,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                 LocalNameQualifiedNamesMap.Entry entry) throws IOException {
         int namespaceURIIndex = KeyIntMap.NOT_PRESENT;
         int prefixIndex = KeyIntMap.NOT_PRESENT;
-        if (namespaceURI != "") {
+        if (namespaceURI.length() > 0) {
             namespaceURIIndex = _v.namespaceName.get(namespaceURI);
             if (namespaceURIIndex == KeyIntMap.NOT_PRESENT) {
                 if (namespaceURI == EncodingConstants.XMLNS_NAMESPACE_NAME || 
@@ -910,7 +910,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                 }
             }
             
-            if (prefix != "") {
+            if (prefix.length() > 0) {
                 prefixIndex = _v.prefix.get(prefix);
                 if (prefixIndex == KeyIntMap.NOT_PRESENT) {
                     throw new IOException(CommonResourceBundle.getInstance().getString("message.prefixNotIndexed", new Object[]{prefix}));
@@ -924,9 +924,9 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         entry.addQualifiedName(name);
 
         _b = EncodingConstants.ATTRIBUTE_LITERAL_QNAME_FLAG;
-        if (namespaceURI != "") {
+        if (namespaceURI.length() > 0) {
             _b |= EncodingConstants.LITERAL_QNAME_NAMESPACE_NAME_FLAG;
-            if (prefix != "") {
+            if (prefix.length() > 0) {
                 _b |= EncodingConstants.LITERAL_QNAME_PREFIX_FLAG;
             }
         }
@@ -1052,6 +1052,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         if (s == null || s.length() == 0) {
             // C.26 an index (first bit '1') with seven '1' bits for an empty string
             write(0xFF);
+            return;
         } else if (addToTable) {
             final int index = _v.attributeValue.obtainIndex(s);
             if (index != KeyIntMap.NOT_PRESENT) {

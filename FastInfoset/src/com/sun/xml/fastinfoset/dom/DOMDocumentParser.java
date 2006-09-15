@@ -592,7 +592,7 @@ public class DOMDocumentParser extends Decoder {
                     prefix = decodeIdentifyingNonEmptyStringOnFirstBitAsPrefix(false);
                     a = createAttribute(
                             EncodingConstants.XMLNS_NAMESPACE_NAME,
-                            createQualifiedNameString(EncodingConstants.XMLNS_NAMESPACE_PREFIX_CHARS, prefix),
+                            createQualifiedNameString(XMLNS_NAMESPACE_PREFIX_CHARS, prefix),
                             prefix);
                     a.setValue ("");
                     
@@ -605,7 +605,7 @@ public class DOMDocumentParser extends Decoder {
                     prefix = decodeIdentifyingNonEmptyStringOnFirstBitAsPrefix(true);
                     a = createAttribute(
                             EncodingConstants.XMLNS_NAMESPACE_NAME,
-                            createQualifiedNameString(EncodingConstants.XMLNS_NAMESPACE_PREFIX_CHARS, prefix),
+                            createQualifiedNameString(XMLNS_NAMESPACE_PREFIX_CHARS, prefix),
                             prefix);
                     a.setValue (decodeIdentifyingNonEmptyStringOnFirstBitAsNamespaceName(true));
                     

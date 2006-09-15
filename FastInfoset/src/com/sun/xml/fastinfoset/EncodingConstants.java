@@ -51,14 +51,11 @@ public final class EncodingConstants {
     public static final int XML_NAMESPACE_PREFIX_LENGTH = XML_NAMESPACE_PREFIX.length();
     public static final String XML_NAMESPACE_NAME = "http://www.w3.org/XML/1998/namespace";
     public static final int XML_NAMESPACE_NAME_LENGTH = XML_NAMESPACE_NAME.length();
-    public static final char[] XML_NAMESPACE_NAME_CHARS = XML_NAMESPACE_NAME.toCharArray();
             
     public static final String XMLNS_NAMESPACE_PREFIX = "xmlns";    
     public static final int XMLNS_NAMESPACE_PREFIX_LENGTH = XMLNS_NAMESPACE_PREFIX.length();
-    public static final char[] XMLNS_NAMESPACE_PREFIX_CHARS = XMLNS_NAMESPACE_PREFIX.toCharArray();
     public static final String XMLNS_NAMESPACE_NAME = "http://www.w3.org/2000/xmlns/";
     public static final int XMLNS_NAMESPACE_NAME_LENGTH = XMLNS_NAMESPACE_NAME.length();
-    public static final char[] XMLNS_NAMESPACE_NAME_CHARS = XMLNS_NAMESPACE_NAME.toCharArray();
     
     public static final QualifiedName DEFAULT_NAMESPACE_DECLARATION = new QualifiedName(
             "",
@@ -176,7 +173,7 @@ public final class EncodingConstants {
     public static final int OCTET_STRING_LENGTH_2ND_BIT_LARGE_FLAG = 0x60;
     public static final int OCTET_STRING_LENGTH_2ND_BIT_SMALL_MASK = 0x1F;
 
-    public static final int[] OCTET_STRING_LENGTH_2ND_BIT_VALUES = {
+    /* package */ static final int[] OCTET_STRING_LENGTH_2ND_BIT_VALUES = {
         OCTET_STRING_LENGTH_2ND_BIT_SMALL_LIMIT,
         OCTET_STRING_LENGTH_2ND_BIT_MEDIUM_LIMIT,
         OCTET_STRING_LENGTH_2ND_BIT_MEDIUM_FLAG,
@@ -192,7 +189,7 @@ public final class EncodingConstants {
     public static final int OCTET_STRING_LENGTH_5TH_BIT_LARGE_FLAG = 0x0C;
     public static final int OCTET_STRING_LENGTH_5TH_BIT_SMALL_MASK = 0x07;
     
-    public static final int[] OCTET_STRING_LENGTH_5TH_BIT_VALUES = {
+    /* package */ static final int[] OCTET_STRING_LENGTH_5TH_BIT_VALUES = {
         OCTET_STRING_LENGTH_5TH_BIT_SMALL_LIMIT,
         OCTET_STRING_LENGTH_5TH_BIT_MEDIUM_LIMIT,
         OCTET_STRING_LENGTH_5TH_BIT_MEDIUM_FLAG,
@@ -208,7 +205,7 @@ public final class EncodingConstants {
     public static final int OCTET_STRING_LENGTH_7TH_BIT_LARGE_FLAG = 0x03;
     public static final int OCTET_STRING_LENGTH_7TH_BIT_SMALL_MASK = 0x01;
 
-    public static final int[] OCTET_STRING_LENGTH_7TH_BIT_VALUES = {
+    /* package */ static final int[] OCTET_STRING_LENGTH_7TH_BIT_VALUES = {
         OCTET_STRING_LENGTH_7TH_BIT_SMALL_LIMIT,
         OCTET_STRING_LENGTH_7TH_BIT_MEDIUM_LIMIT,
         OCTET_STRING_LENGTH_7TH_BIT_MEDIUM_FLAG,
@@ -239,7 +236,7 @@ public final class EncodingConstants {
     public static final int INTEGER_2ND_BIT_MEDIUM_MASK = 0x1F;
     public static final int INTEGER_2ND_BIT_LARGE_MASK = 0x0F;
     
-    public static final int[] INTEGER_2ND_BIT_VALUES = {
+    /* package */ static final int[] INTEGER_2ND_BIT_VALUES = {
         INTEGER_2ND_BIT_SMALL_LIMIT,
         INTEGER_2ND_BIT_MEDIUM_LIMIT,
         INTEGER_2ND_BIT_LARGE_LIMIT,
@@ -262,7 +259,7 @@ public final class EncodingConstants {
     public static final int INTEGER_3RD_BIT_LARGE_MASK = 0x07;
     public static final int INTEGER_3RD_BIT_LARGE_LARGE_MASK = 0x0F;
 
-    public static final int[] INTEGER_3RD_BIT_VALUES = {
+    /* package */ static final int[] INTEGER_3RD_BIT_VALUES = {
         INTEGER_3RD_BIT_SMALL_LIMIT,
         INTEGER_3RD_BIT_MEDIUM_LIMIT,
         INTEGER_3RD_BIT_LARGE_LIMIT,
@@ -284,7 +281,7 @@ public final class EncodingConstants {
     public static final int INTEGER_4TH_BIT_MEDIUM_MASK = 0x03;
     public static final int INTEGER_4TH_BIT_LARGE_MASK = 0x03;
 
-    public static final int[] INTEGER_4TH_BIT_VALUES = {
+    /* package */ static final int[] INTEGER_4TH_BIT_VALUES = {
         INTEGER_4TH_BIT_SMALL_LIMIT,
         INTEGER_4TH_BIT_MEDIUM_LIMIT,
         INTEGER_4TH_BIT_LARGE_LIMIT,
@@ -293,9 +290,9 @@ public final class EncodingConstants {
         INTEGER_4TH_BIT_LARGE_LARGE_FLAG
     };
         
-    public static final byte[] BINARY_HEADER = {(byte)0xE0, 0, 0, 1};
+    /* package */ static final byte[] BINARY_HEADER = {(byte)0xE0, 0, 0, 1};
     
-    public static byte[][] XML_DECLARATION_VALUES;
+    /* package */ static byte[][] XML_DECLARATION_VALUES;
     
     private static void initiateXMLDeclarationValues() {
         

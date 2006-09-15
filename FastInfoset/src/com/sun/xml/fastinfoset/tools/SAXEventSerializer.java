@@ -101,7 +101,7 @@ public class SAXEventSerializer extends DefaultHandler
             _namespaceAttributes = new ArrayList();
         }
         
-        String qName = (prefix == "") ? "xmlns" : "xmlns" + prefix;
+        String qName = (prefix.length() == 0) ? "xmlns" : "xmlns" + prefix;
         AttributeValueHolder attribute = new AttributeValueHolder(
                 qName,
                 prefix, 

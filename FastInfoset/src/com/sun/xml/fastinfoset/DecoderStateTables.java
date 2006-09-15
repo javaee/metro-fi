@@ -524,14 +524,14 @@ public class DecoderStateTables {
     };
 
     
-    public final static int ISTRING_SMALL_LENGTH        = 0;
-    public final static int ISTRING_MEDIUM_LENGTH       = 1;
-    public final static int ISTRING_LARGE_LENGTH        = 2;
-    public final static int ISTRING_INDEX_SMALL         = 3;
-    public final static int ISTRING_INDEX_MEDIUM        = 4;
-    public final static int ISTRING_INDEX_LARGE         = 5;
+    /* package */ final static int ISTRING_SMALL_LENGTH        = 0;
+    /* package */ final static int ISTRING_MEDIUM_LENGTH       = 1;
+    /* package */ final static int ISTRING_LARGE_LENGTH        = 2;
+    /* package */ final static int ISTRING_INDEX_SMALL         = 3;
+    /* package */ final static int ISTRING_INDEX_MEDIUM        = 4;
+    /* package */ final static int ISTRING_INDEX_LARGE         = 5;
 
-    public static final int[] ISTRING = new int[256];
+    /* package */ static final int[] ISTRING = new int[256];
     
     private static int[][] ISTRING_RANGES = {
         // %00000000 to %00111111 small length
@@ -563,13 +563,13 @@ public class DecoderStateTables {
     };
 
     
-    public final static int ISTRING_PREFIX_NAMESPACE_LENGTH_3   = 6;
-    public final static int ISTRING_PREFIX_NAMESPACE_LENGTH_5   = 7;
-    public final static int ISTRING_PREFIX_NAMESPACE_LENGTH_29  = 8;
-    public final static int ISTRING_PREFIX_NAMESPACE_LENGTH_36  = 9;
-    public final static int ISTRING_PREFIX_NAMESPACE_INDEX_ZERO = 10;
+    /* package */ final static int ISTRING_PREFIX_NAMESPACE_LENGTH_3   = 6;
+    /* package */ final static int ISTRING_PREFIX_NAMESPACE_LENGTH_5   = 7;
+    /* package */ final static int ISTRING_PREFIX_NAMESPACE_LENGTH_29  = 8;
+    /* package */ final static int ISTRING_PREFIX_NAMESPACE_LENGTH_36  = 9;
+    /* package */ final static int ISTRING_PREFIX_NAMESPACE_INDEX_ZERO = 10;
     
-    public static final int[] ISTRING_PREFIX_NAMESPACE = new int[256];
+    /* package */ static final int[] ISTRING_PREFIX_NAMESPACE = new int[256];
     
     private static int[][] ISTRING_PREFIX_NAMESPACE_RANGES = {
         // %00000000 to %00000001 small length
@@ -631,13 +631,13 @@ public class DecoderStateTables {
     };
     
     // UTF-8 states
-    public final static int UTF8_NCNAME_NCNAME         = 0;
-    public final static int UTF8_NCNAME_NCNAME_CHAR    = 1;
-    public final static int UTF8_TWO_BYTES             = 2;
-    public final static int UTF8_THREE_BYTES           = 3;
-    public final static int UTF8_FOUR_BYTES            = 4;
+    /* package */ final static int UTF8_NCNAME_NCNAME         = 0;
+    /* package */ final static int UTF8_NCNAME_NCNAME_CHAR    = 1;
+    /* package */ final static int UTF8_TWO_BYTES             = 2;
+    /* package */ final static int UTF8_THREE_BYTES           = 3;
+    /* package */ final static int UTF8_FOUR_BYTES            = 4;
 
-    public static final int[] UTF8_NCNAME = new int[256];
+    /* package */ static final int[] UTF8_NCNAME = new int[256];
     
     private static int[][] UTF8_NCNAME_RANGES = {
         
@@ -707,9 +707,9 @@ public class DecoderStateTables {
         { 0xFF, STATE_ILLEGAL }
     };
 
-    public final static int UTF8_ONE_BYTE              = 1;
+    /* package */ final static int UTF8_ONE_BYTE = 1;
     
-    public static final int[] UTF8 = new int[256];
+    /* package */ static final int[] UTF8 = new int[256];
     
     private static int[][] UTF8_RANGES = {
         

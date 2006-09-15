@@ -83,6 +83,12 @@ import org.jvnet.fastinfoset.FastInfosetParser;
  */
 public abstract class Decoder implements FastInfosetParser {
 
+    protected static final char[] XML_NAMESPACE_NAME_CHARS = EncodingConstants.XML_NAMESPACE_NAME.toCharArray();
+            
+    protected static final char[] XMLNS_NAMESPACE_PREFIX_CHARS = EncodingConstants.XMLNS_NAMESPACE_PREFIX.toCharArray();
+    
+    protected static final char[] XMLNS_NAMESPACE_NAME_CHARS = EncodingConstants.XMLNS_NAMESPACE_NAME.toCharArray();
+
     /**
      * String interning system property.
      */
@@ -1064,7 +1070,7 @@ public abstract class Decoder implements FastInfosetParser {
                 _octetBufferLength = EncodingConstants.XMLNS_NAMESPACE_NAME_LENGTH;
                 decodeUtf8StringAsCharBuffer();
                 
-                if (compareCharsWithCharBufferFromEndToStart(EncodingConstants.XMLNS_NAMESPACE_NAME_CHARS)) {
+                if (compareCharsWithCharBufferFromEndToStart(XMLNS_NAMESPACE_NAME_CHARS)) {
                     throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.xmlnsConnotBeBoundToPrefix"));
                 }
                 
@@ -1078,7 +1084,7 @@ public abstract class Decoder implements FastInfosetParser {
                 _octetBufferLength = EncodingConstants.XML_NAMESPACE_NAME_LENGTH;
                 decodeUtf8StringAsCharBuffer();
                 
-                if (compareCharsWithCharBufferFromEndToStart(EncodingConstants.XML_NAMESPACE_NAME_CHARS)) {
+                if (compareCharsWithCharBufferFromEndToStart(XML_NAMESPACE_NAME_CHARS)) {
                     throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.illegalNamespaceName"));
                 }
                 
@@ -1264,7 +1270,7 @@ public abstract class Decoder implements FastInfosetParser {
     }
     
     protected final String decodeRAOctetsAsString(char[] restrictedAlphabet) throws FastInfosetException, IOException {
-        decodeAlphabetOctetsAsCharBuffer(null);
+        decodeAlphabetOctetsAsCharBuffer(restrictedAlphabet);
         return new String(_charBuffer, 0, _charBufferLength);
     }
 

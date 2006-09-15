@@ -266,7 +266,7 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
         try {
             if (getIgnoreProcesingInstructions()) return;
             
-            if (target == "") {
+            if (target.length() == 0) {
                 throw new SAXException(CommonResourceBundle.getInstance().
                         getString("message.processingInstructionTargetIsEmpty"));
             }
