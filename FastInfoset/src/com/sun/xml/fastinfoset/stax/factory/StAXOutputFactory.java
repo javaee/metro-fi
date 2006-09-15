@@ -96,7 +96,7 @@ public class StAXOutputFactory extends XMLOutputFactory {
                 }
             }
         }
-        else if(result instanceof Result){
+        else {
             try{
                 //xxx: should we be using FileOutputStream - nb.
                 FileWriter writer = new FileWriter(new File(result.getSystemId()));

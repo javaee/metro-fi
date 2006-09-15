@@ -185,7 +185,6 @@ public class DOMDocumentParser extends Decoder {
                     while (_b == EncodingConstants.PROCESSING_INSTRUCTION) {
                         switch(decodeNonIdentifyingStringOnFirstBit()) {
                             case NISTRING_STRING:
-                                final String data = new String(_charBuffer, 0, _charBufferLength);
                                 if (_addToTable) {
                                     _v.otherString.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
                                 }
@@ -298,7 +297,7 @@ public class DOMDocumentParser extends Decoder {
         }
 
         if ((_b & EncodingConstants.DOCUMENT_VERSION_FLAG) > 0) {
-            String version = decodeVersion();
+            decodeVersion();
             /*
              * TODO 
              * how to report the document version?

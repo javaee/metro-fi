@@ -110,7 +110,19 @@ public class EntityDeclarationImpl extends EventBase implements EntityDeclaratio
     public String getBaseURI() {
         return _baseURI;
     }
-  
+
+    public void setPublicId(String publicId) {
+        _publicId = publicId;
+    }
+    
+    public void setSystemId(String systemId) {
+        _systemId = systemId;
+    }
+    
+    public void setBaseURI(String baseURI) {
+        _baseURI = baseURI;
+    }
+    
     public void setName(String entityName){
         _entityName = entityName;
     }    

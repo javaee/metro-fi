@@ -67,6 +67,7 @@ public class DOMDocumentSerializer extends Encoder {
         switch (n.getNodeType()) {
             case Node.DOCUMENT_NODE:
                 serialize((Document)n);
+                break;
             case Node.ELEMENT_NODE:
                 serializeElementAsDocument(n);
                 break;

@@ -56,7 +56,7 @@ public class IntEncodingAlgorithm extends IntegerEncodingAlgorithm {
     public final int getPrimtiveLengthFromOctetLength(int octetLength) throws EncodingAlgorithmException {
         if (octetLength % INT_SIZE != 0) {
             throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().
-                    getString("message.lengthNotMultipleOfInt", new Object[]{new Integer(INT_SIZE)}));
+                    getString("message.lengthNotMultipleOfInt", new Object[]{Integer.valueOf(INT_SIZE)}));
         }
         
         return octetLength / INT_SIZE;
@@ -150,7 +150,7 @@ public class IntEncodingAlgorithm extends IntegerEncodingAlgorithm {
                     ((b[1] & 0xFF) << 16) | 
                     ((b[2] & 0xFF) << 8) | 
                     (b[3] & 0xFF);
-            integerList.add(new Integer(i));
+            integerList.add(Integer.valueOf(i));
         }
         
         return generateArrayFromList(integerList);

@@ -63,19 +63,13 @@ public class ParserVocabulary extends Vocabulary {
     public static final String NON_IDENTIFYING_STRING_TABLE_MAXIMUM_CHARACTERS_PEOPERTY = 
         "com.sun.xml.fastinfoset.vocab.ParserVocabulary.NonIdentifyingStringTable.maximumCharacters";
 
-    protected static int IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS;
-    protected static int NON_IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS; 
-    protected static int NON_IDENTIFYING_STRING_TABLE_MAXIMUM_CHARACTERS;
-    
-    static {
-        IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS = 
-                getIntegerValueFromProperty(IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS_PEOPERTY);
-        NON_IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS = 
-                getIntegerValueFromProperty(NON_IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS_PEOPERTY);
-        NON_IDENTIFYING_STRING_TABLE_MAXIMUM_CHARACTERS = 
-                getIntegerValueFromProperty(NON_IDENTIFYING_STRING_TABLE_MAXIMUM_CHARACTERS_PEOPERTY);
-    }
-    
+    protected static final int IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS =
+            getIntegerValueFromProperty(IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS_PEOPERTY);
+    protected static final int NON_IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS = 
+            getIntegerValueFromProperty(NON_IDENTIFYING_STRING_TABLE_MAXIMUM_ITEMS_PEOPERTY);
+    protected static final int NON_IDENTIFYING_STRING_TABLE_MAXIMUM_CHARACTERS =
+            getIntegerValueFromProperty(NON_IDENTIFYING_STRING_TABLE_MAXIMUM_CHARACTERS_PEOPERTY);
+        
     private static int getIntegerValueFromProperty(String property) {
         String value = System.getProperty(property);
         if (value == null) {

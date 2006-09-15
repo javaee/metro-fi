@@ -176,12 +176,12 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
                                 else if (alphabet == RestrictedAlphabet.DATE_TIME_CHARACTERS) 
                                     encodeNonIdentifyingStringOnFirstBit(
                                             RestrictedAlphabet.DATE_TIME_CHARACTERS_INDEX, 
-                                            EncodingConstants.DATE_TIME_CHARACTERS_TABLE,
+                                            DATE_TIME_CHARACTERS_TABLE,
                                             value, addToTable);
                                 else if (alphabet == RestrictedAlphabet.DATE_TIME_CHARACTERS) 
                                     encodeNonIdentifyingStringOnFirstBit(
                                             RestrictedAlphabet.NUMERIC_CHARACTERS_INDEX, 
-                                            EncodingConstants.NUMERIC_CHARACTERS_TABLE,
+                                            NUMERIC_CHARACTERS_TABLE,
                                             value, addToTable);
                                 else
                                     encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
@@ -502,7 +502,7 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
             encodeTermination();
 
             final boolean addToTable = (length < characterContentChunkSizeContraint);
-            encodeFourBitCharacters(RestrictedAlphabet.NUMERIC_CHARACTERS_INDEX, EncodingConstants.NUMERIC_CHARACTERS_TABLE,
+            encodeFourBitCharacters(RestrictedAlphabet.NUMERIC_CHARACTERS_INDEX, NUMERIC_CHARACTERS_TABLE,
                     ch, start, length, addToTable);
         } catch (IOException e) {
             throw new SAXException(e);
@@ -520,7 +520,7 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
             encodeTermination();
 
             final boolean addToTable = (length < characterContentChunkSizeContraint);
-            encodeFourBitCharacters(RestrictedAlphabet.DATE_TIME_CHARACTERS_INDEX, EncodingConstants.DATE_TIME_CHARACTERS_TABLE,
+            encodeFourBitCharacters(RestrictedAlphabet.DATE_TIME_CHARACTERS_INDEX, DATE_TIME_CHARACTERS_TABLE,
                     ch, start, length, addToTable);
         } catch (IOException e) {
             throw new SAXException(e);

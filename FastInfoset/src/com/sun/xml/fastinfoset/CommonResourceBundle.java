@@ -62,14 +62,12 @@ public class CommonResourceBundle extends AbstractResourceBundle {
     public static CommonResourceBundle getInstance() {
         if (instance == null) {
             synchronized (CommonResourceBundle.class) {
-                if (instance == null) {
-                    instance = new CommonResourceBundle();
-                    //**need to know where to get the locale
-                    //String localeString = CommonProperties.getInstance()
-                    //                  .getProperty("omar.common.locale");
-                    String localeString = null;
-                    locale = parseLocale(localeString);
-                }
+                instance = new CommonResourceBundle();
+                //**need to know where to get the locale
+                //String localeString = CommonProperties.getInstance()
+                //                  .getProperty("omar.common.locale");
+                String localeString = null;
+                locale = parseLocale(localeString);
             }
         }
 
@@ -79,9 +77,7 @@ public class CommonResourceBundle extends AbstractResourceBundle {
     public static CommonResourceBundle getInstance(Locale locale) {
         if (instance == null) {
             synchronized (CommonResourceBundle.class) {
-                if (instance == null) {
-                    instance = new CommonResourceBundle(locale);
-                }
+                instance = new CommonResourceBundle(locale);
             }
         } else {
             synchronized (CommonResourceBundle.class) {

@@ -42,7 +42,7 @@
  *
  * Copyright (c) 2001 - 2005 freebxml.org.  All rights reserved.
  *
- * $Header: /zpool01/javanet/scm/svn/tmp/cvs2svn/fi/FastInfoset/src/com/sun/xml/fastinfoset/AbstractResourceBundle.java,v 1.3 2006-03-16 16:22:15 sandoz Exp $
+ * $Header: /zpool01/javanet/scm/svn/tmp/cvs2svn/fi/FastInfoset/src/com/sun/xml/fastinfoset/AbstractResourceBundle.java,v 1.4 2006-09-15 12:02:53 sandoz Exp $
  * ====================================================================
  */
 package com.sun.xml.fastinfoset;
@@ -66,7 +66,7 @@ public abstract class AbstractResourceBundle extends ResourceBundle {
     public static String getBundleName() {
         return _bundleName;
     }
-    public void setBundleName(String name) {
+    public static void setBundleName(String name) {
         _bundleName = name;
     }
     /**

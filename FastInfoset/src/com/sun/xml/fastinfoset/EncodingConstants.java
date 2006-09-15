@@ -44,7 +44,6 @@ import org.jvnet.fastinfoset.RestrictedAlphabet;
 
 public final class EncodingConstants {
     static {
-        initiateCharacterTables();
         initiateXMLDeclarationValues();
     }
     
@@ -293,42 +292,7 @@ public final class EncodingConstants {
         INTEGER_4TH_BIT_LARGE_FLAG,
         INTEGER_4TH_BIT_LARGE_LARGE_FLAG
     };
-    
-    
-    public static int[] NUMERIC_CHARACTERS_TABLE;
-    
-    public static int[] DATE_TIME_CHARACTERS_TABLE;
-    
-    private static void initiateCharacterTables() {
-        NUMERIC_CHARACTERS_TABLE = new int[maxCharacter(RestrictedAlphabet.NUMERIC_CHARACTERS) + 1];
-        DATE_TIME_CHARACTERS_TABLE = new int[maxCharacter(RestrictedAlphabet.DATE_TIME_CHARACTERS) + 1];
-    
-        for (int i = 0; i < NUMERIC_CHARACTERS_TABLE.length ; i++) {
-            NUMERIC_CHARACTERS_TABLE[i] = -1;
-        }
-        for (int i = 0; i < DATE_TIME_CHARACTERS_TABLE.length ; i++) {
-            DATE_TIME_CHARACTERS_TABLE[i] = -1;
-        }
         
-        for (int i = 0; i < RestrictedAlphabet.NUMERIC_CHARACTERS.length() ; i++) {
-            NUMERIC_CHARACTERS_TABLE[RestrictedAlphabet.NUMERIC_CHARACTERS.charAt(i)] = i;
-        }        
-        for (int i = 0; i < RestrictedAlphabet.DATE_TIME_CHARACTERS.length() ; i++) {
-            DATE_TIME_CHARACTERS_TABLE[RestrictedAlphabet.DATE_TIME_CHARACTERS.charAt(i)] = i;
-        }
-    }
-    
-    private static int maxCharacter(String alphabet) {
-        int c = 0;
-        for (int i = 0; i < alphabet.length() ; i++) {
-            if (c < alphabet.charAt(i)) {
-                c = alphabet.charAt(i);
-            }
-        }
-        
-        return c;
-    }
-    
     public static final byte[] BINARY_HEADER = {(byte)0xE0, 0, 0, 1};
     
     public static byte[][] XML_DECLARATION_VALUES;
