@@ -97,6 +97,32 @@ public class FrequencyHandler extends DefaultHandler {
             attributeValues.add0(s);
         }
     }
+    
+    public void addXsiAttributes() {
+        QName q = new QName("http://www.w3.org/2001/XMLSchema-instance", "type");
+        addQNameToAttributes(q);
+        
+        q = new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation");
+        addQNameToAttributes(q);
+    }
+    
+    public void addQNameToElements(QName q) {
+        // Add the namespace to the table
+        namespaces.add0(q.getNamespaceURI());
+        // Add the local name to the table
+        localNames.add0(q.getLocalPart());
+        
+        bucketQNameToNamespace(q, namespacesToElements);
+    }
+    
+    public void addQNameToAttributes(QName q) {
+        // Add the namespace to the table
+        namespaces.add0(q.getNamespaceURI());
+        // Add the local name to the table
+        localNames.add0(q.getLocalPart());
+        
+        bucketQNameToNamespace(q, namespacesToAttributes);
+    }
 
     /**
      * Get the frequency based lists of properties of information items.
@@ -161,6 +187,9 @@ public class FrequencyHandler extends DefaultHandler {
             } else {
                 String prefix = getNewPrefix();
                 namespaceURIToPrefix.put(namespaceURI, prefix);
+                
+                // Add the prefix to the table
+                prefixes.add0(prefix);
             }
         }
         
@@ -189,6 +218,15 @@ public class FrequencyHandler extends DefaultHandler {
             }
             subs.add(q);
         }
+    }
+    
+    private void bucketQNameToNamespace(QName q, Map<String, Set<QName>> m) {
+        Set<QName> subs = m.get(q.getNamespaceURI());
+        if (subs == null) {
+            subs = new HashSet();
+            m.put(q.getNamespaceURI(), subs);
+        }
+        subs.add(q);        
     }
     
     public void startPrefixMapping(String prefix, String uri) throws SAXException {
