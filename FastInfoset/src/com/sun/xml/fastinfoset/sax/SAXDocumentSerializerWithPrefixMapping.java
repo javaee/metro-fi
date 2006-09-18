@@ -47,6 +47,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import org.xml.sax.SAXException;
 import java.util.Map;
+import org.jvnet.fastinfoset.FastInfosetException;
+import org.jvnet.fastinfoset.RestrictedAlphabet;
+import org.jvnet.fastinfoset.sax.EncodingAlgorithmAttributes;
+import org.xml.sax.Attributes;
 
 /**
  * The Fast Infoset SAX serializer that maps prefixes to user specified prefixes
@@ -66,6 +70,7 @@ import java.util.Map;
  */
 public class SAXDocumentSerializerWithPrefixMapping extends SAXDocumentSerializer {
     protected Map _namespaceToPrefixMapping;
+    protected Map _prefixToPrefixMapping;
     protected String _lastCheckedNamespace;
     protected String _lastCheckedPrefix;
     
@@ -75,6 +80,8 @@ public class SAXDocumentSerializerWithPrefixMapping extends SAXDocumentSerialize
         // Use the local name to look up elements/attributes
         super(true);
         _namespaceToPrefixMapping = new HashMap(namespaceToPrefixMapping);
+        _prefixToPrefixMapping = new HashMap();
+        
         // Empty prefix
         _namespaceToPrefixMapping.put("", "");
         // 'xml' prefix
@@ -98,13 +105,19 @@ public class SAXDocumentSerializerWithPrefixMapping extends SAXDocumentSerialize
                 _declaredNamespaces.clear();
                 _declaredNamespaces.obtainIndex(uri);
             } else {
-                if (_declaredNamespaces.obtainIndex(uri) != KeyIntMap.NOT_PRESENT)
-                    return;
+                if (_declaredNamespaces.obtainIndex(uri) != KeyIntMap.NOT_PRESENT) {
+                    final String p = getPrefix(uri);
+                    if (p != null) {
+                        _prefixToPrefixMapping.put(prefix, p);
+                    }
+                    return;   
+                }
             }
-
+            
             final String p = getPrefix(uri);
             if (p != null) {
                 encodeNamespaceAttribute(p, uri);
+                _prefixToPrefixMapping.put(prefix, p);
             } else {
                 putPrefix(uri, prefix);
                 encodeNamespaceAttribute(prefix, uri);
@@ -130,6 +143,87 @@ public class SAXDocumentSerializerWithPrefixMapping extends SAXDocumentSerialize
 
         encodeLiteralElementQualifiedNameOnThirdBit(namespaceURI, getPrefix(namespaceURI),
                 localName, entry);            
+    }
+    
+    protected final void encodeAttributes(Attributes atts) throws IOException, FastInfosetException {
+        boolean addToTable;
+        String value;
+        if (atts instanceof EncodingAlgorithmAttributes) {
+            final EncodingAlgorithmAttributes eAtts = (EncodingAlgorithmAttributes)atts;
+            Object data;
+            String alphabet;
+            for (int i = 0; i < eAtts.getLength(); i++) {
+                final String uri = atts.getURI(i);
+                if (encodeAttribute(uri, atts.getQName(i), atts.getLocalName(i))) {
+                    data = eAtts.getAlgorithmData(i);
+                    // If data is null then there is no algorithm data
+                    if (data == null) {
+                        value = eAtts.getValue(i);
+                        addToTable = (eAtts.getToIndex(i) || value.length() < attributeValueSizeConstraint) ? true : false;
+
+                        alphabet = eAtts.getAlpababet(i);
+                        if (alphabet == null) {
+                            if (uri == "http://www.w3.org/2001/XMLSchema-instance" || 
+                                    uri.equals("http://www.w3.org/2001/XMLSchema-instance")) {
+                                value = convertQName(value);
+                            }
+                            encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
+                        } else if (alphabet == RestrictedAlphabet.DATE_TIME_CHARACTERS) 
+                            encodeNonIdentifyingStringOnFirstBit(
+                                    RestrictedAlphabet.DATE_TIME_CHARACTERS_INDEX, 
+                                    DATE_TIME_CHARACTERS_TABLE,
+                                    value, addToTable);
+                        else if (alphabet == RestrictedAlphabet.DATE_TIME_CHARACTERS) 
+                            encodeNonIdentifyingStringOnFirstBit(
+                                    RestrictedAlphabet.NUMERIC_CHARACTERS_INDEX, 
+                                    NUMERIC_CHARACTERS_TABLE,
+                                    value, addToTable);
+                        else
+                            encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
+
+                    } else {
+                        encodeNonIdentifyingStringOnFirstBit(eAtts.getAlgorithmURI(i),
+                                eAtts.getAlgorithmIndex(i), data);
+                    }
+                }
+            }
+        } else {
+            for (int i = 0; i < atts.getLength(); i++) {
+                final String uri = atts.getURI(i);
+                if (encodeAttribute(atts.getURI(i), atts.getQName(i), atts.getLocalName(i))) {
+                    value = atts.getValue(i);
+                    addToTable = (value.length() < attributeValueSizeConstraint) ? true : false;
+                    
+                    if (uri == "http://www.w3.org/2001/XMLSchema-instance" || 
+                            uri.equals("http://www.w3.org/2001/XMLSchema-instance")) {
+                        value = convertQName(value);
+                    }
+                    encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
+                }
+            }
+        }
+        _b = EncodingConstants.TERMINATOR;
+        _terminate = true;
+    }
+    
+    private String convertQName(String qName) {
+        int i = qName.indexOf(':');
+        String prefix = "";
+        String localName = qName;
+        if (i != -1) {
+            prefix = qName.substring(0, i);
+            localName = qName.substring(i + 1);
+        }
+        
+        String p = (String)_prefixToPrefixMapping.get(prefix);
+        if (p != null) {
+            if (p.length() == 0)
+                return localName;
+            else
+                return p + ":" + localName;
+        } else {
+            return qName;
+        }
     }
     
     protected final boolean encodeAttribute(String namespaceURI, String qName, String localName) throws IOException {

@@ -156,73 +156,13 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
             encodeElement(namespaceURI, qName, localName);
 
             if (attributeCount > 0) {
-                boolean addToTable;
-                String value;
-                if (atts instanceof EncodingAlgorithmAttributes) {
-                    final EncodingAlgorithmAttributes eAtts = (EncodingAlgorithmAttributes)atts;
-                    Object data;
-                    String alphabet;
-                    for (int i = 0; i < eAtts.getLength(); i++) {
-                        if (encodeAttribute(atts.getURI(i), atts.getQName(i), atts.getLocalName(i))) {
-                            data = eAtts.getAlgorithmData(i);
-                            // If data is null then there is no algorithm data
-                            if (data == null) {
-                                value = eAtts.getValue(i);
-                                addToTable = (eAtts.getToIndex(i) || value.length() < attributeValueSizeConstraint) ? true : false;
-
-                                alphabet = eAtts.getAlpababet(i);
-                                if (alphabet == null)
-                                    encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
-                                else if (alphabet == RestrictedAlphabet.DATE_TIME_CHARACTERS) 
-                                    encodeNonIdentifyingStringOnFirstBit(
-                                            RestrictedAlphabet.DATE_TIME_CHARACTERS_INDEX, 
-                                            DATE_TIME_CHARACTERS_TABLE,
-                                            value, addToTable);
-                                else if (alphabet == RestrictedAlphabet.DATE_TIME_CHARACTERS) 
-                                    encodeNonIdentifyingStringOnFirstBit(
-                                            RestrictedAlphabet.NUMERIC_CHARACTERS_INDEX, 
-                                            NUMERIC_CHARACTERS_TABLE,
-                                            value, addToTable);
-                                else
-                                    encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
-                                    
-                            } else {
-                                encodeNonIdentifyingStringOnFirstBit(eAtts.getAlgorithmURI(i),
-                                        eAtts.getAlgorithmIndex(i), data);
-                            }
-                        }
-                    }
-                } else {
-                    for (int i = 0; i < atts.getLength(); i++) {
-                        if (encodeAttribute(atts.getURI(i), atts.getQName(i), atts.getLocalName(i))) {
-                            value = atts.getValue(i);
-                            addToTable = (value.length() < attributeValueSizeConstraint) ? true : false;
-                            encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
-                        }
-                    }
-                }
-                _b = EncodingConstants.TERMINATOR;
-                _terminate = true;
+                encodeAttributes(atts);
             }
         } catch (IOException e) {
             throw new SAXException("startElement", e);
         } catch (FastInfosetException e) {
             throw new SAXException("startElement", e);
         }
-    }
-
-    public final int countAttributes(Attributes atts) {
-        // Count attributes ignoring any in the XMLNS namespace
-        // Note, such attributes may be produced when transforming from a DOM node
-        int count = 0;
-        for (int i = 0; i < atts.getLength(); i++) {
-            final String uri = atts.getURI(i);
-            if (uri == "http://www.w3.org/2000/xmlns/" || uri.equals("http://www.w3.org/2000/xmlns/")) {
-                continue;
-            }
-            count++;
-        }
-        return count;
     }
 
     public final void endElement(String namespaceURI, String localName, String qName) throws SAXException {
@@ -545,7 +485,7 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
         }
     }
 
-    // ExtentdedContentHandler
+    // ExtendedContentHandler
     
     public void characters(char[] ch, int start, int length, boolean index) throws SAXException {
         if (length <= 0) {
@@ -572,6 +512,70 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
 
     
 
+    protected final int countAttributes(Attributes atts) {
+        // Count attributes ignoring any in the XMLNS namespace
+        // Note, such attributes may be produced when transforming from a DOM node
+        int count = 0;
+        for (int i = 0; i < atts.getLength(); i++) {
+            final String uri = atts.getURI(i);
+            if (uri == "http://www.w3.org/2000/xmlns/" || uri.equals("http://www.w3.org/2000/xmlns/")) {
+                continue;
+            }
+            count++;
+        }
+        return count;
+    }
+
+    protected void encodeAttributes(Attributes atts) throws IOException, FastInfosetException {
+        boolean addToTable;
+        String value;
+        if (atts instanceof EncodingAlgorithmAttributes) {
+            final EncodingAlgorithmAttributes eAtts = (EncodingAlgorithmAttributes)atts;
+            Object data;
+            String alphabet;
+            for (int i = 0; i < eAtts.getLength(); i++) {
+                if (encodeAttribute(atts.getURI(i), atts.getQName(i), atts.getLocalName(i))) {
+                    data = eAtts.getAlgorithmData(i);
+                    // If data is null then there is no algorithm data
+                    if (data == null) {
+                        value = eAtts.getValue(i);
+                        addToTable = (eAtts.getToIndex(i) || value.length() < attributeValueSizeConstraint) ? true : false;
+
+                        alphabet = eAtts.getAlpababet(i);
+                        if (alphabet == null)
+                            encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
+                        else if (alphabet == RestrictedAlphabet.DATE_TIME_CHARACTERS) 
+                            encodeNonIdentifyingStringOnFirstBit(
+                                    RestrictedAlphabet.DATE_TIME_CHARACTERS_INDEX, 
+                                    DATE_TIME_CHARACTERS_TABLE,
+                                    value, addToTable);
+                        else if (alphabet == RestrictedAlphabet.DATE_TIME_CHARACTERS) 
+                            encodeNonIdentifyingStringOnFirstBit(
+                                    RestrictedAlphabet.NUMERIC_CHARACTERS_INDEX, 
+                                    NUMERIC_CHARACTERS_TABLE,
+                                    value, addToTable);
+                        else
+                            encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
+
+                    } else {
+                        encodeNonIdentifyingStringOnFirstBit(eAtts.getAlgorithmURI(i),
+                                eAtts.getAlgorithmIndex(i), data);
+                    }
+                }
+            }
+        } else {
+            for (int i = 0; i < atts.getLength(); i++) {
+                if (encodeAttribute(atts.getURI(i), atts.getQName(i), atts.getLocalName(i))) {
+                    value = atts.getValue(i);
+                    addToTable = (value.length() < attributeValueSizeConstraint) ? true : false;
+                    encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
+                }
+            }
+        }
+        _b = EncodingConstants.TERMINATOR;
+        _terminate = true;
+    }
+    
     protected void encodeElement(String namespaceURI, String qName, String localName) throws IOException {
         LocalNameQualifiedNamesMap.Entry entry = _v.elementName.obtainEntry(qName);
         if (entry._valueIndex > 0) {
