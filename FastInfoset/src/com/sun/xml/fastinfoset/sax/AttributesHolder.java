@@ -212,6 +212,13 @@ public class AttributesHolder implements EncodingAlgorithmAttributes {
         return _algorithmData[index];
     }
 
+    public String getAlpababet(int index) {
+        return null;
+    }
+
+    public boolean getToIndex(int index) {
+        return false;
+    }
     
     // -----
     
@@ -294,4 +301,5 @@ public class AttributesHolder implements EncodingAlgorithmAttributes {
         ea.convertToCharacters(data, sb);
         return sb;
     }    
+
 }

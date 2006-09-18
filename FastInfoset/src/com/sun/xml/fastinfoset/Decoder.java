@@ -1270,7 +1270,7 @@ public abstract class Decoder implements FastInfosetParser {
 
     protected final void decodeFourBitAlphabetOctetsAsCharBuffer(char[] restrictedAlphabet) throws FastInfosetException, IOException {
         _charBufferLength = 0;
-        final int characters = _octetBufferLength / 2;
+        final int characters = _octetBufferLength * 2;
         if (_charBuffer.length < characters) {
             _charBuffer = new char[characters];
         }

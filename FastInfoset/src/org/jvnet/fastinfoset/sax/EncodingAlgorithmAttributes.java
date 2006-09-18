@@ -105,4 +105,22 @@ public interface EncodingAlgorithmAttributes extends Attributes {
      * @return The data. If the index is out of range then null is returned.
      */
     public Object getAlgorithmData(int index);    
+    
+    /**
+     * Return the alphabet associated with the attribute value.
+     *
+     * @param index The attribute index (zero-based). 
+     * @return The alphabet. 
+     *         If the index is out of range then null is returned.
+     *         If there is is no alphabet then null is returned.
+     */
+    public String getAlpababet(int index);
+    
+    /**
+     * Return the whether the attribute value should be indexed or not.
+     *
+     * @param index The attribute index (zero-based). 
+     * @return True if attribute value should be indexed, otherwise false.
+     */
+    public boolean getToIndex(int index);
 }

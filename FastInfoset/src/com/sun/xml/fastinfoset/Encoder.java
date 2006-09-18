@@ -588,7 +588,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
      * @throws ArrayIndexOutOfBoundsException.
      */
     protected final void encodeCharactersNoClone(char[] ch, int offset, int length) throws IOException {
-        final boolean addToTable = (length < characterContentChunkSizeContraint) ? true : false;
+        final boolean addToTable = (length < characterContentChunkSizeContraint);
         encodeNonIdentifyingStringOnThirdBit(ch, offset, length, _v.characterContentChunk, addToTable, false);
     }
     
@@ -602,11 +602,22 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
      * @param ch the array of characters.
      * @param offset the offset into the array of characters.
      * @param length the length of characters.
+     * @param addToTable if characters should be added to table.
      * @throws ArrayIndexOutOfBoundsException.
      */
-    protected final void encodeFourBitCharacters(int id, int[] table, char[] ch, int offset, int length) throws FastInfosetException, IOException {
+    protected final void encodeFourBitCharacters(int id, int[] table, char[] ch, int offset, int length, 
+            boolean addToTable) throws FastInfosetException, IOException {
+        if (addToTable) {
+            final int index = _v.characterContentChunk.obtainIndex(ch, offset, length, true);
+            if (index != KeyIntMap.NOT_PRESENT) {
+                _b = EncodingConstants.CHARACTER_CHUNK | 0x20;
+                encodeNonZeroIntegerOnFourthBit(index);
+                return;
+            }
+        }
+        
         // This procedure assumes that id <= 64
-        _b = (length < characterContentChunkSizeContraint) ?
+        _b = (addToTable) ?
             EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_RESTRICTED_ALPHABET_FLAG | EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG :
             EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_RESTRICTED_ALPHABET_FLAG;
         write (_b);
@@ -1002,6 +1013,34 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
+    protected final void encodeNonIdentifyingStringOnFirstBit(int id, int[] table, String s, boolean addToTable) 
+            throws IOException, FastInfosetException {
+        if (s == null || s.length() == 0) {
+            // C.26 an index (first bit '1') with seven '1' bits for an empty string
+            write(0xFF);
+        } else if (addToTable) {
+            final int index = _v.attributeValue.obtainIndex(s);
+            if (index != KeyIntMap.NOT_PRESENT) {
+                encodeNonZeroIntegerOnSecondBitFirstBitOne(index);
+                return;
+            }
+        }
+
+        _b = (addToTable) 
+                ? EncodingConstants.NISTRING_RESTRICTED_ALPHABET_FLAG | EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG
+                : EncodingConstants.NISTRING_RESTRICTED_ALPHABET_FLAG;
+        // Encode identification and top four bits of alphabet id
+        write (_b | ((id & 0xF0) >> 4));
+        // Encode bottom 4 bits of alphabet id
+        _b = (id & 0x0F) << 4;
+
+        final int length = s.length();
+        final int octetPairLength = length / 2;
+        final int octetSingleLength = length % 2;
+        encodeNonZeroOctetStringLengthOnFifthBit(octetPairLength + octetSingleLength);
+        encodeNonEmptyFourBitCharacterString(table, s.toCharArray(), 0, octetPairLength, octetSingleLength);
+    }
+    
     /**
      * Encode a non identifying string on the first bit of an octet as binary
      * data using an encoding algorithm.
@@ -1545,7 +1584,11 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         
         // Encode the length
         encodeNonZeroOctetStringLengthOnSenventhBit(octetPairLength + octetSingleLength);
-
+        encodeNonEmptyFourBitCharacterString(table, ch, offset, octetPairLength, octetSingleLength);
+    }
+    
+    protected final void encodeNonEmptyFourBitCharacterString(int[] table, char[] ch, int offset, 
+            int octetPairLength, int octetSingleLength) throws FastInfosetException, IOException {
         ensureSize(octetPairLength + octetSingleLength);
         // Encode all pairs
         int v = 0;
@@ -2194,8 +2237,8 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         if (!XMLChar.isSpace(ch[start])) return false;
         
         final int end = start + length;
-        start++;
-        while(start < end && XMLChar.isSpace(ch[start++]));
+        while(++start < end && XMLChar.isSpace(ch[start]));
+        
         return start == end;
     }
     

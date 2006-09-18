@@ -97,7 +97,7 @@ public class DoubleEncodingAlgorithm extends IEEE754FloatingPointEncodingAlgorit
                 new WordListener() {
             public void word(int start, int end) {
                 String fStringValue = cb.subSequence(start, end).toString();
-                doubleList.add(Float.valueOf(fStringValue));
+                doubleList.add(Double.valueOf(fStringValue));
             }
         }
         );

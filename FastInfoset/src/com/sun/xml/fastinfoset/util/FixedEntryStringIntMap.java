@@ -97,6 +97,7 @@ public class FixedEntryStringIntMap extends StringIntMap {
         if (_readOnlyMap != null) {
             readOnlyMap.removeFixedEntry();
             _readOnlyMapSize = readOnlyMap.size();
+            _index = _readOnlyMapSize + _size;
             if (clear) {
                 clear();
             }
