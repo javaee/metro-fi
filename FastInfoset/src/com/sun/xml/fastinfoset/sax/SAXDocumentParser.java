@@ -501,7 +501,6 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     while (_b == EncodingConstants.PROCESSING_INSTRUCTION) {
                         switch(decodeNonIdentifyingStringOnFirstBit()) {
                             case NISTRING_STRING:
-                                final String data = new String(_charBuffer, 0, _charBufferLength);
                                 if (_addToTable) {
                                     _v.otherString.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
                                 }
@@ -631,7 +630,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         }
         
         if ((_b & EncodingConstants.DOCUMENT_VERSION_FLAG) > 0) {
-            String version = decodeVersion();
+            decodeVersion();
             /*
              * TODO
              * how to report the standalone flag?
@@ -1333,7 +1332,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             final String URI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
             if (URI == null) {
                 throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().
-                        getString("message.URINotPresent", new Object[]{new Integer(_identifier)}));
+                        getString("message.URINotPresent", new Object[]{Integer.valueOf(_identifier)}));
             }
             
             final EncodingAlgorithm ea = (EncodingAlgorithm)_registeredEncodingAlgorithms.get(URI);
@@ -1368,8 +1367,6 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             int length;
             switch(_identifier) {
                 case EncodingAlgorithmIndexes.HEXADECIMAL:
-                    _primitiveHandler.bytes(_octetBuffer, _octetBufferStart, _octetBufferLength);
-                    break;
                 case EncodingAlgorithmIndexes.BASE64:
                     _primitiveHandler.bytes(_octetBuffer, _octetBufferStart, _octetBufferLength);
                     break;
@@ -1483,7 +1480,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     throw new UnsupportedOperationException("CDATA");
                 default:
                     throw new FastInfosetException(CommonResourceBundle.getInstance().
-                            getString("message.unsupportedAlgorithm", new Object[]{new Integer(_identifier)}));
+                            getString("message.unsupportedAlgorithm", new Object[]{Integer.valueOf(_identifier)}));
             }
         } catch (SAXException e) {
             throw new FastInfosetException(e);
@@ -1505,7 +1502,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             final String URI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
             if (URI == null) {
                 throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().
-                        getString("message.URINotPresent", new Object[]{new Integer(_identifier)}));
+                        getString("message.URINotPresent", new Object[]{Integer.valueOf(_identifier)}));
             }
             
             final EncodingAlgorithm ea = (EncodingAlgorithm)_registeredEncodingAlgorithms.get(URI);

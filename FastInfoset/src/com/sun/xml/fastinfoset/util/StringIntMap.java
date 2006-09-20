@@ -42,7 +42,7 @@ package com.sun.xml.fastinfoset.util;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class StringIntMap extends KeyIntMap {
-    protected static Entry NULL_ENTRY = new Entry(null, 0, -1, null);
+    protected static final Entry NULL_ENTRY = new Entry(null, 0, -1, null);
     
     protected StringIntMap _readOnlyMap;
     

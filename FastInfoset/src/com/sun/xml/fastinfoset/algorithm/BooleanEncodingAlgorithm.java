@@ -115,7 +115,7 @@ public class BooleanEncodingAlgorithm extends BuiltInEncodingAlgorithm {
             
             while(bitPosition < bitPositionEnd) {
                 booleanList.add(
-                        new Boolean((value & BIT_TABLE[bitPosition++]) > 0));
+                        Boolean.valueOf((value & BIT_TABLE[bitPosition++]) > 0));
             }
             
             value = valueNext;

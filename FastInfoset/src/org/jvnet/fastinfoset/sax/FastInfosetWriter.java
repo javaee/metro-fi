@@ -6,5 +6,6 @@ import org.xml.sax.ext.LexicalHandler;
 
 public interface FastInfosetWriter extends ContentHandler, LexicalHandler, 
         EncodingAlgorithmContentHandler, PrimitiveTypeContentHandler,
-        RestrictedAlphabetContentHandler, FastInfosetSerializer {
+        RestrictedAlphabetContentHandler, ExtendedContentHandler,
+        FastInfosetSerializer {
 }

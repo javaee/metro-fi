@@ -540,7 +540,7 @@ public class StAXDocumentParser extends Decoder
                     CommonResourceBundle.getInstance().getString("message.mustBeOnSTARTELEMENT"), getLocation());
         }
         //current is StartElement, move to the next
-        int eventType = next();
+        next();
         return getElementText(true);
     }
     /**
@@ -590,7 +590,7 @@ public class StAXDocumentParser extends Decoder
      * @throws XMLStreamException if the current event is not white space
      */
     public final int nextTag() throws XMLStreamException {
-        int eventType = next();
+        next();
         return nextTag(true);
     }
     /** if the current tag has already read, such as in the case EventReader's
@@ -1122,7 +1122,7 @@ public class StAXDocumentParser extends Decoder
         }
         
         if ((b & EncodingConstants.DOCUMENT_VERSION_FLAG) > 0) {
-            String version = decodeVersion();
+            decodeVersion();
             /*
              * TODO
              * how to report the standalone flag?
@@ -1601,7 +1601,7 @@ public class StAXDocumentParser extends Decoder
         if (_algorithmId >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
             _algorithmURI = _v.encodingAlgorithm.get(_algorithmId - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
             if (_algorithmURI == null) {
-                throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.URINotPresent", new Object[]{new Integer(_identifier)}));
+                throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.URINotPresent", new Object[]{Integer.valueOf(_identifier)}));
             }
         } else if (_algorithmId > EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
             // Reserved built-in algorithms for future use
@@ -1616,7 +1616,7 @@ public class StAXDocumentParser extends Decoder
         if (_identifier >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
             URI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
             if (URI == null) {
-                throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.URINotPresent", new Object[]{new Integer(_identifier)}));
+                throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.URINotPresent", new Object[]{Integer.valueOf(_identifier)}));
             }
         } else if (_identifier >= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
             if (_identifier == EncodingAlgorithmIndexes.CDATA) {

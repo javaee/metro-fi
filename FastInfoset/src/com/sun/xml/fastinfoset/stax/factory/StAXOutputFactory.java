@@ -96,7 +96,7 @@ public class StAXOutputFactory extends XMLOutputFactory {
                 }
             }
         }
-        else if(result instanceof Result){
+        else {
             try{
                 //xxx: should we be using FileOutputStream - nb.
                 FileWriter writer = new FileWriter(new File(result.getSystemId()));
@@ -127,7 +127,7 @@ public class StAXOutputFactory extends XMLOutputFactory {
     
     public Object getProperty(String name) throws java.lang.IllegalArgumentException {
         if(name == null){
-            throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.propertyNotSupported", new Object[]{name}));
+            throw new IllegalArgumentException(CommonResourceBundle.getInstance().getString("message.propertyNotSupported", new Object[]{null}));
         }
         if(_manager.containsProperty(name))
             return _manager.getProperty(name);

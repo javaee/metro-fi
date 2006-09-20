@@ -310,7 +310,7 @@ public class QualifiedName {
     }
     
     private final String createQNameString(String p, String l) {
-        if (p != null && p != "") {
+        if (p != null && p.length() > 0) {
             final StringBuffer b = new StringBuffer(p);
             b.append(':');
             b.append(l);

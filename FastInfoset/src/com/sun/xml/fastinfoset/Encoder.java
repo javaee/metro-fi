@@ -37,7 +37,6 @@
  */
 package com.sun.xml.fastinfoset;
 
-import com.sun.xml.fastinfoset.algorithm.BuiltInEncodingAlgorithm;
 import com.sun.xml.fastinfoset.algorithm.BuiltInEncodingAlgorithmFactory;
 import com.sun.xml.fastinfoset.org.apache.xerces.util.XMLChar;
 import com.sun.xml.fastinfoset.util.CharArrayIntMap;
@@ -55,6 +54,7 @@ import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
 import org.jvnet.fastinfoset.ExternalVocabulary;
 import org.jvnet.fastinfoset.FastInfosetException;
 import org.jvnet.fastinfoset.FastInfosetSerializer;
+import org.jvnet.fastinfoset.RestrictedAlphabet;
 import org.jvnet.fastinfoset.VocabularyApplicationData;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -94,18 +94,52 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
      * Default character encoding scheme system property for the encoding 
      * of content and attribute values.
      */
-    protected static String _characterEncodingSchemeSystemDefault = UTF_8;
+    protected static final String _characterEncodingSchemeSystemDefault = getDefaultEncodingScheme();
         
-    static {
-        // Initiate the default character encoding schema from the system
-        // property
+    private static String getDefaultEncodingScheme() {
         String p = System.getProperty(CHARACTER_ENCODING_SCHEME_SYSTEM_PROPERTY,
-            _characterEncodingSchemeSystemDefault);
+            UTF_8);
         if (p.equals(UTF_16BE)) {
-            _characterEncodingSchemeSystemDefault = UTF_16BE;
+            return UTF_16BE;
+        } else {
+            return UTF_8;
         }
     }
 
+    protected static int[] NUMERIC_CHARACTERS_TABLE;
+    
+    protected static int[] DATE_TIME_CHARACTERS_TABLE;
+    
+    static {
+        NUMERIC_CHARACTERS_TABLE = new int[maxCharacter(RestrictedAlphabet.NUMERIC_CHARACTERS) + 1];
+        DATE_TIME_CHARACTERS_TABLE = new int[maxCharacter(RestrictedAlphabet.DATE_TIME_CHARACTERS) + 1];
+    
+        for (int i = 0; i < NUMERIC_CHARACTERS_TABLE.length ; i++) {
+            NUMERIC_CHARACTERS_TABLE[i] = -1;
+        }
+        for (int i = 0; i < DATE_TIME_CHARACTERS_TABLE.length ; i++) {
+            DATE_TIME_CHARACTERS_TABLE[i] = -1;
+        }
+        
+        for (int i = 0; i < RestrictedAlphabet.NUMERIC_CHARACTERS.length() ; i++) {
+            NUMERIC_CHARACTERS_TABLE[RestrictedAlphabet.NUMERIC_CHARACTERS.charAt(i)] = i;
+        }        
+        for (int i = 0; i < RestrictedAlphabet.DATE_TIME_CHARACTERS.length() ; i++) {
+            DATE_TIME_CHARACTERS_TABLE[RestrictedAlphabet.DATE_TIME_CHARACTERS.charAt(i)] = i;
+        }
+    }
+    
+    private static int maxCharacter(String alphabet) {
+        int c = 0;
+        for (int i = 0; i < alphabet.length() ; i++) {
+            if (c < alphabet.charAt(i)) {
+                c = alphabet.charAt(i);
+            }
+        }
+        
+        return c;
+    }
+    
     /**
      * True if DTD and internal subset shall be ignored.
      */
@@ -474,7 +508,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
             }
 
             if (initialVocabulary.hasExternalVocabulary()) {
-                encodeNonEmptyOctetStringOnSecondBit(_v.getExternalVocabularyURI().toString());
+                encodeNonEmptyOctetStringOnSecondBit(_v.getExternalVocabularyURI());
             }
 
             // TODO check for contents of vocabulary to encode values
@@ -486,7 +520,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
             write(_b);
             write(0);
 
-            encodeNonEmptyOctetStringOnSecondBit(_v.getExternalVocabularyURI().toString());
+            encodeNonEmptyOctetStringOnSecondBit(_v.getExternalVocabularyURI());
         }
     }
 
@@ -540,10 +574,10 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
      */
     protected final void encodeNamespaceAttribute(String prefix, String uri) throws IOException {
         _b = EncodingConstants.NAMESPACE_ATTRIBUTE;
-        if (prefix != "") {
+        if (prefix.length() > 0) {
             _b |= EncodingConstants.NAMESPACE_ATTRIBUTE_PREFIX_FLAG;
         }
-        if (uri != "") {
+        if (uri.length() > 0) {
             _b |= EncodingConstants.NAMESPACE_ATTRIBUTE_NAME_FLAG;
         }
 
@@ -554,10 +588,10 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
 
         write(_b);
 
-        if (prefix != "") {
+        if (prefix.length() > 0) {
             encodeIdentifyingNonEmptyStringOnFirstBit(prefix, _v.prefix);
         }
-        if (uri != "") {
+        if (uri.length() > 0) {
             encodeIdentifyingNonEmptyStringOnFirstBit(uri, _v.namespaceName);
         }
     }
@@ -588,7 +622,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
      * @throws ArrayIndexOutOfBoundsException.
      */
     protected final void encodeCharactersNoClone(char[] ch, int offset, int length) throws IOException {
-        final boolean addToTable = (length < characterContentChunkSizeContraint) ? true : false;
+        final boolean addToTable = (length < characterContentChunkSizeContraint);
         encodeNonIdentifyingStringOnThirdBit(ch, offset, length, _v.characterContentChunk, addToTable, false);
     }
     
@@ -602,11 +636,22 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
      * @param ch the array of characters.
      * @param offset the offset into the array of characters.
      * @param length the length of characters.
+     * @param addToTable if characters should be added to table.
      * @throws ArrayIndexOutOfBoundsException.
      */
-    protected final void encodeFourBitCharacters(int id, int[] table, char[] ch, int offset, int length) throws FastInfosetException, IOException {
+    protected final void encodeFourBitCharacters(int id, int[] table, char[] ch, int offset, int length, 
+            boolean addToTable) throws FastInfosetException, IOException {
+        if (addToTable) {
+            final int index = _v.characterContentChunk.obtainIndex(ch, offset, length, true);
+            if (index != KeyIntMap.NOT_PRESENT) {
+                _b = EncodingConstants.CHARACTER_CHUNK | 0x20;
+                encodeNonZeroIntegerOnFourthBit(index);
+                return;
+            }
+        }
+        
         // This procedure assumes that id <= 64
-        _b = (length < characterContentChunkSizeContraint) ?
+        _b = (addToTable) ?
             EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_RESTRICTED_ALPHABET_FLAG | EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG :
             EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_RESTRICTED_ALPHABET_FLAG;
         write (_b);
@@ -771,13 +816,13 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
 
         int namespaceURIIndex = KeyIntMap.NOT_PRESENT;
         int prefixIndex = KeyIntMap.NOT_PRESENT;
-        if (namespaceURI != "") {
+        if (namespaceURI.length() > 0) {
             namespaceURIIndex = _v.namespaceName.get(namespaceURI);
             if (namespaceURIIndex == KeyIntMap.NOT_PRESENT) {
                 throw new IOException(CommonResourceBundle.getInstance().getString("message.namespaceURINotIndexed", new Object[]{namespaceURI}));
             }
 
-            if (prefix != "") {
+            if (prefix.length() > 0) {
                 prefixIndex = _v.prefix.get(prefix);
                 if (prefixIndex == KeyIntMap.NOT_PRESENT) {
                     throw new IOException(CommonResourceBundle.getInstance().getString("message.prefixNotIndexed", new Object[]{prefix}));
@@ -854,7 +899,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                 LocalNameQualifiedNamesMap.Entry entry) throws IOException {
         int namespaceURIIndex = KeyIntMap.NOT_PRESENT;
         int prefixIndex = KeyIntMap.NOT_PRESENT;
-        if (namespaceURI != "") {
+        if (namespaceURI.length() > 0) {
             namespaceURIIndex = _v.namespaceName.get(namespaceURI);
             if (namespaceURIIndex == KeyIntMap.NOT_PRESENT) {
                 if (namespaceURI == EncodingConstants.XMLNS_NAMESPACE_NAME || 
@@ -865,7 +910,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                 }
             }
             
-            if (prefix != "") {
+            if (prefix.length() > 0) {
                 prefixIndex = _v.prefix.get(prefix);
                 if (prefixIndex == KeyIntMap.NOT_PRESENT) {
                     throw new IOException(CommonResourceBundle.getInstance().getString("message.prefixNotIndexed", new Object[]{prefix}));
@@ -879,9 +924,9 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         entry.addQualifiedName(name);
 
         _b = EncodingConstants.ATTRIBUTE_LITERAL_QNAME_FLAG;
-        if (namespaceURI != "") {
+        if (namespaceURI.length() > 0) {
             _b |= EncodingConstants.LITERAL_QNAME_NAMESPACE_NAME_FLAG;
-            if (prefix != "") {
+            if (prefix.length() > 0) {
                 _b |= EncodingConstants.LITERAL_QNAME_PREFIX_FLAG;
             }
         }
@@ -1002,6 +1047,35 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
+    protected final void encodeNonIdentifyingStringOnFirstBit(int id, int[] table, String s, boolean addToTable) 
+            throws IOException, FastInfosetException {
+        if (s == null || s.length() == 0) {
+            // C.26 an index (first bit '1') with seven '1' bits for an empty string
+            write(0xFF);
+            return;
+        } else if (addToTable) {
+            final int index = _v.attributeValue.obtainIndex(s);
+            if (index != KeyIntMap.NOT_PRESENT) {
+                encodeNonZeroIntegerOnSecondBitFirstBitOne(index);
+                return;
+            }
+        }
+
+        _b = (addToTable) 
+                ? EncodingConstants.NISTRING_RESTRICTED_ALPHABET_FLAG | EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG
+                : EncodingConstants.NISTRING_RESTRICTED_ALPHABET_FLAG;
+        // Encode identification and top four bits of alphabet id
+        write (_b | ((id & 0xF0) >> 4));
+        // Encode bottom 4 bits of alphabet id
+        _b = (id & 0x0F) << 4;
+
+        final int length = s.length();
+        final int octetPairLength = length / 2;
+        final int octetSingleLength = length % 2;
+        encodeNonZeroOctetStringLengthOnFifthBit(octetPairLength + octetSingleLength);
+        encodeNonEmptyFourBitCharacterString(table, s.toCharArray(), 0, octetPairLength, octetSingleLength);
+    }
+    
     /**
      * Encode a non identifying string on the first bit of an octet as binary
      * data using an encoding algorithm.
@@ -1035,12 +1109,9 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                 }
             }
         } else if (id <= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
-            BuiltInEncodingAlgorithm a = BuiltInEncodingAlgorithmFactory.table[id];
             int length = 0;
             switch(id) {
                 case EncodingAlgorithmIndexes.HEXADECIMAL:
-                    length = ((byte[])data).length;
-                    break;
                 case EncodingAlgorithmIndexes.BASE64:
                     length = ((byte[])data).length;
                     break;
@@ -1051,6 +1122,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                     length = ((int[])data).length;
                     break;
                 case EncodingAlgorithmIndexes.LONG:
+                case EncodingAlgorithmIndexes.UUID:
                     length = ((long[])data).length;
                     break;
                 case EncodingAlgorithmIndexes.BOOLEAN:
@@ -1062,13 +1134,10 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                 case EncodingAlgorithmIndexes.DOUBLE:
                     length = ((double[])data).length;
                     break;
-                case EncodingAlgorithmIndexes.UUID:
-                    length = ((long[])data).length;
-                    break;
                 case EncodingAlgorithmIndexes.CDATA:
                     throw new UnsupportedOperationException(CommonResourceBundle.getInstance().getString("message.CDATA"));
                 default:
-                    throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.UnsupportedBuiltInAlgorithm", new Object[]{new Integer(id)}));
+                    throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.UnsupportedBuiltInAlgorithm", new Object[]{Integer.valueOf(id)}));
             }
             encodeAIIBuiltInAlgorithmData(id, data, 0, length);
         } else if (id >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
@@ -1231,8 +1300,6 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
             int length = 0;
             switch(id) {
                 case EncodingAlgorithmIndexes.HEXADECIMAL:
-                    length = ((byte[])data).length;
-                    break;
                 case EncodingAlgorithmIndexes.BASE64:
                     length = ((byte[])data).length;
                     break;
@@ -1243,7 +1310,8 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                     length = ((int[])data).length;
                     break;
                 case EncodingAlgorithmIndexes.LONG:
-                    length = ((int[])data).length;
+                case EncodingAlgorithmIndexes.UUID:
+                    length = ((long[])data).length;
                     break;
                 case EncodingAlgorithmIndexes.BOOLEAN:
                     length = ((boolean[])data).length;
@@ -1254,13 +1322,10 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                 case EncodingAlgorithmIndexes.DOUBLE:
                     length = ((double[])data).length;
                     break;
-                case EncodingAlgorithmIndexes.UUID:
-                    length = ((int[])data).length;
-                    break;
                 case EncodingAlgorithmIndexes.CDATA:
                     throw new UnsupportedOperationException(CommonResourceBundle.getInstance().getString("message.CDATA"));
                 default:
-                    throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.UnsupportedBuiltInAlgorithm", new Object[]{new Integer(id)}));
+                    throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.UnsupportedBuiltInAlgorithm", new Object[]{Integer.valueOf(id)}));
             }
             encodeCIIBuiltInAlgorithmData(id, data, 0, length);
         } else if (id >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
@@ -1545,7 +1610,11 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         
         // Encode the length
         encodeNonZeroOctetStringLengthOnSenventhBit(octetPairLength + octetSingleLength);
-
+        encodeNonEmptyFourBitCharacterString(table, ch, offset, octetPairLength, octetSingleLength);
+    }
+    
+    protected final void encodeNonEmptyFourBitCharacterString(int[] table, char[] ch, int offset, 
+            int octetPairLength, int octetSingleLength) throws FastInfosetException, IOException {
         ensureSize(octetPairLength + octetSingleLength);
         // Encode all pairs
         int v = 0;
@@ -1582,7 +1651,6 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         while ((1 << bitsPerCharacter) <= alphabet.length()) {
             bitsPerCharacter++;
         }
-        final int terminatingValue = (1 << bitsPerCharacter) - 1;
         
         final int bits = length * bitsPerCharacter;
         final int octets = bits / 8;
@@ -1695,7 +1763,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         } else {
             throw new IOException(
                     CommonResourceBundle.getInstance().getString("message.integerMaxSize", 
-                    new Object[]{new Integer(EncodingConstants.INTEGER_2ND_BIT_LARGE_LIMIT)}));
+                    new Object[]{Integer.valueOf(EncodingConstants.INTEGER_2ND_BIT_LARGE_LIMIT)}));
         }
     }
 
@@ -1886,7 +1954,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
             write((i >> 8) & 0xFF);
             write(i & 0xFF);
         } else {
-            throw new IOException(CommonResourceBundle.getInstance().getString("message.integerMaxSize", new Object[]{new Integer(EncodingConstants.INTEGER_MAXIMUM_SIZE)}));
+            throw new IOException(CommonResourceBundle.getInstance().getString("message.integerMaxSize", new Object[]{Integer.valueOf(EncodingConstants.INTEGER_MAXIMUM_SIZE)}));
         }
     }
 
@@ -2194,8 +2262,8 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         if (!XMLChar.isSpace(ch[start])) return false;
         
         final int end = start + length;
-        start++;
-        while(start < end && XMLChar.isSpace(ch[start++]));
+        while(++start < end && XMLChar.isSpace(ch[start]));
+        
         return start == end;
     }
     

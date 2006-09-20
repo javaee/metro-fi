@@ -83,6 +83,12 @@ import org.jvnet.fastinfoset.FastInfosetParser;
  */
 public abstract class Decoder implements FastInfosetParser {
 
+    protected static final char[] XML_NAMESPACE_NAME_CHARS = EncodingConstants.XML_NAMESPACE_NAME.toCharArray();
+            
+    protected static final char[] XMLNS_NAMESPACE_PREFIX_CHARS = EncodingConstants.XMLNS_NAMESPACE_PREFIX.toCharArray();
+    
+    protected static final char[] XMLNS_NAMESPACE_NAME_CHARS = EncodingConstants.XMLNS_NAMESPACE_NAME.toCharArray();
+
     /**
      * String interning system property.
      */
@@ -1064,7 +1070,7 @@ public abstract class Decoder implements FastInfosetParser {
                 _octetBufferLength = EncodingConstants.XMLNS_NAMESPACE_NAME_LENGTH;
                 decodeUtf8StringAsCharBuffer();
                 
-                if (compareCharsWithCharBufferFromEndToStart(EncodingConstants.XMLNS_NAMESPACE_NAME_CHARS)) {
+                if (compareCharsWithCharBufferFromEndToStart(XMLNS_NAMESPACE_NAME_CHARS)) {
                     throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.xmlnsConnotBeBoundToPrefix"));
                 }
                 
@@ -1078,7 +1084,7 @@ public abstract class Decoder implements FastInfosetParser {
                 _octetBufferLength = EncodingConstants.XML_NAMESPACE_NAME_LENGTH;
                 decodeUtf8StringAsCharBuffer();
                 
-                if (compareCharsWithCharBufferFromEndToStart(EncodingConstants.XML_NAMESPACE_NAME_CHARS)) {
+                if (compareCharsWithCharBufferFromEndToStart(XML_NAMESPACE_NAME_CHARS)) {
                     throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.illegalNamespaceName"));
                 }
                 
@@ -1247,7 +1253,7 @@ public abstract class Decoder implements FastInfosetParser {
         } else if (_identifier >= EncodingConstants.RESTRICTED_ALPHABET_APPLICATION_START) {
             CharArray ca = _v.restrictedAlphabet.get(_identifier - EncodingConstants.RESTRICTED_ALPHABET_APPLICATION_START);
             if (ca == null) {
-                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.alphabetNotPresent", new Object[]{new Integer(_identifier)}));
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.alphabetNotPresent", new Object[]{Integer.valueOf(_identifier)}));
             }
             decodeAlphabetOctetsAsCharBuffer(ca.ch);            
         } else {
@@ -1264,13 +1270,13 @@ public abstract class Decoder implements FastInfosetParser {
     }
     
     protected final String decodeRAOctetsAsString(char[] restrictedAlphabet) throws FastInfosetException, IOException {
-        decodeAlphabetOctetsAsCharBuffer(null);
+        decodeAlphabetOctetsAsCharBuffer(restrictedAlphabet);
         return new String(_charBuffer, 0, _charBufferLength);
     }
 
     protected final void decodeFourBitAlphabetOctetsAsCharBuffer(char[] restrictedAlphabet) throws FastInfosetException, IOException {
         _charBufferLength = 0;
-        final int characters = _octetBufferLength / 2;
+        final int characters = _octetBufferLength * 2;
         if (_charBuffer.length < characters) {
             _charBuffer = new char[characters];
         }
@@ -1470,10 +1476,10 @@ public abstract class Decoder implements FastInfosetParser {
                 final char c = decodeUtf8ThreeByteChar(end, b1);
                 if (XMLChar.isContent(c)) {
                     _charBuffer[_charBufferLength++] = c;
-                    break;
                 } else {
                     decodeUtf8StringIllegalState();
                 }
+                break;
             case DecoderStateTables.UTF8_FOUR_BYTES:
             {
                 final int supplemental = decodeUtf8FourByteChar(end, b1);
@@ -1515,10 +1521,10 @@ public abstract class Decoder implements FastInfosetParser {
                 final char c = decodeUtf8ThreeByteChar(end, b1);
                 if (XMLChar.isContent(c)) {
                     ch[_charBufferLength++] = c;
-                    break;
                 } else {
                     decodeUtf8StringIllegalState();
                 }
+                break;
             case DecoderStateTables.UTF8_FOUR_BYTES:
             {
                 final int supplemental = decodeUtf8FourByteChar(end, b1);
@@ -1578,16 +1584,15 @@ public abstract class Decoder implements FastInfosetParser {
                     | (b2 & 0x3F));
                 if (XMLChar.isNCNameStart(c)) {
                     _charBuffer[_charBufferLength++] = c;
-                    break;
                 } else {
                     decodeUtf8NCNameIllegalState();
                 }
+                break;
             }
             case DecoderStateTables.UTF8_THREE_BYTES:
                 final char c = decodeUtf8ThreeByteChar(end, b1);
                 if (XMLChar.isNCNameStart(c)) {
                     _charBuffer[_charBufferLength++] = c;
-                    break;
                 } else {
                     decodeUtf8NCNameIllegalState();
                 }
@@ -1628,16 +1633,15 @@ public abstract class Decoder implements FastInfosetParser {
                     | (b2 & 0x3F));
                 if (XMLChar.isNCName(c)) {
                     _charBuffer[_charBufferLength++] = c;
-                    break;
                 } else {
                     decodeUtf8NCNameIllegalState();
                 }
+                break;
             }
             case DecoderStateTables.UTF8_THREE_BYTES:
                 final char c = decodeUtf8ThreeByteChar(end, b1);
                 if (XMLChar.isNCName(c)) {
                     _charBuffer[_charBufferLength++] = c;
-                    break;
                 } else {
                     decodeUtf8NCNameIllegalState();
                 }

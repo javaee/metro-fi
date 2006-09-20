@@ -169,11 +169,6 @@ public class StAXDocumentSerializer extends Encoder
     }
     
     public void writeEndDocument() throws XMLStreamException {
-        // Need to flush a pending empty element?
-        if (_inStartElement) {
-//            encodeTerminationAndCurrentElement();
-        }
-
         try {
             // TODO
             // Use nsSupport to terminate all elements not terminated

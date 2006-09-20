@@ -49,6 +49,7 @@ import com.sun.xml.fastinfoset.vocab.SerializerVocabulary;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -62,6 +63,8 @@ import org.jvnet.fastinfoset.FastInfosetParser;
 
 public class DecodingTest extends TestCase {
 
+    private byte[][] XML_DECLARATION_VALUES;
+    
     public static final String FINF_SPEC_UBL_XML_RESOURCE = "X.finf/UBL-example.xml";
     public static final String FINF_SPEC_UBL_FINF_RESOURCE = "X.finf/UBL-example.finf";
     public static final String FINF_SPEC_UBL_FINF_REFVOCAB_RESOURCE = "X.finf/UBL-example-refvocab.finf";
@@ -83,8 +86,27 @@ public class DecodingTest extends TestCase {
         _xmlDocumentURL = this.getClass().getClassLoader().getResource(FINF_SPEC_UBL_XML_RESOURCE);
         _finfDocumentURL = this.getClass().getClassLoader().getResource(FINF_SPEC_UBL_FINF_RESOURCE);
         _finfRefVocabDocumentURL = this.getClass().getClassLoader().getResource(FINF_SPEC_UBL_FINF_REFVOCAB_RESOURCE);
+
+        initiateXMLDeclarationValues();
     }
 
+    private void initiateXMLDeclarationValues() {
+        XML_DECLARATION_VALUES = new byte[9][];
+        
+        try {
+            XML_DECLARATION_VALUES[0] = "<?xml encoding='finf'?>".getBytes("UTF-8");
+            XML_DECLARATION_VALUES[1] = "<?xml version='1.0' encoding='finf'?>".getBytes("UTF-8");
+            XML_DECLARATION_VALUES[2] = "<?xml version='1.1' encoding='finf'?>".getBytes("UTF-8");
+            XML_DECLARATION_VALUES[3] = "<?xml encoding='finf' standalone='no'?>".getBytes("UTF-8");
+            XML_DECLARATION_VALUES[4] = "<?xml encoding='finf' standalone='yes'?>".getBytes("UTF-8");
+            XML_DECLARATION_VALUES[5] = "<?xml version='1.0' encoding='finf' standalone='no'?>".getBytes("UTF-8");
+            XML_DECLARATION_VALUES[6] = "<?xml version='1.1' encoding='finf' standalone='no'?>".getBytes("UTF-8");
+            XML_DECLARATION_VALUES[7] = "<?xml version='1.0' encoding='finf' standalone='yes'?>".getBytes("UTF-8");
+            XML_DECLARATION_VALUES[8] = "<?xml version='1.1' encoding='finf' standalone='yes'?>".getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+        }
+    }
+    
     public static Test suite() {
         TestSuite suite = new TestSuite(DecodingTest.class);
         return suite;
@@ -195,8 +217,8 @@ public class DecodingTest extends TestCase {
     }
 
     public void testDecodeWithXMLDeclaration() throws Exception {
-        for (int i = 0; i < EncodingConstants.XML_DECLARATION_VALUES.length; i++) {
-            _testDecodeWithXMLDeclaration(EncodingConstants.XML_DECLARATION_VALUES[i]);
+        for (int i = 0; i < XML_DECLARATION_VALUES.length; i++) {
+            _testDecodeWithXMLDeclaration(XML_DECLARATION_VALUES[i]);
         }
     }
     

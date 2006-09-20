@@ -39,6 +39,7 @@
 package com.sun.xml.fastinfoset.stax.events;
 import java.util.Iterator;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
+import java.util.NoSuchElementException;
 
 
 public class EmptyIterator implements Iterator {
@@ -52,8 +53,8 @@ public class EmptyIterator implements Iterator {
     public boolean hasNext() {
         return false;
     }
-    public Object next() {
-        return null;
+    public Object next() throws NoSuchElementException {
+        throw new NoSuchElementException();
     }
     public void remove() {
          throw new  UnsupportedOperationException(CommonResourceBundle.getInstance().getString("message.emptyIterator"));
