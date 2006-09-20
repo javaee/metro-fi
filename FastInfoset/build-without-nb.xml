@@ -73,7 +73,7 @@
         <ant antfile="j2se-integration.xml" target="j2se-integration"/>
     </target>
 
-    <target name="dist" depends="compile, j2se-integration">
+    <target name="dist" depends="compile">
         <!-- Build the FI jar -->
 	<createManifest version="${release.impl.version}"
                 manifestDir="${manifest.root}" 
