@@ -61,7 +61,7 @@ public class ShortEncodingAlgorithm extends IntegerEncodingAlgorithm {
     public final int getPrimtiveLengthFromOctetLength(int octetLength) throws EncodingAlgorithmException {
         if (octetLength % SHORT_SIZE != 0) {
             throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().
-                    getString("message.lengthNotMultipleOfShort", new Object[]{Integer.valueOf(SHORT_SIZE)}));
+                    getString("message.lengthNotMultipleOfShort", new Object[]{new Integer(SHORT_SIZE)}));
         }
 
         return octetLength / SHORT_SIZE;
@@ -151,7 +151,7 @@ public class ShortEncodingAlgorithm extends IntegerEncodingAlgorithm {
 
             final int i = ((b[0] & 0xFF) << 8) |
                     (b[1] & 0xFF);
-            shortList.add(Short.valueOf((short)i));
+            shortList.add(new Short((short)i));
         }
 
         return generateArrayFromList(shortList);

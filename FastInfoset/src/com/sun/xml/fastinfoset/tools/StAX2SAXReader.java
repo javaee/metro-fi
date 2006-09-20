@@ -168,7 +168,7 @@ public class StAX2SAXReader {
                 case XMLStreamConstants.END_DOCUMENT:
                     break;
                 default:
-                    throw new RuntimeException(CommonResourceBundle.getInstance().getString("message.StAX2SAXReader", new Object[]{Integer.valueOf(event)}));
+                    throw new RuntimeException(CommonResourceBundle.getInstance().getString("message.StAX2SAXReader", new Object[]{new Integer(event)}));
                 } // switch
             }
         }

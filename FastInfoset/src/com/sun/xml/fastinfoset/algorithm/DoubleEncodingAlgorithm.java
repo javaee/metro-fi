@@ -57,7 +57,7 @@ public class DoubleEncodingAlgorithm extends IEEE754FloatingPointEncodingAlgorit
     public final int getPrimtiveLengthFromOctetLength(int octetLength) throws EncodingAlgorithmException {
         if (octetLength % DOUBLE_SIZE != 0) {
             throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().
-                    getString("message.lengthIsNotMultipleOfDouble", new Object[]{Integer.valueOf(DOUBLE_SIZE)}));
+                    getString("message.lengthIsNotMultipleOfDouble", new Object[]{new Integer(DOUBLE_SIZE)}));
         }
         
         return octetLength / DOUBLE_SIZE;
@@ -162,7 +162,7 @@ public class DoubleEncodingAlgorithm extends IEEE754FloatingPointEncodingAlgorit
                     ((b[6] & 0xFF) << 8) | 
                     (b[7] & 0xFF);
             
-            doubleList.add(Double.valueOf(Double.longBitsToDouble(bits)));
+            doubleList.add(new Double(Double.longBitsToDouble(bits)));
         }
         
         return generateArrayFromList(doubleList);

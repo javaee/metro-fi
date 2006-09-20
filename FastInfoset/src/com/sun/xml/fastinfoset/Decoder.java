@@ -1253,7 +1253,7 @@ public abstract class Decoder implements FastInfosetParser {
         } else if (_identifier >= EncodingConstants.RESTRICTED_ALPHABET_APPLICATION_START) {
             CharArray ca = _v.restrictedAlphabet.get(_identifier - EncodingConstants.RESTRICTED_ALPHABET_APPLICATION_START);
             if (ca == null) {
-                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.alphabetNotPresent", new Object[]{Integer.valueOf(_identifier)}));
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.alphabetNotPresent", new Object[]{new Integer(_identifier)}));
             }
             decodeAlphabetOctetsAsCharBuffer(ca.ch);            
         } else {

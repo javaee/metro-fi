@@ -1137,7 +1137,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                 case EncodingAlgorithmIndexes.CDATA:
                     throw new UnsupportedOperationException(CommonResourceBundle.getInstance().getString("message.CDATA"));
                 default:
-                    throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.UnsupportedBuiltInAlgorithm", new Object[]{Integer.valueOf(id)}));
+                    throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.UnsupportedBuiltInAlgorithm", new Object[]{new Integer(id)}));
             }
             encodeAIIBuiltInAlgorithmData(id, data, 0, length);
         } else if (id >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
@@ -1325,7 +1325,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                 case EncodingAlgorithmIndexes.CDATA:
                     throw new UnsupportedOperationException(CommonResourceBundle.getInstance().getString("message.CDATA"));
                 default:
-                    throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.UnsupportedBuiltInAlgorithm", new Object[]{Integer.valueOf(id)}));
+                    throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.UnsupportedBuiltInAlgorithm", new Object[]{new Integer(id)}));
             }
             encodeCIIBuiltInAlgorithmData(id, data, 0, length);
         } else if (id >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
@@ -1763,7 +1763,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         } else {
             throw new IOException(
                     CommonResourceBundle.getInstance().getString("message.integerMaxSize", 
-                    new Object[]{Integer.valueOf(EncodingConstants.INTEGER_2ND_BIT_LARGE_LIMIT)}));
+                    new Object[]{new Integer(EncodingConstants.INTEGER_2ND_BIT_LARGE_LIMIT)}));
         }
     }
 
@@ -1954,7 +1954,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
             write((i >> 8) & 0xFF);
             write(i & 0xFF);
         } else {
-            throw new IOException(CommonResourceBundle.getInstance().getString("message.integerMaxSize", new Object[]{Integer.valueOf(EncodingConstants.INTEGER_MAXIMUM_SIZE)}));
+            throw new IOException(CommonResourceBundle.getInstance().getString("message.integerMaxSize", new Object[]{new Integer(EncodingConstants.INTEGER_MAXIMUM_SIZE)}));
         }
     }
 

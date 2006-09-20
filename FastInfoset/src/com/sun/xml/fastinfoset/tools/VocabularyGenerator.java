@@ -259,14 +259,14 @@ public class VocabularyGenerator extends DefaultHandler implements LexicalHandle
             namespaceURIIndex = _serializerVocabulary.namespaceName.get(namespaceURI);
             if (namespaceURIIndex == KeyIntMap.NOT_PRESENT) {
                 throw new SAXException(CommonResourceBundle.getInstance().
-                        getString("message.namespaceURINotIndexed", new Object[]{Integer.valueOf(namespaceURIIndex)}));
+                        getString("message.namespaceURINotIndexed", new Object[]{new Integer(namespaceURIIndex)}));
             }
             
             if (prefix.length() > 0) {
                 prefixIndex = _serializerVocabulary.prefix.get(prefix);
                 if (prefixIndex == KeyIntMap.NOT_PRESENT) {
                     throw new SAXException(CommonResourceBundle.getInstance().
-                            getString("message.prefixNotIndexed", new Object[]{Integer.valueOf(prefixIndex)}));
+                            getString("message.prefixNotIndexed", new Object[]{new Integer(prefixIndex)}));
                 }
             }
         }

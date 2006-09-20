@@ -57,7 +57,7 @@ public class FloatEncodingAlgorithm extends IEEE754FloatingPointEncodingAlgorith
     public final int getPrimtiveLengthFromOctetLength(int octetLength) throws EncodingAlgorithmException {
         if (octetLength % FLOAT_SIZE != 0) {
             throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().
-                    getString("message.lengthNotMultipleOfFloat", new Object[]{Integer.valueOf(FLOAT_SIZE)}));
+                    getString("message.lengthNotMultipleOfFloat", new Object[]{new Integer(FLOAT_SIZE)}));
         }
         
         return octetLength / FLOAT_SIZE;
@@ -151,7 +151,7 @@ public class FloatEncodingAlgorithm extends IEEE754FloatingPointEncodingAlgorith
                     ((b[1] & 0xFF) << 16) | 
                     ((b[2] & 0xFF) << 8) | 
                     (b[3] & 0xFF);
-            floatList.add(Float.valueOf(Float.intBitsToFloat(bits)));
+            floatList.add(new Float(Float.intBitsToFloat(bits)));
         }
         
         return generateArrayFromList(floatList);

@@ -1332,7 +1332,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             final String URI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
             if (URI == null) {
                 throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().
-                        getString("message.URINotPresent", new Object[]{Integer.valueOf(_identifier)}));
+                        getString("message.URINotPresent", new Object[]{new Integer(_identifier)}));
             }
             
             final EncodingAlgorithm ea = (EncodingAlgorithm)_registeredEncodingAlgorithms.get(URI);
@@ -1480,7 +1480,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     throw new UnsupportedOperationException("CDATA");
                 default:
                     throw new FastInfosetException(CommonResourceBundle.getInstance().
-                            getString("message.unsupportedAlgorithm", new Object[]{Integer.valueOf(_identifier)}));
+                            getString("message.unsupportedAlgorithm", new Object[]{new Integer(_identifier)}));
             }
         } catch (SAXException e) {
             throw new FastInfosetException(e);
@@ -1502,7 +1502,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             final String URI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
             if (URI == null) {
                 throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().
-                        getString("message.URINotPresent", new Object[]{Integer.valueOf(_identifier)}));
+                        getString("message.URINotPresent", new Object[]{new Integer(_identifier)}));
             }
             
             final EncodingAlgorithm ea = (EncodingAlgorithm)_registeredEncodingAlgorithms.get(URI);

@@ -49,7 +49,7 @@ public class UUIDEncodingAlgorithm extends LongEncodingAlgorithm {
     public final int getPrimtiveLengthFromOctetLength(int octetLength) throws EncodingAlgorithmException {
         if (octetLength % (LONG_SIZE * 2) != 0) {
             throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().
-                    getString("message.lengthNotMultipleOfUUID",new Object[]{Integer.valueOf(LONG_SIZE * 2)}));
+                    getString("message.lengthNotMultipleOfUUID",new Object[]{new Integer(LONG_SIZE * 2)}));
         }
         
         return octetLength / LONG_SIZE;
@@ -64,8 +64,8 @@ public class UUIDEncodingAlgorithm extends LongEncodingAlgorithm {
             public void word(int start, int end) {
                 String uuidValue = cb.subSequence(start, end).toString();
                 fromUUIDString(uuidValue);
-                longList.add(Long.valueOf(_msb));
-                longList.add(Long.valueOf(_lsb));
+                longList.add(new Long(_msb));
+                longList.add(new Long(_lsb));
             }
         }
         );

@@ -55,7 +55,7 @@ public class LongEncodingAlgorithm extends IntegerEncodingAlgorithm {
     public int getPrimtiveLengthFromOctetLength(int octetLength) throws EncodingAlgorithmException {
         if (octetLength % LONG_SIZE != 0) {
             throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().
-                    getString("message.lengthNotMultipleOfLong", new Object[]{Integer.valueOf(LONG_SIZE)}));
+                    getString("message.lengthNotMultipleOfLong", new Object[]{new Integer(LONG_SIZE)}));
         }
         
         return octetLength / LONG_SIZE;
@@ -159,7 +159,7 @@ public class LongEncodingAlgorithm extends IntegerEncodingAlgorithm {
                     ((b[5] & 0xFF) << 16) | 
                     ((b[6] & 0xFF) << 8) | 
                     (b[7] & 0xFF);
-            longList.add(Long.valueOf(l));
+            longList.add(new Long(l));
         }
         
         return generateArrayFromList(longList);
