@@ -112,7 +112,7 @@ public class FrequencyHandler extends DefaultHandler {
         // Add the local name to the table
         localNames.add0(q.getLocalPart());
         
-        bucketQNameToNamespace(q, namespacesToElements);
+        // bucketQNameToNamespace(q, namespacesToElements);
     }
     
     public void addQNameToAttributes(QName q) {
@@ -121,7 +121,7 @@ public class FrequencyHandler extends DefaultHandler {
         // Add the local name to the table
         localNames.add0(q.getLocalPart());
         
-        bucketQNameToNamespace(q, namespacesToAttributes);
+        // bucketQNameToNamespace(q, namespacesToAttributes);
     }
 
     /**
