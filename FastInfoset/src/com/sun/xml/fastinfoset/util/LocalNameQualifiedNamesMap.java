@@ -127,12 +127,6 @@ public class LocalNameQualifiedNamesMap extends KeyIntMap {
     }
     
     public final boolean isQNameFromReadOnlyMap(QualifiedName name) {
-        if (_readOnlyMap != null) {
-            System.out.println(name.getQName());
-            System.out.println(_readOnlyMap.getIndex());
-            System.out.println(name.index);
-        }
-        
         return (_readOnlyMap != null && name.index <= _readOnlyMap.getIndex());
     }
     
