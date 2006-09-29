@@ -415,6 +415,8 @@ public class SchemaProcessor {
     
     private void addAttribute(XSDeclaration d) {
         QName q = getQName(d);
+        if ("http://www.w3.org/XML/1998/namespace".equals(q.getNamespaceURI()))
+            return;
         attributes.add(q);
         addNamespaceLocalNameAndPrefix(q);
     }
