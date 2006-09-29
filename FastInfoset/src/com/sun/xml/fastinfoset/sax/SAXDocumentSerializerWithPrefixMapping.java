@@ -134,7 +134,7 @@ public class SAXDocumentSerializerWithPrefixMapping extends SAXDocumentSerialize
             if (encodeElementMapEntry(entry, namespaceURI)) return;
             // Check the entry is a member of the read only map
             if (_v.elementName.isQNameFromReadOnlyMap(entry._value[0])) {
-                entry = _v.attributeName.obtainEntry(localName);
+                entry = _v.elementName.obtainDynamicEntry(localName);
                 if (entry._valueIndex > 0) {
                     if (encodeElementMapEntry(entry, namespaceURI)) return;
                 }
@@ -145,7 +145,7 @@ public class SAXDocumentSerializerWithPrefixMapping extends SAXDocumentSerialize
                 localName, entry);            
     }
     
-    protected boolean encodeElementMapEntry(LocalNameQualifiedNamesMap.Entry entry, String namespaceURI) throws IOException {        
+    protected boolean encodeElementMapEntry(LocalNameQualifiedNamesMap.Entry entry, String namespaceURI) throws IOException {
         QualifiedName[] names = entry._value;
         for (int i = 0; i < entry._valueIndex; i++) {
             if ((namespaceURI == names[i].namespaceName || namespaceURI.equals(names[i].namespaceName))) {
@@ -237,24 +237,6 @@ public class SAXDocumentSerializerWithPrefixMapping extends SAXDocumentSerialize
             return qName;
         }
     }
-
-    /*
-    protected final boolean encodeAttribute(String namespaceURI, String qName, String localName) throws IOException {
-        LocalNameQualifiedNamesMap.Entry entry = _v.attributeName.obtainEntry(localName);
-        if (entry._valueIndex > 0) {
-            QualifiedName[] names = entry._value;
-            for (int i = 0; i < entry._valueIndex; i++) {
-                if ((namespaceURI == names[i].namespaceName || namespaceURI.equals(names[i].namespaceName))) {
-                    encodeNonZeroIntegerOnSecondBitFirstBitZero(names[i].index);
-                    return true;
-                }
-            }
-        }
-
-        return encodeLiteralAttributeQualifiedNameOnSecondBit(namespaceURI, getPrefix(namespaceURI),
-                localName, entry);            
-    }
-*/
     
     protected final boolean encodeAttribute(String namespaceURI, String qName, String localName) throws IOException {
         LocalNameQualifiedNamesMap.Entry entry = _v.attributeName.obtainEntry(localName);
@@ -262,7 +244,7 @@ public class SAXDocumentSerializerWithPrefixMapping extends SAXDocumentSerialize
             if (encodeAttributeMapEntry(entry, namespaceURI)) return true;
             // Check the entry is a member of the read only map
             if (_v.attributeName.isQNameFromReadOnlyMap(entry._value[0])) {
-                entry = _v.attributeName.obtainEntry(localName);
+                entry = _v.attributeName.obtainDynamicEntry(localName);
                 if (entry._valueIndex > 0) {
                     if (encodeAttributeMapEntry(entry, namespaceURI)) return true;
                 }
