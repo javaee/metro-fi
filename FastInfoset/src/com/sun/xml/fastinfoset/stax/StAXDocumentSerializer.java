@@ -650,11 +650,15 @@ public class StAXDocumentSerializer extends Encoder
         encodeNonZeroIntegerOnThirdBit(index);
     }
     
-    public final void writeLowLevelStartElement(int type, String prefix, String localName,
+    public final boolean writeLowLevelStartElement(int type, String prefix, String localName,
             String namespaceURI) throws IOException {
-        if (!encodeElement(type, namespaceURI, prefix, localName))
+        final boolean isIndexed = encodeElement(type, namespaceURI, prefix, localName);
+        
+        if (!isIndexed)
             encodeLiteral(type | EncodingConstants.ELEMENT_LITERAL_QNAME_FLAG,
                     namespaceURI, prefix, localName);
+        
+        return isIndexed;
     }
                 
     public final void writeLowLevelStartNamespaces() throws IOException {
@@ -681,10 +685,14 @@ public class StAXDocumentSerializer extends Encoder
         encodeNonZeroIntegerOnSecondBitFirstBitZero(index);
     }
     
-    public final void writeLowLevelAttribute(String prefix, String namespaceURI, String localName) throws IOException {
-        if (!encodeAttribute(namespaceURI, prefix, localName))
+    public final boolean writeLowLevelAttribute(String prefix, String namespaceURI, String localName) throws IOException {
+        final boolean isIndexed = encodeAttribute(namespaceURI, prefix, localName);
+
+        if (!isIndexed)
             encodeLiteral(EncodingConstants.ATTRIBUTE_LITERAL_QNAME_FLAG, 
                     namespaceURI, prefix, localName);
+        
+        return isIndexed;
     }
                 
     public final void writeLowLevelAttributeValue(String value) throws IOException

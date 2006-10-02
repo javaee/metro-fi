@@ -149,7 +149,12 @@ public interface LowLevelFastInfosetStreamWriter {
     public void writeLowLevelStartElementIndexed(int type, int index)
     throws IOException;
     
-    public void writeLowLevelStartElement(int type, 
+    /**
+     * Write the start of an element.
+     *
+     * @return true if element is indexed, otherwise false.
+     */
+    public boolean writeLowLevelStartElement(int type, 
             String prefix, String localName, String namespaceURI) 
             throws IOException;
                 
@@ -168,7 +173,12 @@ public interface LowLevelFastInfosetStreamWriter {
     public void writeLowLevelAttributeIndexed(int index)
     throws IOException;
     
-    public void writeLowLevelAttribute(
+    /**
+     * Write an attribute.
+     *
+     * @return true if attribute is indexed, otherwise false.
+     */
+    public boolean writeLowLevelAttribute(
             String prefix, String namespaceURI, String localName)
             throws IOException;
                 
