@@ -339,7 +339,7 @@ public class StAXDocumentParser extends Decoder
                     return _eventType = CHARACTERS;
                 case DecoderStateTables.CII_RA:
                 {
-                    final boolean addToTable = (_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0;
+                    final boolean addToTable = (b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0;
                     
                     _identifier = (b & 0x02) << 6;
                     final int b2 = read();

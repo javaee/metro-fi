@@ -125,7 +125,11 @@ public class LocalNameQualifiedNamesMap extends KeyIntMap {
             _index = 0;
         }     
     }
-
+    
+    public final boolean isQNameFromReadOnlyMap(QualifiedName name) {
+        return (_readOnlyMap != null && name.index <= _readOnlyMap.getIndex());
+    }
+    
     public final int getNextIndex() {
         return _index++;
     }
@@ -144,6 +148,19 @@ public class LocalNameQualifiedNamesMap extends KeyIntMap {
                 return entry;
             }
         }
+        
+        final int tableIndex = indexFor(hash, _table.length);
+        for (Entry e = _table[tableIndex]; e != null; e = e._next) {
+            if (e._hash == hash && eq(key, e._key)) {
+                return e;
+            }
+        }
+
+        return addEntry(key, hash, tableIndex);        
+    }
+    
+    public final Entry obtainDynamicEntry(String key) {
+        final int hash = hashHash(key.hashCode());
         
         final int tableIndex = indexFor(hash, _table.length);
         for (Entry e = _table[tableIndex]; e != null; e = e._next) {

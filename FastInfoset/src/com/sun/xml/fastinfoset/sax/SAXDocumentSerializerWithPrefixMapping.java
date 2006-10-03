@@ -127,16 +127,16 @@ public class SAXDocumentSerializerWithPrefixMapping extends SAXDocumentSerialize
             throw new SAXException("startElement", e);
         }
     }
-
+    
     protected final void encodeElement(String namespaceURI, String qName, String localName) throws IOException {
         LocalNameQualifiedNamesMap.Entry entry = _v.elementName.obtainEntry(localName);
         if (entry._valueIndex > 0) {
-            final QualifiedName[] names = entry._value;
-            for (int i = 0; i < entry._valueIndex; i++) {
-                final QualifiedName n = names[i];
-                if (namespaceURI == n.namespaceName || namespaceURI.equals(n.namespaceName)) {
-                    encodeNonZeroIntegerOnThirdBit(n.index);
-                    return;
+            if (encodeElementMapEntry(entry, namespaceURI)) return;
+            // Check the entry is a member of the read only map
+            if (_v.elementName.isQNameFromReadOnlyMap(entry._value[0])) {
+                entry = _v.elementName.obtainDynamicEntry(localName);
+                if (entry._valueIndex > 0) {
+                    if (encodeElementMapEntry(entry, namespaceURI)) return;
                 }
             }
         }
@@ -144,6 +144,18 @@ public class SAXDocumentSerializerWithPrefixMapping extends SAXDocumentSerialize
         encodeLiteralElementQualifiedNameOnThirdBit(namespaceURI, getPrefix(namespaceURI),
                 localName, entry);            
     }
+    
+    protected boolean encodeElementMapEntry(LocalNameQualifiedNamesMap.Entry entry, String namespaceURI) throws IOException {
+        QualifiedName[] names = entry._value;
+        for (int i = 0; i < entry._valueIndex; i++) {
+            if ((namespaceURI == names[i].namespaceName || namespaceURI.equals(names[i].namespaceName))) {
+                encodeNonZeroIntegerOnThirdBit(names[i].index);
+                return true;
+            }
+        }
+        return false;
+    }
+    
     
     protected final void encodeAttributes(Attributes atts) throws IOException, FastInfosetException {
         boolean addToTable;
@@ -229,11 +241,12 @@ public class SAXDocumentSerializerWithPrefixMapping extends SAXDocumentSerialize
     protected final boolean encodeAttribute(String namespaceURI, String qName, String localName) throws IOException {
         LocalNameQualifiedNamesMap.Entry entry = _v.attributeName.obtainEntry(localName);
         if (entry._valueIndex > 0) {
-            QualifiedName[] names = entry._value;
-            for (int i = 0; i < entry._valueIndex; i++) {
-                if ((namespaceURI == names[i].namespaceName || namespaceURI.equals(names[i].namespaceName))) {
-                    encodeNonZeroIntegerOnSecondBitFirstBitZero(names[i].index);
-                    return true;
+            if (encodeAttributeMapEntry(entry, namespaceURI)) return true;
+            // Check the entry is a member of the read only map
+            if (_v.attributeName.isQNameFromReadOnlyMap(entry._value[0])) {
+                entry = _v.attributeName.obtainDynamicEntry(localName);
+                if (entry._valueIndex > 0) {
+                    if (encodeAttributeMapEntry(entry, namespaceURI)) return true;
                 }
             }
         }
@@ -241,7 +254,18 @@ public class SAXDocumentSerializerWithPrefixMapping extends SAXDocumentSerialize
         return encodeLiteralAttributeQualifiedNameOnSecondBit(namespaceURI, getPrefix(namespaceURI),
                 localName, entry);            
     }
-    
+
+    protected boolean encodeAttributeMapEntry(LocalNameQualifiedNamesMap.Entry entry, String namespaceURI) throws IOException {        
+        QualifiedName[] names = entry._value;
+        for (int i = 0; i < entry._valueIndex; i++) {
+            if ((namespaceURI == names[i].namespaceName || namespaceURI.equals(names[i].namespaceName))) {
+                encodeNonZeroIntegerOnSecondBitFirstBitZero(names[i].index);
+                return true;
+            }
+        }
+        return false;
+    }
+            
     protected final String getPrefix(String namespaceURI) {
         if (_lastCheckedNamespace == namespaceURI) return _lastCheckedPrefix;
         

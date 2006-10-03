@@ -36,14 +36,12 @@
  *
  */
 /*
- * ====================================================================
  *
  * This code is subject to the freebxml License, Version 1.1
  *
  * Copyright (c) 2001 - 2005 freebxml.org.  All rights reserved.
  *
- * $Header: /zpool01/javanet/scm/svn/tmp/cvs2svn/fi/FastInfoset/src/com/sun/xml/fastinfoset/AbstractResourceBundle.java,v 1.3.2.1 2006-09-20 12:37:03 sandoz Exp $
- * ====================================================================
+ * $Header: /zpool01/javanet/scm/svn/tmp/cvs2svn/fi/FastInfoset/src/com/sun/xml/fastinfoset/AbstractResourceBundle.java,v 1.3.2.2 2006-10-03 13:38:07 sandoz Exp $
  */
 package com.sun.xml.fastinfoset;
 
