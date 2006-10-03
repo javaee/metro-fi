@@ -80,6 +80,7 @@
                 <include name="dist/FastInfoset.jar"/>
             </fileset>
             <fileset dir="${FastInfosetUtilities.dir}">
+                <include name="bin/*"/>
                 <include name="lib/*.jar"/>
                 <include name="dist/FastInfosetUtilities.jar"/>
             </fileset>
