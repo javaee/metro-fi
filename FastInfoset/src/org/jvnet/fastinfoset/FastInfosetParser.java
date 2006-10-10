@@ -155,4 +155,20 @@ public interface FastInfosetParser {
      */
     public Map getExternalVocabularies();
     
+    /**
+     * Set the parse fragments property.
+     *
+     * <p>If the parse fragments property is set to true then 
+     * then fragments of an XML infoset may be parsed.
+     *
+     * @param parseFragments The parse fragments property.
+     */
+    public void setParseFragments(boolean parseFragments);
+    
+    /**
+     * Return the parse fragments property.
+     *
+     * @return The parse fragments property.
+     */
+    public boolean getParseFragments();
 }
