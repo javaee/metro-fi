@@ -411,7 +411,10 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         try {
             reset();
             decodeHeader();
-            processDII();
+            if (_parseFragments)
+                processDIIFragment();
+            else 
+                processDII();
         } catch (RuntimeException e) {
             try {
                 _errorHandler.fatalError(new SAXParseException(e.getClass().getName(), null, e));
@@ -565,6 +568,249 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             }
         }
         
+        try {
+            _contentHandler.endDocument();
+        } catch (SAXException e) {
+            throw new FastInfosetException("processDII", e);
+        }
+    }
+    
+    protected final void processDIIFragment() throws FastInfosetException, IOException {
+        try {
+            _contentHandler.startDocument();
+        } catch (SAXException e) {
+            throw new FastInfosetException("processDII", e);
+        }
+                
+        _b = read();
+        if (_b > 0) {
+            processDIIOptionalProperties();
+        }
+        
+        while(!_terminate) {
+            _b = read();
+            switch(DecoderStateTables.EII[_b]) {
+                case DecoderStateTables.EII_NO_AIIS_INDEX_SMALL:
+                    processEII(_elementNameTable._array[_b], false);
+                    break;
+                case DecoderStateTables.EII_AIIS_INDEX_SMALL:
+                    processEII(_elementNameTable._array[_b & EncodingConstants.INTEGER_3RD_BIT_SMALL_MASK], true);
+                    break;
+                case DecoderStateTables.EII_INDEX_MEDIUM:
+                    processEII(decodeEIIIndexMedium(), (_b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
+                    break;
+                case DecoderStateTables.EII_INDEX_LARGE:
+                    processEII(decodeEIIIndexLarge(), (_b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
+                    break;
+                case DecoderStateTables.EII_LITERAL:
+                {
+                    final QualifiedName qn = decodeLiteralQualifiedName(
+                                _b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK,
+                                _elementNameTable.getNext());
+                    _elementNameTable.add(qn);
+                    processEII(qn, (_b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
+                    break;
+                }
+                case DecoderStateTables.EII_NAMESPACES:
+                    processEIIWithNamespaces();
+                    break;
+                case DecoderStateTables.CII_UTF8_SMALL_LENGTH:
+                    _octetBufferLength = (_b & EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_MASK)
+                    + 1;
+                    processUtf8CharacterString();
+                    break;
+                case DecoderStateTables.CII_UTF8_MEDIUM_LENGTH:
+                    _octetBufferLength = read() + EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_LIMIT;
+                    processUtf8CharacterString();
+                    break;
+                case DecoderStateTables.CII_UTF8_LARGE_LENGTH:
+                    _octetBufferLength = ((read() << 24) |
+                            (read() << 16) |
+                            (read() << 8) |
+                            read())
+                            + EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_MEDIUM_LIMIT;
+                    processUtf8CharacterString();
+                    break;
+                case DecoderStateTables.CII_UTF16_SMALL_LENGTH:
+                    _octetBufferLength = (_b & EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_MASK)
+                    + 1;
+                    decodeUtf16StringAsCharBuffer();
+                    if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
+                        _characterContentChunkTable.add(_charBuffer, _charBufferLength);
+                    }
+                    
+                    try {
+                        _contentHandler.characters(_charBuffer, 0, _charBufferLength);
+                    } catch (SAXException e) {
+                        throw new FastInfosetException("processCII", e);
+                    }
+                    break;
+                case DecoderStateTables.CII_UTF16_MEDIUM_LENGTH:
+                    _octetBufferLength = read() + EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_LIMIT;
+                    decodeUtf16StringAsCharBuffer();
+                    if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
+                        _characterContentChunkTable.add(_charBuffer, _charBufferLength);
+                    }
+                    
+                    try {
+                        _contentHandler.characters(_charBuffer, 0, _charBufferLength);
+                    } catch (SAXException e) {
+                        throw new FastInfosetException("processCII", e);
+                    }
+                    break;
+                case DecoderStateTables.CII_UTF16_LARGE_LENGTH:
+                    _octetBufferLength = ((read() << 24) |
+                            (read() << 16) |
+                            (read() << 8) |
+                            read())
+                            + EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_MEDIUM_LIMIT;
+                    decodeUtf16StringAsCharBuffer();
+                    if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
+                        _characterContentChunkTable.add(_charBuffer, _charBufferLength);
+                    }
+                    
+                    try {
+                        _contentHandler.characters(_charBuffer, 0, _charBufferLength);
+                    } catch (SAXException e) {
+                        throw new FastInfosetException("processCII", e);
+                    }
+                    break;
+                case DecoderStateTables.CII_RA:
+                {
+                    final boolean addToTable = (_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0;
+                    
+                    // Decode resitricted alphabet integer
+                    _identifier = (_b & 0x02) << 6;
+                    _b = read();
+                    _identifier |= (_b & 0xFC) >> 2;
+                    
+                    decodeOctetsOnSeventhBitOfNonIdentifyingStringOnThirdBit(_b);
+                    
+                    decodeRestrictedAlphabetAsCharBuffer();
+                    
+                    if (addToTable) {
+                        _characterContentChunkTable.add(_charBuffer, _charBufferLength);
+                    }
+
+                    try {
+                        _contentHandler.characters(_charBuffer, 0, _charBufferLength);
+                    } catch (SAXException e) {
+                        throw new FastInfosetException("processCII", e);
+                    }                    
+                    break;
+                }
+                case DecoderStateTables.CII_EA:
+                {
+                    if ((_b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0) {
+                        throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.addToTableNotSupported"));
+                    }
+                    
+                    // Decode encoding algorithm integer
+                    _identifier = (_b & 0x02) << 6;
+                    _b = read();
+                    _identifier |= (_b & 0xFC) >> 2;
+                    
+                    decodeOctetsOnSeventhBitOfNonIdentifyingStringOnThirdBit(_b);
+                    
+                    processCIIEncodingAlgorithm();
+                    break;
+                }
+                case DecoderStateTables.CII_INDEX_SMALL:
+                {
+                    final int index = _b & EncodingConstants.INTEGER_4TH_BIT_SMALL_MASK;
+                    try {
+                        _contentHandler.characters(_characterContentChunkTable._array, 
+                                _characterContentChunkTable._offset[index], 
+                                _characterContentChunkTable._length[index]);
+                    } catch (SAXException e) {
+                        throw new FastInfosetException("processCII", e);
+                    }
+                    break;
+                }
+                case DecoderStateTables.CII_INDEX_MEDIUM:
+                {
+                    final int index = (((_b & EncodingConstants.INTEGER_4TH_BIT_MEDIUM_MASK) << 8) | read())
+                            + EncodingConstants.INTEGER_4TH_BIT_SMALL_LIMIT;
+                    try {
+                        _contentHandler.characters(_characterContentChunkTable._array, 
+                                _characterContentChunkTable._offset[index], 
+                                _characterContentChunkTable._length[index]);
+                    } catch (SAXException e) {
+                        throw new FastInfosetException("processCII", e);
+                    }
+                    break;
+                }
+                case DecoderStateTables.CII_INDEX_LARGE:
+                {
+                    final int index = (((_b & EncodingConstants.INTEGER_4TH_BIT_LARGE_MASK) << 16) |
+                            (read() << 8) |
+                            read()) 
+                            + EncodingConstants.INTEGER_4TH_BIT_MEDIUM_LIMIT;
+                    
+                    try {
+                        _contentHandler.characters(_characterContentChunkTable._array, 
+                                _characterContentChunkTable._offset[index], 
+                                _characterContentChunkTable._length[index]);
+                    } catch (SAXException e) {
+                        throw new FastInfosetException("processCII", e);
+                    }
+                    break;
+                }
+                case DecoderStateTables.CII_INDEX_LARGE_LARGE:
+                {
+                    final int index = ((read() << 16) |
+                            (read() << 8) |
+                            read()) 
+                            + EncodingConstants.INTEGER_4TH_BIT_LARGE_LIMIT;
+                    
+                    try {
+                        _contentHandler.characters(_characterContentChunkTable._array, 
+                                _characterContentChunkTable._offset[index], 
+                                _characterContentChunkTable._length[index]);
+                    } catch (SAXException e) {
+                        throw new FastInfosetException("processCII", e);
+                    }
+                    break;
+                }
+                case DecoderStateTables.COMMENT_II:
+                    processCommentII();
+                    break;
+                case DecoderStateTables.PROCESSING_INSTRUCTION_II:
+                    processProcessingII();
+                    break;
+                case DecoderStateTables.UNEXPANDED_ENTITY_REFERENCE_II:
+                {
+                    String entity_reference_name = decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherNCName);
+                    
+                    String system_identifier = ((_b & EncodingConstants.UNEXPANDED_ENTITY_SYSTEM_IDENTIFIER_FLAG) > 0)
+                    ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
+                    String public_identifier = ((_b & EncodingConstants.UNEXPANDED_ENTITY_PUBLIC_IDENTIFIER_FLAG) > 0)
+                    ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
+                    
+                    try {
+                        /*
+                         * TODO
+                         * Need to verify if the skippedEntity method:
+                         * http://java.sun.com/j2se/1.4.2/docs/api/org/xml/sax/ContentHandler.html#skippedEntity(java.lang.String)
+                         * is the correct method to call. It appears so but a more extensive
+                         * check is necessary.
+                         */
+                        _contentHandler.skippedEntity(entity_reference_name);
+                    } catch (SAXException e) {
+                        throw new FastInfosetException("processUnexpandedEntityReferenceII", e);
+                    }
+                    break;
+                }
+                case DecoderStateTables.TERMINATOR_DOUBLE:
+                    _doubleTerminate = true;
+                case DecoderStateTables.TERMINATOR_SINGLE:
+                    _terminate = true;
+                    break;
+                default:
+                    throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.IllegalStateDecodingEII"));
+            }
+        }
+                
         try {
             _contentHandler.endDocument();
         } catch (SAXException e) {

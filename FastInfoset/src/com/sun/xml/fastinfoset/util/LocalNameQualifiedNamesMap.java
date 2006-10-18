@@ -135,8 +135,7 @@ public class LocalNameQualifiedNamesMap extends KeyIntMap {
     }
 
     public final int getIndex() {
-        return _index;
-        
+        return _index;        
     }
     
     public final Entry obtainEntry(String key) {

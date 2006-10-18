@@ -137,6 +137,11 @@ public abstract class Decoder implements FastInfosetParser {
     private Map _externalVocabularies;    
 
     /**
+     * True if can parse fragments.
+     */
+    protected boolean _parseFragments;
+    
+    /**
      * True if the vocabulary is internally created by decoder.
      */
     private boolean _vIsInternal;
@@ -348,8 +353,21 @@ public abstract class Decoder implements FastInfosetParser {
         return _externalVocabularies;
     }
     
-    // End FastInfosetParser interface
+    /**
+     * {@inheritDoc}
+     */
+    public void setParseFragments(boolean parseFragments) {
+        _parseFragments = parseFragments;
+    }
     
+    /**
+     * {@inheritDoc}
+     */
+    public boolean getParseFragments() {
+        return _parseFragments;
+    }
+    
+    // End FastInfosetParser interface
     
     /**
      * Reset the decoder for reuse decoding another XML infoset.

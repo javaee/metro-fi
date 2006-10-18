@@ -69,7 +69,8 @@ public abstract class BuiltInEncodingAlgorithm implements EncodingAlgorithm {
             }
             i = m.end();
         }
-        wl.word(i, cb.length());
+        if (i != cb.length())
+            wl.word(i, cb.length());
     }
     
     public StringBuffer removeWhitespace(char[] ch, int start, int length) {

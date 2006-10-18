@@ -131,6 +131,14 @@ public interface LowLevelFastInfosetStreamWriter {
     public int getNextAttributeIndex();
     
     /**
+     * Get the current index that was applied to an [local name] of an 
+     * Element or Attribute Information Item.
+     * </pre>
+     * @return the index.
+     */
+    public int getLocalNameIndex();
+    
+    /**
      * Get the next index to apply to an [local name] of an Element or Attribute
      * Information Item.
      * This will increment the next obtained index such that:

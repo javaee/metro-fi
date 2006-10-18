@@ -636,6 +636,10 @@ public class StAXDocumentSerializer extends Encoder
         return _v.attributeName.getNextIndex();
     }
     
+    public final int getLocalNameIndex() {
+        return _v.localName.getIndex();
+    }
+    
     public final int getNextLocalNameIndex() {
         return _v.localName.getNextIndex();
     }

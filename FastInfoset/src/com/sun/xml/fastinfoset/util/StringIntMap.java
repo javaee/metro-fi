@@ -114,6 +114,10 @@ public class StringIntMap extends KeyIntMap {
         return _index++;
     }
     
+    public final int getIndex() {
+        return _index;        
+    }
+    
     public final int obtainIndex(String key) {
         final int hash = hashHash(key.hashCode());
         
