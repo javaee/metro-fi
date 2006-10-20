@@ -184,7 +184,7 @@ public class AttributesHolder implements EncodingAlgorithmAttributes {
     public final String getValue(String uri, String localName) {
         int index = getIndex(uri, localName);
         if (index >= 0) {
-            return _values[index];
+            return getValue(index);
         } else {
             return null;
         }
