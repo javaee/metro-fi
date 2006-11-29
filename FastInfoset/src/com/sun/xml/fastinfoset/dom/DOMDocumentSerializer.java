@@ -129,6 +129,8 @@ public class DOMDocumentSerializer extends Encoder {
         int attributesSize = 0;
         
         String elementNamespaceURI = e.getNamespaceURI();
+        String elementPrefix = e.getPrefix();
+        if (elementPrefix == null)  elementPrefix = "";
         
         /* isElementNamespaceURIPresent shows whether element's namespace
          * was defined as element's NS attribute */
@@ -151,7 +153,8 @@ public class DOMDocumentSerializer extends Encoder {
                     }
                     _namespaceAttributes[namespaceAttributesSize++] = a;
                     isElementNamespaceURIPresent = isElementNamespaceURIPresent ||
-                            a.getNodeValue().equals(elementNamespaceURI);
+                            (a.getNodeValue().equals(elementNamespaceURI) &&
+                            elementPrefix.equals(a.getPrefix()));
                 } else {
                     if (attributesSize == _attributes.length) {
                         final Node[] attributes = new Node[attributesSize * 3 / 2 + 1];
@@ -185,11 +188,7 @@ public class DOMDocumentSerializer extends Encoder {
             
             /* Fix bug, when NSAttribute was not set using element.setAttributeNS() */
             if (!isElementNamespaceURIPresent) {
-                String prefix = e.getPrefix();
-                if (prefix == null) {
-                    prefix = "";
-                }
-                encodeNamespaceAttribute(prefix, elementNamespaceURI);
+                encodeNamespaceAttribute(elementPrefix, elementNamespaceURI);
             }
             
             write(EncodingConstants.TERMINATOR);
