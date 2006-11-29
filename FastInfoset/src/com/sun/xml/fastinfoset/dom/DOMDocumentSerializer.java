@@ -131,12 +131,8 @@ public class DOMDocumentSerializer extends Encoder {
         String elementNamespaceURI = e.getNamespaceURI();
         
         /* isElementNamespaceURIPresent shows whether element's namespace
-         * was declared before or is defined as element's NS attribute */
-        boolean isElementNamespaceURIPresent = true;
-        if (elementNamespaceURI != null) {
-            isElementNamespaceURIPresent =
-                    _v.namespaceName.get(elementNamespaceURI) != -1;
-        }
+         * was defined as element's NS attribute */
+        boolean isElementNamespaceURIPresent = (elementNamespaceURI == null);
         
         if (e.hasAttributes()) {
             /*
