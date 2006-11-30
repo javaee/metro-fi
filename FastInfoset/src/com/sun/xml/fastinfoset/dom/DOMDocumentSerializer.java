@@ -41,9 +41,12 @@ package com.sun.xml.fastinfoset.dom;
 import com.sun.xml.fastinfoset.Encoder;
 import com.sun.xml.fastinfoset.EncodingConstants;
 import com.sun.xml.fastinfoset.QualifiedName;
-import com.sun.xml.fastinfoset.stax.NamespaceContextImplementation;
+import com.sun.xml.fastinfoset.util.NamespaceContextImplementation;
 import com.sun.xml.fastinfoset.util.LocalNameQualifiedNamesMap;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import org.jvnet.fastinfoset.FastInfosetException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -120,20 +123,18 @@ public class DOMDocumentSerializer extends Encoder {
     }
     
     
-    protected Node[] _namespaceAttributes = new Node[4];
-    protected Node[] _attributes = new Node[32];
+//    protected Node[] _namespaceAttributes = new Node[4];
+
+    // map which will hold all current scope prefixes and associated attributes
+    private Map _namespaceScopeAttributes = new HashMap();
     // Collection of populated namespace available for current scope
     protected NamespaceContextImplementation _namespaceScopeContext = new NamespaceContextImplementation();
+    protected Node[] _attributes = new Node[32];
     
     protected final void serializeElement(Node e) throws IOException {
         encodeTermination();
         
-        int namespaceAttributesSize = 0;
         int attributesSize = 0;
-        
-        String elementNamespaceURI = e.getNamespaceURI();
-        String elementPrefix = e.getPrefix();
-        if (elementPrefix == null)  elementPrefix = "";
         
         _namespaceScopeContext.pushContext();
         
@@ -149,12 +150,9 @@ public class DOMDocumentSerializer extends Encoder {
                 if (namespaceURI != null && namespaceURI.equals("http://www.w3.org/2000/xmlns/")) {
                     String attrPrefix = a.getLocalName();
                     String attrNamespace = a.getNodeValue();
-                    if (namespaceAttributesSize == _namespaceAttributes.length) {
-                        final Node[] attributes = new Node[namespaceAttributesSize * 3 / 2 + 1];
-                        System.arraycopy(_namespaceAttributes, 0, attributes, 0, namespaceAttributesSize);
-                        _namespaceAttributes = attributes;
+                    if (attrPrefix == "xmlns" || attrPrefix.equals("xmlns")) {
+                        attrPrefix = "";
                     }
-                    _namespaceAttributes[namespaceAttributesSize++] = a;
                     _namespaceScopeContext.declarePrefix(attrPrefix, attrNamespace);
                 } else {
                     if (attributesSize == _attributes.length) {
@@ -163,14 +161,26 @@ public class DOMDocumentSerializer extends Encoder {
                         _attributes = attributes;
                     }
                     _attributes[attributesSize++] = a;
+                    
+                    String attrNamespaceURI = a.getNamespaceURI();
+                    String attrPrefix = a.getPrefix();
+                    if (attrPrefix != null && !_namespaceScopeContext.getNamespaceURI(attrPrefix).equals(attrNamespaceURI)) {
+                        _namespaceScopeContext.declarePrefix(attrPrefix, attrNamespaceURI);
+                    }
                 }
             }
         }
         
-        boolean isElementNamespaceInScope = (elementNamespaceURI == null ||
-                _namespaceScopeContext.getNamespaceURI(elementPrefix).equals(elementNamespaceURI));
+        String elementNamespaceURI = e.getNamespaceURI();
+        String elementPrefix = e.getPrefix();
+        if (elementPrefix == null)  elementPrefix = "";
+        if (elementNamespaceURI != null &&
+                !_namespaceScopeContext.getNamespaceURI(elementPrefix).equals(elementNamespaceURI)) {
+            _namespaceScopeContext.declarePrefix(elementPrefix, elementNamespaceURI);
+        }
         
-        if (namespaceAttributesSize > 0 || !isElementNamespaceInScope) {
+        _namespaceScopeAttributes = _namespaceScopeContext.getCurrentScopeNamespaceMap(_namespaceScopeAttributes);
+        if (!_namespaceScopeAttributes.isEmpty()) {
             if (attributesSize > 0) {
                 write(EncodingConstants.ELEMENT | EncodingConstants.ELEMENT_NAMESPACES_FLAG |
                         EncodingConstants.ELEMENT_ATTRIBUTE_FLAG);
@@ -178,23 +188,12 @@ public class DOMDocumentSerializer extends Encoder {
                 write(EncodingConstants.ELEMENT | EncodingConstants.ELEMENT_NAMESPACES_FLAG);
             }
             
-            // Serialize the namespace attributes
-            for (int i = 0; i < namespaceAttributesSize; i++) {
-                final Node a = _namespaceAttributes[i];
-                _namespaceAttributes[i] = null;
-                String prefix = a.getLocalName();
-                if (prefix == "xmlns" || prefix.equals("xmlns")) {
-                    prefix = "";
-                }
-                final String uri = a.getNodeValue();
+            for(Iterator it = _namespaceScopeAttributes.keySet().iterator(); it.hasNext(); ) {
+                String prefix = (String) it.next();
+                String uri = (String) _namespaceScopeAttributes.get(prefix);
                 encodeNamespaceAttribute(prefix, uri);
             }
-            
-            /* Fix bug, when NSAttribute was not set using element.setAttributeNS() */
-            if (!isElementNamespaceInScope) {
-                _namespaceScopeContext.declarePrefix(elementPrefix, elementNamespaceURI);
-                encodeNamespaceAttribute(elementPrefix, elementNamespaceURI);
-            }
+            _namespaceScopeAttributes.clear();
             
             write(EncodingConstants.TERMINATOR);
             _b = 0;
@@ -253,6 +252,135 @@ public class DOMDocumentSerializer extends Encoder {
         encodeElementTermination();
         _namespaceScopeContext.popContext();
     }
+    
+//    protected final void serializeElement(Node e) throws IOException {
+//        encodeTermination();
+//
+//        int namespaceAttributesSize = 0;
+//        int attributesSize = 0;
+//
+//        String elementNamespaceURI = e.getNamespaceURI();
+//        String elementPrefix = e.getPrefix();
+//        if (elementPrefix == null)  elementPrefix = "";
+//
+//        _namespaceScopeContext.pushContext();
+//
+//        if (e.hasAttributes()) {
+//            /*
+//             * Split the attribute nodes into namespace attributes
+//             * or normal attributes.
+//             */
+//            final NamedNodeMap nnm = e.getAttributes();
+//            for (int i = 0; i < nnm.getLength(); i++) {
+//                final Node a = nnm.item(i);
+//                final String namespaceURI = a.getNamespaceURI();
+//                if (namespaceURI != null && namespaceURI.equals("http://www.w3.org/2000/xmlns/")) {
+//                    String attrPrefix = a.getLocalName();
+//                    String attrNamespace = a.getNodeValue();
+//                    if (namespaceAttributesSize == _namespaceAttributes.length) {
+//                        final Node[] attributes = new Node[namespaceAttributesSize * 3 / 2 + 1];
+//                        System.arraycopy(_namespaceAttributes, 0, attributes, 0, namespaceAttributesSize);
+//                        _namespaceAttributes = attributes;
+//                    }
+//                    _namespaceAttributes[namespaceAttributesSize++] = a;
+//                    _namespaceScopeContext.declarePrefix(attrPrefix, attrNamespace);
+//                } else {
+//                    if (attributesSize == _attributes.length) {
+//                        final Node[] attributes = new Node[attributesSize * 3 / 2 + 1];
+//                        System.arraycopy(_attributes, 0, attributes, 0, attributesSize);
+//                        _attributes = attributes;
+//                    }
+//                    _attributes[attributesSize++] = a;
+//                }
+//            }
+//        }
+//
+//        boolean isElementNamespaceInScope = (elementNamespaceURI == null ||
+//                _namespaceScopeContext.getNamespaceURI(elementPrefix).equals(elementNamespaceURI));
+//
+//        if (namespaceAttributesSize > 0 || !isElementNamespaceInScope) {
+//            if (attributesSize > 0) {
+//                write(EncodingConstants.ELEMENT | EncodingConstants.ELEMENT_NAMESPACES_FLAG |
+//                        EncodingConstants.ELEMENT_ATTRIBUTE_FLAG);
+//            } else {
+//                write(EncodingConstants.ELEMENT | EncodingConstants.ELEMENT_NAMESPACES_FLAG);
+//            }
+//
+//            // Serialize the namespace attributes
+//            for (int i = 0; i < namespaceAttributesSize; i++) {
+//                final Node a = _namespaceAttributes[i];
+//                _namespaceAttributes[i] = null;
+//                String prefix = a.getLocalName();
+//                if (prefix == "xmlns" || prefix.equals("xmlns")) {
+//                    prefix = "";
+//                }
+//                final String uri = a.getNodeValue();
+//                encodeNamespaceAttribute(prefix, uri);
+//            }
+//
+//            /* Fix bug, when NSAttribute was not set using element.setAttributeNS() */
+//            if (!isElementNamespaceInScope) {
+//                _namespaceScopeContext.declarePrefix(elementPrefix, elementNamespaceURI);
+//                encodeNamespaceAttribute(elementPrefix, elementNamespaceURI);
+//            }
+//
+//            write(EncodingConstants.TERMINATOR);
+//            _b = 0;
+//        } else {
+//            _b = (attributesSize > 0) ? EncodingConstants.ELEMENT | EncodingConstants.ELEMENT_ATTRIBUTE_FLAG :
+//                EncodingConstants.ELEMENT;
+//        }
+//
+//        String namespaceURI = elementNamespaceURI;
+////        namespaceURI = (namespaceURI == null) ? _namespaceScopeContext.getNamespaceURI("") : namespaceURI;
+//        namespaceURI = (namespaceURI == null) ? "" : namespaceURI;
+//        encodeElement(namespaceURI, e.getNodeName(), e.getLocalName());
+//
+//        if (attributesSize > 0) {
+//            // Serialize the attributes
+//            for (int i = 0; i < attributesSize; i++) {
+//                final Node a = _attributes[i];
+//                _attributes[i] = null;
+//                namespaceURI = a.getNamespaceURI();
+//                namespaceURI = (namespaceURI == null) ? "" : namespaceURI;
+//                encodeAttribute(namespaceURI, a.getNodeName(), a.getLocalName());
+//
+//                final String value = a.getNodeValue();
+//                final boolean addToTable = (value.length() < attributeValueSizeConstraint) ? true : false;
+//                encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
+//            }
+//
+//            _b = EncodingConstants.TERMINATOR;
+//            _terminate = true;
+//        }
+//
+//        if (e.hasChildNodes()) {
+//            // Serialize the children
+//            final NodeList nl = e.getChildNodes();
+//            for (int i = 0; i < nl.getLength(); i++) {
+//                final Node n = nl.item(i);
+//                switch (n.getNodeType()) {
+//                    case Node.ELEMENT_NODE:
+//                        serializeElement(n);
+//                        break;
+//                    case Node.TEXT_NODE:
+//                        serializeText(n);
+//                        break;
+//                    case Node.CDATA_SECTION_NODE:
+//                        serializeCDATA(n);
+//                        break;
+//                    case Node.COMMENT_NODE:
+//                        serializeComment(n);
+//                        break;
+//                    case Node.PROCESSING_INSTRUCTION_NODE:
+//                        serializeProcessingInstruction(n);
+//                        break;
+//                }
+//            }
+//        }
+//        encodeElementTermination();
+//        _namespaceScopeContext.popContext();
+//    }
     
     protected final void serializeText(Node t) throws IOException {
         final String text = t.getNodeValue();
