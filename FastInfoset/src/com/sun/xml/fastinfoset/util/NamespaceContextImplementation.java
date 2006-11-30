@@ -36,11 +36,12 @@
  *
  */
 
-package com.sun.xml.fastinfoset.stax;
+package com.sun.xml.fastinfoset.util;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import javax.xml.namespace.NamespaceContext;
 
 /**
@@ -64,7 +65,7 @@ final public class NamespaceContextImplementation implements NamespaceContext {
         namespaceURIs[0] = "http://www.w3.org/XML/1998/namespace";
         prefixes[1] = "xmlns";
         namespaceURIs[1] = "http://www.w3.org/2000/xmlns/";
-
+        
         currentContext = namespacePosition = 2;
     }
     
@@ -80,10 +81,10 @@ final public class NamespaceContextImplementation implements NamespaceContext {
                 return namespaceURIs[i];
             }
         }
-
+        
         return "";
     }
-
+    
     public String getPrefix(String namespaceURI) {
         if (namespaceURI == null) throw new IllegalArgumentException();
         
@@ -105,7 +106,7 @@ final public class NamespaceContextImplementation implements NamespaceContext {
         
         return null;
     }
-
+    
     public Iterator getPrefixes(String namespaceURI) {
         if (namespaceURI == null) throw new IllegalArgumentException();
         
@@ -131,7 +132,13 @@ final public class NamespaceContextImplementation implements NamespaceContext {
     }
     
     
-    //
+    public Map getCurrentScopeNamespaceMap(Map map) {
+        for (int i = currentContext; i < namespacePosition; i++) {
+            map.put(prefixes[i], namespaceURIs[i]);
+        }
+        
+        return map;
+    }
     
     public void declarePrefix(String prefix, String namespaceURI) {
         prefix = prefix.intern();
@@ -153,15 +160,15 @@ final public class NamespaceContextImplementation implements NamespaceContext {
         
         if (namespacePosition == namespaceURIs.length)
             resizeNamespaces();
-
+        
         // Add new declaration
         prefixes[namespacePosition] = prefix;
         namespaceURIs[namespacePosition++] = namespaceURI;
     }
-
+    
     private void resizeNamespaces() {
         final int newLength = namespaceURIs.length * 3 / 2 + 1;
-
+        
         String[] newPrefixes = new String[newLength];
         System.arraycopy(prefixes, 0, newPrefixes, 0, prefixes.length);
         prefixes = newPrefixes;
@@ -191,6 +198,6 @@ final public class NamespaceContextImplementation implements NamespaceContext {
     }
     
     public void reset() {
-         currentContext = namespacePosition = 2;
+        currentContext = namespacePosition = 2;
     }
 }

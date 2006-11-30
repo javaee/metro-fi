@@ -1,6 +1,6 @@
 package namespace;
 
-import com.sun.xml.fastinfoset.stax.NamespaceContextImplementation;
+import com.sun.xml.fastinfoset.util.NamespaceContextImplementation;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
