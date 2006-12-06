@@ -183,14 +183,11 @@ public class DOMDocumentSerializer extends Encoder {
                 write(EncodingConstants.ELEMENT | EncodingConstants.ELEMENT_NAMESPACES_FLAG);
             }
             
-            String[] prefixes = _namespaceScopeContext.getPrefixes();
-            String[] namespaceURIs = _namespaceScopeContext.getNamespaceURIs();
-            
             for (int i = _namespaceScopeContext.getCurrentContextStartIndex();
                      i < _namespaceScopeContext.getCurrentContextEndIndex(); i++) {
 
-                String prefix = prefixes[i];
-                String uri = namespaceURIs[i];
+                String prefix = _namespaceScopeContext.getPrefix(i);
+                String uri = _namespaceScopeContext.getNamespaceURI(i);
                 encodeNamespaceAttribute(prefix, uri);
             }
                         

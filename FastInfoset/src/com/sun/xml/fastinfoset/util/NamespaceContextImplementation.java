@@ -131,12 +131,12 @@ final public class NamespaceContextImplementation implements NamespaceContext {
     }
     
     
-    public String[] getPrefixes() {
-        return prefixes;
+    public String getPrefix(int index) {
+        return prefixes[index];
     }
     
-    public String[] getNamespaceURIs() {
-        return namespaceURIs;
+    public String getNamespaceURI(int index) {
+        return namespaceURIs[index];
     }
     
     public int getCurrentContextStartIndex() {
