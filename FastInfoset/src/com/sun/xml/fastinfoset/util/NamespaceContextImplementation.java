@@ -41,7 +41,6 @@ package com.sun.xml.fastinfoset.util;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import javax.xml.namespace.NamespaceContext;
 
 /**
@@ -132,12 +131,24 @@ final public class NamespaceContextImplementation implements NamespaceContext {
     }
     
     
-    public Map getCurrentScopeNamespaceMap(Map map) {
-        for (int i = currentContext; i < namespacePosition; i++) {
-            map.put(prefixes[i], namespaceURIs[i]);
-        }
-        
-        return map;
+    public String[] getPrefixes() {
+        return prefixes;
+    }
+    
+    public String[] getNamespaceURIs() {
+        return namespaceURIs;
+    }
+    
+    public int getCurrentContextStartIndex() {
+        return currentContext;
+    }
+    
+    public int getCurrentContextEndIndex() {
+        return namespacePosition;
+    }
+    
+    public boolean isCurrentContextEmpty() {
+        return currentContext == namespacePosition;
     }
     
     public void declarePrefix(String prefix, String namespaceURI) {

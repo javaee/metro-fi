@@ -44,9 +44,6 @@ import com.sun.xml.fastinfoset.QualifiedName;
 import com.sun.xml.fastinfoset.util.NamespaceContextImplementation;
 import com.sun.xml.fastinfoset.util.LocalNameQualifiedNamesMap;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import org.jvnet.fastinfoset.FastInfosetException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -124,9 +121,8 @@ public class DOMDocumentSerializer extends Encoder {
     
     
 //    protected Node[] _namespaceAttributes = new Node[4];
-
+    
     // map which will hold all current scope prefixes and associated attributes
-    private Map _namespaceScopeAttributes = new HashMap();
     // Collection of populated namespace available for current scope
     protected NamespaceContextImplementation _namespaceScopeContext = new NamespaceContextImplementation();
     protected Node[] _attributes = new Node[32];
@@ -179,8 +175,7 @@ public class DOMDocumentSerializer extends Encoder {
             _namespaceScopeContext.declarePrefix(elementPrefix, elementNamespaceURI);
         }
         
-        _namespaceScopeAttributes = _namespaceScopeContext.getCurrentScopeNamespaceMap(_namespaceScopeAttributes);
-        if (!_namespaceScopeAttributes.isEmpty()) {
+        if (!_namespaceScopeContext.isCurrentContextEmpty()) {
             if (attributesSize > 0) {
                 write(EncodingConstants.ELEMENT | EncodingConstants.ELEMENT_NAMESPACES_FLAG |
                         EncodingConstants.ELEMENT_ATTRIBUTE_FLAG);
@@ -188,13 +183,17 @@ public class DOMDocumentSerializer extends Encoder {
                 write(EncodingConstants.ELEMENT | EncodingConstants.ELEMENT_NAMESPACES_FLAG);
             }
             
-            for(Iterator it = _namespaceScopeAttributes.keySet().iterator(); it.hasNext(); ) {
-                String prefix = (String) it.next();
-                String uri = (String) _namespaceScopeAttributes.get(prefix);
+            String[] prefixes = _namespaceScopeContext.getPrefixes();
+            String[] namespaceURIs = _namespaceScopeContext.getNamespaceURIs();
+            
+            for (int i = _namespaceScopeContext.getCurrentContextStartIndex();
+                     i < _namespaceScopeContext.getCurrentContextEndIndex(); i++) {
+
+                String prefix = prefixes[i];
+                String uri = namespaceURIs[i];
                 encodeNamespaceAttribute(prefix, uri);
             }
-            _namespaceScopeAttributes.clear();
-            
+                        
             write(EncodingConstants.TERMINATOR);
             _b = 0;
         } else {
