@@ -119,10 +119,22 @@ public interface FastInfosetSerializer {
     public final static int CHARACTER_CONTENT_CHUNK_SIZE_CONSTRAINT = 7;
     
     /**
+     * The default value for limit on the size of indexed Map for attribute values
+     * Limit is measured in bytes not in number of entries
+     */
+    public static final int CHARACTER_CONTENT_CHUNK_MAP_MEMORY_CONSTRAINT = Integer.MAX_VALUE;
+
+    /**
      * The default value for the limit on the size of attribute values
      * that will be indexed.
      */
     public final static int ATTRIBUTE_VALUE_SIZE_CONSTRAINT = 7;
+    
+    /**
+     * The default value for limit on the size of indexed Map for character content chunks
+     * Limit is measured in bytes not in number of entries
+     */
+    public static final int ATTRIBUTE_VALUE_MAP_MEMORY_CONSTRAINT = Integer.MAX_VALUE;
     
     /**
      * The character encoding scheme string for UTF-8.
@@ -133,7 +145,7 @@ public interface FastInfosetSerializer {
      * The character encoding scheme string for UTF-16BE.
      */
     public static final String UTF_16BE = "UTF-16BE";
-    
+
     /**
      * Set the {@link #IGNORE_DTD_FEATURE}.
      * @param ignoreDTD true if the feature shall be ignored.
@@ -233,6 +245,23 @@ public interface FastInfosetSerializer {
     public int getCharacterContentChunkSizeLimit();
 
     /**
+     * Sets the limit on the memory size of Map of attribute values
+     * that will be indexed.
+     *
+     * @param size The attribute value size limit. Any value less
+     * that a length of size limit will be indexed.
+     */
+    public void setCharacterContentChunkMapMemoryLimit(int size);
+    
+    /**
+     * Gets the limit on the memory size of Map of attribute values
+     * that will be indexed.
+     *
+     * @return The attribute value size limit.
+     */
+    public int getCharacterContentChunkMapMemoryLimit();
+    
+    /**
      * Sets the limit on the size of attribute values
      * that will be indexed.
      *
@@ -248,6 +277,23 @@ public interface FastInfosetSerializer {
      * @return The attribute value size limit.
      */
     public int getAttributeValueSizeLimit();
+
+    /**
+     * Sets the limit on the memory size of Map of attribute values
+     * that will be indexed.
+     *
+     * @param size The attribute value size limit. Any value less
+     * that a length of size limit will be indexed.
+     */
+    public void setAttributeValueMapMemoryLimit(int size);
+    
+    /**
+     * Gets the limit on the memory size of Map of attribute values
+     * that will be indexed.
+     *
+     * @return The attribute value size limit.
+     */
+    public int getAttributeValueMapMemoryLimit();
 
     /**
      * Set the external vocabulary that shall be used when serializing.

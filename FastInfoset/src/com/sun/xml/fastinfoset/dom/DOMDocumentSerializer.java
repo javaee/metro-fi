@@ -213,7 +213,7 @@ public class DOMDocumentSerializer extends Encoder {
                 encodeAttribute(namespaceURI, a.getNodeName(), a.getLocalName());
                 
                 final String value = a.getNodeValue();
-                final boolean addToTable = (value.length() < attributeValueSizeConstraint) ? true : false;
+                final boolean addToTable = isAttributeValueLengthMathesLimit(value.length());
                 encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
             }
             

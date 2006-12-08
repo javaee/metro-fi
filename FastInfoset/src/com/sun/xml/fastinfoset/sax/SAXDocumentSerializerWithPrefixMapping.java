@@ -171,7 +171,7 @@ public class SAXDocumentSerializerWithPrefixMapping extends SAXDocumentSerialize
                     // If data is null then there is no algorithm data
                     if (data == null) {
                         value = eAtts.getValue(i);
-                        addToTable = (eAtts.getToIndex(i) || value.length() < attributeValueSizeConstraint) ? true : false;
+                        addToTable = eAtts.getToIndex(i) || isAttributeValueLengthMathesLimit(value.length());
 
                         alphabet = eAtts.getAlpababet(i);
                         if (alphabet == null) {
@@ -204,7 +204,7 @@ public class SAXDocumentSerializerWithPrefixMapping extends SAXDocumentSerialize
                 final String uri = atts.getURI(i);
                 if (encodeAttribute(atts.getURI(i), atts.getQName(i), atts.getLocalName(i))) {
                     value = atts.getValue(i);
-                    addToTable = (value.length() < attributeValueSizeConstraint) ? true : false;
+                    addToTable = isAttributeValueLengthMathesLimit(value.length());
                     
                     if (uri == "http://www.w3.org/2001/XMLSchema-instance" || 
                             uri.equals("http://www.w3.org/2001/XMLSchema-instance")) {

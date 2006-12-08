@@ -43,6 +43,9 @@ import com.sun.xml.fastinfoset.CommonResourceBundle;
 public class CharArrayIntMap extends KeyIntMap {
 
     private CharArrayIntMap _readOnlyMap;
+
+    // Current total size of all Map's entries keys (in bytes)
+    protected int _totalCharactersMemorySize;
     
     static class Entry extends BaseEntry {
         final char[] _ch;
@@ -96,6 +99,7 @@ public class CharArrayIntMap extends KeyIntMap {
             _table[i] = null;
         }
         _size = 0;
+        _totalCharactersMemorySize = 0;
     }
 
     public final void setReadOnlyMap(KeyIntMap readOnlyMap, boolean clear) {
@@ -149,6 +153,10 @@ public class CharArrayIntMap extends KeyIntMap {
         return NOT_PRESENT;
     }
     
+    public final int getTotalCharactersMemorySize() {
+        return _totalCharactersMemorySize;
+    }
+
     private final int get(char[] ch, int start, int length, int hash) {
         if (_readOnlyMap != null) {
             final int i = _readOnlyMap.get(ch, start, length, hash);
@@ -170,7 +178,8 @@ public class CharArrayIntMap extends KeyIntMap {
     private final void addEntry(char[] ch, int start, int length, int hash, int value, int bucketIndex) {
 	Entry e = _table[bucketIndex];
         _table[bucketIndex] = new Entry(ch, start, length, hash, value, e);
-        if (_size++ >= _threshold) {
+        _totalCharactersMemorySize += (length << 1); // Each char is 2 bytes
+                if (_size++ >= _threshold) {
             resize(2 * _table.length);
         }        
     }
