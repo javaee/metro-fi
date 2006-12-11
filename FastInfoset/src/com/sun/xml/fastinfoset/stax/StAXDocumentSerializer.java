@@ -595,7 +595,7 @@ public class StAXDocumentSerializer extends Encoder
 
                     final String value = _attributesArray[i];
                     _attributesArray[i++] = null;
-                    final boolean addToTable = (value.length() < attributeValueSizeConstraint) ? true : false;
+                    final boolean addToTable = isAttributeValueLengthMathesLimit(value.length());
                     encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
                     
                     _b = EncodingConstants.TERMINATOR;
@@ -702,7 +702,7 @@ public class StAXDocumentSerializer extends Encoder
                 
     public final void writeLowLevelAttributeValue(String value) throws IOException
     {
-        final boolean addToTable = (value.length() < attributeValueSizeConstraint) ? true : false;
+        final boolean addToTable = isAttributeValueLengthMathesLimit(value.length());
         encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
     }
     
