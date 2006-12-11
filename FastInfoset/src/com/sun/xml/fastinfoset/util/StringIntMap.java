@@ -119,7 +119,6 @@ public class StringIntMap extends KeyIntMap {
     }
     
     public final int obtainIndex(String key) {
-        System.out.println(hashCode() + ": " + key);
         final int hash = hashHash(key.hashCode());
         
         if (_readOnlyMap != null) {
