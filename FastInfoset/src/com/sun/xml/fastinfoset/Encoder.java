@@ -758,6 +758,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
      * @param ch the array of characters.
      * @param offset the offset into the array of characters.
      * @param length the length of characters.
+     * @param addToTable if characters should be added to table
      * @throws ArrayIndexOutOfBoundsException.
      * @throws FastInfosetException if the alphabet is not present in the
      *         vocabulary.
