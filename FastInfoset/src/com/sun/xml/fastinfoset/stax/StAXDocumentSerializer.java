@@ -40,6 +40,7 @@ package com.sun.xml.fastinfoset.stax;
 
 import com.sun.xml.fastinfoset.Encoder;
 import com.sun.xml.fastinfoset.EncodingConstants;
+import com.sun.xml.fastinfoset.util.NamespaceContextImplementation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.EmptyStackException;

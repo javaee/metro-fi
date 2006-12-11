@@ -41,6 +41,7 @@ package com.sun.xml.fastinfoset.dom;
 import com.sun.xml.fastinfoset.Encoder;
 import com.sun.xml.fastinfoset.EncodingConstants;
 import com.sun.xml.fastinfoset.QualifiedName;
+import com.sun.xml.fastinfoset.util.NamespaceContextImplementation;
 import com.sun.xml.fastinfoset.util.LocalNameQualifiedNamesMap;
 import java.io.IOException;
 import org.jvnet.fastinfoset.FastInfosetException;
@@ -119,25 +120,19 @@ public class DOMDocumentSerializer extends Encoder {
         encodeDocumentTermination();
     }
     
+//    protected Node[] _namespaceAttributes = new Node[4];
     
-    protected Node[] _namespaceAttributes = new Node[4];
+    // map which will hold all current scope prefixes and associated attributes
+    // Collection of populated namespace available for current scope
+    protected NamespaceContextImplementation _namespaceScopeContext = new NamespaceContextImplementation();
     protected Node[] _attributes = new Node[32];
     
     protected final void serializeElement(Node e) throws IOException {
         encodeTermination();
         
-        int namespaceAttributesSize = 0;
         int attributesSize = 0;
         
-        String elementNamespaceURI = e.getNamespaceURI();
-        
-        /* isElementNamespaceURIPresent shows whether element's namespace
-         * was declared before or is defined as element's NS attribute */
-        boolean isElementNamespaceURIPresent = true;
-        if (elementNamespaceURI != null) {
-            isElementNamespaceURIPresent =
-                    _v.namespaceName.get(elementNamespaceURI) != -1;
-        }
+        _namespaceScopeContext.pushContext();
         
         if (e.hasAttributes()) {
             /*
@@ -149,14 +144,12 @@ public class DOMDocumentSerializer extends Encoder {
                 final Node a = nnm.item(i);
                 final String namespaceURI = a.getNamespaceURI();
                 if (namespaceURI != null && namespaceURI.equals("http://www.w3.org/2000/xmlns/")) {
-                    if (namespaceAttributesSize == _namespaceAttributes.length) {
-                        final Node[] attributes = new Node[namespaceAttributesSize * 3 / 2 + 1];
-                        System.arraycopy(_namespaceAttributes, 0, attributes, 0, namespaceAttributesSize);
-                        _namespaceAttributes = attributes;
+                    String attrPrefix = a.getLocalName();
+                    String attrNamespace = a.getNodeValue();
+                    if (attrPrefix == "xmlns" || attrPrefix.equals("xmlns")) {
+                        attrPrefix = "";
                     }
-                    _namespaceAttributes[namespaceAttributesSize++] = a;
-                    isElementNamespaceURIPresent = isElementNamespaceURIPresent ||
-                            a.getNodeValue().equals(elementNamespaceURI);
+                    _namespaceScopeContext.declarePrefix(attrPrefix, attrNamespace);
                 } else {
                     if (attributesSize == _attributes.length) {
                         final Node[] attributes = new Node[attributesSize * 3 / 2 + 1];
@@ -164,11 +157,25 @@ public class DOMDocumentSerializer extends Encoder {
                         _attributes = attributes;
                     }
                     _attributes[attributesSize++] = a;
+                    
+                    String attrNamespaceURI = a.getNamespaceURI();
+                    String attrPrefix = a.getPrefix();
+                    if (attrPrefix != null && !_namespaceScopeContext.getNamespaceURI(attrPrefix).equals(attrNamespaceURI)) {
+                        _namespaceScopeContext.declarePrefix(attrPrefix, attrNamespaceURI);
+                    }
                 }
             }
         }
         
-        if (namespaceAttributesSize > 0 || !isElementNamespaceURIPresent) {
+        String elementNamespaceURI = e.getNamespaceURI();
+        String elementPrefix = e.getPrefix();
+        if (elementPrefix == null)  elementPrefix = "";
+        if (elementNamespaceURI != null &&
+                !_namespaceScopeContext.getNamespaceURI(elementPrefix).equals(elementNamespaceURI)) {
+            _namespaceScopeContext.declarePrefix(elementPrefix, elementNamespaceURI);
+        }
+        
+        if (!_namespaceScopeContext.isCurrentContextEmpty()) {
             if (attributesSize > 0) {
                 write(EncodingConstants.ELEMENT | EncodingConstants.ELEMENT_NAMESPACES_FLAG |
                         EncodingConstants.ELEMENT_ATTRIBUTE_FLAG);
@@ -176,27 +183,13 @@ public class DOMDocumentSerializer extends Encoder {
                 write(EncodingConstants.ELEMENT | EncodingConstants.ELEMENT_NAMESPACES_FLAG);
             }
             
-            // Serialize the namespace attributes
-            for (int i = 0; i < namespaceAttributesSize; i++) {
-                final Node a = _namespaceAttributes[i];
-                _namespaceAttributes[i] = null;
-                String prefix = a.getLocalName();
-                if (prefix == "xmlns" || prefix.equals("xmlns")) {
-                    prefix = "";
-                }
-                final String uri = a.getNodeValue();
+            for (int i = _namespaceScopeContext.getCurrentContextStartIndex();
+                     i < _namespaceScopeContext.getCurrentContextEndIndex(); i++) {
+
+                String prefix = _namespaceScopeContext.getPrefix(i);
+                String uri = _namespaceScopeContext.getNamespaceURI(i);
                 encodeNamespaceAttribute(prefix, uri);
             }
-            
-            /* Fix bug, when NSAttribute was not set using element.setAttributeNS() */
-            if (!isElementNamespaceURIPresent) {
-                String prefix = e.getPrefix();
-                if (prefix == null) {
-                    prefix = "";
-                }
-                encodeNamespaceAttribute(prefix, elementNamespaceURI);
-            }
-            
             write(EncodingConstants.TERMINATOR);
             _b = 0;
         } else {
@@ -204,7 +197,8 @@ public class DOMDocumentSerializer extends Encoder {
                 EncodingConstants.ELEMENT;
         }
         
-        String namespaceURI = e.getNamespaceURI();
+        String namespaceURI = elementNamespaceURI;
+//        namespaceURI = (namespaceURI == null) ? _namespaceScopeContext.getNamespaceURI("") : namespaceURI;
         namespaceURI = (namespaceURI == null) ? "" : namespaceURI;
         encodeElement(namespaceURI, e.getNodeName(), e.getLocalName());
         
@@ -218,7 +212,7 @@ public class DOMDocumentSerializer extends Encoder {
                 encodeAttribute(namespaceURI, a.getNodeName(), a.getLocalName());
                 
                 final String value = a.getNodeValue();
-                final boolean addToTable = (value.length() < attributeValueSizeConstraint) ? true : false;
+                final boolean addToTable = isAttributeValueLengthMathesLimit(value.length());
                 encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
             }
             
@@ -251,7 +245,9 @@ public class DOMDocumentSerializer extends Encoder {
             }
         }
         encodeElementTermination();
+        _namespaceScopeContext.popContext();
     }
+    
     
     protected final void serializeText(Node t) throws IOException {
         final String text = t.getNodeValue();

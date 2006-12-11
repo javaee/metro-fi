@@ -252,12 +252,23 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     protected int attributeValueSizeConstraint = FastInfosetSerializer.ATTRIBUTE_VALUE_SIZE_CONSTRAINT;
     
     /**
+     * The limit on the size of indexed Map for attribute values
+     * Limit is measured in bytes not in number of entries
+     */
+    protected int attributeValueMapMemoryConstraint = FastInfosetSerializer.ATTRIBUTE_VALUE_MAP_MEMORY_CONSTRAINT;
+
+    /**
      * The limit on the size of character content chunks
      * of Character Information Items or Comment Information Items that 
      * will be indexed.
      */
     protected int characterContentChunkSizeContraint = FastInfosetSerializer.CHARACTER_CONTENT_CHUNK_SIZE_CONSTRAINT;
 
+    /**
+     * The limit on the size of indexed Map for character content chunks
+     * Limit is measured in bytes not in number of entries
+     */
+    protected int characterContentChunkMapMemoryConstraint = FastInfosetSerializer.CHARACTER_CONTENT_CHUNK_MAP_MEMORY_CONSTRAINT;
     
     /**
      * Default constructor for the Encoder.
@@ -391,6 +402,38 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     /**
      * {@inheritDoc}
      */
+    public void setCharacterContentChunkMapMemoryLimit(int size) {
+        if (size < 0 ) {
+            size = 0;
+        }
+        
+        characterContentChunkMapMemoryConstraint = size;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public int getCharacterContentChunkMapMemoryLimit() {
+        return characterContentChunkMapMemoryConstraint;
+    }
+
+    /**
+     * Checks whether character content chunk (its length) matches limits:
+     * length limit itself and limit for total capacity of specified CharArrayIntMap
+     *
+     * @param length the length of character content chunk is checking to be added to Map.
+     * @param map the custom CharArrayIntMap, which memory limits will be checked.
+     * @return whether character content chunk length matches limits
+     */
+    public boolean isCharacterContentChunkLengthMathesLimit(int length, CharArrayIntMap map) {
+        return (length < characterContentChunkSizeContraint) &&
+                (map.getTotalCharactersMemorySize() + (length << 1) <
+                        characterContentChunkMapMemoryConstraint);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public void setAttributeValueSizeLimit(int size) {
         if (size < 0 ) {
             size = 0;
@@ -406,6 +449,37 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         return attributeValueSizeConstraint;
     }
     
+    /**
+     * {@inheritDoc}
+     */
+    public void setAttributeValueMapMemoryLimit(int size) {
+        if (size < 0 ) {
+            size = 0;
+        }
+        
+        attributeValueMapMemoryConstraint = size;
+        
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public int getAttributeValueMapMemoryLimit() {
+        return attributeValueMapMemoryConstraint;
+    }
+    
+    /**
+     * Checks whether attribute value (its length) matches limits:
+     * length limit itself and limit for index Map total capacity
+     *
+     * @return whether attribute value matches limits
+     */
+    public boolean isAttributeValueLengthMathesLimit(int length) {
+        return (length < attributeValueSizeConstraint) &&
+                (_v.attributeValue.getTotalStringsMemorySize() + (length << 1) <
+                        attributeValueMapMemoryConstraint);
+    }
+
     /**
      * {@inheritDoc}
      */
