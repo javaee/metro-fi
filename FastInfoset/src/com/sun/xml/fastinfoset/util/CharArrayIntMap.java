@@ -44,7 +44,7 @@ public class CharArrayIntMap extends KeyIntMap {
 
     private CharArrayIntMap _readOnlyMap;
 
-    // Current total size of all Map's entries keys (in bytes)
+    // Total character count of Map
     protected int _totalCharacterCount;
     
     static class Entry extends BaseEntry {

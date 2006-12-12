@@ -63,7 +63,7 @@ public class StringIntMap extends KeyIntMap {
     
     protected int _index;
     
-    // Current total size of all Map's entries keys (in bytes)
+    // Total character count of Map
     protected int _totalCharacterCount;
     
     public StringIntMap(int initialCapacity, float loadFactor) {
