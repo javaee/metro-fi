@@ -253,9 +253,9 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     
     /**
      * The limit on the size of indexed Map for attribute values
-     * Limit is measured in bytes not in number of entries
+     * Limit is measured in characters number
      */
-    protected int attributeValueMapTotalCharactersConstraint = FastInfosetSerializer.ATTRIBUTE_VALUE_MAP_MEMORY_CONSTRAINT;
+    protected int attributeValueMapTotalCharactersConstraint = FastInfosetSerializer.ATTRIBUTE_VALUE_MAP_MEMORY_CONSTRAINT / 2;
 
     /**
      * The limit on the size of character content chunks
@@ -266,9 +266,9 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
 
     /**
      * The limit on the size of indexed Map for character content chunks
-     * Limit is measured in bytes not in number of entries
+     * Limit is measured in characters number
      */
-    protected int characterContentChunkMapTotalCharactersConstraint = FastInfosetSerializer.CHARACTER_CONTENT_CHUNK_MAP_MEMORY_CONSTRAINT;
+    protected int characterContentChunkMapTotalCharactersConstraint = FastInfosetSerializer.CHARACTER_CONTENT_CHUNK_MAP_MEMORY_CONSTRAINT / 2;
     
     /**
      * Default constructor for the Encoder.
