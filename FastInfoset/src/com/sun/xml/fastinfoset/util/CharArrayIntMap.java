@@ -1,31 +1,31 @@
 /*
  * Fast Infoset ver. 0.1 software ("Software")
- * 
- * Copyright, 2004-2005 Sun Microsystems, Inc. All Rights Reserved. 
- * 
+ *
+ * Copyright, 2004-2005 Sun Microsystems, Inc. All Rights Reserved.
+ *
  * Software is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License. You may
  * obtain a copy of the License at:
- * 
+ *
  *        http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  *    Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations.
- * 
+ *
  *    Sun supports and benefits from the global community of open source
  * developers, and thanks the community for its important contributions and
  * open standards-based technology, which Sun has adopted into many of its
  * products.
- * 
+ *
  *    Please note that portions of Software may be provided with notices and
  * open source licenses from such communities and third parties that govern the
  * use of those portions, and any licenses granted hereunder do not alter any
  * rights and obligations you may have under such open source licenses,
  * however, the disclaimer of warranty and limitation of liability provisions
  * in this License will apply to all Software in this distribution.
- * 
+ *
  *    You acknowledge that the Software is not designed, licensed or intended
  * for use in the design, construction, operation or maintenance of any nuclear
  * facility.
@@ -34,18 +34,18 @@
  * Version 2.0, January 2004
  * http://www.apache.org/licenses/
  *
- */ 
+ */
 
 package com.sun.xml.fastinfoset.util;
 
 import com.sun.xml.fastinfoset.CommonResourceBundle;
 
 public class CharArrayIntMap extends KeyIntMap {
-
+    
     private CharArrayIntMap _readOnlyMap;
-
-    // Current total size of all Map's entries keys (in bytes)
-    protected int _totalCharactersMemorySize;
+    
+    // Total character count of Map
+    protected int _totalCharacterCount;
     
     static class Entry extends BaseEntry {
         final char[] _ch;
@@ -72,7 +72,7 @@ public class CharArrayIntMap extends KeyIntMap {
                 }
                 return true;
             }
-
+            
             return false;
         }
         
@@ -82,8 +82,8 @@ public class CharArrayIntMap extends KeyIntMap {
     
     public CharArrayIntMap(int initialCapacity, float loadFactor) {
         super(initialCapacity, loadFactor);
-
-        _table = new Entry[_capacity];        
+        
+        _table = new Entry[_capacity];
     }
     
     public CharArrayIntMap(int initialCapacity) {
@@ -93,20 +93,20 @@ public class CharArrayIntMap extends KeyIntMap {
     public CharArrayIntMap() {
         this(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR);
     }
-
+    
     public final void clear() {
         for (int i = 0; i < _table.length; i++) {
             _table[i] = null;
         }
         _size = 0;
-        _totalCharactersMemorySize = 0;
+        _totalCharacterCount = 0;
     }
-
+    
     public final void setReadOnlyMap(KeyIntMap readOnlyMap, boolean clear) {
         if (!(readOnlyMap instanceof CharArrayIntMap)) {
             throw new IllegalArgumentException(CommonResourceBundle.getInstance().
                     getString("message.illegalClass", new Object[]{readOnlyMap}));
-        }       
+        }
         
         setReadOnlyMap((CharArrayIntMap)readOnlyMap, clear);
     }
@@ -121,7 +121,7 @@ public class CharArrayIntMap extends KeyIntMap {
             }
         }  else {
             _readOnlyMapSize = 0;
-        }     
+        }
     }
     
     public final int obtainIndex(char[] ch, int start, int length, boolean clone) {
@@ -140,23 +140,23 @@ public class CharArrayIntMap extends KeyIntMap {
                 return e._value;
             }
         }
-
+        
         if (clone) {
             char[] chClone = new char[length];
             System.arraycopy(ch, start, chClone, 0, length);
-
+            
             ch = chClone;
             start = 0;
         }
         
-        addEntry(ch, start, length, hash, _size + _readOnlyMapSize, tableIndex);        
+        addEntry(ch, start, length, hash, _size + _readOnlyMapSize, tableIndex);
         return NOT_PRESENT;
     }
     
-    public final int getTotalCharactersMemorySize() {
-        return _totalCharactersMemorySize;
+    public final int getTotalCharacterCount() {
+        return _totalCharacterCount;
     }
-
+    
     private final int get(char[] ch, int start, int length, int hash) {
         if (_readOnlyMap != null) {
             final int i = _readOnlyMap.get(ch, start, length, hash);
@@ -164,24 +164,24 @@ public class CharArrayIntMap extends KeyIntMap {
                 return i;
             }
         }
-
+        
         final int tableIndex = indexFor(hash, _table.length);
         for (Entry e = _table[tableIndex]; e != null; e = e._next) {
             if (e._hash == hash && e.equalsCharArray(ch, start, length)) {
                 return e._value;
             }
         }
-                
+        
         return -1;
     }
-
+    
     private final void addEntry(char[] ch, int start, int length, int hash, int value, int bucketIndex) {
-	Entry e = _table[bucketIndex];
+        Entry e = _table[bucketIndex];
         _table[bucketIndex] = new Entry(ch, start, length, hash, value, e);
-        _totalCharactersMemorySize += (length << 1); // Each char is 2 bytes
-                if (_size++ >= _threshold) {
+        _totalCharacterCount += length;
+        if (_size++ >= _threshold) {
             resize(2 * _table.length);
-        }        
+        }
     }
     
     private final void resize(int newCapacity) {
@@ -192,13 +192,13 @@ public class CharArrayIntMap extends KeyIntMap {
             _threshold = Integer.MAX_VALUE;
             return;
         }
-
+        
         Entry[] newTable = new Entry[_capacity];
         transfer(newTable);
         _table = newTable;
-        _threshold = (int)(_capacity * _loadFactor);        
+        _threshold = (int)(_capacity * _loadFactor);
     }
-
+    
     private final void transfer(Entry[] newTable) {
         Entry[] src = _table;
         int newCapacity = newTable.length;
@@ -208,12 +208,12 @@ public class CharArrayIntMap extends KeyIntMap {
                 src[j] = null;
                 do {
                     Entry next = e._next;
-                    int i = indexFor(e._hash, newCapacity);  
+                    int i = indexFor(e._hash, newCapacity);
                     e._next = newTable[i];
                     newTable[i] = e;
                     e = next;
                 } while (e != null);
             }
         }
-    }        
+    }
 }

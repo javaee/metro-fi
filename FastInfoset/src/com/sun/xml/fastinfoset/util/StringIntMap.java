@@ -63,8 +63,8 @@ public class StringIntMap extends KeyIntMap {
     
     protected int _index;
     
-    // Current total size of all Map's entries keys (in bytes)
-    protected int _totalStringsMemorySize;
+    // Total character count of Map
+    protected int _totalCharacterCount;
     
     public StringIntMap(int initialCapacity, float loadFactor) {
         super(initialCapacity, loadFactor);
@@ -87,7 +87,7 @@ public class StringIntMap extends KeyIntMap {
         _lastEntry = NULL_ENTRY;
         _size = 0;
         _index = _readOnlyMapSize;
-        _totalStringsMemorySize = 0;
+        _totalCharacterCount = 0;
     }
 
     public void setReadOnlyMap(KeyIntMap readOnlyMap, boolean clear) {
@@ -116,6 +116,10 @@ public class StringIntMap extends KeyIntMap {
     
     public final int getNextIndex() {
         return _index++;
+    }
+    
+    public final int getIndex() {
+        return _index;        
     }
     
     public final int obtainIndex(String key) {
@@ -152,8 +156,8 @@ public class StringIntMap extends KeyIntMap {
         return get(key, hashHash(key.hashCode()));
     }
     
-    public final int getTotalStringsMemorySize() {
-        return _totalStringsMemorySize;
+    public final int getTotalCharacterCount() {
+        return _totalCharacterCount;
     }
     
     private final int get(String key, int hash) {
@@ -179,7 +183,7 @@ public class StringIntMap extends KeyIntMap {
     private final void addEntry(String key, int hash, int bucketIndex) {
 	Entry e = _table[bucketIndex];
         _table[bucketIndex] = new Entry(key, hash, _index++, e);
-        _totalStringsMemorySize += (key.length() << 1); // Each char is 2 bytes
+        _totalCharacterCount += key.length();
         if (_size++ >= _threshold) {
             resize(2 * _table.length);
         }

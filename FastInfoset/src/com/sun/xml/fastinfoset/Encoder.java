@@ -253,9 +253,9 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     
     /**
      * The limit on the size of indexed Map for attribute values
-     * Limit is measured in bytes not in number of entries
+     * Limit is measured in characters number
      */
-    protected int attributeValueMapMemoryConstraint = FastInfosetSerializer.ATTRIBUTE_VALUE_MAP_MEMORY_CONSTRAINT;
+    protected int attributeValueMapTotalCharactersConstraint = FastInfosetSerializer.ATTRIBUTE_VALUE_MAP_MEMORY_CONSTRAINT / 2;
     
     /**
      * The limit on the size of character content chunks
@@ -266,9 +266,9 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     
     /**
      * The limit on the size of indexed Map for character content chunks
-     * Limit is measured in bytes not in number of entries
+     * Limit is measured in characters number
      */
-    protected int characterContentChunkMapMemoryConstraint = FastInfosetSerializer.CHARACTER_CONTENT_CHUNK_MAP_MEMORY_CONSTRAINT;
+    protected int characterContentChunkMapTotalCharactersConstraint = FastInfosetSerializer.CHARACTER_CONTENT_CHUNK_MAP_MEMORY_CONSTRAINT / 2;
     
     /**
      * Default constructor for the Encoder.
@@ -407,14 +407,14 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
             size = 0;
         }
         
-        characterContentChunkMapMemoryConstraint = size;
+        characterContentChunkMapTotalCharactersConstraint = size / 2;
     }
     
     /**
      * {@inheritDoc}
      */
     public int getCharacterContentChunkMapMemoryLimit() {
-        return characterContentChunkMapMemoryConstraint;
+        return characterContentChunkMapTotalCharactersConstraint * 2;
     }
 
     
@@ -440,8 +440,8 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
      */
     public boolean isCharacterContentChunkLengthMathesLimit(int length, CharArrayIntMap map) {
         return (length < characterContentChunkSizeContraint) &&
-                (map.getTotalCharactersMemorySize() + (length << 1) <
-                        characterContentChunkMapMemoryConstraint);
+                (map.getTotalCharacterCount() + length <
+                        characterContentChunkMapTotalCharactersConstraint);
     }
 
     /**
@@ -470,7 +470,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
             size = 0;
         }
         
-        attributeValueMapMemoryConstraint = size;
+        attributeValueMapTotalCharactersConstraint = size / 2;
         
     }
     
@@ -478,7 +478,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
      * {@inheritDoc}
      */
     public int getAttributeValueMapMemoryLimit() {
-        return attributeValueMapMemoryConstraint;
+        return attributeValueMapTotalCharactersConstraint * 2;
     }
     
     /**
@@ -489,8 +489,8 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
      */
     public boolean isAttributeValueLengthMathesLimit(int length) {
         return (length < attributeValueSizeConstraint) &&
-                (_v.attributeValue.getTotalStringsMemorySize() + (length << 1) <
-                        attributeValueMapMemoryConstraint);
+                (_v.attributeValue.getTotalCharacterCount() + length <
+                        attributeValueMapTotalCharactersConstraint);
     }
 
     /**

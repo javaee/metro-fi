@@ -145,17 +145,18 @@ public class EncodingTest extends TestCase {
     }
     
     public void testEncodeWithMemoryLimitation() throws Exception {
-        int limitation = 20;
+        int memoryLimitation = 20;
+        int charsLimitation = memoryLimitation / 2;
         SerializerVocabulary voc = _initialVocabulary;
         try {
-            _ds.setAttributeValueMapMemoryLimit(limitation);
-            _ds.setCharacterContentChunkMapMemoryLimit(limitation);
+            _ds.setAttributeValueMapMemoryLimit(memoryLimitation);
+            _ds.setCharacterContentChunkMapMemoryLimit(memoryLimitation);
             
             voc.clear();
             parse();
-            assertTrue(voc.characterContentChunk.getTotalCharactersMemorySize() < limitation);
-            assertTrue(voc.otherString.getTotalCharactersMemorySize() < limitation);
-            assertTrue(voc.attributeValue.getTotalStringsMemorySize() < limitation);
+            assertTrue(voc.characterContentChunk.getTotalCharacterCount() < charsLimitation);
+            assertTrue(voc.otherString.getTotalCharacterCount() < charsLimitation);
+            assertTrue(voc.attributeValue.getTotalCharacterCount() < charsLimitation);
             assertTrue(voc.characterContentChunk.obtainIndex("236WV".toCharArray(), 0, 5, false) != KeyIntMap.NOT_PRESENT);
             assertTrue(voc.attributeValue.obtainIndex("unit") != KeyIntMap.NOT_PRESENT);
             assertFalse(voc.characterContentChunk.obtainIndex("wood".toCharArray(), 0, 4, false) != KeyIntMap.NOT_PRESENT);
