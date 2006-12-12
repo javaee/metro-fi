@@ -255,7 +255,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
      * The limit on the size of indexed Map for attribute values
      * Limit is measured in bytes not in number of entries
      */
-    protected int attributeValueMapMemoryConstraint = FastInfosetSerializer.ATTRIBUTE_VALUE_MAP_MEMORY_CONSTRAINT;
+    protected int attributeValueMapTotalCharactersConstraint = FastInfosetSerializer.ATTRIBUTE_VALUE_MAP_MEMORY_CONSTRAINT;
 
     /**
      * The limit on the size of character content chunks
@@ -268,7 +268,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
      * The limit on the size of indexed Map for character content chunks
      * Limit is measured in bytes not in number of entries
      */
-    protected int characterContentChunkMapMemoryConstraint = FastInfosetSerializer.CHARACTER_CONTENT_CHUNK_MAP_MEMORY_CONSTRAINT;
+    protected int characterContentChunkMapTotalCharactersConstraint = FastInfosetSerializer.CHARACTER_CONTENT_CHUNK_MAP_MEMORY_CONSTRAINT;
     
     /**
      * Default constructor for the Encoder.
@@ -407,14 +407,14 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
             size = 0;
         }
         
-        characterContentChunkMapMemoryConstraint = size;
+        characterContentChunkMapTotalCharactersConstraint = size / 2;
     }
     
     /**
      * {@inheritDoc}
      */
     public int getCharacterContentChunkMapMemoryLimit() {
-        return characterContentChunkMapMemoryConstraint;
+        return characterContentChunkMapTotalCharactersConstraint * 2;
     }
 
     /**
@@ -425,10 +425,10 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
      * @param map the custom CharArrayIntMap, which memory limits will be checked.
      * @return whether character content chunk length matches limits
      */
-    public boolean isCharacterContentChunkLengthMathesLimit(int length, CharArrayIntMap map) {
+    public boolean isCharacterContentChunkLengthMatchesLimit(int length, CharArrayIntMap map) {
         return (length < characterContentChunkSizeContraint) &&
-                (map.getTotalCharactersMemorySize() + (length << 1) <
-                        characterContentChunkMapMemoryConstraint);
+                (map.getTotalCharacterCount() + length <
+                        characterContentChunkMapTotalCharactersConstraint);
     }
 
     /**
@@ -457,7 +457,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
             size = 0;
         }
         
-        attributeValueMapMemoryConstraint = size;
+        attributeValueMapTotalCharactersConstraint = size / 2;
         
     }
     
@@ -465,7 +465,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
      * {@inheritDoc}
      */
     public int getAttributeValueMapMemoryLimit() {
-        return attributeValueMapMemoryConstraint;
+        return attributeValueMapTotalCharactersConstraint * 2;
     }
     
     /**
@@ -474,10 +474,10 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
      *
      * @return whether attribute value matches limits
      */
-    public boolean isAttributeValueLengthMathesLimit(int length) {
+    public boolean isAttributeValueLengthMatchesLimit(int length) {
         return (length < attributeValueSizeConstraint) &&
-                (_v.attributeValue.getTotalStringsMemorySize() + (length << 1) <
-                        attributeValueMapMemoryConstraint);
+                (_v.attributeValue.getTotalCharacterCount() + length <
+                        attributeValueMapTotalCharactersConstraint);
     }
 
     /**
@@ -679,7 +679,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
      * @throws ArrayIndexOutOfBoundsException.
      */
     protected final void encodeCharacters(char[] ch, int offset, int length) throws IOException {
-        final boolean addToTable = (length < characterContentChunkSizeContraint) ? true : false;
+        final boolean addToTable = isCharacterContentChunkLengthMatchesLimit(length, _v.characterContentChunk);
         encodeNonIdentifyingStringOnThirdBit(ch, offset, length, _v.characterContentChunk, addToTable, true);
     }
 
@@ -696,7 +696,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
      * @throws ArrayIndexOutOfBoundsException.
      */
     protected final void encodeCharactersNoClone(char[] ch, int offset, int length) throws IOException {
-        final boolean addToTable = (length < characterContentChunkSizeContraint);
+        final boolean addToTable = isCharacterContentChunkLengthMatchesLimit(length, _v.characterContentChunk);
         encodeNonIdentifyingStringOnThirdBit(ch, offset, length, _v.characterContentChunk, addToTable, false);
     }
     
@@ -737,7 +737,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     }
     
     /**
-     * Encode a chunk of Character Information Items using a restricted 
+     * Encode a chunk of Character Information Items using a restricted
      * alphabet table.
      *
      * @param alphabet the alphabet defining the mapping between characters and
@@ -745,27 +745,38 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
      * @param ch the array of characters.
      * @param offset the offset into the array of characters.
      * @param length the length of characters.
+     * @param addToTable if characters should be added to table
      * @throws ArrayIndexOutOfBoundsException.
-     * @throws FastInfosetException if the alphabet is not present in the 
+     * @throws FastInfosetException if the alphabet is not present in the
      *         vocabulary.
      */
-    protected final void encodeAlphabetCharacters(String alphabet, char[] ch, int offset, int length) throws FastInfosetException, IOException {
+    protected final void encodeAlphabetCharacters(String alphabet, char[] ch, int offset, int length,
+            boolean addToTable) throws FastInfosetException, IOException {
+        if (addToTable) {
+            final int index = _v.characterContentChunk.obtainIndex(ch, offset, length, true);
+            if (index != KeyIntMap.NOT_PRESENT) {
+                _b = EncodingConstants.CHARACTER_CHUNK | 0x20;
+                encodeNonZeroIntegerOnFourthBit(index);
+                return;
+            }
+        }
+
         int id = _v.restrictedAlphabet.get(alphabet);
         if (id == KeyIntMap.NOT_PRESENT) {
             throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.restrictedAlphabetNotPresent"));
         }
         id += EncodingConstants.RESTRICTED_ALPHABET_APPLICATION_START;
         
-        _b = (length < characterContentChunkSizeContraint) ?
+        _b = (addToTable) ?
             EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_RESTRICTED_ALPHABET_FLAG | EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG :
-            EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_RESTRICTED_ALPHABET_FLAG;        
+            EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_RESTRICTED_ALPHABET_FLAG;
         _b |= (id & 0xC0) >> 6;
-        write (_b);
-
+        write(_b);
+        
         // Encode bottom 6 bits of enoding algorithm id
         _b = (id & 0x3F) << 2;
-
-        encodeNonEmptyNBitCharacterStringOnSeventhBit(alphabet, ch, offset, length);        
+        
+        encodeNonEmptyNBitCharacterStringOnSeventhBit(alphabet, ch, offset, length);
     }
             
     /**
@@ -781,7 +792,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         encodeIdentifyingNonEmptyStringOnFirstBit(target, _v.otherNCName);
 
         // Data
-        boolean addToTable = (data.length() < characterContentChunkSizeContraint) ? true : false;
+        boolean addToTable = isCharacterContentChunkLengthMatchesLimit(data.length(), _v.characterContentChunk);
         encodeNonIdentifyingStringOnFirstBit(data, _v.otherString, addToTable);
     }
 
@@ -820,7 +831,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     protected final void encodeComment(char[] ch, int offset, int length) throws IOException {
         write(EncodingConstants.COMMENT);
 
-        boolean addToTable = (length < characterContentChunkSizeContraint) ? true : false;
+        boolean addToTable = isCharacterContentChunkLengthMatchesLimit(length, _v.otherString);
         encodeNonIdentifyingStringOnFirstBit(ch, offset, length, _v.otherString, addToTable, true);
     }
 
@@ -839,7 +850,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     protected final void encodeCommentNoClone(char[] ch, int offset, int length) throws IOException {
         write(EncodingConstants.COMMENT);
 
-        boolean addToTable = (length < characterContentChunkSizeContraint) ? true : false;
+        boolean addToTable = isCharacterContentChunkLengthMatchesLimit(length, _v.otherString);
         encodeNonIdentifyingStringOnFirstBit(ch, offset, length, _v.otherString, addToTable, false);
     }
 
