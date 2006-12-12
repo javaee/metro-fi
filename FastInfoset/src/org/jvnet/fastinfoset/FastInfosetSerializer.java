@@ -116,7 +116,7 @@ public interface FastInfosetSerializer {
      * The default value for the limit on the size of character content chunks
      * that will be indexed.
      */
-    public final static int CHARACTER_CONTENT_CHUNK_SIZE_CONSTRAINT = 7;
+    public final static int CHARACTER_CONTENT_CHUNK_SIZE_CONSTRAINT = 32;
     
     /**
      * The default value for limit on the size of indexed Map for attribute values
@@ -128,7 +128,7 @@ public interface FastInfosetSerializer {
      * The default value for the limit on the size of attribute values
      * that will be indexed.
      */
-    public final static int ATTRIBUTE_VALUE_SIZE_CONSTRAINT = 7;
+    public final static int ATTRIBUTE_VALUE_SIZE_CONSTRAINT = 32;
     
     /**
      * The default value for limit on the size of indexed Map for character content chunks
