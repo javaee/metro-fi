@@ -1,1 +1,1 @@
-<!ELEMENT animal (cat|tiger|leopard)+>
+<!ELEMENT animal (cat|tiger|leopard)+>

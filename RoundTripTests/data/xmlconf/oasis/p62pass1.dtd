@@ -1,12 +1,12 @@
-<![INCLUDE[
-<![
-INCLUDE
-[
-<!ELEMENT doc EMPTY>
-<![IGNORE[asdfasdf]]>
-]]>]]>
-<![INCLUDE[]]>
-<![INCLUDE[
-]]>
-<![INCLUDE[ ]]>
-
+<![INCLUDE[
+<![
+INCLUDE
+[
+<!ELEMENT doc EMPTY>
+<![IGNORE[asdfasdf]]>
+]]>]]>
+<![INCLUDE[]]>
+<![INCLUDE[
+]]>
+<![INCLUDE[ ]]>
+

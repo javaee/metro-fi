@@ -1,5 +1,5 @@
-<!DOCTYPE doc [
-<!ELEMENT doc (#PCDATA)>
-<!ATTLIST doc a CDATA #IMPLIED>
-]>
-<doc a="x&#9;y"></doc>
+<!DOCTYPE doc [
+<!ELEMENT doc (#PCDATA)>
+<!ATTLIST doc a CDATA #IMPLIED>
+]>
+<doc a="x&#9;y"></doc>

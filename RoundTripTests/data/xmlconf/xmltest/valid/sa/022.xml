@@ -1,4 +1,4 @@
-<!DOCTYPE doc [
-<!ELEMENT doc (#PCDATA)>
-]>
-<doc><!-- a comment ->--></doc>
+<!DOCTYPE doc [
+<!ELEMENT doc (#PCDATA)>
+]>
+<doc><!-- a comment ->--></doc>

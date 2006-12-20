@@ -1,5 +1,5 @@
 <!-- ANT Build Script for the JAKARTA-TAGLIBS Project -->
-<!-- $Id: build-build.xml,v 1.1 2005-05-27 20:47:42 joehw Exp $ -->
+<!-- $Id: build-build.xml,v 1.1.2.1 2006-12-20 21:27:25 oleksiys Exp $ -->
 <project name="jakarta-taglibs" default="dist" basedir=".">
 
   <!-- ****************** Project Standard Properties ******************* -->

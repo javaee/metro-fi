@@ -1,2 +1,2 @@
-<!ELEMENT doc (#PCDATA)>
-<!ATTLIST doc a1 CDATA "v2">
+<!ELEMENT doc (#PCDATA)>
+<!ATTLIST doc a1 CDATA "v2">

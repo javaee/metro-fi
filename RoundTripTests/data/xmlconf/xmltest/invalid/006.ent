@@ -1,2 +1,2 @@
-<!ENTITY % e "(#PCDATA)>">
-<!ELEMENT doc %e;
+<!ENTITY % e "(#PCDATA)>">
+<!ELEMENT doc %e;

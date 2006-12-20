@@ -1,2 +1,2 @@
-<!ELEMENT name (#PCDATA)>
+<!ELEMENT name (#PCDATA)>
 <!ELEMENT  notebook (#PCDATA)>

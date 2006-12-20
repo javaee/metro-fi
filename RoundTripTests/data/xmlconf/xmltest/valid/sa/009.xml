@@ -1,4 +1,4 @@
-<!DOCTYPE doc [
-<!ELEMENT doc (#PCDATA)>
-]>
-<doc>&#x20;</doc>
+<!DOCTYPE doc [
+<!ELEMENT doc (#PCDATA)>
+]>
+<doc>&#x20;</doc>

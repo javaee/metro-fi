@@ -1,5 +1,5 @@
-<!DOCTYPE doc [
-<!ELEMENT doc (a | b)>
-<!ELEMENT a (#PCDATA)>
-]>
-<doc><a></a></doc>
+<!DOCTYPE doc [
+<!ELEMENT doc (a | b)>
+<!ELEMENT a (#PCDATA)>
+]>
+<doc><a></a></doc>

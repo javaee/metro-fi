@@ -1,40 +1,40 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE article [
-<!ENTITY FS-status SYSTEM "FS-status.xml">
-]>
-<article>
-  <title>Formatting specifications for UBL Order Cancellation instances</title>
-<articleinfo>
-
-<copyright><year>2004</year><holder>OASIS</holder></copyright>
-<pubdate>$Date: 2005-05-27 22:23:24 $(UTC)</pubdate>
-</articleinfo>
-
-<section>
-<title>
-Order cancellation formatting specifications</title>
-
-<para>
-Two sample formatting specifications are offered for this document type:</para>
-
-<itemizedlist>
-<listitem><para>
-<ulink url="OrderCancellation/OfficeOrderCancellation.html">
-Office-oriented order cancellation form</ulink>
-</para>
-</listitem>
-<listitem><para>
-<ulink url="OrderCancellation/UN320OrderCancellation.html">
-United Nations Layout Key form 320 (subset): Order Cancellation</ulink>
-</para>
-</listitem>
-</itemizedlist>
-
-<para>
-For a list of all formatting specifications and an overview of the documentation conventions, please visit the <ulink url="index.html">formatting specification home page</ulink>.</para>
-
-</section>
-
-&FS-status;
-
-</article>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE article [
+<!ENTITY FS-status SYSTEM "FS-status.xml">
+]>
+<article>
+  <title>Formatting specifications for UBL Order Cancellation instances</title>
+<articleinfo>
+
+<copyright><year>2004</year><holder>OASIS</holder></copyright>
+<pubdate>$Date: 2006-12-20 21:26:13 $(UTC)</pubdate>
+</articleinfo>
+
+<section>
+<title>
+Order cancellation formatting specifications</title>
+
+<para>
+Two sample formatting specifications are offered for this document type:</para>
+
+<itemizedlist>
+<listitem><para>
+<ulink url="OrderCancellation/OfficeOrderCancellation.html">
+Office-oriented order cancellation form</ulink>
+</para>
+</listitem>
+<listitem><para>
+<ulink url="OrderCancellation/UN320OrderCancellation.html">
+United Nations Layout Key form 320 (subset): Order Cancellation</ulink>
+</para>
+</listitem>
+</itemizedlist>
+
+<para>
+For a list of all formatting specifications and an overview of the documentation conventions, please visit the <ulink url="index.html">formatting specification home page</ulink>.</para>
+
+</section>
+
+&FS-status;
+
+</article>

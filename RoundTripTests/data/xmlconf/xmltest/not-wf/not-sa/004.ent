@@ -1,2 +1,2 @@
-<!ELEMENT doc (#PCDATA)>
-<![ INCLUDE [
+<!ELEMENT doc (#PCDATA)>
+<![ INCLUDE [

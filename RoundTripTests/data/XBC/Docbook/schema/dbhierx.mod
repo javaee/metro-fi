@@ -8,7 +8,7 @@
      Organization for the Advancement of Structured Information
      Standards (OASIS).
 
-     $Id: dbhierx.mod,v 1.1 2005-05-27 22:04:25 joehw Exp $
+     $Id: dbhierx.mod,v 1.1.2.1 2006-12-20 21:36:02 oleksiys Exp $
 
      Permission to use, copy, modify and distribute the DocBook DTD
      and its accompanying documentation for any purpose and without fee

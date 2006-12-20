@@ -1,5 +1,5 @@
-<?xml version='1.0'?>
-<!DOCTYPE doc [
-<!ELEMENT doc (#PCDATA)>
-]>
-<doc></doc>
+<?xml version='1.0'?>
+<!DOCTYPE doc [
+<!ELEMENT doc (#PCDATA)>
+]>
+<doc></doc>

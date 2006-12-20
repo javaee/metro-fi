@@ -6,7 +6,7 @@
      and the Organization for the Advancement of Structured Information
      Standards (OASIS).
 
-     $Id: htmltblx.mod,v 1.1 2005-05-27 22:04:26 joehw Exp $
+     $Id: htmltblx.mod,v 1.1.2.1 2006-12-20 21:36:03 oleksiys Exp $
 
      Permission to use, copy, modify and distribute the DocBook XML DTD
      and its accompanying documentation for any purpose and without fee

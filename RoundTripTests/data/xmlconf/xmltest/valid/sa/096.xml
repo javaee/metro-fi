@@ -1,5 +1,5 @@
-<!DOCTYPE doc [
-<!ATTLIST doc a1 NMTOKENS " 1  	2 	">
-<!ELEMENT doc (#PCDATA)>
-]>
-<doc></doc>
+<!DOCTYPE doc [
+<!ATTLIST doc a1 NMTOKENS " 1  	2 	">
+<!ELEMENT doc (#PCDATA)>
+]>
+<doc></doc>

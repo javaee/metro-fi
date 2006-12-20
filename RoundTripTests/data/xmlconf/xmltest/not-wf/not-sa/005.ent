@@ -1,2 +1,2 @@
-<!ELEMENT doc (#PCDATA)>
-%e;
+<!ELEMENT doc (#PCDATA)>
+%e;

@@ -70,7 +70,7 @@
     <releaseinfo>
       <xsl:value-of select="$VERSION"/>
     </releaseinfo>
-    <pubdate>$Date: 2005-05-27 20:49:11 $</pubdate>
+    <pubdate>$Date: 2006-12-20 21:45:51 $</pubdate>
 
     <legalnotice>
       <para condition="online">

@@ -1,4 +1,4 @@
-<!-- $Id: content.ent,v 1.1 2005-05-27 20:49:22 joehw Exp $ -->
+<!-- $Id: content.ent,v 1.1.2.1 2006-12-20 21:32:59 oleksiys Exp $ -->
 
 <!-- Are we publishing the expanded version or the unexpanded version? -->
 <!ENTITY % unexpanded "IGNORE">
