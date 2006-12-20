@@ -384,6 +384,7 @@ public class StAXDocumentSerializer extends Encoder
 
         _namespacesArray[_namespacesArrayIndex++] = "";
         _namespacesArray[_namespacesArrayIndex++] = namespaceURI;
+        setDefaultNamespace(namespaceURI);
     }
     
     public void writeComment(String data) throws XMLStreamException {
@@ -587,6 +588,11 @@ public class StAXDocumentSerializer extends Encoder
                     _b = 0;
                 }
 
+                // If element's prefix is empty - apply default scope namespace
+                if (_currentPrefix.length() == 0 && _currentUri.length() == 0) {
+                    _currentUri = _nsContext.getNamespaceURI("");
+                }
+                
                 encodeElementQualifiedNameOnThirdBit(_currentUri, _currentPrefix, _currentLocalName);
                 
                 for (int i = 0; i < _attributesArrayIndex;) {
