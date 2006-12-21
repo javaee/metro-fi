@@ -72,5 +72,5 @@ public abstract class TransformInputOutput {
         parse(in, out);
     }
     
-    abstract void parse(InputStream in, OutputStream out) throws Exception;
+    abstract public void parse(InputStream in, OutputStream out) throws Exception;
 }
