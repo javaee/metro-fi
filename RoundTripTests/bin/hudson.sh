@@ -15,15 +15,14 @@ export PATH=${JAVA_HOME}/bin:${FIRTT_HOME}/bin:${FI_HOME}/bin:.:$PATH
 ant -f ${FI_HOME}/build-without-nb.xml clean dist
 ant -f ${FIRTT_HOME}/build-without-nb.xml dist
 
-chmod 755 ${FIRTT_HOME}/bin/*
-chmod 755 ${FI_HOME}/bin/*
-
-cd $FIRTT_HOME/data/xmlconf
+# cd $FIRTT_HOME/data/xmlconf
 REPORT_TS=xmlts.html
-${FIRTT_HOME}/bin/allRoundtripTests.sh ${REPORT_TS}
+java -cp ${FI_HOME}/dist/FastInfoset.jar:${FI_HOME}/lib/jsr173_api.jar com.sun.xml.fastinfoset.roundtriptests.AllRoundTripTest ${FIRTT_HOME}/data/xmlconf ${REPORT_TS}
+# ${FIRTT_HOME}/bin/allRoundtripTests.sh ${REPORT_TS}
 
-cd ${FIRTT_HOME}/data/XBC
+# cd ${FIRTT_HOME}/data/XBC
 REPORT_XBC=xbc.html
-${FIRTT_HOME}/bin/allRoundtripTests.sh ${REPORT_XBC}
+java -cp ${FI_HOME}/dist/FastInfoset.jar:${FI_HOME}/lib/jsr173_api.jar com.sun.xml.fastinfoset.roundtriptests.AllRoundTripTest ${FIRTT_HOME}/data/XBC ${REPORT_XBC}
+# ${FIRTT_HOME}/bin/allRoundtripTests.sh ${REPORT_XBC}
 
-cleandiff.sh ${FIRTT_HOME}/data
+# cleandiff.sh ${FIRTT_HOME}/data
