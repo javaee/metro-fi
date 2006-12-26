@@ -17,12 +17,12 @@ ant -f ${FIRTT_HOME}/build-without-nb.xml dist
 
 # cd $FIRTT_HOME/data/xmlconf
 REPORT_TS=xmlts.html
-java -cp ${FIRTT_HOME}/dist/RoundTripTests.jar:${FI_HOME}/dist/FastInfoset.jar:${FI_HOME}/lib/jsr173_api.jar com.sun.xml.fastinfoset.roundtriptests.AllRoundTripTest ${FIRTT_HOME}/data/xmlconf ${REPORT_TS}
+java -cp ${FIRTT_HOME}/dist/RoundTripTests.jar:${FI_HOME}/dist/FastInfoset.jar:${FI_HOME}/lib/jsr173_api.jar com.sun.xml.fastinfoset.roundtriptests.AllRoundTripTest ${FIRTT_HOME}/data/xmlconf ${FIRTT_DATA}/${REPORT_TS}
 # ${FIRTT_HOME}/bin/allRoundtripTests.sh ${REPORT_TS}
 
 # cd ${FIRTT_HOME}/data/XBC
 REPORT_XBC=xbc.html
-java -cp ${FIRTT_HOME}/dist/RoundTripTests.jar:${FI_HOME}/dist/FastInfoset.jar:${FI_HOME}/lib/jsr173_api.jar com.sun.xml.fastinfoset.roundtriptests.AllRoundTripTest ${FIRTT_HOME}/data/XBC ${REPORT_XBC}
+java -cp ${FIRTT_HOME}/dist/RoundTripTests.jar:${FI_HOME}/dist/FastInfoset.jar:${FI_HOME}/lib/jsr173_api.jar com.sun.xml.fastinfoset.roundtriptests.AllRoundTripTest ${FIRTT_HOME}/data/XBC ${FIRTT_DATA}/${REPORT_XBC}
 # ${FIRTT_HOME}/bin/allRoundtripTests.sh ${REPORT_XBC}
 
 # cleandiff.sh ${FIRTT_HOME}/data

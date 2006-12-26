@@ -66,7 +66,10 @@ public class RoundTripTestExecutor {
         }
         String passedStr = passed ? "passed" : "failed";
         System.out.println(passedStr.toUpperCase());
-        RoundTripReport.main(new String[] {report.getParent(), report.getName(), srcFile.getName(), srcFile.getParent(), test.getName(), passedStr});
+        
+        String reportFolder = report.getParent() != null ? report.getParent() : ".";
+        String srcFolder = srcFile.getParent() != null ? srcFile.getParent() : ".";
+        RoundTripReport.main(new String[] {reportFolder, report.getName(), srcFile.getName(), srcFolder, test.getName(), passedStr});
     }
     
     public void processFileOrFolder(File srcFile) {
