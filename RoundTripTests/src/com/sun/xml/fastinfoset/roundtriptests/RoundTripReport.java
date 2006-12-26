@@ -72,7 +72,7 @@ public class RoundTripReport {
     static final String TEST_DOM = "domroundtrip";
     static final String TEST_DOMSAX = "domsaxroundtrip";
     static final String TEST_SAXSTAX = "saxstaxdiff";
-
+    
     /** Creates a new instance of RoundTripReport */
     public RoundTripReport() {
     }
@@ -85,22 +85,22 @@ public class RoundTripReport {
             displayUsageAndExit(args);
         }
         new RoundTripReport().report(args);
-            
+        
         
     }
     public void report(String[] args) {
         try {
-            //String filename = args[INDEX_REPORT];    
-            String filename = args[INDEX_HOME]+"/"+args[INDEX_REPORT]; 
+            //String filename = args[INDEX_REPORT];
+            String filename = args[INDEX_HOME]+"/"+args[INDEX_REPORT];
             String content = reportContent(filename, args);
             OutputStreamWriter osr = new OutputStreamWriter(
-                new FileOutputStream(
+                    new FileOutputStream(
                     new File(filename)));
             osr.write(content);
             osr.close();
         } catch (Exception e) {
             e.printStackTrace();
-        }        
+        }
     }
     public String reportContent(String filename, String[] args) {
         File file = new File(filename);
@@ -116,11 +116,12 @@ public class RoundTripReport {
         int testcaseStart = content.indexOf(args[INDEX_TESTCASE]);
 //        if (testcaseStart < 0) {
 //            countIncrement(REPORTCOUNT_TOTAL, content);
-//        }        
+//        }
         //
         int start = 0;
-        int end = 0;      
+        int end = 0;
         String newrow = null;
+
         if (args[INDEX_RESULT].equals(RESULT_FAILED)) {
             if (testcaseStart < 0) {
                 newrow = "<tr><td><a href="+args[INDEX_TESTCASEPATH].substring(args[INDEX_HOME].length()+1)+"/"+args[INDEX_TESTCASE]+">"+
@@ -136,43 +137,39 @@ public class RoundTripReport {
                 content.replace(start, end, newrow);
                 testcaseStart = start;
             }
-
+            
             String testname = "<!--"+args[INDEX_TESTNAME]+"-->";
             start = content.indexOf(testname, testcaseStart);
             if (start>0) {
                 end = start + testname.length();
                 content.replace(start, end, args[INDEX_RESULT]);
             }
-        }        
+        }
         return content.toString();
     }
-
+    
     private String readFromFile(File file) {
         StringBuffer sb = new StringBuffer();
-        try
-        {
+        try {
             FileInputStream fstream = new FileInputStream(file);
-
+            
             // Convert our input stream to a
             // DataInputStream
             DataInputStream in = new DataInputStream(fstream);
-
-            while (in.available() !=0)
-            {
-                    sb.append(in.readLine());
+            
+            while (in.available() !=0) {
+                sb.append(in.readLine());
             }
-
+            
             in.close();
-        } 
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return sb.toString();
     }
     private boolean countIncrement(String tag, StringBuffer content) {
         try {
-            int start = content.indexOf(tag);           
+            int start = content.indexOf(tag);
             int end = content.indexOf(tag, start+1);
             
             String temp = content.substring(start+tag.length(), end);
@@ -195,23 +192,23 @@ public class RoundTripReport {
         template.append("<table width=\"80%\" border=1>\n");
         template.append("<tr><th></th><th>SAX</th><th>StAX</th><th>DOM</th><th>DOM-SAX</th><th>SAX-StAX</th></tr>\n");
         template.append("<tr><td>Passed</td>\n"+
-                    "<td>"+COUNT_SAXPASSED+COUNT_DEFAULT+COUNT_SAXPASSED+"</td>\n"+
-                    "<td>"+COUNT_STAXPASSED+COUNT_DEFAULT+COUNT_STAXPASSED+"</td>\n"+
-                    "<td>"+COUNT_DOMPASSED+COUNT_DEFAULT+COUNT_DOMPASSED+"</td>\n"+
-                    "<td>"+COUNT_DOMSAXPASSED+COUNT_DEFAULT+COUNT_DOMSAXPASSED+"</td>\n"+
-                    "<td>"+COUNT_SAXSTAXPASSED+COUNT_DEFAULT+COUNT_SAXSTAXPASSED+"</td></tr>\n");
+                "<td>"+COUNT_SAXPASSED+COUNT_DEFAULT+COUNT_SAXPASSED+"</td>\n"+
+                "<td>"+COUNT_STAXPASSED+COUNT_DEFAULT+COUNT_STAXPASSED+"</td>\n"+
+                "<td>"+COUNT_DOMPASSED+COUNT_DEFAULT+COUNT_DOMPASSED+"</td>\n"+
+                "<td>"+COUNT_DOMSAXPASSED+COUNT_DEFAULT+COUNT_DOMSAXPASSED+"</td>\n"+
+                "<td>"+COUNT_SAXSTAXPASSED+COUNT_DEFAULT+COUNT_SAXSTAXPASSED+"</td></tr>\n");
         template.append("<tr><td>Failed</td>\n"+
-                    "<td>"+COUNT_SAXFAILED+COUNT_DEFAULT+COUNT_SAXFAILED+"</td>\n"+
-                    "<td>"+COUNT_STAXFAILED+COUNT_DEFAULT+COUNT_STAXFAILED+"</td>\n"+
-                    "<td>"+COUNT_DOMFAILED+COUNT_DEFAULT+COUNT_DOMFAILED+"</td>\n"+
-                    "<td>"+COUNT_DOMSAXFAILED+COUNT_DEFAULT+COUNT_DOMSAXFAILED+"</td>\n"+
-                    "<td>"+COUNT_SAXSTAXFAILED+COUNT_DEFAULT+COUNT_SAXSTAXFAILED+"</td></tr>\n");
+                "<td>"+COUNT_SAXFAILED+COUNT_DEFAULT+COUNT_SAXFAILED+"</td>\n"+
+                "<td>"+COUNT_STAXFAILED+COUNT_DEFAULT+COUNT_STAXFAILED+"</td>\n"+
+                "<td>"+COUNT_DOMFAILED+COUNT_DEFAULT+COUNT_DOMFAILED+"</td>\n"+
+                "<td>"+COUNT_DOMSAXFAILED+COUNT_DEFAULT+COUNT_DOMSAXFAILED+"</td>\n"+
+                "<td>"+COUNT_SAXSTAXFAILED+COUNT_DEFAULT+COUNT_SAXSTAXFAILED+"</td></tr>\n");
         template.append("<tr><td>Total</td>\n"+
-                    "<td>"+REPORTCOUNT_TOTAL+COUNT_DEFAULT+REPORTCOUNT_TOTAL+"</td>\n"+
-                    "<td></td>\n"+
-                    "<td></td>\n"+
-                    "<td></td>\n"+
-                    "<td></td></tr>\n");
+                "<td>"+REPORTCOUNT_TOTAL+COUNT_DEFAULT+REPORTCOUNT_TOTAL+"</td>\n"+
+                "<td></td>\n"+
+                "<td></td>\n"+
+                "<td></td>\n"+
+                "<td></td></tr>\n");
         template.append(REPORTCOUNT_TOTAL);
         template.append("</table>\n");
         template.append("<br><b>Failed List</b><br><table width=\"80%\" border=1>\n");
@@ -221,7 +218,7 @@ public class RoundTripReport {
         template.append("</body>\n</html>");
         return template.toString();
     }
-
+    
     private static void displayUsageAndExit(String[] args) {
         System.err.println("Usage: RoundTripReport TS_HOME reportPath testcase_filename testcase_path testname testresult");
         System.err.println("Your input:");
@@ -230,7 +227,7 @@ public class RoundTripReport {
             System.err.println("args["+i+"]="+args[i]);
         }
         System.err.println("Example: RoundTripReport /projects/fi/RoundTripTests/data xmlts_report.html 011.xml /projects/fi/RoundTripTests/xmltest/valid saxroundtrip failed");
-        System.exit(1);        
+        System.exit(1);
     }
     
 }
