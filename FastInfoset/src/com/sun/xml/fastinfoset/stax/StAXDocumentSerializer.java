@@ -297,7 +297,7 @@ public class StAXDocumentSerializer extends Encoder
         
         // Find prefix for attribute, ignoring default namespace
         if (namespaceURI.length() > 0) {            
-            prefix = _nsContext.getPrefix(namespaceURI);
+            prefix = _nsContext.getNonDefaultPrefix(namespaceURI);
 
             // Undeclared prefix or ignorable default ns?
             if (prefix == null || prefix.length() == 0) {
@@ -366,6 +366,7 @@ public class StAXDocumentSerializer extends Encoder
             
             _namespacesArray[_namespacesArrayIndex++] = prefix;
             _namespacesArray[_namespacesArrayIndex++] = namespaceURI;
+            setPrefix(prefix, namespaceURI);
         }
     }
     
@@ -384,7 +385,7 @@ public class StAXDocumentSerializer extends Encoder
 
         _namespacesArray[_namespacesArrayIndex++] = "";
         _namespacesArray[_namespacesArrayIndex++] = namespaceURI;
-        setDefaultNamespace(namespaceURI);
+        setPrefix("", namespaceURI);
     }
     
     public void writeComment(String data) throws XMLStreamException {

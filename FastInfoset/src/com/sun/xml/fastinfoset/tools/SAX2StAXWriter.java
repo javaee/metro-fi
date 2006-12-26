@@ -141,13 +141,15 @@ public class SAX2StAXWriter extends DefaultHandler implements LexicalHandler {
     public void startPrefixMapping(String prefix, String uri) 
         throws SAXException 
     {
-        try {
-            _writer.setPrefix(prefix, uri);
+    // Commented as in StAX NS are declared for current element?
+    // now _writer.setPrefix() is invoked in _writer.writeNamespace()
+//        try {
+//            _writer.setPrefix(prefix, uri);
             _namespaces.add(new QualifiedName(prefix, uri));
-        }
-        catch (XMLStreamException e) {
-            throw new SAXException(e);
-        }
+//        }
+//        catch (XMLStreamException e) {
+//            throw new SAXException(e);
+//        }
     }
     
     public void endPrefixMapping(String prefix) throws SAXException {

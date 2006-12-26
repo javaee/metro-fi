@@ -106,6 +106,29 @@ final public class NamespaceContextImplementation implements NamespaceContext {
         return null;
     }
     
+    public String getNonDefaultPrefix(String namespaceURI) {
+        if (namespaceURI == null) throw new IllegalArgumentException();
+        
+        // namespaceURI = namespaceURI.intern();
+        
+        for (int i = namespacePosition - 1; i >= 0; i--) {
+            final String declaredNamespaceURI = namespaceURIs[i];
+            if ((declaredNamespaceURI == namespaceURI || declaredNamespaceURI.equals(namespaceURI)) &&
+                prefixes[i].length() > 0){
+                final String declaredPrefix = prefixes[i];
+                
+                // Check if prefix is out of scope
+                for (++i; i < namespacePosition; i++)
+                    if (declaredPrefix == prefixes[i])
+                        return null;
+                
+                return declaredPrefix;
+            }
+        }
+        
+        return null;
+    }
+
     public Iterator getPrefixes(String namespaceURI) {
         if (namespaceURI == null) throw new IllegalArgumentException();
         
