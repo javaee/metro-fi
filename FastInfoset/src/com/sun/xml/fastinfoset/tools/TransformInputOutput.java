@@ -101,9 +101,16 @@ public abstract class TransformInputOutput {
                 if (systemId != null && systemId.startsWith("file:/")) {
                     int delim = systemId.lastIndexOf(currentJavaWorkingDirectory);
                     if (delim != -1) {
-                        String filename = systemId.substring(delim + currentJavaWorkingDirectory.length());
-                        File workingFile = new File(workingDirectory, filename);
-                        return new InputSource(workingFile.toURL().toExternalForm());
+                        String workingDirectoryURL = new File(workingDirectory).toURL().toExternalForm().substring("file:/".length());
+                        // workaround when imported entity has own import. Then systemId is built based on workingDirectory, not
+                        // user.dir one.
+                        if (systemId.indexOf(workingDirectoryURL) == -1) {
+                            String filename = systemId.substring(delim + currentJavaWorkingDirectory.length());
+                            System.out.println("Was: " + systemId);
+                            System.out.println("Become: " + workingDirectory + "/" + filename);
+                            File workingFile = new File(workingDirectory, filename);
+                            return new InputSource(workingFile.toURL().toExternalForm());
+                        }
                     }
                 }
                 return null;
