@@ -48,6 +48,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
+import java.net.MalformedURLException;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -84,13 +85,23 @@ public abstract class TransformInputOutput {
         throw new UnsupportedOperationException();
     }
     
+    private static String currentJavaWorkingDirectory;
+    static {
+        File currentDirectory = new File(System.getProperty("user.dir"));
+        try {
+            currentJavaWorkingDirectory = currentDirectory.toURL().toExternalForm().substring("file:/".length());
+        } catch (MalformedURLException ex) {
+            // Should never got here
+        }
+    }
+    
     protected EntityResolver createRelativePathResolver(final String workingDirectory) {
         return new EntityResolver() {
             public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
-                if (publicId == null && systemId != null && systemId.startsWith("file://")) {
-                    int delim = systemId.lastIndexOf('/');
-                    if (delim != -1 && delim < systemId.length() - 1) {
-                        String filename = systemId.substring(delim + 1);
+                if (systemId != null && systemId.startsWith("file:/")) {
+                    int delim = systemId.lastIndexOf(currentJavaWorkingDirectory);
+                    if (delim != -1) {
+                        String filename = systemId.substring(delim + currentJavaWorkingDirectory.length());
                         File workingFile = new File(workingDirectory, filename);
                         return new InputSource(workingFile.toURL().toExternalForm());
                     }
