@@ -48,7 +48,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
-import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -80,42 +81,83 @@ public abstract class TransformInputOutput {
     
     abstract public void parse(InputStream in, OutputStream out) throws Exception;
     
-    // parse alternative with working directory parameter useful for loading xml included docs
+    // parse alternative with current working directory parameter
+    // is used to process xml documents, which have external imported entities
     public void parse(InputStream in, OutputStream out, String workingDirectory) throws Exception {
         throw new UnsupportedOperationException();
     }
-    
-    private static String currentJavaWorkingDirectory;
+        
+    private static URI currentJavaWorkingDirectory;
     static {
-        File currentDirectory = new File(System.getProperty("user.dir"));
-        try {
-            currentJavaWorkingDirectory = currentDirectory.toURL().toExternalForm().substring("file:/".length());
-        } catch (MalformedURLException ex) {
-            // Should never got here
-        }
+        currentJavaWorkingDirectory = new File(System.getProperty("user.dir")).toURI();
     }
-    
-    protected EntityResolver createRelativePathResolver(final String workingDirectory) {
+
+    protected static EntityResolver createRelativePathResolver(final String workingDirectory) {
         return new EntityResolver() {
             public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
                 if (systemId != null && systemId.startsWith("file:/")) {
-                    int delim = systemId.lastIndexOf(currentJavaWorkingDirectory);
-                    if (delim != -1) {
-                        String workingDirectoryURL = new File(workingDirectory).toURL().toExternalForm().substring("file:/".length());
-                        // workaround when imported entity has own import. Then systemId is built based on workingDirectory, not
-                        // user.dir one.
-                        if (systemId.indexOf(workingDirectoryURL) == -1) {
-                            String filename = systemId.substring(delim + currentJavaWorkingDirectory.length());
-                            System.out.println("Was: " + systemId);
-                            System.out.println("Become: " + workingDirectory + "/" + filename);
-                            File workingFile = new File(workingDirectory, filename);
-                            return new InputSource(workingFile.toURL().toExternalForm());
-                        }
+                    URI workingDirectoryURI = new File(workingDirectory).toURI();
+                    URI workingFile;
+                    try {
+                        // Construction new File(new URI(String)).toURI() is used to be sure URI has correct representation without redundant '/'
+                        workingFile = convertToNewWorkingDirectory(currentJavaWorkingDirectory, workingDirectoryURI, new File(new URI(systemId)).toURI());
+                        return new InputSource(workingFile.toString());
+                    } catch (URISyntaxException ex) {
+                        //Should not get here
                     }
                 }
                 return null;
             }
-            
         };
+    }
+    
+    private static URI convertToNewWorkingDirectory(URI oldwd, URI newwd, URI file) throws IOException, URISyntaxException {
+        String oldwdStr = oldwd.toString();
+        String newwdStr = newwd.toString();
+        String fileStr = file.toString();
+        
+        String cmpStr = null;
+        // In simpliest case <user.dir>/file.xml - do it faster
+        if (fileStr.startsWith(oldwdStr) && (cmpStr = fileStr.substring(oldwdStr.length())).indexOf('/') == -1) {
+            return new URI(newwdStr + '/' + cmpStr);
+        }
+        
+        String[] oldwdSplit = oldwdStr.split("/");
+        String[] newwdSplit = newwdStr.split("/");
+        String[] fileSplit = fileStr.split("/");
+        
+        int diff;
+        for(diff = 0; diff<oldwdSplit.length & diff<fileSplit.length; diff++) {
+            if (!oldwdSplit[diff].equals(fileSplit[diff])) {
+                break;
+            }
+        }
+        
+        int diffNew;
+        for(diffNew=0; diffNew<newwdSplit.length && diffNew<fileSplit.length; diffNew++) {
+            if (!newwdSplit[diffNew].equals(fileSplit[diffNew])) {
+                break;
+            }
+        }
+        
+        //Workaround for case, when extrnal imported entity has imports other entity
+        //in that case systemId has correct path, not based on user.dir
+        if (diffNew > diff) {
+            return file;
+        }
+
+        int elemsToSub = oldwdSplit.length - diff;
+        StringBuffer resultStr = new StringBuffer(100);
+        for(int i=0; i<newwdSplit.length - elemsToSub; i++) {
+            resultStr.append(newwdSplit[i]);
+            resultStr.append('/');
+        }
+                
+        for(int i=diff; i<fileSplit.length; i++) {
+            resultStr.append(fileSplit[i]);
+            if (i < fileSplit.length - 1) resultStr.append('/');
+        }
+        
+        return new URI(resultStr.toString());
     }
 }
