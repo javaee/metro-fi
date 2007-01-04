@@ -38,18 +38,22 @@
 
 package com.sun.xml.fastinfoset.roundtriptests;
 
+import com.sun.xml.fastinfoset.roundtriptests.rtt.RoundTripRtt;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 
 /**
  * @author Alexey Stashok
  */
-public class RoundTripTestExecutor {
+public class SingleRountTripTest {
     
-    private File report;
+    private RoundTripReport report;
     private RoundTripRtt test;
     
-    public RoundTripTestExecutor(RoundTripRtt test, File report) {
+    public SingleRountTripTest(RoundTripRtt test, RoundTripReport report) {
         this.test = test;
         this.report = report;
     }
@@ -64,12 +68,12 @@ public class RoundTripTestExecutor {
             System.err.println("Exception occured when processing file: " + srcFile.getAbsolutePath() + " test: " + test.getClass().getName());
             ex.printStackTrace();
         }
-        String passedStr = passed ? "passed" : "failed";
-        System.out.println(passedStr.toUpperCase());
         
-        String reportFolder = report.getParent() != null ? report.getParent() : ".";
         String srcFolder = srcFile.getParent() != null ? srcFile.getParent() : ".";
-        RoundTripReport.main(new String[] {reportFolder, report.getName(), srcFile.getName(), srcFolder, test.getName(), passedStr});
+        report.addResult(test.getName(), passed, srcFolder, srcFile.getName());
+        
+        String passedStr = passed ? "passed" : "failed";
+        System.out.println(passedStr.toUpperCase());        
     }
     
     public void processFileOrFolder(File srcFile) {
@@ -90,10 +94,17 @@ public class RoundTripTestExecutor {
     
     public static void main(String[] args) throws Exception {
         if (args.length < 3) {
-            System.out.println("Usage: RoundTripTestExecutor <RoundTripRtt classname> <src file or directory> <report_filename>");
+            System.out.println("Usage: SingleRountTripTest <RoundTripRtt classname> <src file or directory> <report_filename>");
             System.exit(0);
         }
         
-        new RoundTripTestExecutor((RoundTripRtt) Class.forName(args[0]).newInstance(), new File(args[2])).processFileOrFolder(new File(args[1]));
+        RoundTripReport report = new RoundTripReport();
+        new SingleRountTripTest((RoundTripRtt) Class.forName(args[0]).newInstance(), report).processFileOrFolder(new File(args[1]));
+        PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(args[2])));
+        try {
+            writer.print(report.generateReport());
+        } finally {
+            writer.close();
+        }
     }
 }

@@ -37,7 +37,7 @@
  */
 
 
-package com.sun.xml.fastinfoset.roundtriptests;
+package com.sun.xml.fastinfoset.roundtriptests.rtt;
 
 import com.sun.xml.fastinfoset.tools.TransformInputOutput;
 import java.io.BufferedInputStream;

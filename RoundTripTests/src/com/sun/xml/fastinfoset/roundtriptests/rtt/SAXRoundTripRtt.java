@@ -36,35 +36,34 @@
  *
  */
 
-package com.sun.xml.fastinfoset.roundtriptests;
+package com.sun.xml.fastinfoset.roundtriptests.rtt;
 
 import com.sun.xml.fastinfoset.tools.FI_SAX_Or_XML_SAX_SAXEvent;
-import com.sun.xml.fastinfoset.tools.FI_StAX_SAX_Or_XML_SAX_SAXEvent;
-import com.sun.xml.fastinfoset.tools.XML_SAX_StAX_FI;
+import com.sun.xml.fastinfoset.tools.XML_SAX_FI;
 import java.io.File;
 
 /**
  * @author Alexey Stashok
  */
-public class StAXRoundTripRtt extends RoundTripRtt {
+public class SAXRoundTripRtt extends RoundTripRtt {
     
     public boolean process(File file) throws Exception {
         String absolutePath = file.getAbsolutePath();
         
-        String fiOutputFileName = absolutePath + ".stax.finf";
-        String saxOutputFileName = absolutePath + ".sax-event";
-        String fiStaxOutputFileName = absolutePath + ".stax.finf.sax-event";
-        String diffOutputFileName = absolutePath + ".stax.sax-event.diff";
+        String fiOutputFileName = absolutePath + ".sax.finf";
+        String SaxOutputFileName = absolutePath + ".sax-event";
+        String fiSaxOutputFileName = absolutePath + ".sax.finf.sax-event";
+        String diffOutputFileName = absolutePath + ".sax.sax-event.diff";
 
-        transform(file.getAbsolutePath(), fiOutputFileName, file.getParent(), new XML_SAX_StAX_FI());
-        transform(file.getAbsolutePath(), saxOutputFileName, file.getParent(), new FI_SAX_Or_XML_SAX_SAXEvent());
-        transform(fiOutputFileName, fiStaxOutputFileName, new FI_StAX_SAX_Or_XML_SAX_SAXEvent());
+        transform(file.getAbsolutePath(), fiOutputFileName, file.getParent(), new XML_SAX_FI());
+        transform(file.getAbsolutePath(), SaxOutputFileName, file.getParent(), new FI_SAX_Or_XML_SAX_SAXEvent());
+        transform(fiOutputFileName, fiSaxOutputFileName, new FI_SAX_Or_XML_SAX_SAXEvent());
         
-        return diffText(saxOutputFileName, fiStaxOutputFileName, diffOutputFileName);
+        return diffText(SaxOutputFileName, fiSaxOutputFileName, diffOutputFileName);
     }
     
     public String getName() {
-        return "staxroundtrip";
+        return "saxroundtrip";
     }
 
     public static void main(String[] args) throws Exception {
@@ -74,7 +73,7 @@ public class StAXRoundTripRtt extends RoundTripRtt {
         }
         
         File file = new File(args[0]);
-        StAXRoundTripRtt rtt = new StAXRoundTripRtt();
+        SAXRoundTripRtt rtt = new SAXRoundTripRtt();
         rtt.process(file);
     }
 }

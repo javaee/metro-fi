@@ -36,7 +36,7 @@
  *
  */
 
-package com.sun.xml.fastinfoset.roundtriptests;
+package com.sun.xml.fastinfoset.roundtriptests.rtt;
 
 import com.sun.xml.fastinfoset.tools.FI_SAX_Or_XML_SAX_DOM_SAX_SAXEvent;
 import com.sun.xml.fastinfoset.tools.XML_DOM_SAX_FI;

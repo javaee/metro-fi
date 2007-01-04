@@ -43,6 +43,12 @@ import java.io.FileInputStream;
 import java.io.DataInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class RoundTripReport {
@@ -73,8 +79,60 @@ public class RoundTripReport {
     static final String TEST_DOMSAX = "domsaxroundtrip";
     static final String TEST_SAXSTAX = "saxstaxdiff";
     
+    static final List<String> RTT_NAMES = new ArrayList(Arrays.<String>asList(new String[] {TEST_SAX, TEST_STAX, TEST_DOM, TEST_DOMSAX, TEST_SAXSTAX}));
+    static final int SAX_RTT = 0;
+    static final int STAX_RTT = 1;
+    static final int DOM_RTT = 2;
+    static final int DOM_SAX_RTT = 3;
+    static final int SAX_STAX_RTT = 4;
+    
+    private int[] passed = new int[RTT_NAMES.size()];
+    private int[] failed = new int[RTT_NAMES.size()];
+    
+    private Map<String, FailedTestRecord> failedTests = new HashMap<String, FailedTestRecord>();
+    
     /** Creates a new instance of RoundTripReport */
     public RoundTripReport() {
+    }
+    
+    public void addResult(String rttName, boolean passed, String testFolder, String testFile) {
+        int rttIndex = RTT_NAMES.indexOf(rttName);
+        if (rttIndex == -1) {
+            // Unknown RTT
+            return;
+        }
+        
+        if (passed) {
+            incPassed(rttIndex);
+        } else {
+            incFailed(rttIndex);
+            addFailedRecord(testFolder, testFile, rttIndex);
+        }
+    }
+    
+    public String generateReport() {
+        return generateReport(passed, failed, failedTests);
+    }
+
+    private void incPassed(int rtt) {
+        passed[rtt]++;
+    }
+
+    private void incFailed(int rtt) {
+        failed[rtt]++;
+    }
+    
+    private void addFailedRecord(String testPath, String testName, int rtt) {
+        String testFullName = testPath + "/" + testName;
+        
+        FailedTestRecord failTestRecord = failedTests.get(testFullName);
+        
+        if (failTestRecord == null) {
+            failTestRecord = new FailedTestRecord(testName);
+            failedTests.put(testFullName, failTestRecord);
+        }
+        
+        failTestRecord.setFailedFor(rtt);
     }
     
     /**
@@ -121,7 +179,7 @@ public class RoundTripReport {
         int start = 0;
         int end = 0;
         String newrow = null;
-
+        
         if (args[INDEX_RESULT].equals(RESULT_FAILED)) {
             if (testcaseStart < 0) {
                 newrow = "<tr><td><a href="+args[INDEX_TESTCASEPATH].substring(args[INDEX_HOME].length()+1)+"/"+args[INDEX_TESTCASE]+">"+
@@ -186,37 +244,63 @@ public class RoundTripReport {
         
     }
     private String getTemplate() {
-        StringBuffer template = new StringBuffer();
-        template.append("<html>\n<body>\n<b>Roundtrip Tests</b><br><br>");
-        template.append("<b>Summary</b>");
-        template.append("<table width=\"80%\" border=1>\n");
-        template.append("<tr><th></th><th>SAX</th><th>StAX</th><th>DOM</th><th>DOM-SAX</th><th>SAX-StAX</th></tr>\n");
-        template.append("<tr><td>Passed</td>\n"+
-                "<td>"+COUNT_SAXPASSED+COUNT_DEFAULT+COUNT_SAXPASSED+"</td>\n"+
-                "<td>"+COUNT_STAXPASSED+COUNT_DEFAULT+COUNT_STAXPASSED+"</td>\n"+
-                "<td>"+COUNT_DOMPASSED+COUNT_DEFAULT+COUNT_DOMPASSED+"</td>\n"+
-                "<td>"+COUNT_DOMSAXPASSED+COUNT_DEFAULT+COUNT_DOMSAXPASSED+"</td>\n"+
-                "<td>"+COUNT_SAXSTAXPASSED+COUNT_DEFAULT+COUNT_SAXSTAXPASSED+"</td></tr>\n");
-        template.append("<tr><td>Failed</td>\n"+
-                "<td>"+COUNT_SAXFAILED+COUNT_DEFAULT+COUNT_SAXFAILED+"</td>\n"+
-                "<td>"+COUNT_STAXFAILED+COUNT_DEFAULT+COUNT_STAXFAILED+"</td>\n"+
-                "<td>"+COUNT_DOMFAILED+COUNT_DEFAULT+COUNT_DOMFAILED+"</td>\n"+
-                "<td>"+COUNT_DOMSAXFAILED+COUNT_DEFAULT+COUNT_DOMSAXFAILED+"</td>\n"+
-                "<td>"+COUNT_SAXSTAXFAILED+COUNT_DEFAULT+COUNT_SAXSTAXFAILED+"</td></tr>\n");
-        template.append("<tr><td>Total</td>\n"+
-                "<td>"+REPORTCOUNT_TOTAL+COUNT_DEFAULT+REPORTCOUNT_TOTAL+"</td>\n"+
-                "<td></td>\n"+
-                "<td></td>\n"+
-                "<td></td>\n"+
-                "<td></td></tr>\n");
-        template.append(REPORTCOUNT_TOTAL);
-        template.append("</table>\n");
-        template.append("<br><b>Failed List</b><br><table width=\"80%\" border=1>\n");
-        template.append("<tr><th>Name of Testcase</th><th>SAX</th><th>StAX</th><th>DOM</th><th>DOM-SAX</th><th>SAX-StAX</th></tr>\n");
-        template.append(REPORT_NEWROW);
-        template.append("</table>\n");
-        template.append("</body>\n</html>");
-        return template.toString();
+        return generateReport(new int[5], new int[5], Collections.<String, FailedTestRecord>emptyMap());
+    }
+    
+    private static String generateReport(int[] passed, int[] failed, Map<String, FailedTestRecord> failedTests) {
+        StringBuffer report = new StringBuffer();
+        report.append("<html>\n<body>\n<b>Roundtrip Tests</b><br><br>");
+        report.append("<b>Summary</b>");
+        report.append("<table width=\"80%\" border=1>\n");
+        report.append("<tr><th></th><th>SAX</th><th>StAX</th><th>DOM</th><th>DOM-SAX</th><th>SAX-StAX</th></tr>\n");
+        report.append("<tr><td>Passed</td>\n"+
+                "<td>"+COUNT_SAXPASSED+getReportValue(passed[SAX_RTT], failed[SAX_RTT])+COUNT_SAXPASSED+"</td>\n"+
+                "<td>"+COUNT_STAXPASSED+getReportValue(passed[STAX_RTT], failed[STAX_RTT])+COUNT_STAXPASSED+"</td>\n"+
+                "<td>"+COUNT_DOMPASSED+getReportValue(passed[DOM_RTT], failed[DOM_RTT])+COUNT_DOMPASSED+"</td>\n"+
+                "<td>"+COUNT_DOMSAXPASSED+getReportValue(passed[DOM_SAX_RTT], failed[DOM_SAX_RTT])+COUNT_DOMSAXPASSED+"</td>\n"+
+                "<td>"+COUNT_SAXSTAXPASSED+getReportValue(passed[SAX_STAX_RTT], failed[SAX_STAX_RTT])+COUNT_SAXSTAXPASSED+"</td></tr>\n");
+        report.append("<tr><td>Failed</td>\n"+
+                "<td>"+COUNT_SAXFAILED+getReportValue(failed[SAX_RTT], passed[SAX_RTT])+COUNT_SAXFAILED+"</td>\n"+
+                "<td>"+COUNT_STAXFAILED+getReportValue(failed[STAX_RTT], passed[STAX_RTT])+COUNT_STAXFAILED+"</td>\n"+
+                "<td>"+COUNT_DOMFAILED+getReportValue(failed[DOM_RTT], passed[DOM_RTT])+COUNT_DOMFAILED+"</td>\n"+
+                "<td>"+COUNT_DOMSAXFAILED+getReportValue(failed[DOM_SAX_RTT], passed[DOM_SAX_RTT])+COUNT_DOMSAXFAILED+"</td>\n"+
+                "<td>"+COUNT_SAXSTAXFAILED+getReportValue(failed[SAX_STAX_RTT], passed[SAX_STAX_RTT])+COUNT_SAXSTAXFAILED+"</td></tr>\n");
+        report.append("<tr><td>Total</td>\n"+
+                "<td>"+ getReportValue(failed[SAX_RTT] + passed[SAX_RTT]) + "</td>\n"+
+                "<td>"+ getReportValue(failed[STAX_RTT] + passed[STAX_RTT]) + "</td>\n"+
+                "<td>"+ getReportValue(failed[DOM_RTT] + passed[DOM_RTT]) + "</td>\n"+
+                "<td>"+ getReportValue(failed[DOM_SAX_RTT] + passed[DOM_SAX_RTT]) + "</td>\n"+
+                "<td>"+ getReportValue(failed[SAX_STAX_RTT] + passed[SAX_STAX_RTT]) + "</td></tr>\n");
+        report.append(REPORTCOUNT_TOTAL);
+        report.append("</table>\n");
+        report.append("<br><b>Failed List</b><br><table width=\"80%\" border=1>\n");
+        report.append("<tr><th>Name of Testcase</th><th>SAX</th><th>StAX</th><th>DOM</th><th>DOM-SAX</th><th>SAX-StAX</th></tr>\n");
+        for(String testFullPath : failedTests.keySet()) {
+            FailedTestRecord failedRecord = failedTests.get(testFullPath);
+            String newrow = "<tr><td><a href="+testFullPath+">"+
+                    failedRecord.testName+"</a></td>\n"+
+                    "<td><!--"+TEST_SAX+"-->" + getResultAsString(!failedRecord.isFailedFor(SAX_RTT))+"</td>\n"+
+                    "<td><!--"+TEST_STAX+"-->" +getResultAsString(!failedRecord.isFailedFor(STAX_RTT))+"</td>\n"+
+                    "<td><!--"+TEST_DOM+"-->" +getResultAsString(!failedRecord.isFailedFor(DOM_RTT))+"</td>\n"+
+                    "<td><!--"+TEST_DOMSAX+"-->" +getResultAsString(!failedRecord.isFailedFor(DOM_SAX_RTT))+"</td>\n"+
+                    "<td><!--"+TEST_SAXSTAX+"-->" +getResultAsString(!failedRecord.isFailedFor(SAX_STAX_RTT))+"</td></tr>\n";
+            report.append(newrow);
+        }
+        report.append(REPORT_NEWROW+"\n");
+        report.append("</table>\n");
+        report.append("</body>\n</html>");
+        return report.toString();
+    }
+    
+    private static String getResultAsString(boolean result) {
+        return result ? "" : "failed";
+    }
+    private static String getReportValue(int value) {
+        return getReportValue(value, value);
+    }
+    
+    private static String getReportValue(int value, int oppositeResultValue) {
+        return (value == 0 && oppositeResultValue == 0) ? COUNT_DEFAULT : String.valueOf(value);
     }
     
     private static void displayUsageAndExit(String[] args) {
@@ -228,6 +312,23 @@ public class RoundTripReport {
         }
         System.err.println("Example: RoundTripReport /projects/fi/RoundTripTests/data xmlts_report.html 011.xml /projects/fi/RoundTripTests/xmltest/valid saxroundtrip failed");
         System.exit(1);
+    }
+
+    
+    private static class FailedTestRecord {
+        private int rttMap;
+        private String testName;
+        public FailedTestRecord(String testName) {
+            this.testName = testName;
+        }
+        
+        public boolean isFailedFor(int rtt) {
+            return (rttMap & (1 << rtt)) != 0;
+        }
+        
+        public void setFailedFor(int rtt) {
+            rttMap |= (1 << rtt);
+        }
     }
     
 }

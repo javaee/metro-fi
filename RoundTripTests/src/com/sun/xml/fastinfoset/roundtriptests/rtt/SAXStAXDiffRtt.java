@@ -36,34 +36,32 @@
  *
  */
 
-package com.sun.xml.fastinfoset.roundtriptests;
+package com.sun.xml.fastinfoset.roundtriptests.rtt;
 
-import com.sun.xml.fastinfoset.tools.FI_SAX_Or_XML_SAX_SAXEvent;
 import com.sun.xml.fastinfoset.tools.XML_SAX_FI;
+import com.sun.xml.fastinfoset.tools.XML_SAX_StAX_FI;
 import java.io.File;
 
 /**
  * @author Alexey Stashok
  */
-public class SAXRoundTripRtt extends RoundTripRtt {
+public class SAXStAXDiffRtt extends RoundTripRtt {
     
     public boolean process(File file) throws Exception {
         String absolutePath = file.getAbsolutePath();
         
-        String fiOutputFileName = absolutePath + ".sax.finf";
-        String SaxOutputFileName = absolutePath + ".sax-event";
-        String fiSaxOutputFileName = absolutePath + ".sax.finf.sax-event";
-        String diffOutputFileName = absolutePath + ".sax.sax-event.diff";
+        String fiSaxOutputFileName = absolutePath + ".sax.finf";
+        String fiStaxOutputFileName = absolutePath + ".stax.finf";
+        String diffOutputFileName = absolutePath + ".sax.stax.diff";
 
-        transform(file.getAbsolutePath(), fiOutputFileName, file.getParent(), new XML_SAX_FI());
-        transform(file.getAbsolutePath(), SaxOutputFileName, file.getParent(), new FI_SAX_Or_XML_SAX_SAXEvent());
-        transform(fiOutputFileName, fiSaxOutputFileName, new FI_SAX_Or_XML_SAX_SAXEvent());
+        transform(file.getAbsolutePath(), fiSaxOutputFileName, file.getParent(), new XML_SAX_FI());
+        transform(file.getAbsolutePath(), fiStaxOutputFileName, file.getParent(), new XML_SAX_StAX_FI());
         
-        return diffText(SaxOutputFileName, fiSaxOutputFileName, diffOutputFileName);
+        return diffBinary(fiStaxOutputFileName, fiSaxOutputFileName, diffOutputFileName);
     }
     
     public String getName() {
-        return "saxroundtrip";
+        return "saxstaxdiff";
     }
 
     public static void main(String[] args) throws Exception {
@@ -73,7 +71,7 @@ public class SAXRoundTripRtt extends RoundTripRtt {
         }
         
         File file = new File(args[0]);
-        SAXRoundTripRtt rtt = new SAXRoundTripRtt();
+        SAXStAXDiffRtt rtt = new SAXStAXDiffRtt();
         rtt.process(file);
     }
 }

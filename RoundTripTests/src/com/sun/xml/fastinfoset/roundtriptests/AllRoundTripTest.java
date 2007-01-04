@@ -38,8 +38,18 @@
 
 package com.sun.xml.fastinfoset.roundtriptests;
 
+import com.sun.xml.fastinfoset.roundtriptests.rtt.DOMRoundTripRtt;
+import com.sun.xml.fastinfoset.roundtriptests.rtt.DOMSAXRoundTripRtt;
+import com.sun.xml.fastinfoset.roundtriptests.rtt.RoundTripRtt;
+import com.sun.xml.fastinfoset.roundtriptests.rtt.SAXRoundTripRtt;
+import com.sun.xml.fastinfoset.roundtriptests.rtt.SAXStAXDiffRtt;
+import com.sun.xml.fastinfoset.roundtriptests.rtt.StAXRoundTripRtt;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 
 /**
  * @author Alexey Stashok
@@ -52,13 +62,24 @@ public class AllRoundTripTest {
     
     public void processAllRttTests(String testSrc, String report) {
         File testSrcFile = new File(testSrc);
-        File reportFile = new File(report);
+        RoundTripReport reporter = new RoundTripReport();
         for (int i=0; i<roundTripTests.length; i++) {
-            RoundTripTestExecutor roundTripTest = new RoundTripTestExecutor(roundTripTests[i], reportFile);
+            SingleRountTripTest roundTripTest = new SingleRountTripTest(roundTripTests[i], reporter);
             roundTripTest.processFileOrFolder(testSrcFile);
         }
         
         cleanupDiffs(testSrcFile);
+        
+        try {
+            PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(report)));
+            try {
+                writer.print(reporter.generateReport());
+            } finally {
+                writer.close();
+            }
+        } catch (FileNotFoundException ex) {
+            System.out.println("Error generating report!");
+        }
     }
     
     private void cleanupDiffs(File testSrcFile) {
