@@ -26,7 +26,7 @@
 	</target>
 
 	<target name="compile" depends="prepare">
-		<javac source="1.4" srcdir="src" destdir="${build.dir}/classes"
+		<javac srcdir="src" destdir="${build.dir}/classes"
 			debug="on" optimize="on" deprecation="on">
 			<classpath refid="compile.class.path"/>
 		</javac>
@@ -38,8 +38,7 @@
 	</target>
         
 	<target name="doc" depends="dist">
-		<javadoc source="1.4"
-                        sourcepath="src"
+		<javadoc sourcepath="src"
                         packagenames="com.sun.xml.fastinfoset.roundtriptests.*"
 			destdir="${dist.dir}/javadoc"
                         version="true">
