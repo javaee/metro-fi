@@ -41,6 +41,7 @@ package com.sun.xml.fastinfoset.stax;
 import com.sun.xml.fastinfoset.Decoder;
 import com.sun.xml.fastinfoset.DecoderStateTables;
 import com.sun.xml.fastinfoset.EncodingConstants;
+import com.sun.xml.fastinfoset.OctetBufferListener;
 import com.sun.xml.fastinfoset.QualifiedName;
 import com.sun.xml.fastinfoset.algorithm.BuiltInEncodingAlgorithmFactory;
 import com.sun.xml.fastinfoset.sax.AttributesHolder;
@@ -74,7 +75,7 @@ import org.jvnet.fastinfoset.stax.FastInfosetStreamReader;
  * {@link java.io.InputStream}.
  */
 public class StAXDocumentParser extends Decoder 
-        implements XMLStreamReader, FastInfosetStreamReader {
+        implements XMLStreamReader, FastInfosetStreamReader, OctetBufferListener {
     protected static final int INTERNAL_STATE_START_DOCUMENT = 0;
     protected static final int INTERNAL_STATE_START_ELEMENT_TERMINATE = 1;
     protected static final int INTERNAL_STATE_SINGLE_TERMINATE_ELEMENT_WITH_NAMESPACES = 2;
@@ -988,7 +989,7 @@ public class StAXDocumentParser extends Decoder
     
     public final int peekNext() throws XMLStreamException {
         try {
-            switch(DecoderStateTables.EII[peek()]) {
+            switch(DecoderStateTables.EII[peek(this)]) {
                 case DecoderStateTables.EII_NO_AIIS_INDEX_SMALL:
                 case DecoderStateTables.EII_AIIS_INDEX_SMALL:
                 case DecoderStateTables.EII_INDEX_MEDIUM:
@@ -1029,6 +1030,13 @@ public class StAXDocumentParser extends Decoder
         }
     }
     
+    public void onBeforeOctetBufferOverwrite() {
+        if (_algorithmData != null) {
+            _algorithmDataOffset = 0;
+            _algorithmData = getTextAlgorithmBytesClone();
+        }
+    }
+
     // Faster access methods without checks
     
     public final int accessNamespaceCount() {
@@ -1724,6 +1732,5 @@ public class StAXDocumentParser extends Decoder
                 return "CDATA";
         }
         return "UNKNOWN_EVENT_TYPE";
-    }
-    
+    }    
 }

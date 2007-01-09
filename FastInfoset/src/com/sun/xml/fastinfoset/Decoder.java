@@ -1811,9 +1811,17 @@ public abstract class Decoder implements FastInfosetParser {
     }
 
     protected final int peek() throws IOException {
+        return peek(null);
+    }
+    
+    protected final int peek(OctetBufferListener octetBufferListener) throws IOException {
         if (_octetBufferOffset < _octetBufferEnd) {
             return _octetBuffer[_octetBufferOffset] & 0xFF;
         } else {
+            if (octetBufferListener != null) {
+                octetBufferListener.onBeforeOctetBufferOverwrite();
+            }
+            
             _octetBufferEnd = _s.read(_octetBuffer);
             if (_octetBufferEnd < 0) {
                 throw new EOFException(CommonResourceBundle.getInstance().getString("message.EOF"));
@@ -1823,7 +1831,7 @@ public abstract class Decoder implements FastInfosetParser {
             return _octetBuffer[0] & 0xFF;
         }
     }
-    
+
     protected class EncodingAlgorithmInputStream extends InputStream {
 
         public int read() throws IOException {
