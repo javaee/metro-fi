@@ -1032,8 +1032,8 @@ public class StAXDocumentParser extends Decoder
     
     public void onBeforeOctetBufferOverwrite() {
         if (_algorithmData != null) {
-            _algorithmDataOffset = 0;
             _algorithmData = getTextAlgorithmBytesClone();
+            _algorithmDataOffset = 0;
         }
     }
 
