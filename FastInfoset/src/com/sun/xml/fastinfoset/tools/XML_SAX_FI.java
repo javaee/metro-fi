@@ -68,7 +68,7 @@ public class XML_SAX_FI extends TransformInputOutput {
     }
     
     public void parse(InputStream xml, OutputStream finf) throws Exception {
-        parse(xml, finf);
+        parse(xml, finf, null);
     }
     
     public void convert(Reader reader, OutputStream finf) throws Exception {
