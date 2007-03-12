@@ -171,11 +171,13 @@ public class StAXDocumentSerializer extends Encoder
     
     public void writeEndDocument() throws XMLStreamException {
         try {
-            // TODO
-            // Use nsSupport to terminate all elements not terminated
+            
+            // terminate all elements not terminated
             // by writeEndElement
-            
-            
+            for(;_stackCount >= 0; _stackCount--) {
+                writeEndElement();
+            }
+
             encodeDocumentTermination();
         } 
         catch (IOException e) {
