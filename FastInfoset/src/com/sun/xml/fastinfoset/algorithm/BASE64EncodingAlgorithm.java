@@ -193,23 +193,46 @@ public class BASE64EncodingAlgorithm extends BuiltInEncodingAlgorithm {
             return;
         }
         final byte[] value = (byte[]) data;
-        if (value.length == 0) {
+        
+        convertToCharacters(value, 0, value.length, s);
+    }
+    
+    public final int getPrimtiveLengthFromOctetLength(int octetLength) throws EncodingAlgorithmException {
+        return octetLength;
+    }
+
+    public int getOctetLengthFromPrimitiveLength(int primitiveLength) {
+        return primitiveLength;
+    }
+    
+    public final void encodeToBytes(Object array, int astart, int alength, byte[] b, int start) {
+        System.arraycopy((byte[])array, astart, b, start, alength);
+    }    
+
+    public final void convertToCharacters(byte[] data, int offset, int length, StringBuffer s) {
+        if (data == null) {
+            return;
+        }
+        final byte[] value = data;
+        if (length == 0) {
             return;
         }
         
-        final int partialBlockLength = value.length % 3;
+        final int partialBlockLength = length % 3;
         final int blockCount = (partialBlockLength != 0) ? 
-            value.length / 3 + 1 : 
-            value.length / 3;
+            length / 3 + 1 : 
+            length / 3;
 
         final int encodedLength = blockCount * 4;
-        s.ensureCapacity(encodedLength);
+        final int originalBufferSize = s.length();
+        s.ensureCapacity(encodedLength + originalBufferSize);
 
-        int idx = 0;
+        int idx = offset;
+        int lastIdx = offset + length;
         for (int i = 0; i < blockCount; ++i) {
             int b1 = value[idx++] & 0xFF;
-            int b2 = (idx < value.length) ? value[idx++] & 0xFF : 0;
-            int b3 = (idx < value.length) ? value[idx++] & 0xFF : 0;
+            int b2 = (idx < lastIdx) ? value[idx++] & 0xFF : 0;
+            int b3 = (idx < lastIdx) ? value[idx++] & 0xFF : 0;
 
             s.append(encodeBase64[b1 >> 2]);
 
@@ -222,26 +245,12 @@ public class BASE64EncodingAlgorithm extends BuiltInEncodingAlgorithm {
 
         switch (partialBlockLength) {
             case 1 :
-                s.setCharAt(encodedLength - 1, '=');
-                s.setCharAt(encodedLength - 2, '=');
+                s.setCharAt(originalBufferSize + encodedLength - 1, '=');
+                s.setCharAt(originalBufferSize + encodedLength - 2, '=');
                 break;
             case 2 :
-                s.setCharAt(encodedLength - 1, '=');
+                s.setCharAt(originalBufferSize + encodedLength - 1, '=');
                 break;
         }
     }
-    
-    
-        
-    public final int getPrimtiveLengthFromOctetLength(int octetLength) throws EncodingAlgorithmException {
-        return octetLength;
-    }
-
-    public int getOctetLengthFromPrimitiveLength(int primitiveLength) {
-        return primitiveLength;
-    }
-    
-    public final void encodeToBytes(Object array, int astart, int alength, byte[] b, int start) {
-        System.arraycopy((byte[])array, astart, b, start, alength);
-    }    
 }

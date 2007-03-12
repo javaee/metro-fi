@@ -67,14 +67,14 @@ import org.jvnet.fastinfoset.stax.FastInfosetStreamReader;
 /**
  * The Fast Infoset StAX parser.
  * <p>
- * Instantiate this parser to parse a fast infoset document in accordance 
+ * Instantiate this parser to parse a fast infoset document in accordance
  * with the StAX API.
- * 
+ *
  * <p>
- * More than one fast infoset document may be decoded from the 
+ * More than one fast infoset document may be decoded from the
  * {@link java.io.InputStream}.
  */
-public class StAXDocumentParser extends Decoder 
+public class StAXDocumentParser extends Decoder
         implements XMLStreamReader, FastInfosetStreamReader, OctetBufferListener {
     protected static final int INTERNAL_STATE_START_DOCUMENT = 0;
     protected static final int INTERNAL_STATE_START_ELEMENT_TERMINATE = 1;
@@ -82,7 +82,7 @@ public class StAXDocumentParser extends Decoder
     protected static final int INTERNAL_STATE_DOUBLE_TERMINATE_ELEMENT = 3;
     protected static final int INTERNAL_STATE_END_DOCUMENT = 4;
     protected static final int INTERNAL_STATE_VOID = -1;
-
+    
     protected int _internalState;
     
     /**
@@ -118,7 +118,7 @@ public class StAXDocumentParser extends Decoder
      * List of attributes
      */
     protected AttributesHolder _attributes = new AttributesHolder();
-
+    
     protected boolean _clearAttributes = false;
     
     /**
@@ -126,9 +126,10 @@ public class StAXDocumentParser extends Decoder
      */
     protected char[] _characters;
     protected int _charactersOffset;
-
+    
     protected String _algorithmURI;
     protected int _algorithmId;
+    protected boolean _isAlgorithmDataCloned;
     protected byte[] _algorithmData;
     protected int _algorithmDataOffset;
     protected int _algorithmDataLength;
@@ -138,7 +139,7 @@ public class StAXDocumentParser extends Decoder
      */
     protected String _piTarget;
     protected String _piData;
-        
+    
     protected NamespaceContextImpl _nsContext = new NamespaceContextImpl();
     
     protected String _characterEncodingScheme;
@@ -162,59 +163,59 @@ public class StAXDocumentParser extends Decoder
     }
     
     public void setInputStream(InputStream s) {
-        super.setInputStream(s);        
+        super.setInputStream(s);
         reset();
     }
     
     public void reset() {
         super.reset();
         if (_internalState != INTERNAL_STATE_START_DOCUMENT &&
-            _internalState != INTERNAL_STATE_END_DOCUMENT) {
+                _internalState != INTERNAL_STATE_END_DOCUMENT) {
             
             for (int i = _namespaceAIIsIndex - 1; i >= 0; i--) {
                 _prefixTable.popScopeWithPrefixEntry(_namespaceAIIsPrefixIndex[i]);
             }
-       
+            
             _stackCount = -1;
-
+            
             _namespaceAIIsIndex = 0;
             _characters = null;
             _algorithmData = null;
         }
-     
+        
         _characterEncodingScheme = "UTF-8";
         _eventType = START_DOCUMENT;
-        _internalState = INTERNAL_STATE_START_DOCUMENT;        
+        _internalState = INTERNAL_STATE_START_DOCUMENT;
     }
-
+    
     protected void resetOnError() {
         super.reset();
-
+        
         if (_v != null) {
             _prefixTable.clearCompletely();
         }
         _duplicateAttributeVerifier.clear();
-
+        
         _stackCount = -1;
-
+        
         _namespaceAIIsIndex = 0;
         _characters = null;
         _algorithmData = null;
         
         _eventType = START_DOCUMENT;
-        _internalState = INTERNAL_STATE_START_DOCUMENT;        
+        _internalState = INTERNAL_STATE_START_DOCUMENT;
     }
     
     // -- XMLStreamReader Interface -------------------------------------------
     
     public Object getProperty(java.lang.String name)
-            throws java.lang.IllegalArgumentException {
+    throws java.lang.IllegalArgumentException {
         if (_manager != null) {
             return _manager.getProperty(name);
         }
         return null;
     }
-        
+    
     public int next() throws XMLStreamException {
         try {
             if (_internalState != INTERNAL_STATE_VOID) {
@@ -222,7 +223,7 @@ public class StAXDocumentParser extends Decoder
                     case INTERNAL_STATE_START_DOCUMENT:
                         decodeHeader();
                         processDII();
-
+                        
                         _internalState = INTERNAL_STATE_VOID;
                         break;
                     case INTERNAL_STATE_START_ELEMENT_TERMINATE:
@@ -235,7 +236,7 @@ public class StAXDocumentParser extends Decoder
                         
                         // Pop information off the stack
                         popStack();
-
+                        
                         _internalState = INTERNAL_STATE_VOID;
                         return _eventType = END_ELEMENT;
                     case INTERNAL_STATE_SINGLE_TERMINATE_ELEMENT_WITH_NAMESPACES:
@@ -259,19 +260,19 @@ public class StAXDocumentParser extends Decoder
                             _internalState = INTERNAL_STATE_END_DOCUMENT;
                             return _eventType = END_DOCUMENT;
                         }
-                                            
+                        
                         // Pop information off the stack
                         popStack();
                         
-                        _internalState = (_currentNamespaceAIIsEnd > 0) ? 
-                                INTERNAL_STATE_SINGLE_TERMINATE_ELEMENT_WITH_NAMESPACES :
-                                INTERNAL_STATE_VOID;                        
+                        _internalState = (_currentNamespaceAIIsEnd > 0) ?
+                            INTERNAL_STATE_SINGLE_TERMINATE_ELEMENT_WITH_NAMESPACES :
+                            INTERNAL_STATE_VOID;
                         return _eventType = END_ELEMENT;
                     case INTERNAL_STATE_END_DOCUMENT:
                         throw new NoSuchElementException(CommonResourceBundle.getInstance().getString("message.noMoreEvents"));
                 }
             }
-                        
+            
             // Reset internal state
             _characters = null;
             _algorithmData = null;
@@ -295,7 +296,7 @@ public class StAXDocumentParser extends Decoder
                 case DecoderStateTables.EII_LITERAL:
                 {
                     final QualifiedName qn = processLiteralQualifiedName(
-                                b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK,
+                            b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK,
                             _elementNameTable.getNext());
                     _elementNameTable.add(qn);
                     processEII(qn, (b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
@@ -306,7 +307,7 @@ public class StAXDocumentParser extends Decoder
                     return _eventType;
                 case DecoderStateTables.CII_UTF8_SMALL_LENGTH:
                     _octetBufferLength = (b & EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_MASK)
-                            + 1;
+                    + 1;
                     processUtf8CharacterString(b);
                     return _eventType = CHARACTERS;
                 case DecoderStateTables.CII_UTF8_MEDIUM_LENGTH:
@@ -355,7 +356,7 @@ public class StAXDocumentParser extends Decoder
                         _characters = _characterContentChunkTable._array;
                     } else {
                         _characters = _charBuffer;
-                        _charactersOffset = 0;                        
+                        _charactersOffset = 0;
                     }
                     return _eventType = CHARACTERS;
                 }
@@ -370,7 +371,7 @@ public class StAXDocumentParser extends Decoder
                     final int b2 = read();
                     _algorithmId |= (b2 & 0xFC) >> 2;
                     
-                    decodeOctetsOnSeventhBitOfNonIdentifyingStringOnThirdBit(b2);                    
+                    decodeOctetsOnSeventhBitOfNonIdentifyingStringOnThirdBit(b2);
                     processCIIEncodingAlgorithm();
                     
                     return _eventType = CHARACTERS;
@@ -388,7 +389,7 @@ public class StAXDocumentParser extends Decoder
                 case DecoderStateTables.CII_INDEX_MEDIUM:
                 {
                     final int index = (((b & EncodingConstants.INTEGER_4TH_BIT_MEDIUM_MASK) << 8) | read())
-                            + EncodingConstants.INTEGER_4TH_BIT_SMALL_LIMIT;
+                    + EncodingConstants.INTEGER_4TH_BIT_SMALL_LIMIT;
                     _characterContentChunkTable._cachedIndex = index;
                     
                     _characters = _characterContentChunkTable._array;
@@ -438,11 +439,11 @@ public class StAXDocumentParser extends Decoder
                     if (_stackCount != -1) {
                         // Pop information off the stack
                         popStack();
-
+                        
                         _internalState = INTERNAL_STATE_DOUBLE_TERMINATE_ELEMENT;
                         return _eventType = END_ELEMENT;
-                    } 
-                     
+                    }
+                    
                     _internalState = INTERNAL_STATE_END_DOCUMENT;
                     return _eventType = END_DOCUMENT;
                 case DecoderStateTables.TERMINATOR_SINGLE:
@@ -500,7 +501,7 @@ public class StAXDocumentParser extends Decoder
             _charactersOffset = 0;
         }
     }
-        
+    
     private final void popStack() {
         // Pop information off the stack
         _qualifiedName = _qNameStack[_stackCount];
@@ -618,7 +619,7 @@ public class StAXDocumentParser extends Decoder
     public final boolean hasNext() throws XMLStreamException {
         return (_eventType != END_DOCUMENT);
     }
-        
+    
     public void close() throws XMLStreamException {
     }
     
@@ -784,7 +785,7 @@ public class StAXDocumentParser extends Decoder
         if (_characters == null) {
             checkTextState();
         }
-
+        
         if (_characters == _characterContentChunkTable._array) {
             return _characterContentChunkTable.getString(_characterContentChunkTable._cachedIndex);
         } else {
@@ -804,7 +805,7 @@ public class StAXDocumentParser extends Decoder
         if (_characters == null) {
             checkTextState();
         }
-                
+        
         return _charactersOffset;
     }
     
@@ -925,7 +926,7 @@ public class StAXDocumentParser extends Decoder
         return _piData;
     }
     
-
+    
     
     
     public final String getNameString() {
@@ -942,12 +943,12 @@ public class StAXDocumentParser extends Decoder
         }
         return _attributes.getQualifiedName(index).getQNameString();
     }
-        
+    
     
     public final String getTextAlgorithmURI() {
         return _algorithmURI;
     }
- 
+    
     public final int getTextAlgorithmIndex() {
         return _algorithmId;
     }
@@ -975,7 +976,7 @@ public class StAXDocumentParser extends Decoder
     }
     
     public final int getTextAlgorithmBytes(int sourceStart, byte[] target,
-            int targetStart, int length) throws XMLStreamException {        
+            int targetStart, int length) throws XMLStreamException {
         try {
             System.arraycopy(_algorithmData, sourceStart, target,
                     targetStart, length);
@@ -984,7 +985,7 @@ public class StAXDocumentParser extends Decoder
             throw new XMLStreamException(e);
         }
     }
-
+    
     // FastInfosetStreamReader impl
     
     public final int peekNext() throws XMLStreamException {
@@ -1034,9 +1035,10 @@ public class StAXDocumentParser extends Decoder
         if (_algorithmData != null) {
             _algorithmData = getTextAlgorithmBytesClone();
             _algorithmDataOffset = 0;
+            _isAlgorithmDataCloned = true;
         }
     }
-
+    
     // Faster access methods without checks
     
     public final int accessNamespaceCount() {
@@ -1046,7 +1048,7 @@ public class StAXDocumentParser extends Decoder
     public final String accessLocalName() {
         return _qualifiedName.localName;
     }
-        
+    
     public final String accessNamespaceURI() {
         return _qualifiedName.namespaceName;
     }
@@ -1137,17 +1139,17 @@ public class StAXDocumentParser extends Decoder
              */
         }
     }
-
+    
     
     protected final void resizeNamespaceAIIs() {
         final String[] namespaceAIIsPrefix = new String[_namespaceAIIsIndex * 2];
         System.arraycopy(_namespaceAIIsPrefix, 0, namespaceAIIsPrefix, 0, _namespaceAIIsIndex);
         _namespaceAIIsPrefix = namespaceAIIsPrefix;
-
+        
         final String[] namespaceAIIsNamespaceName = new String[_namespaceAIIsIndex * 2];
         System.arraycopy(_namespaceAIIsNamespaceName, 0, namespaceAIIsNamespaceName, 0, _namespaceAIIsIndex);
         _namespaceAIIsNamespaceName = namespaceAIIsNamespaceName;
-
+        
         final int[] namespaceAIIsPrefixIndex = new int[_namespaceAIIsIndex * 2];
         System.arraycopy(_namespaceAIIsPrefixIndex, 0, namespaceAIIsPrefixIndex, 0, _namespaceAIIsIndex);
         _namespaceAIIsPrefixIndex = namespaceAIIsPrefixIndex;
@@ -1157,7 +1159,7 @@ public class StAXDocumentParser extends Decoder
         if (++_prefixTable._declarationId == Integer.MAX_VALUE) {
             _prefixTable.clearDeclarationIds();
         }
-
+        
         _currentNamespaceAIIsStart = _namespaceAIIsIndex;
         String prefix = "", namespaceName = "";
         int b = read();
@@ -1171,36 +1173,36 @@ public class StAXDocumentParser extends Decoder
                 // Undeclaration of default namespace
                 case 0:
                     prefix = namespaceName =
-                            _namespaceAIIsPrefix[_namespaceAIIsIndex] = 
+                            _namespaceAIIsPrefix[_namespaceAIIsIndex] =
                             _namespaceAIIsNamespaceName[_namespaceAIIsIndex] = "";
                     
                     _namespaceNameIndex = _prefixIndex = _namespaceAIIsPrefixIndex[_namespaceAIIsIndex++] = -1;
                     break;
-                // no prefix, namespace
-                // Declaration of default namespace
+                    // no prefix, namespace
+                    // Declaration of default namespace
                 case 1:
                     prefix = _namespaceAIIsPrefix[_namespaceAIIsIndex] = "";
-                    namespaceName = _namespaceAIIsNamespaceName[_namespaceAIIsIndex] = 
+                    namespaceName = _namespaceAIIsNamespaceName[_namespaceAIIsIndex] =
                             decodeIdentifyingNonEmptyStringOnFirstBitAsNamespaceName(false);
-                           
+                    
                     _prefixIndex = _namespaceAIIsPrefixIndex[_namespaceAIIsIndex++] = -1;
                     break;
-                // prefix, no namespace
-                // Undeclaration of namespace
+                    // prefix, no namespace
+                    // Undeclaration of namespace
                 case 2:
-                    prefix = _namespaceAIIsPrefix[_namespaceAIIsIndex] = 
+                    prefix = _namespaceAIIsPrefix[_namespaceAIIsIndex] =
                             decodeIdentifyingNonEmptyStringOnFirstBitAsPrefix(false);
                     namespaceName = _namespaceAIIsNamespaceName[_namespaceAIIsIndex] = "";
                     
                     _namespaceNameIndex = -1;
                     _namespaceAIIsPrefixIndex[_namespaceAIIsIndex++] = _prefixIndex;
                     break;
-                // prefix, namespace
-                // Declaration of prefixed namespace 
+                    // prefix, namespace
+                    // Declaration of prefixed namespace
                 case 3:
-                    prefix = _namespaceAIIsPrefix[_namespaceAIIsIndex] = 
+                    prefix = _namespaceAIIsPrefix[_namespaceAIIsIndex] =
                             decodeIdentifyingNonEmptyStringOnFirstBitAsPrefix(true);
-                    namespaceName = _namespaceAIIsNamespaceName[_namespaceAIIsIndex] = 
+                    namespaceName = _namespaceAIIsNamespaceName[_namespaceAIIsIndex] =
                             decodeIdentifyingNonEmptyStringOnFirstBitAsNamespaceName(true);
                     
                     _namespaceAIIsPrefixIndex[_namespaceAIIsIndex++] = _prefixIndex;
@@ -1231,7 +1233,7 @@ public class StAXDocumentParser extends Decoder
             case DecoderStateTables.EII_LITERAL:
             {
                 final QualifiedName qn = processLiteralQualifiedName(
-                            b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK,
+                        b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK,
                         _elementNameTable.getNext());
                 _elementNameTable.add(qn);
                 processEII(qn, hasAttributes);
@@ -1246,10 +1248,10 @@ public class StAXDocumentParser extends Decoder
         if (_prefixTable._currentInScope[name.prefixIndex] != name.namespaceNameIndex) {
             throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.qnameOfEIINotInScope"));
         }
-
+        
         _eventType = START_ELEMENT;
         _qualifiedName = name;
-
+        
         if (_clearAttributes) {
             _attributes.clear();
             _clearAttributes = false;
@@ -1276,7 +1278,7 @@ public class StAXDocumentParser extends Decoder
         }
         _qNameStack[_stackCount] = _qualifiedName;
         _namespaceAIIsStartStack[_stackCount] = _currentNamespaceAIIsStart;
-        _namespaceAIIsEndStack[_stackCount] = _currentNamespaceAIIsEnd;        
+        _namespaceAIIsEndStack[_stackCount] = _currentNamespaceAIIsEnd;
     }
     
     protected final void processAIIs() throws FastInfosetException, IOException {
@@ -1300,14 +1302,14 @@ public class StAXDocumentParser extends Decoder
                 case DecoderStateTables.AII_INDEX_MEDIUM:
                 {
                     final int i = (((b & EncodingConstants.INTEGER_2ND_BIT_MEDIUM_MASK) << 8) | read())
-                            + EncodingConstants.INTEGER_2ND_BIT_SMALL_LIMIT;
+                    + EncodingConstants.INTEGER_2ND_BIT_SMALL_LIMIT;
                     name = _attributeNameTable._array[i];
                     break;
                 }
                 case DecoderStateTables.AII_INDEX_LARGE:
                 {
                     final int i = (((b & EncodingConstants.INTEGER_2ND_BIT_LARGE_MASK) << 16) | (read() << 8) | read())
-                            + EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT;
+                    + EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT;
                     name = _attributeNameTable._array[i];
                     break;
                 }
@@ -1329,11 +1331,11 @@ public class StAXDocumentParser extends Decoder
             }
             
             // [normalized value] of AII
- 
+            
             if (name.prefixIndex > 0 && _prefixTable._currentInScope[name.prefixIndex] != name.namespaceNameIndex) {
                 throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.AIIqNameNotInScope"));
             }
-
+            
             _duplicateAttributeVerifier.checkForDuplicateAttribute(name.attributeHash, name.attributeId);
             
             b = read();
@@ -1434,7 +1436,7 @@ public class StAXDocumentParser extends Decoder
                     break;
                 }
                 case DecoderStateTables.NISTRING_INDEX_SMALL:
-                    _attributes.addAttribute(name, 
+                    _attributes.addAttribute(name,
                             _attributeValueTable._array[b & EncodingConstants.INTEGER_2ND_BIT_SMALL_MASK]);
                     break;
                 case DecoderStateTables.NISTRING_INDEX_MEDIUM:
@@ -1442,7 +1444,7 @@ public class StAXDocumentParser extends Decoder
                     final int index = (((b & EncodingConstants.INTEGER_2ND_BIT_MEDIUM_MASK) << 8) | read())
                     + EncodingConstants.INTEGER_2ND_BIT_SMALL_LIMIT;
                     
-                    _attributes.addAttribute(name, 
+                    _attributes.addAttribute(name,
                             _attributeValueTable._array[index]);
                     break;
                 }
@@ -1451,7 +1453,7 @@ public class StAXDocumentParser extends Decoder
                     final int index = (((b & EncodingConstants.INTEGER_2ND_BIT_LARGE_MASK) << 16) | (read() << 8) | read())
                     + EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT;
                     
-                    _attributes.addAttribute(name, 
+                    _attributes.addAttribute(name,
                             _attributeValueTable._array[index]);
                     break;
                 }
@@ -1467,28 +1469,28 @@ public class StAXDocumentParser extends Decoder
         // Reset duplication attribute verfifier
         _duplicateAttributeVerifier._poolCurrent = _duplicateAttributeVerifier._poolHead;
     }
-
+    
     protected final QualifiedName processEIIIndexMedium(int b) throws FastInfosetException, IOException {
         final int i = (((b & EncodingConstants.INTEGER_3RD_BIT_MEDIUM_MASK) << 8) | read())
-            + EncodingConstants.INTEGER_3RD_BIT_SMALL_LIMIT;
+        + EncodingConstants.INTEGER_3RD_BIT_SMALL_LIMIT;
         return _elementNameTable._array[i];
     }
-
+    
     protected final QualifiedName processEIIIndexLarge(int b) throws FastInfosetException, IOException {
         int i;
         if ((b & EncodingConstants.INTEGER_3RD_BIT_LARGE_LARGE_FLAG) == 0x20) {
             // EII large index
             i = (((b & EncodingConstants.INTEGER_3RD_BIT_LARGE_MASK) << 16) | (read() << 8) | read())
-                + EncodingConstants.INTEGER_3RD_BIT_MEDIUM_LIMIT;
+            + EncodingConstants.INTEGER_3RD_BIT_MEDIUM_LIMIT;
         } else {
             // EII large large index
             i = (((read() & EncodingConstants.INTEGER_3RD_BIT_LARGE_LARGE_MASK) << 16) | (read() << 8) | read())
-                + EncodingConstants.INTEGER_3RD_BIT_LARGE_LIMIT;
+            + EncodingConstants.INTEGER_3RD_BIT_LARGE_LIMIT;
         }
         return _elementNameTable._array[i];
     }
     
-    protected final QualifiedName processLiteralQualifiedName(int state, QualifiedName q) 
+    protected final QualifiedName processLiteralQualifiedName(int state, QualifiedName q)
     throws FastInfosetException, IOException {
         if (q == null) q = new QualifiedName();
         
@@ -1496,33 +1498,33 @@ public class StAXDocumentParser extends Decoder
             // no prefix, no namespace
             case 0:
                 return q.set(
-                        "", 
-                        "", 
+                        "",
+                        "",
                         decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName),
                         "",
                         0,
                         -1,
                         -1,
                         _identifier);
-            // no prefix, namespace
+                // no prefix, namespace
             case 1:
                 return q.set(
                         "",
-                        decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(false), 
+                        decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(false),
                         decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName),
                         "",
                         0,
                         -1,
                         _namespaceNameIndex,
                         _identifier);
-            // prefix, no namespace
+                // prefix, no namespace
             case 2:
                 throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.qNameMissingNamespaceName"));
-            // prefix, namespace
+                // prefix, namespace
             case 3:
                 return q.set(
-                        decodeIdentifyingNonEmptyStringIndexOnFirstBitAsPrefix(true), 
-                        decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(true), 
+                        decodeIdentifyingNonEmptyStringIndexOnFirstBitAsPrefix(true),
+                        decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(true),
                         decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName),
                         "",
                         0,
@@ -1530,8 +1532,8 @@ public class StAXDocumentParser extends Decoder
                         _namespaceNameIndex,
                         _identifier);
             default:
-                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.decodingEII"));                
-        }        
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.decodingEII"));
+        }
     }
     
     protected final void processCommentII() throws FastInfosetException, IOException {
@@ -1594,7 +1596,7 @@ public class StAXDocumentParser extends Decoder
          * How does StAX report such events?
          */
         String entity_reference_name = decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherNCName);
-
+        
         String system_identifier = ((b & EncodingConstants.UNEXPANDED_ENTITY_SYSTEM_IDENTIFIER_FLAG) > 0)
         ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
         String public_identifier = ((b & EncodingConstants.UNEXPANDED_ENTITY_PUBLIC_IDENTIFIER_FLAG) > 0)
@@ -1605,7 +1607,8 @@ public class StAXDocumentParser extends Decoder
         _algorithmData = _octetBuffer;
         _algorithmDataOffset = _octetBufferStart;
         _algorithmDataLength = _octetBufferLength;
-            
+        _isAlgorithmDataCloned = false;
+        
         if (_algorithmId >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
             _algorithmURI = _v.encodingAlgorithm.get(_algorithmId - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
             if (_algorithmURI == null) {
@@ -1641,12 +1644,14 @@ public class StAXDocumentParser extends Decoder
         System.arraycopy(_octetBuffer, _octetBufferStart, data, 0, _octetBufferLength);
         _attributes.addAttributeWithAlgorithmData(name, URI, _identifier, data);
     }
-
+    
     protected final void convertEncodingAlgorithmDataToCharacters() throws FastInfosetException, IOException {
         StringBuffer buffer = new StringBuffer();
-        if (_algorithmId < EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
+        if (_algorithmId == EncodingAlgorithmIndexes.BASE64) {
+            convertBase64AlorithmDataToCharacters(buffer);
+        } else if (_algorithmId < EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
             Object array = BuiltInEncodingAlgorithmFactory.table[_algorithmId].
-                decodeFromBytes(_algorithmData, _algorithmDataOffset, _algorithmDataLength);
+                    decodeFromBytes(_algorithmData, _algorithmDataOffset, _algorithmDataLength);
             BuiltInEncodingAlgorithmFactory.table[_algorithmId].convertToCharacters(array,  buffer);
         } else if (_algorithmId == EncodingAlgorithmIndexes.CDATA) {
             _octetBufferOffset -= _octetBufferLength;
@@ -1669,7 +1674,94 @@ public class StAXDocumentParser extends Decoder
         _characters = new char[buffer.length()];
         buffer.getChars(0, buffer.length(), _characters, 0);
         _charactersOffset = 0;
-        _charBufferLength = _characters.length;                    
+        _charBufferLength = _characters.length;
+    }
+    
+    /* If base64 data comes is chunks, bytes, which were cut to align 3,
+     * from prev. base64 chunk are stored in this buffer */
+    private byte[] base64TaleBytes = new byte[3];
+    private int base64TaleLength;
+    /*
+     * Method converts _algorithmData to base64 encoded String
+     * Counts with base64 data coming in chunks, aligning input chunks by 3,
+     * avoiding double cloning, happening after possible peek, peek2 cloning by Base64 algorithm
+     */
+    protected void convertBase64AlorithmDataToCharacters(StringBuffer buffer) throws EncodingAlgorithmException, IOException {
+        // How much new came data was serialized with prev. tale
+        int afterTaleOffset = 0;
+        
+        if (base64TaleLength > 0) {
+            // Serialize tale left from prev. chunk
+            int bytesToCopy = Math.min(3 - base64TaleLength, _algorithmDataLength);
+            System.arraycopy(_algorithmData, _algorithmDataOffset, base64TaleBytes, base64TaleLength, bytesToCopy);
+            if (base64TaleLength + bytesToCopy == 3) {
+                base64DecodeWithCloning(buffer, base64TaleBytes, 0, 3);
+            } else if (!isBase64Follows()) {
+                // End of text was read to temp array
+                base64DecodeWithCloning(buffer, base64TaleBytes, 0, base64TaleLength + bytesToCopy);
+                return;
+            } else {
+                // If the end of chunk fit to tmp array, but next chunk is expected
+                base64TaleLength += bytesToCopy;
+                return;
+            }
+            
+            afterTaleOffset = bytesToCopy;
+            base64TaleLength = 0;
+        }
+        
+        int taleBytesRemaining = isBase64Follows() ? (_algorithmDataLength - afterTaleOffset) % 3 : 0;
+        
+        if (_isAlgorithmDataCloned) {
+            base64DecodeWithoutCloning(buffer, _algorithmData, _algorithmDataOffset + afterTaleOffset,
+                    _algorithmDataLength - afterTaleOffset - taleBytesRemaining);
+        } else {
+            base64DecodeWithCloning(buffer, _algorithmData, _algorithmDataOffset + afterTaleOffset,
+                    _algorithmDataLength - afterTaleOffset - taleBytesRemaining);
+        }
+        
+        if (taleBytesRemaining > 0) {
+            System.arraycopy(_algorithmData, _algorithmDataOffset + _algorithmDataLength - taleBytesRemaining,
+                    base64TaleBytes, 0, taleBytesRemaining);
+            base64TaleLength = taleBytesRemaining;
+        }
+    }
+    
+    /*
+     * Encodes incoming data to Base64 string.
+     * Method performs additional input data cloning
+     */
+    private void base64DecodeWithCloning(StringBuffer dstBuffer, byte[] data, int offset, int length) throws EncodingAlgorithmException {
+        Object array = BuiltInEncodingAlgorithmFactory.base64EncodingAlgorithm.
+                decodeFromBytes(data, offset, length);
+        BuiltInEncodingAlgorithmFactory.base64EncodingAlgorithm.convertToCharacters(array, dstBuffer);
+    }
+    
+    /*
+     * Encodes incoming data to Base64 string.
+     * Avoids input data cloning
+     */
+    private void base64DecodeWithoutCloning(StringBuffer dstBuffer, byte[] data, int offset, int length) throws EncodingAlgorithmException {
+        BuiltInEncodingAlgorithmFactory.base64EncodingAlgorithm.convertToCharacters(data, offset, length, dstBuffer);
+    }
+    
+    
+    /*
+     * Looks ahead in InputStream, whether next data is Base64 chunk
+     */
+    public boolean isBase64Follows() throws IOException {
+        // Process information item
+        int b = peek(this);
+        switch (DecoderStateTables.EII[b]) {
+            case DecoderStateTables.CII_EA:
+                int algorithmId = (b & 0x02) << 6;
+                int b2 = peek2(this);
+                algorithmId |= (b2 & 0xFC) >> 2;
+                
+                return algorithmId == EncodingAlgorithmIndexes.BASE64;
+            default:
+                return false;
+        }
     }
     
     protected class NamespaceContextImpl implements NamespaceContext {
@@ -1689,7 +1781,7 @@ public class StAXDocumentParser extends Decoder
     public final String getNamespaceDecl(String prefix) {
         return _prefixTable.getNamespaceFromPrefix(prefix);
     }
-        
+    
     public final String getURI(String prefix) {
         return getNamespaceDecl(prefix);
     }
@@ -1732,5 +1824,5 @@ public class StAXDocumentParser extends Decoder
                 return "CDATA";
         }
         return "UNKNOWN_EVENT_TYPE";
-    }    
+    }
 }

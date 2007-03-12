@@ -1832,6 +1832,30 @@ public abstract class Decoder implements FastInfosetParser {
         }
     }
 
+    protected final int peek2(OctetBufferListener octetBufferListener) throws IOException {
+        if (_octetBufferOffset + 1 < _octetBufferEnd) {
+            return _octetBuffer[_octetBufferOffset + 1] & 0xFF;
+        } else {
+            if (octetBufferListener != null) {
+                octetBufferListener.onBeforeOctetBufferOverwrite();
+            }
+            
+            int offset = 0;
+            if (_octetBufferOffset < _octetBufferEnd) {
+                _octetBuffer[0] = _octetBuffer[_octetBufferOffset];
+                offset = 1;
+            }
+            _octetBufferEnd = _s.read(_octetBuffer, offset, _octetBuffer.length - offset);
+            
+            if (_octetBufferEnd < 0) {
+                throw new EOFException(CommonResourceBundle.getInstance().getString("message.EOF"));
+            }
+
+            _octetBufferOffset = 0;
+            return _octetBuffer[1] & 0xFF;
+        }
+    }
+
     protected class EncodingAlgorithmInputStream extends InputStream {
 
         public int read() throws IOException {
