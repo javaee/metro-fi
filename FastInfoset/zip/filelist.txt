@@ -1,1 +1,0 @@
-jaxws/lib/FastInfoset.jar
