@@ -1830,7 +1830,7 @@ public abstract class Decoder implements FastInfosetParser {
     }
     
     protected final void closeIfRequired() throws IOException {
-        if (_s != null & _needForceStreamClose) {
+        if (_s != null && _needForceStreamClose) {
             _s.close();
         }
     }
