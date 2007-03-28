@@ -81,6 +81,13 @@ public interface FastInfosetParser {
     public static final String EXTERNAL_VOCABULARIES_PROPERTY =
         "http://jvnet.org/fastinfoset/parser/properties/external-vocabularies";
     
+   /**
+     * The property name to be used for getting and setting the 
+     * flag, which will indicate whether underlying Parser's
+     * input stream should be really closed
+     */    
+    public static final String FORCE_STREAM_CLOSE_PROPERTY =
+        "http://jvnet.org/fastinfoset/parser/properties/force-stream-close";
    
     /**
      * Set the string interning property.
@@ -159,7 +166,7 @@ public interface FastInfosetParser {
      * Set the parse fragments property.
      *
      * <p>If the parse fragments property is set to true then 
-     * then fragments of an XML infoset may be parsed.
+     * fragments of an XML infoset may be parsed.
      *
      * @param parseFragments The parse fragments property.
      */
@@ -171,4 +178,22 @@ public interface FastInfosetParser {
      * @return The parse fragments property.
      */
     public boolean getParseFragments();
+    
+    /**
+     * Set the force stream close property.
+     *
+     * <p>If the force stream property is set to true then 
+     * Parser's underlying InputStream will be closed.
+     *
+     * @param needForceStreamClose The force stream close property.
+     */
+    public void setForceStreamClose(boolean needForceStreamClose);
+    
+    /**
+     * Return the force stream close property.
+     *
+     * @return The force stream close property.
+     */
+    public boolean getForceStreamClose();
+    
 }

@@ -621,6 +621,10 @@ public class StAXDocumentParser extends Decoder
     }
     
     public void close() throws XMLStreamException {
+        try {
+            super.closeIfRequired();
+        } catch (IOException ex) {
+        }
     }
     
     public final String getNamespaceURI(String prefix) {
