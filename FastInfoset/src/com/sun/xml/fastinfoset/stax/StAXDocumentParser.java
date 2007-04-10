@@ -362,17 +362,14 @@ public class StAXDocumentParser extends Decoder
                 }
                 case DecoderStateTables.CII_EA:
                 {
-                    if ((b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0) {
-                        throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.addToTableNotSupported"));
-                    }
-                    
+                    final boolean addToTable = (b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0;
                     // Decode encoding algorithm integer
                     _algorithmId = (b & 0x02) << 6;
                     final int b2 = read();
                     _algorithmId |= (b2 & 0xFC) >> 2;
                     
                     decodeOctetsOnSeventhBitOfNonIdentifyingStringOnThirdBit(b2);
-                    processCIIEncodingAlgorithm();
+                    processCIIEncodingAlgorithm(addToTable);
                     
                     return _eventType = CHARACTERS;
                 }
@@ -1426,17 +1423,14 @@ public class StAXDocumentParser extends Decoder
                 }
                 case DecoderStateTables.NISTRING_EA:
                 {
-                    if ((b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0) {
-                        throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.addToTableNotSupported"));
-                    }
-                    
+                    final boolean addToTable = (b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0;
                     // Decode encoding algorithm integer
                     _identifier = (b & 0x0F) << 4;
                     b = read();
                     _identifier |= (b & 0xF0) >> 4;
                     
                     decodeOctetsOnFifthBitOfNonIdentifyingStringOnFirstBit(b);
-                    processAIIEncodingAlgorithm(name);
+                    processAIIEncodingAlgorithm(name, addToTable);
                     break;
                 }
                 case DecoderStateTables.NISTRING_INDEX_SMALL:
@@ -1607,7 +1601,7 @@ public class StAXDocumentParser extends Decoder
         ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
     }
     
-    protected final void processCIIEncodingAlgorithm() throws FastInfosetException, IOException {
+    protected final void processCIIEncodingAlgorithm(boolean addToTable) throws FastInfosetException, IOException {
         _algorithmData = _octetBuffer;
         _algorithmDataOffset = _octetBufferStart;
         _algorithmDataLength = _octetBufferLength;
@@ -1624,9 +1618,14 @@ public class StAXDocumentParser extends Decoder
             // reported, allows for support through handler if required.
             throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.identifiers10to31Reserved"));
         }
+        
+        if (addToTable) {
+            convertEncodingAlgorithmDataToCharacters();
+            _characterContentChunkTable.add(_characters, _characters.length);
+        }
     }
     
-    protected final void processAIIEncodingAlgorithm(QualifiedName name) throws FastInfosetException, IOException {
+    protected final void processAIIEncodingAlgorithm(QualifiedName name, boolean addToTable) throws FastInfosetException, IOException {
         String URI = null;
         if (_identifier >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
             URI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
@@ -1647,6 +1646,9 @@ public class StAXDocumentParser extends Decoder
         final byte[] data = new byte[_octetBufferLength];
         System.arraycopy(_octetBuffer, _octetBufferStart, data, 0, _octetBufferLength);
         _attributes.addAttributeWithAlgorithmData(name, URI, _identifier, data);
+        if (addToTable) {
+            _attributeValueTable.add(_attributes.getValue(_attributes.getIndex(name.qName)));
+        }
     }
     
     protected final void convertEncodingAlgorithmDataToCharacters() throws FastInfosetException, IOException {

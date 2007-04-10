@@ -60,9 +60,9 @@ import com.sun.xml.fastinfoset.CommonResourceBundle;
 /**
  * The Fast Infoset DOM parser.
  * <p>
- * Instantiate this parser to parse a fast infoset document in accordance 
+ * Instantiate this parser to parse a fast infoset document in accordance
  * with the DOM API.
- * 
+ *
  */
 public class DOMDocumentParser extends Decoder {
     protected Document _document;
@@ -70,29 +70,29 @@ public class DOMDocumentParser extends Decoder {
     protected Node _currentNode;
     
     protected Element _currentElement;
-
+    
     protected Attr[] _namespaceAttributes = new Attr[16];
-
+    
     protected int _namespaceAttributesIndex;
     
     protected int[] _namespacePrefixes = new int[16];
     
     protected int _namespacePrefixesIndex;
-
+    
     /**
      * Parse a fast infoset document into a {@link Document} instance.
      * <p>
-     * {@link Node}s will be created and appended to the {@link Document} 
+     * {@link Node}s will be created and appended to the {@link Document}
      * instance.
      *
      * @param d the {@link Document} instance.
      * @param s the input stream containing the fast infoset document.
      */
-    public void parse(Document d, InputStream s) throws FastInfosetException, IOException {        
+    public void parse(Document d, InputStream s) throws FastInfosetException, IOException {
         _currentNode = _document = d;
         _namespaceAttributesIndex = 0;
-                    
-        parse(s);        
+        
+        parse(s);
     }
     
     protected final void parse(InputStream s) throws FastInfosetException, IOException {
@@ -112,7 +112,7 @@ public class DOMDocumentParser extends Decoder {
     protected final void parse() throws FastInfosetException, IOException {
         try {
             reset();
-            decodeHeader();                                                                                
+            decodeHeader();
             processDII();
         } catch (RuntimeException e) {
             resetOnError();
@@ -127,7 +127,7 @@ public class DOMDocumentParser extends Decoder {
         }
     }
     
-    protected final void processDII() throws FastInfosetException, IOException {        
+    protected final void processDII() throws FastInfosetException, IOException {
         _b = read();
         if (_b > 0) {
             processDIIOptionalProperties();
@@ -158,8 +158,8 @@ public class DOMDocumentParser extends Decoder {
                 case DecoderStateTables.EII_LITERAL:
                 {
                     final QualifiedName qn = processLiteralQualifiedName(
-                                _b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK,
-                                _elementNameTable.getNext());
+                            _b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK,
+                            _elementNameTable.getNext());
                     _elementNameTable.add(qn);
                     processEII(qn, (_b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
                     firstElementHasOccured = true;
@@ -175,11 +175,11 @@ public class DOMDocumentParser extends Decoder {
                         throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.secondOccurenceOfDTDII"));
                     }
                     documentTypeDeclarationOccured = true;
-
-                    String system_identifier = ((_b & EncodingConstants.DOCUMENT_TYPE_SYSTEM_IDENTIFIER_FLAG) > 0) 
-                        ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : null;
-                    String public_identifier = ((_b & EncodingConstants.DOCUMENT_TYPE_PUBLIC_IDENTIFIER_FLAG) > 0) 
-                        ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : null;
+                    
+                    String system_identifier = ((_b & EncodingConstants.DOCUMENT_TYPE_SYSTEM_IDENTIFIER_FLAG) > 0)
+                    ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : null;
+                    String public_identifier = ((_b & EncodingConstants.DOCUMENT_TYPE_PUBLIC_IDENTIFIER_FLAG) > 0)
+                    ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : null;
                     
                     _b = read();
                     while (_b == EncodingConstants.PROCESSING_INSTRUCTION) {
@@ -190,7 +190,7 @@ public class DOMDocumentParser extends Decoder {
                                 }
                                 break;
                             case NISTRING_ENCODING_ALGORITHM:
-                                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.processingIIWithEncodingAlgorithm"));                        
+                                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.processingIIWithEncodingAlgorithm"));
                             case NISTRING_INDEX:
                                 break;
                             case NISTRING_EMPTY_STRING:
@@ -219,8 +219,8 @@ public class DOMDocumentParser extends Decoder {
                 case DecoderStateTables.PROCESSING_INSTRUCTION_II:
                     processProcessingII();
                     break;
-                case DecoderStateTables.TERMINATOR_DOUBLE:                    
-                    _doubleTerminate = true; 
+                case DecoderStateTables.TERMINATOR_DOUBLE:
+                    _doubleTerminate = true;
                 case DecoderStateTables.TERMINATOR_SINGLE:
                     _terminate = true;
                     break;
@@ -228,7 +228,7 @@ public class DOMDocumentParser extends Decoder {
                     throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.IllegalStateDecodingDII"));
             }
         }
-
+        
         // Decode any remaining Comment IIs, PI IIs
         while(!_terminate) {
             _b = read();
@@ -239,8 +239,8 @@ public class DOMDocumentParser extends Decoder {
                 case DecoderStateTables.PROCESSING_INSTRUCTION_II:
                     processProcessingII();
                     break;
-                case DecoderStateTables.TERMINATOR_DOUBLE:                    
-                    _doubleTerminate = true; 
+                case DecoderStateTables.TERMINATOR_DOUBLE:
+                    _doubleTerminate = true;
                 case DecoderStateTables.TERMINATOR_SINGLE:
                     _terminate = true;
                     break;
@@ -248,10 +248,10 @@ public class DOMDocumentParser extends Decoder {
                     throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.IllegalStateDecodingDII"));
             }
         }
-
+        
     }
-
-    protected final void processDIIOptionalProperties() throws FastInfosetException, IOException {     
+    
+    protected final void processDIIOptionalProperties() throws FastInfosetException, IOException {
         // Optimize for the most common case
         if (_b == EncodingConstants.DOCUMENT_INITIAL_VOCABULARY_FLAG) {
             decodeInitialVocabulary();
@@ -261,7 +261,7 @@ public class DOMDocumentParser extends Decoder {
         if ((_b & EncodingConstants.DOCUMENT_ADDITIONAL_DATA_FLAG) > 0) {
             decodeAdditionalData();
             /*
-             * TODO 
+             * TODO
              * how to report the additional data?
              */
         }
@@ -269,21 +269,21 @@ public class DOMDocumentParser extends Decoder {
         if ((_b & EncodingConstants.DOCUMENT_INITIAL_VOCABULARY_FLAG) > 0) {
             decodeInitialVocabulary();
         }
-
+        
         if ((_b & EncodingConstants.DOCUMENT_NOTATIONS_FLAG) > 0) {
             decodeNotations();
             // TODO Report notations
         }
-
+        
         if ((_b & EncodingConstants.DOCUMENT_UNPARSED_ENTITIES_FLAG) > 0) {
             decodeUnparsedEntities();
             // TODO Report unparsed entities
         }
-
+        
         if ((_b & EncodingConstants.DOCUMENT_CHARACTER_ENCODING_SCHEME) > 0) {
             String version = decodeCharacterEncodingScheme();
             /*
-             * TODO 
+             * TODO
              * how to report the character encoding scheme?
              */
         }
@@ -291,20 +291,20 @@ public class DOMDocumentParser extends Decoder {
         if ((_b & EncodingConstants.DOCUMENT_STANDALONE_FLAG) > 0) {
             boolean standalone = (read() > 0) ? true : false ;
             /*
-             * TODO 
+             * TODO
              * how to report the standalone flag?
              */
         }
-
+        
         if ((_b & EncodingConstants.DOCUMENT_VERSION_FLAG) > 0) {
             decodeVersion();
             /*
-             * TODO 
+             * TODO
              * how to report the document version?
              */
         }
     }
-
+    
     protected final void processEII(QualifiedName name, boolean hasAttributes) throws FastInfosetException, IOException {
         if (_prefixTable._currentInScope[name.prefixIndex] != name.namespaceNameIndex) {
             throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.qnameOfEIINotInScope"));
@@ -327,7 +327,7 @@ public class DOMDocumentParser extends Decoder {
         }
         
         parentCurrentNode.appendChild(_currentElement);
-
+        
         while(!_terminate) {
             _b = read();
             switch(DecoderStateTables.EII[_b]) {
@@ -346,8 +346,8 @@ public class DOMDocumentParser extends Decoder {
                 case DecoderStateTables.EII_LITERAL:
                 {
                     final QualifiedName qn = processLiteralQualifiedName(
-                                _b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK,
-                                _elementNameTable.getNext());
+                            _b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK,
+                            _elementNameTable.getNext());
                     _elementNameTable.add(qn);
                     processEII(qn, (_b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
                     break;
@@ -357,8 +357,8 @@ public class DOMDocumentParser extends Decoder {
                     break;
                 case DecoderStateTables.CII_UTF8_SMALL_LENGTH:
                 {
-                    _octetBufferLength = (_b & EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_MASK) 
-                        + 1;
+                    _octetBufferLength = (_b & EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_MASK)
+                    + 1;
                     processUtf8CharacterString();
                     break;
                 }
@@ -371,17 +371,17 @@ public class DOMDocumentParser extends Decoder {
                 case DecoderStateTables.CII_UTF8_LARGE_LENGTH:
                 {
                     _octetBufferLength = (read() << 24) |
-                        (read() << 16) |
-                        (read() << 8) |
-                        read();
+                            (read() << 16) |
+                            (read() << 8) |
+                            read();
                     _octetBufferLength += EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_MEDIUM_LIMIT;
                     processUtf8CharacterString();
                     break;
                 }
                 case DecoderStateTables.CII_UTF16_SMALL_LENGTH:
                 {
-                    _octetBufferLength = (_b & EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_MASK) 
-                        + 1;
+                    _octetBufferLength = (_b & EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_MASK)
+                    + 1;
                     String v = decodeUtf16StringAsString();
                     if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
                         _characterContentChunkTable.add(_charBuffer, _charBufferLength);
@@ -404,9 +404,9 @@ public class DOMDocumentParser extends Decoder {
                 case DecoderStateTables.CII_UTF16_LARGE_LENGTH:
                 {
                     _octetBufferLength = (read() << 24) |
-                        (read() << 16) |
-                        (read() << 8) |
-                        read();
+                            (read() << 16) |
+                            (read() << 8) |
+                            read();
                     _octetBufferLength += EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_MEDIUM_LIMIT;
                     String v = decodeUtf16StringAsString();
                     if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
@@ -424,10 +424,10 @@ public class DOMDocumentParser extends Decoder {
                     _identifier = (_b & 0x02) << 6;
                     _b = read();
                     _identifier |= (_b & 0xFC) >> 2;
-
+                    
                     decodeOctetsOnSeventhBitOfNonIdentifyingStringOnThirdBit(_b);
                     
-                    String v = decodeRestrictedAlphabetAsString();                    
+                    String v = decodeRestrictedAlphabetAsString();
                     if (addToTable) {
                         _characterContentChunkTable.add(_charBuffer, _charBufferLength);
                     }
@@ -437,10 +437,7 @@ public class DOMDocumentParser extends Decoder {
                 }
                 case DecoderStateTables.CII_EA:
                 {
-                    if ((_b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0) {
-                        throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.addToTableNotSupported"));
-                    }
-
+                    final boolean addToTable = (_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0;
                     // Decode encoding algorithm integer
                     _identifier = (_b & 0x02) << 6;
                     _b = read();
@@ -448,6 +445,9 @@ public class DOMDocumentParser extends Decoder {
                     
                     decodeOctetsOnSeventhBitOfNonIdentifyingStringOnThirdBit(_b);
                     final String s = convertEncodingAlgorithmDataToCharacters(false);
+                    if (addToTable) {
+                        _characterContentChunkTable.add(s.toCharArray(), s.length());
+                    }
                     _currentNode.appendChild(_document.createTextNode(s));
                     break;
                 }
@@ -461,7 +461,7 @@ public class DOMDocumentParser extends Decoder {
                 case DecoderStateTables.CII_INDEX_MEDIUM:
                 {
                     final int index = (((_b & EncodingConstants.INTEGER_4TH_BIT_MEDIUM_MASK) << 8) | read())
-                        + EncodingConstants.INTEGER_4TH_BIT_SMALL_LIMIT;
+                    + EncodingConstants.INTEGER_4TH_BIT_SMALL_LIMIT;
                     final String s = _characterContentChunkTable.getString(index);
                     
                     _currentNode.appendChild(_document.createTextNode(s));
@@ -470,8 +470,8 @@ public class DOMDocumentParser extends Decoder {
                 case DecoderStateTables.CII_INDEX_LARGE:
                 {
                     int index = ((_b & EncodingConstants.INTEGER_4TH_BIT_LARGE_MASK) << 16) |
-                        (read() << 8) |
-                        read();
+                            (read() << 8) |
+                            read();
                     index += EncodingConstants.INTEGER_4TH_BIT_MEDIUM_LIMIT;
                     final String s = _characterContentChunkTable.getString(index);
                     
@@ -480,15 +480,15 @@ public class DOMDocumentParser extends Decoder {
                 }
                 case DecoderStateTables.CII_INDEX_LARGE_LARGE:
                 {
-                    int index = (read() << 16) | 
-                        (read() << 8) |
-                        read();
+                    int index = (read() << 16) |
+                            (read() << 8) |
+                            read();
                     index += EncodingConstants.INTEGER_4TH_BIT_LARGE_LIMIT;
                     final String s = _characterContentChunkTable.getString(index);
                     
                     _currentNode.appendChild(_document.createTextNode(s));
                     break;
-                }                       
+                }
                 case DecoderStateTables.COMMENT_II:
                     processCommentII();
                     break;
@@ -499,16 +499,16 @@ public class DOMDocumentParser extends Decoder {
                 {
                     String entity_reference_name = decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherNCName);
                     
-                    String system_identifier = ((_b & EncodingConstants.UNEXPANDED_ENTITY_SYSTEM_IDENTIFIER_FLAG) > 0) 
-                        ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : null;
-                    String public_identifier = ((_b & EncodingConstants.UNEXPANDED_ENTITY_PUBLIC_IDENTIFIER_FLAG) > 0) 
-                        ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : null;
-
+                    String system_identifier = ((_b & EncodingConstants.UNEXPANDED_ENTITY_SYSTEM_IDENTIFIER_FLAG) > 0)
+                    ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : null;
+                    String public_identifier = ((_b & EncodingConstants.UNEXPANDED_ENTITY_PUBLIC_IDENTIFIER_FLAG) > 0)
+                    ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : null;
+                    
                     // TODO create Node
                     break;
                 }
-                case DecoderStateTables.TERMINATOR_DOUBLE:                    
-                    _doubleTerminate = true; 
+                case DecoderStateTables.TERMINATOR_DOUBLE:
+                    _doubleTerminate = true;
                 case DecoderStateTables.TERMINATOR_SINGLE:
                     _terminate = true;
                     break;
@@ -516,13 +516,13 @@ public class DOMDocumentParser extends Decoder {
                     throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.IllegalStateDecodingEII"));
             }
         }
-
+        
         _terminate = _doubleTerminate;
         _doubleTerminate = false;
         
         _currentNode = parentCurrentNode;
     }
-
+    
     private final void processUtf8CharacterString() throws FastInfosetException, IOException {
         if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
             _characterContentChunkTable.ensureSize(_octetBufferLength);
@@ -540,11 +540,11 @@ public class DOMDocumentParser extends Decoder {
     
     protected final void processEIIWithNamespaces() throws FastInfosetException, IOException {
         final boolean hasAttributes = (_b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0;
-
+        
         if (++_prefixTable._declarationId == Integer.MAX_VALUE) {
             _prefixTable.clearDeclarationIds();
         }
-
+        
         String prefix;
         Attr a = null;
         final int start = _namespacePrefixesIndex;
@@ -555,13 +555,13 @@ public class DOMDocumentParser extends Decoder {
                 System.arraycopy(_namespaceAttributes, 0, newNamespaceAttributes, 0, _namespaceAttributesIndex);
                 _namespaceAttributes = newNamespaceAttributes;
             }
-
+            
             if (_namespacePrefixesIndex == _namespacePrefixes.length) {
                 final int[] namespaceAIIs = new int[_namespacePrefixesIndex * 3 / 2 + 1];
                 System.arraycopy(_namespacePrefixes, 0, namespaceAIIs, 0, _namespacePrefixesIndex);
                 _namespacePrefixes = namespaceAIIs;
             }
-
+            
             
             switch (b & EncodingConstants.NAMESPACE_ATTRIBUTE_PREFIX_NAME_MASK) {
                 // no prefix, no namespace
@@ -569,50 +569,50 @@ public class DOMDocumentParser extends Decoder {
                 case 0:
                     a = createAttribute(
                             EncodingConstants.XMLNS_NAMESPACE_NAME,
-                            EncodingConstants.XMLNS_NAMESPACE_PREFIX, 
+                            EncodingConstants.XMLNS_NAMESPACE_PREFIX,
                             EncodingConstants.XMLNS_NAMESPACE_PREFIX);
-                    a.setValue ("");
+                    a.setValue("");
                     
                     _prefixIndex = _namespaceNameIndex = _namespacePrefixes[_namespacePrefixesIndex++] = -1;
                     break;
-                // no prefix, namespace
-                // Declaration of default namespace
+                    // no prefix, namespace
+                    // Declaration of default namespace
                 case 1:
                     a = createAttribute(
                             EncodingConstants.XMLNS_NAMESPACE_NAME,
-                            EncodingConstants.XMLNS_NAMESPACE_PREFIX, 
+                            EncodingConstants.XMLNS_NAMESPACE_PREFIX,
                             EncodingConstants.XMLNS_NAMESPACE_PREFIX);
-                    a.setValue (decodeIdentifyingNonEmptyStringOnFirstBitAsNamespaceName(false));
-                           
+                    a.setValue(decodeIdentifyingNonEmptyStringOnFirstBitAsNamespaceName(false));
+                    
                     _prefixIndex = _namespacePrefixes[_namespacePrefixesIndex++] = -1;
                     break;
-                // prefix, no namespace
-                // Undeclaration of namespace
+                    // prefix, no namespace
+                    // Undeclaration of namespace
                 case 2:
                     prefix = decodeIdentifyingNonEmptyStringOnFirstBitAsPrefix(false);
                     a = createAttribute(
                             EncodingConstants.XMLNS_NAMESPACE_NAME,
                             createQualifiedNameString(XMLNS_NAMESPACE_PREFIX_CHARS, prefix),
                             prefix);
-                    a.setValue ("");
+                    a.setValue("");
                     
                     _namespaceNameIndex = -1;
                     _namespacePrefixes[_namespacePrefixesIndex++] = _prefixIndex;
                     break;
-                // prefix, namespace
-                // Declaration of prefixed namespace 
+                    // prefix, namespace
+                    // Declaration of prefixed namespace
                 case 3:
                     prefix = decodeIdentifyingNonEmptyStringOnFirstBitAsPrefix(true);
                     a = createAttribute(
                             EncodingConstants.XMLNS_NAMESPACE_NAME,
                             createQualifiedNameString(XMLNS_NAMESPACE_PREFIX_CHARS, prefix),
                             prefix);
-                    a.setValue (decodeIdentifyingNonEmptyStringOnFirstBitAsNamespaceName(true));
+                    a.setValue(decodeIdentifyingNonEmptyStringOnFirstBitAsNamespaceName(true));
                     
                     _namespacePrefixes[_namespacePrefixesIndex++] = _prefixIndex;
                     break;
             }
-                        
+            
             _prefixTable.pushScope(_prefixIndex, _namespaceNameIndex);
             
             _namespaceAttributes[_namespaceAttributesIndex++] = a;
@@ -623,7 +623,7 @@ public class DOMDocumentParser extends Decoder {
             throw new IOException(CommonResourceBundle.getInstance().getString("message.EIInamespaceNameNotTerminatedCorrectly"));
         }
         final int end = _namespacePrefixesIndex;
-
+        
         _b = read();
         switch(DecoderStateTables.EII[_b]) {
             case DecoderStateTables.EII_NO_AIIS_INDEX_SMALL:
@@ -638,8 +638,8 @@ public class DOMDocumentParser extends Decoder {
             case DecoderStateTables.EII_LITERAL:
             {
                 final QualifiedName qn = processLiteralQualifiedName(
-                            _b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK,
-                            _elementNameTable.getNext());
+                        _b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK,
+                        _elementNameTable.getNext());
                 _elementNameTable.add(qn);
                 processEII(qn, hasAttributes);
                 break;
@@ -654,7 +654,7 @@ public class DOMDocumentParser extends Decoder {
         _namespacePrefixesIndex = start;
         
     }
-
+    
     protected final QualifiedName processLiteralQualifiedName(int state, QualifiedName q)
     throws FastInfosetException, IOException {
         if (q == null) q = new QualifiedName();
@@ -663,87 +663,87 @@ public class DOMDocumentParser extends Decoder {
             // no prefix, no namespace
             case 0:
                 return q.set(
-                        null, 
-                        null, 
+                        null,
+                        null,
                         decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName),
                         -1,
                         -1,
                         _identifier,
                         null);
-            // no prefix, namespace
+                // no prefix, namespace
             case 1:
                 return q.set(
                         null,
-                        decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(false), 
+                        decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(false),
                         decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName),
                         -1,
                         _namespaceNameIndex,
                         _identifier,
                         null);
-            // prefix, no namespace
+                // prefix, no namespace
             case 2:
                 throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.qNameMissingNamespaceName"));
-            // prefix, namespace
+                // prefix, namespace
             case 3:
                 return q.set(
-                        decodeIdentifyingNonEmptyStringIndexOnFirstBitAsPrefix(true), 
-                        decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(true), 
+                        decodeIdentifyingNonEmptyStringIndexOnFirstBitAsPrefix(true),
+                        decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(true),
                         decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName),
                         _prefixIndex,
-                        _namespaceNameIndex, 
+                        _namespaceNameIndex,
                         _identifier,
                         _charBuffer);
             default:
-                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.decodingEII"));                
-        }        
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.decodingEII"));
+        }
     }
-
+    
     protected final QualifiedName processLiteralQualifiedName(int state)
     throws FastInfosetException, IOException {
         switch (state) {
             // no prefix, no namespace
             case 0:
                 return new QualifiedName(
-                        null, 
-                        null, 
+                        null,
+                        null,
                         decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName),
                         -1,
                         -1,
                         _identifier,
                         null);
-            // no prefix, namespace
+                // no prefix, namespace
             case 1:
                 return new QualifiedName(
                         null,
-                        decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(false), 
+                        decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(false),
                         decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName),
                         -1,
                         _namespaceNameIndex,
                         _identifier,
                         null);
-            // prefix, no namespace
+                // prefix, no namespace
             case 2:
                 throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.qNameMissingNamespaceName"));
-            // prefix, namespace
+                // prefix, namespace
             case 3:
                 return new QualifiedName(
-                        decodeIdentifyingNonEmptyStringIndexOnFirstBitAsPrefix(true), 
-                        decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(true), 
+                        decodeIdentifyingNonEmptyStringIndexOnFirstBitAsPrefix(true),
+                        decodeIdentifyingNonEmptyStringIndexOnFirstBitAsNamespaceName(true),
                         decodeIdentifyingNonEmptyStringOnFirstBit(_v.localName),
                         _prefixIndex,
-                        _namespaceNameIndex, 
+                        _namespaceNameIndex,
                         _identifier,
                         _charBuffer);
             default:
-                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.decodingEII"));                
-        }        
+                throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.decodingEII"));
+        }
     }
     
     protected final void processAIIs() throws FastInfosetException, IOException {
         QualifiedName name;
         int b;
         String value;
-
+        
         if (++_duplicateAttributeVerifier._currentIteration == Integer.MAX_VALUE) {
             _duplicateAttributeVerifier.clear();
         }
@@ -757,15 +757,15 @@ public class DOMDocumentParser extends Decoder {
                     break;
                 case DecoderStateTables.AII_INDEX_MEDIUM:
                 {
-                    final int i = (((b & EncodingConstants.INTEGER_2ND_BIT_MEDIUM_MASK) << 8) | read()) 
-                        + EncodingConstants.INTEGER_2ND_BIT_SMALL_LIMIT;            
+                    final int i = (((b & EncodingConstants.INTEGER_2ND_BIT_MEDIUM_MASK) << 8) | read())
+                    + EncodingConstants.INTEGER_2ND_BIT_SMALL_LIMIT;
                     name = _attributeNameTable._array[i];
                     break;
                 }
                 case DecoderStateTables.AII_INDEX_LARGE:
                 {
-                    final int i = (((b & EncodingConstants.INTEGER_2ND_BIT_LARGE_MASK) << 16) | (read() << 8) | read()) 
-                        + EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT;
+                    final int i = (((b & EncodingConstants.INTEGER_2ND_BIT_LARGE_MASK) << 16) | (read() << 8) | read())
+                    + EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT;
                     name = _attributeNameTable._array[i];
                     break;
                 }
@@ -776,7 +776,7 @@ public class DOMDocumentParser extends Decoder {
                     name.createAttributeValues(_duplicateAttributeVerifier.MAP_SIZE);
                     _attributeNameTable.add(name);
                     break;
-                case DecoderStateTables.AII_TERMINATOR_DOUBLE:                    
+                case DecoderStateTables.AII_TERMINATOR_DOUBLE:
                     _doubleTerminate = true;
                 case DecoderStateTables.AII_TERMINATOR_SINGLE:
                     _terminate = true;
@@ -785,18 +785,18 @@ public class DOMDocumentParser extends Decoder {
                 default:
                     throw new IOException(CommonResourceBundle.getInstance().getString("message.decodingAIIs"));
             }
-
+            
             if (name.prefixIndex > 0 && _prefixTable._currentInScope[name.prefixIndex] != name.namespaceNameIndex) {
                 throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.AIIqNameNotInScope"));
             }
-
+            
             _duplicateAttributeVerifier.checkForDuplicateAttribute(name.attributeHash, name.attributeId);
-
+            
             Attr a = createAttribute(
-                        name.namespaceName,
-                        name.qName, 
-                        name.localName);
-                        
+                    name.namespaceName,
+                    name.qName,
+                    name.localName);
+            
             // [normalized value] of AII
             
             b = read();
@@ -810,7 +810,7 @@ public class DOMDocumentParser extends Decoder {
                         _attributeValueTable.add(value);
                     }
                     
-                    a.setValue(value);                
+                    a.setValue(value);
                     _currentElement.setAttributeNode(a);
                     break;
                 }
@@ -823,7 +823,7 @@ public class DOMDocumentParser extends Decoder {
                         _attributeValueTable.add(value);
                     }
                     
-                    a.setValue(value);                
+                    a.setValue(value);
                     _currentElement.setAttributeNode(a);
                     break;
                 }
@@ -831,16 +831,16 @@ public class DOMDocumentParser extends Decoder {
                 {
                     final boolean addToTable = (b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0;
                     final int length = (read() << 24) |
-                        (read() << 16) |
-                        (read() << 8) |
-                        read();
+                            (read() << 16) |
+                            (read() << 8) |
+                            read();
                     _octetBufferLength = length + EncodingConstants.OCTET_STRING_LENGTH_5TH_BIT_MEDIUM_LIMIT;
                     value = decodeUtf8StringAsString();
                     if (addToTable) {
                         _attributeValueTable.add(value);
                     }
-
-                    a.setValue(value);                
+                    
+                    a.setValue(value);
                     _currentElement.setAttributeNode(a);
                     break;
                 }
@@ -853,7 +853,7 @@ public class DOMDocumentParser extends Decoder {
                         _attributeValueTable.add(value);
                     }
                     
-                    a.setValue(value);                
+                    a.setValue(value);
                     _currentElement.setAttributeNode(a);
                     break;
                 }
@@ -866,7 +866,7 @@ public class DOMDocumentParser extends Decoder {
                         _attributeValueTable.add(value);
                     }
                     
-                    a.setValue(value);                
+                    a.setValue(value);
                     _currentElement.setAttributeNode(a);
                     break;
                 }
@@ -874,16 +874,16 @@ public class DOMDocumentParser extends Decoder {
                 {
                     final boolean addToTable = (b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0;
                     final int length = (read() << 24) |
-                        (read() << 16) |
-                        (read() << 8) |
-                        read();
+                            (read() << 16) |
+                            (read() << 8) |
+                            read();
                     _octetBufferLength = length + EncodingConstants.OCTET_STRING_LENGTH_5TH_BIT_MEDIUM_LIMIT;
                     value = decodeUtf16StringAsString();
                     if (addToTable) {
                         _attributeValueTable.add(value);
                     }
-
-                    a.setValue(value);                
+                    
+                    a.setValue(value);
                     _currentElement.setAttributeNode(a);
                     break;
                 }
@@ -901,55 +901,55 @@ public class DOMDocumentParser extends Decoder {
                     if (addToTable) {
                         _attributeValueTable.add(value);
                     }
-
-                    a.setValue(value);                
+                    
+                    a.setValue(value);
                     _currentElement.setAttributeNode(a);
                     break;
                 }
                 case DecoderStateTables.NISTRING_EA:
                 {
-                    if ((b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0) {
-                        throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.addToTableNotSupported"));
-                    }
-
+                    final boolean addToTable = (b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0;
                     _identifier = (b & 0x0F) << 4;
                     b = read();
                     _identifier |= (b & 0xF0) >> 4;
-
+                    
                     decodeOctetsOnFifthBitOfNonIdentifyingStringOnFirstBit(b);
                     value = convertEncodingAlgorithmDataToCharacters(true);
-                    a.setValue(value);                
+                    if (addToTable) {
+                        _attributeValueTable.add(value);
+                    }
+                    a.setValue(value);
                     _currentElement.setAttributeNode(a);
                     break;
                 }
                 case DecoderStateTables.NISTRING_INDEX_SMALL:
                     value = _attributeValueTable._array[b & EncodingConstants.INTEGER_2ND_BIT_SMALL_MASK];
-
-                    a.setValue(value);                
+                    
+                    a.setValue(value);
                     _currentElement.setAttributeNode(a);
                     break;
                 case DecoderStateTables.NISTRING_INDEX_MEDIUM:
                 {
-                    final int index = (((b & EncodingConstants.INTEGER_2ND_BIT_MEDIUM_MASK) << 8) | read()) 
-                        + EncodingConstants.INTEGER_2ND_BIT_SMALL_LIMIT;
+                    final int index = (((b & EncodingConstants.INTEGER_2ND_BIT_MEDIUM_MASK) << 8) | read())
+                    + EncodingConstants.INTEGER_2ND_BIT_SMALL_LIMIT;
                     value = _attributeValueTable._array[index];
-
-                    a.setValue(value);                
+                    
+                    a.setValue(value);
                     _currentElement.setAttributeNode(a);
                     break;
                 }
                 case DecoderStateTables.NISTRING_INDEX_LARGE:
                 {
-                    final int index = (((b & EncodingConstants.INTEGER_2ND_BIT_LARGE_MASK) << 16) | (read() << 8) | read()) 
-                        + EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT;
+                    final int index = (((b & EncodingConstants.INTEGER_2ND_BIT_LARGE_MASK) << 16) | (read() << 8) | read())
+                    + EncodingConstants.INTEGER_2ND_BIT_MEDIUM_LIMIT;
                     value = _attributeValueTable._array[index];
-
-                    a.setValue(value);                
+                    
+                    a.setValue(value);
                     _currentElement.setAttributeNode(a);
                     break;
                 }
                 case DecoderStateTables.NISTRING_EMPTY:
-                    a.setValue("");                
+                    a.setValue("");
                     _currentElement.setAttributeNode(a);
                     break;
                 default:
@@ -957,14 +957,14 @@ public class DOMDocumentParser extends Decoder {
             }
             
         } while (!_terminate);
- 
+        
         // Reset duplication attribute verfifier
         _duplicateAttributeVerifier._poolCurrent = _duplicateAttributeVerifier._poolHead;
         
         _terminate = _doubleTerminate;
         _doubleTerminate = false;
     }
-        
+    
     protected final void processCommentII() throws FastInfosetException, IOException {
         switch(decodeNonIdentifyingStringOnFirstBit()) {
             case NISTRING_STRING:
@@ -978,23 +978,23 @@ public class DOMDocumentParser extends Decoder {
                 break;
             }
             case NISTRING_ENCODING_ALGORITHM:
-                throw new IOException(CommonResourceBundle.getInstance().getString("message.commentIIAlgorithmNotSupported"));                        
+                throw new IOException(CommonResourceBundle.getInstance().getString("message.commentIIAlgorithmNotSupported"));
             case NISTRING_INDEX:
             {
                 final String s = _v.otherString.get(_integer).toString();
-
+                
                 _currentNode.appendChild(_document.createComment(s));
                 break;
             }
             case NISTRING_EMPTY_STRING:
                 _currentNode.appendChild(_document.createComment(""));
                 break;
-        }        
+        }
     }
-
+    
     protected final void processProcessingII() throws FastInfosetException, IOException {
         final String target = decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherNCName);
-
+        
         switch(decodeNonIdentifyingStringOnFirstBit()) {
             case NISTRING_STRING:
             {
@@ -1002,21 +1002,21 @@ public class DOMDocumentParser extends Decoder {
                 if (_addToTable) {
                     _v.otherString.add(new CharArrayString(data, false));
                 }
-
-                _currentNode.appendChild (_document.createProcessingInstruction (target, data));
+                
+                _currentNode.appendChild(_document.createProcessingInstruction(target, data));
                 break;
             }
             case NISTRING_ENCODING_ALGORITHM:
-                throw new IOException(CommonResourceBundle.getInstance().getString("message.processingIIWithEncodingAlgorithm"));                        
+                throw new IOException(CommonResourceBundle.getInstance().getString("message.processingIIWithEncodingAlgorithm"));
             case NISTRING_INDEX:
             {
                 final String data = _v.otherString.get(_integer).toString();
                 
-                _currentNode.appendChild (_document.createProcessingInstruction (target, data));
+                _currentNode.appendChild(_document.createProcessingInstruction(target, data));
                 break;
             }
             case NISTRING_EMPTY_STRING:
-                _currentNode.appendChild (_document.createProcessingInstruction (target, ""));
+                _currentNode.appendChild(_document.createProcessingInstruction(target, ""));
                 break;
         }
     }
@@ -1028,20 +1028,20 @@ public class DOMDocumentParser extends Decoder {
     protected Attr createAttribute(String namespaceName, String qName, String localName) {
         return _document.createAttributeNS(namespaceName, qName);
     }
-
+    
     protected String convertEncodingAlgorithmDataToCharacters(boolean isAttributeValue) throws FastInfosetException, IOException {
         StringBuffer buffer = new StringBuffer();
         if (_identifier < EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
             Object array = BuiltInEncodingAlgorithmFactory.table[_identifier].
-                decodeFromBytes(_octetBuffer, _octetBufferStart, _octetBufferLength);
+                    decodeFromBytes(_octetBuffer, _octetBufferStart, _octetBufferLength);
             BuiltInEncodingAlgorithmFactory.table[_identifier].convertToCharacters(array,  buffer);
         } else if (_identifier == EncodingAlgorithmIndexes.CDATA) {
             if (!isAttributeValue) {
                 // Set back buffer position to start of encoded string
                 _octetBufferOffset -= _octetBufferLength;
-                return decodeUtf8StringAsString();                
+                return decodeUtf8StringAsString();
             }
-            throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.CDATAAlgorithmNotSupported"));            
+            throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.CDATAAlgorithmNotSupported"));
         } else if (_identifier >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
             final String URI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
             final EncodingAlgorithm ea = (EncodingAlgorithm)_registeredEncodingAlgorithms.get(URI);
