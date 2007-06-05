@@ -68,7 +68,7 @@
 	</copy>
     </target>
 
-    <target name="j2se-integration" depends="compile"
+    <target name="j2se-integration" depends="compile,integrate-package-rename-task"
 	    description="prepare renamed source code for J2SE integration">
         <ant antfile="j2se-integration.xml" target="j2se-integration"/>
     </target>
