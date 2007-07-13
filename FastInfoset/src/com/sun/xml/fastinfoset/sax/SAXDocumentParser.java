@@ -1786,14 +1786,14 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
     
     protected final void processBuiltInEncodingAlgorithmAsCharacters(StringBuffer buffer) throws FastInfosetException, IOException {
         // TODO not very efficient, need to reuse buffers
-        Object array = BuiltInEncodingAlgorithmFactory.table[_identifier].
+        Object array = BuiltInEncodingAlgorithmFactory.getAlgorithm(_identifier).
                 decodeFromBytes(_octetBuffer, _octetBufferStart, _octetBufferLength);
         
-        BuiltInEncodingAlgorithmFactory.table[_identifier].convertToCharacters(array,  buffer);
+        BuiltInEncodingAlgorithmFactory.getAlgorithm(_identifier).convertToCharacters(array,  buffer);
     }
     
     protected final Object processBuiltInEncodingAlgorithmAsObject() throws FastInfosetException, IOException {
-        return BuiltInEncodingAlgorithmFactory.table[_identifier].
+        return BuiltInEncodingAlgorithmFactory.getAlgorithm(_identifier).
                 decodeFromBytes(_octetBuffer, _octetBufferStart, _octetBufferLength);
     }
 }

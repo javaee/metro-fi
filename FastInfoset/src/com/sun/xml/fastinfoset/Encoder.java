@@ -1305,13 +1305,13 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         // Encode bottom 4 bits of enoding algorithm id
         _b = (id & 0x0F) << 4;
 
-        final int octetLength = BuiltInEncodingAlgorithmFactory.table[id].
+        final int octetLength = BuiltInEncodingAlgorithmFactory.getAlgorithm(id).
                     getOctetLengthFromPrimitiveLength(length);
 
         encodeNonZeroOctetStringLengthOnFifthBit(octetLength);
 
         ensureSize(octetLength);
-        BuiltInEncodingAlgorithmFactory.table[id].
+        BuiltInEncodingAlgorithmFactory.getAlgorithm(id).
                 encodeToBytes(data, offset, length, _octetBuffer, _octetBufferIndex);
         _octetBufferIndex += octetLength;
     }
@@ -1519,13 +1519,13 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         // Encode bottom 6 bits of enoding algorithm id
         _b = (id & 0x3F) << 2;
 
-        final int octetLength = BuiltInEncodingAlgorithmFactory.table[id].
+        final int octetLength = BuiltInEncodingAlgorithmFactory.getAlgorithm(id).
                     getOctetLengthFromPrimitiveLength(length);
 
         encodeNonZeroOctetStringLengthOnSenventhBit(octetLength);
 
         ensureSize(octetLength);
-        BuiltInEncodingAlgorithmFactory.table[id].
+        BuiltInEncodingAlgorithmFactory.getAlgorithm(id).
                 encodeToBytes(data, offset, length, _octetBuffer, _octetBufferIndex);
         _octetBufferIndex += octetLength;
     }

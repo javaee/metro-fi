@@ -1032,9 +1032,9 @@ public class DOMDocumentParser extends Decoder {
     protected String convertEncodingAlgorithmDataToCharacters(boolean isAttributeValue) throws FastInfosetException, IOException {
         StringBuffer buffer = new StringBuffer();
         if (_identifier < EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
-            Object array = BuiltInEncodingAlgorithmFactory.table[_identifier].
+            Object array = BuiltInEncodingAlgorithmFactory.getAlgorithm(_identifier).
                     decodeFromBytes(_octetBuffer, _octetBufferStart, _octetBufferLength);
-            BuiltInEncodingAlgorithmFactory.table[_identifier].convertToCharacters(array,  buffer);
+            BuiltInEncodingAlgorithmFactory.getAlgorithm(_identifier).convertToCharacters(array,  buffer);
         } else if (_identifier == EncodingAlgorithmIndexes.CDATA) {
             if (!isAttributeValue) {
                 // Set back buffer position to start of encoded string

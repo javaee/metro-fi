@@ -1656,9 +1656,9 @@ public class StAXDocumentParser extends Decoder
         if (_algorithmId == EncodingAlgorithmIndexes.BASE64) {
             convertBase64AlorithmDataToCharacters(buffer);
         } else if (_algorithmId < EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
-            Object array = BuiltInEncodingAlgorithmFactory.table[_algorithmId].
+            Object array = BuiltInEncodingAlgorithmFactory.getAlgorithm(_algorithmId).
                     decodeFromBytes(_algorithmData, _algorithmDataOffset, _algorithmDataLength);
-            BuiltInEncodingAlgorithmFactory.table[_algorithmId].convertToCharacters(array,  buffer);
+            BuiltInEncodingAlgorithmFactory.getAlgorithm(_algorithmId).convertToCharacters(array,  buffer);
         } else if (_algorithmId == EncodingAlgorithmIndexes.CDATA) {
             _octetBufferOffset -= _octetBufferLength;
             decodeUtf8StringIntoCharBuffer();
