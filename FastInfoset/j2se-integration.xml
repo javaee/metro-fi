@@ -20,8 +20,8 @@
         <delete dir="j2se-integration"/>
 
 	<prename srcdir="src" destdir="j2se-integration/src">
-	    <pattern from="com.sun.xml.fastinfoset" to="com.sun.xml.internal.fastinfoset" />
-	    <pattern from="org.jvnet.fastinfoset" to="com.sun.xml.internal.org.jvnet.fastinfoset" />
+	    <pattern from="com.sun.xml.fastinfoset" to="sun.xml.internal.fastinfoset" />
+	    <pattern from="org.jvnet.fastinfoset" to="sun.xml.internal.org.jvnet.fastinfoset" />
 	</prename>
 
 	<!-- sanity test -->
