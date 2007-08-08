@@ -79,6 +79,8 @@ public class DOMDocumentParser extends Decoder {
     
     protected int _namespacePrefixesIndex;
     
+    private StringBuffer _textNodeNormalizedValue = new StringBuffer();
+    
     /**
      * Parse a fast infoset document into a {@link Document} instance.
      * <p>
@@ -310,6 +312,7 @@ public class DOMDocumentParser extends Decoder {
             throw new FastInfosetException(CommonResourceBundle.getInstance().getString("message.qnameOfEIINotInScope"));
         }
         
+        _textNodeNormalizedValue.setLength(0);
         final Node parentCurrentNode = _currentNode;
         
         _currentNode = _currentElement = createElement(name.namespaceName, name.qName, name.localName);
@@ -332,19 +335,24 @@ public class DOMDocumentParser extends Decoder {
             _b = read();
             switch(DecoderStateTables.EII[_b]) {
                 case DecoderStateTables.EII_NO_AIIS_INDEX_SMALL:
+                    commitNormalizedTextNodeIfRequired();
                     processEII(_elementNameTable._array[_b], false);
                     break;
                 case DecoderStateTables.EII_AIIS_INDEX_SMALL:
+                    commitNormalizedTextNodeIfRequired();
                     processEII(_elementNameTable._array[_b & EncodingConstants.INTEGER_3RD_BIT_SMALL_MASK], true);
                     break;
                 case DecoderStateTables.EII_INDEX_MEDIUM:
+                    commitNormalizedTextNodeIfRequired();
                     processEII(decodeEIIIndexMedium(), (_b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
                     break;
                 case DecoderStateTables.EII_INDEX_LARGE:
+                    commitNormalizedTextNodeIfRequired();
                     processEII(decodeEIIIndexLarge(), (_b & EncodingConstants.ELEMENT_ATTRIBUTE_FLAG) > 0);
                     break;
                 case DecoderStateTables.EII_LITERAL:
                 {
+                    commitNormalizedTextNodeIfRequired();
                     final QualifiedName qn = processLiteralQualifiedName(
                             _b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK,
                             _elementNameTable.getNext());
@@ -353,29 +361,30 @@ public class DOMDocumentParser extends Decoder {
                     break;
                 }
                 case DecoderStateTables.EII_NAMESPACES:
+                    commitNormalizedTextNodeIfRequired();
                     processEIIWithNamespaces();
                     break;
                 case DecoderStateTables.CII_UTF8_SMALL_LENGTH:
                 {
                     _octetBufferLength = (_b & EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_MASK)
                     + 1;
-                    processUtf8CharacterString();
+                    _textNodeNormalizedValue.append(processUtf8CharacterString());
                     break;
                 }
                 case DecoderStateTables.CII_UTF8_MEDIUM_LENGTH:
                 {
                     _octetBufferLength = read() + EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_SMALL_LIMIT;
-                    processUtf8CharacterString();
+                    _textNodeNormalizedValue.append(processUtf8CharacterString());
                     break;
                 }
-                case DecoderStateTables.CII_UTF8_LARGE_LENGTH:
+                    case DecoderStateTables.CII_UTF8_LARGE_LENGTH:
                 {
                     _octetBufferLength = (read() << 24) |
                             (read() << 16) |
                             (read() << 8) |
                             read();
                     _octetBufferLength += EncodingConstants.OCTET_STRING_LENGTH_7TH_BIT_MEDIUM_LIMIT;
-                    processUtf8CharacterString();
+                    _textNodeNormalizedValue.append(processUtf8CharacterString());
                     break;
                 }
                 case DecoderStateTables.CII_UTF16_SMALL_LENGTH:
@@ -387,7 +396,7 @@ public class DOMDocumentParser extends Decoder {
                         _characterContentChunkTable.add(_charBuffer, _charBufferLength);
                     }
                     
-                    _currentNode.appendChild(_document.createTextNode(v));
+                    _textNodeNormalizedValue.append(v);
                     break;
                 }
                 case DecoderStateTables.CII_UTF16_MEDIUM_LENGTH:
@@ -398,7 +407,7 @@ public class DOMDocumentParser extends Decoder {
                         _characterContentChunkTable.add(_charBuffer, _charBufferLength);
                     }
                     
-                    _currentNode.appendChild(_document.createTextNode(v));
+                    _textNodeNormalizedValue.append(v);
                     break;
                 }
                 case DecoderStateTables.CII_UTF16_LARGE_LENGTH:
@@ -413,7 +422,7 @@ public class DOMDocumentParser extends Decoder {
                         _characterContentChunkTable.add(_charBuffer, _charBufferLength);
                     }
                     
-                    _currentNode.appendChild(_document.createTextNode(v));
+                    _textNodeNormalizedValue.append(v);
                     break;
                 }
                 case DecoderStateTables.CII_RA:
@@ -432,7 +441,7 @@ public class DOMDocumentParser extends Decoder {
                         _characterContentChunkTable.add(_charBuffer, _charBufferLength);
                     }
                     
-                    _currentNode.appendChild(_document.createTextNode(v));
+                    _textNodeNormalizedValue.append(v);
                     break;
                 }
                 case DecoderStateTables.CII_EA:
@@ -448,14 +457,14 @@ public class DOMDocumentParser extends Decoder {
                     if (addToTable) {
                         _characterContentChunkTable.add(s.toCharArray(), s.length());
                     }
-                    _currentNode.appendChild(_document.createTextNode(s));
+                    _textNodeNormalizedValue.append(s);
                     break;
                 }
                 case DecoderStateTables.CII_INDEX_SMALL:
                 {
                     final String s = _characterContentChunkTable.getString(_b & EncodingConstants.INTEGER_4TH_BIT_SMALL_MASK);
                     
-                    _currentNode.appendChild(_document.createTextNode(s));
+                    _textNodeNormalizedValue.append(s);
                     break;
                 }
                 case DecoderStateTables.CII_INDEX_MEDIUM:
@@ -464,7 +473,7 @@ public class DOMDocumentParser extends Decoder {
                     + EncodingConstants.INTEGER_4TH_BIT_SMALL_LIMIT;
                     final String s = _characterContentChunkTable.getString(index);
                     
-                    _currentNode.appendChild(_document.createTextNode(s));
+                    _textNodeNormalizedValue.append(s);
                     break;
                 }
                 case DecoderStateTables.CII_INDEX_LARGE:
@@ -475,7 +484,7 @@ public class DOMDocumentParser extends Decoder {
                     index += EncodingConstants.INTEGER_4TH_BIT_MEDIUM_LIMIT;
                     final String s = _characterContentChunkTable.getString(index);
                     
-                    _currentNode.appendChild(_document.createTextNode(s));
+                    _textNodeNormalizedValue.append(s);
                     break;
                 }
                 case DecoderStateTables.CII_INDEX_LARGE_LARGE:
@@ -486,17 +495,20 @@ public class DOMDocumentParser extends Decoder {
                     index += EncodingConstants.INTEGER_4TH_BIT_LARGE_LIMIT;
                     final String s = _characterContentChunkTable.getString(index);
                     
-                    _currentNode.appendChild(_document.createTextNode(s));
+                    _textNodeNormalizedValue.append(s);
                     break;
                 }
                 case DecoderStateTables.COMMENT_II:
+                    commitNormalizedTextNodeIfRequired();
                     processCommentII();
                     break;
                 case DecoderStateTables.PROCESSING_INSTRUCTION_II:
+                    commitNormalizedTextNodeIfRequired();
                     processProcessingII();
                     break;
                 case DecoderStateTables.UNEXPANDED_ENTITY_REFERENCE_II:
                 {
+                    commitNormalizedTextNodeIfRequired();
                     String entity_reference_name = decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherNCName);
                     
                     String system_identifier = ((_b & EncodingConstants.UNEXPANDED_ENTITY_SYSTEM_IDENTIFIER_FLAG) > 0)
@@ -508,8 +520,10 @@ public class DOMDocumentParser extends Decoder {
                     break;
                 }
                 case DecoderStateTables.TERMINATOR_DOUBLE:
+                    commitNormalizedTextNodeIfRequired();
                     _doubleTerminate = true;
                 case DecoderStateTables.TERMINATOR_SINGLE:
+                    commitNormalizedTextNodeIfRequired();
                     _terminate = true;
                     break;
                 default:
@@ -517,24 +531,31 @@ public class DOMDocumentParser extends Decoder {
             }
         }
         
+        commitNormalizedTextNodeIfRequired();
         _terminate = _doubleTerminate;
         _doubleTerminate = false;
         
         _currentNode = parentCurrentNode;
     }
     
-    private final void processUtf8CharacterString() throws FastInfosetException, IOException {
+    private void commitNormalizedTextNodeIfRequired() {
+        if (_textNodeNormalizedValue.length() > 0) {
+            _currentNode.appendChild(
+                    _document.createTextNode(_textNodeNormalizedValue.toString()));
+            _textNodeNormalizedValue.setLength(0);
+        }
+    }
+
+    private final String processUtf8CharacterString() throws FastInfosetException, IOException {
         if ((_b & EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG) > 0) {
             _characterContentChunkTable.ensureSize(_octetBufferLength);
             final int charactersOffset = _characterContentChunkTable._arrayIndex;
             decodeUtf8StringAsCharBuffer(_characterContentChunkTable._array, charactersOffset);
             _characterContentChunkTable.add(_charBufferLength);
-            _currentNode.appendChild(_document.createTextNode(
-                    _characterContentChunkTable.getString(_characterContentChunkTable._cachedIndex)));
+            return _characterContentChunkTable.getString(_characterContentChunkTable._cachedIndex);
         } else {
             decodeUtf8StringAsCharBuffer();
-            _currentNode.appendChild(_document.createTextNode(
-                    new String(_charBuffer, 0, _charBufferLength)));
+            return new String(_charBuffer, 0, _charBufferLength);
         }
     }
     
@@ -1054,6 +1075,5 @@ public class DOMDocumentParser extends Decoder {
             }
         }
         return buffer.toString();
-    }
-    
+    }    
 }
