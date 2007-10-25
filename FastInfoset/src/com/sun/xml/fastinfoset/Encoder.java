@@ -418,19 +418,28 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     }
 
     /**
-     * Checks whether character content chunk (its length) matches limits:
-     * length limit itself and limit for total capacity of specified CharArrayIntMap
+     * Checks whether character content chunk (its length) matches length limit
+     *
+     * @param length the length of character content chunk is checking to be added to Map.
+     * @return whether character content chunk length matches limit
+     */
+    public boolean isCharacterContentChunkLengthMatchesLimit(int length) {
+        return length < characterContentChunkSizeContraint;
+    }
+
+    /**
+     * Checks whether character content table has enough memory to
+     * store character content chunk with the given length
      *
      * @param length the length of character content chunk is checking to be added to Map.
      * @param map the custom CharArrayIntMap, which memory limits will be checked.
-     * @return whether character content chunk length matches limits
+     * @return whether character content map has enough memory
      */
-    public boolean isCharacterContentChunkLengthMatchesLimit(int length, CharArrayIntMap map) {
-        return (length < characterContentChunkSizeContraint) &&
-                (map.getTotalCharacterCount() + length <
-                        characterContentChunkMapTotalCharactersConstraint);
+    public boolean canAddCharacterContentToTable(int length, CharArrayIntMap map) {
+        return map.getTotalCharacterCount() + length <
+                        characterContentChunkMapTotalCharactersConstraint;
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -469,15 +478,25 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     }
     
     /**
-     * Checks whether attribute value (its length) matches limits:
-     * length limit itself and limit for index Map total capacity
+     * Checks whether attribute value (its length) matches length limit
      *
-     * @return whether attribute value matches limits
+     * @param length the length of attribute
+     * @return whether attribute value matches limit
      */
     public boolean isAttributeValueLengthMatchesLimit(int length) {
-        return (length < attributeValueSizeConstraint) &&
-                (_v.attributeValue.getTotalCharacterCount() + length <
-                        attributeValueMapTotalCharactersConstraint);
+        return length < attributeValueSizeConstraint;
+    }
+
+    /**
+     * Checks whether attribute table has enough memory to
+     * store attribute value with the given length
+     *
+     * @param length the length of attribute value is checking to be added to Map.
+     * @return whether attribute map has enough memory
+     */
+    public boolean canAddAttributeToTable(int length) {
+        return _v.attributeValue.getTotalCharacterCount() + length <
+                        attributeValueMapTotalCharactersConstraint;
     }
 
     /**
@@ -679,7 +698,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
      * @throws ArrayIndexOutOfBoundsException.
      */
     protected final void encodeCharacters(char[] ch, int offset, int length) throws IOException {
-        final boolean addToTable = isCharacterContentChunkLengthMatchesLimit(length, _v.characterContentChunk);
+        final boolean addToTable = isCharacterContentChunkLengthMatchesLimit(length);
         encodeNonIdentifyingStringOnThirdBit(ch, offset, length, _v.characterContentChunk, addToTable, true);
     }
 
@@ -696,7 +715,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
      * @throws ArrayIndexOutOfBoundsException.
      */
     protected final void encodeCharactersNoClone(char[] ch, int offset, int length) throws IOException {
-        final boolean addToTable = isCharacterContentChunkLengthMatchesLimit(length, _v.characterContentChunk);
+        final boolean addToTable = isCharacterContentChunkLengthMatchesLimit(length);
         encodeNonIdentifyingStringOnThirdBit(ch, offset, length, _v.characterContentChunk, addToTable, false);
     }
     
@@ -716,18 +735,31 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     protected final void encodeFourBitCharacters(int id, int[] table, char[] ch, int offset, int length, 
             boolean addToTable) throws FastInfosetException, IOException {
         if (addToTable) {
-            final int index = _v.characterContentChunk.obtainIndex(ch, offset, length, true);
+            // if char array could be added to table
+            boolean canAddCharacterContentToTable =
+                    canAddCharacterContentToTable(length, _v.characterContentChunk);
+                
+            // obtain/get index
+            int index = canAddCharacterContentToTable ?
+                _v.characterContentChunk.obtainIndex(ch, offset, length, true) :
+                _v.characterContentChunk.get(ch, offset, length);
+                
             if (index != KeyIntMap.NOT_PRESENT) {
+                // if char array is in table
                 _b = EncodingConstants.CHARACTER_CHUNK | 0x20;
                 encodeNonZeroIntegerOnFourthBit(index);
                 return;
+            } else if (canAddCharacterContentToTable) {
+                // if char array is not in table, but could be added
+                _b = EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_RESTRICTED_ALPHABET_FLAG | EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG;
+            } else {
+                // if char array is not in table and could not be added
+                _b = EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_RESTRICTED_ALPHABET_FLAG;
             }
+        } else {
+            _b = EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_RESTRICTED_ALPHABET_FLAG;
         }
         
-        // This procedure assumes that id <= 64
-        _b = (addToTable) ?
-            EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_RESTRICTED_ALPHABET_FLAG | EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG :
-            EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_RESTRICTED_ALPHABET_FLAG;
         write (_b);
 
         // Encode bottom 6 bits of enoding algorithm id
@@ -753,12 +785,29 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     protected final void encodeAlphabetCharacters(String alphabet, char[] ch, int offset, int length,
             boolean addToTable) throws FastInfosetException, IOException {
         if (addToTable) {
-            final int index = _v.characterContentChunk.obtainIndex(ch, offset, length, true);
+            // if char array could be added to table
+            boolean canAddCharacterContentToTable =
+                    canAddCharacterContentToTable(length, _v.characterContentChunk);
+                
+            // obtain/get index
+            int index = canAddCharacterContentToTable ?
+                _v.characterContentChunk.obtainIndex(ch, offset, length, true) :
+                _v.characterContentChunk.get(ch, offset, length);
+                
             if (index != KeyIntMap.NOT_PRESENT) {
+                // if char array is in table
                 _b = EncodingConstants.CHARACTER_CHUNK | 0x20;
                 encodeNonZeroIntegerOnFourthBit(index);
                 return;
+            } else if (canAddCharacterContentToTable) {
+                // if char array is not in table, but could be added
+                _b = EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_RESTRICTED_ALPHABET_FLAG | EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG;
+            } else {
+                // if char array is not in table and could not be added
+                _b = EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_RESTRICTED_ALPHABET_FLAG;
             }
+        } else {
+            _b = EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_RESTRICTED_ALPHABET_FLAG;
         }
 
         int id = _v.restrictedAlphabet.get(alphabet);
@@ -767,9 +816,6 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
         id += EncodingConstants.RESTRICTED_ALPHABET_APPLICATION_START;
         
-        _b = (addToTable) ?
-            EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_RESTRICTED_ALPHABET_FLAG | EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG :
-            EncodingConstants.CHARACTER_CHUNK | EncodingConstants.CHARACTER_CHUNK_RESTRICTED_ALPHABET_FLAG;
         _b |= (id & 0xC0) >> 6;
         write(_b);
         
@@ -792,7 +838,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         encodeIdentifyingNonEmptyStringOnFirstBit(target, _v.otherNCName);
 
         // Data
-        boolean addToTable = isCharacterContentChunkLengthMatchesLimit(data.length(), _v.characterContentChunk);
+        boolean addToTable = isCharacterContentChunkLengthMatchesLimit(data.length());
         encodeNonIdentifyingStringOnFirstBit(data, _v.otherString, addToTable);
     }
 
@@ -831,7 +877,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     protected final void encodeComment(char[] ch, int offset, int length) throws IOException {
         write(EncodingConstants.COMMENT);
 
-        boolean addToTable = isCharacterContentChunkLengthMatchesLimit(length, _v.otherString);
+        boolean addToTable = isCharacterContentChunkLengthMatchesLimit(length);
         encodeNonIdentifyingStringOnFirstBit(ch, offset, length, _v.otherString, addToTable, true);
     }
 
@@ -850,7 +896,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     protected final void encodeCommentNoClone(char[] ch, int offset, int length) throws IOException {
         write(EncodingConstants.COMMENT);
 
-        boolean addToTable = isCharacterContentChunkLengthMatchesLimit(length, _v.otherString);
+        boolean addToTable = isCharacterContentChunkLengthMatchesLimit(length);
         encodeNonIdentifyingStringOnFirstBit(ch, offset, length, _v.otherString, addToTable, false);
     }
 
@@ -1044,21 +1090,39 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
      *
      * @param s the string to encode
      * @param map the vocabulary table of strings to indexes.
-     * @param addToTable true if the string should be added to the vocabulary
+     * @param addToTable true if the string could be added to the vocabulary
+     *                   table (if table has enough memory)
+     * @param mustBeAddedToTable true if the string must be added to the vocabulary
      *                   table (if not already present in the table).
      */
-    protected final void encodeNonIdentifyingStringOnFirstBit(String s, StringIntMap map, boolean addToTable) throws IOException {
+    protected final void encodeNonIdentifyingStringOnFirstBit(String s, StringIntMap map, 
+            boolean addToTable, boolean mustBeAddedToTable) throws IOException {
         if (s == null || s.length() == 0) {
             // C.26 an index (first bit '1') with seven '1' bits for an empty string
             write(0xFF);
         } else {
-            if (addToTable) {
-                int index = map.obtainIndex(s);
-                if (index == KeyIntMap.NOT_PRESENT) {
-                    _b = EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG | _nonIdentifyingStringOnFirstBitCES;
+            if (addToTable || mustBeAddedToTable) {
+                // if attribute value could be added to table
+                boolean canAddAttributeToTable = mustBeAddedToTable || 
+                        canAddAttributeToTable(s.length());
+                
+                // obtain/get index
+                int index = canAddAttributeToTable ?
+                    map.obtainIndex(s) :
+                    map.get(s);
+
+                if (index != KeyIntMap.NOT_PRESENT) {
+                    // if attribute value is in table
+                    encodeNonZeroIntegerOnSecondBitFirstBitOne(index);
+                } else if (canAddAttributeToTable) {
+                    // if attribute value is not in table, but could be added
+                    _b = EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG |
+                            _nonIdentifyingStringOnFirstBitCES;
                     encodeNonEmptyCharacterStringOnFifthBit(s);
                 } else {
-                    encodeNonZeroIntegerOnSecondBitFirstBitOne(index);
+                    // if attribute value is not in table and could not be added
+                    _b = _nonIdentifyingStringOnFirstBitCES;
+                    encodeNonEmptyCharacterStringOnFifthBit(s);
                 }
             } else {
                 _b = _nonIdentifyingStringOnFirstBitCES;
@@ -1084,12 +1148,28 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
             if (addToTable) {
                 final char[] ch = s.toCharArray();
                 final int length = s.length();
-                int index = map.obtainIndex(ch, 0, length, false);
-                if (index == KeyIntMap.NOT_PRESENT) {
-                    _b = EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG | _nonIdentifyingStringOnFirstBitCES;
+                
+                // if char array could be added to table
+                boolean canAddCharacterContentToTable = 
+                        canAddCharacterContentToTable(length, map);
+                
+                // obtain/get index
+                int index = canAddCharacterContentToTable ?
+                    map.obtainIndex(ch, 0, length, false) :
+                    map.get(ch, 0, length);
+                
+                if (index != KeyIntMap.NOT_PRESENT) {
+                    // if char array is in table
+                    encodeNonZeroIntegerOnSecondBitFirstBitOne(index);
+                } else if (canAddCharacterContentToTable) {
+                    // if char array is not in table, but could be added
+                    _b = EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG |
+                            _nonIdentifyingStringOnFirstBitCES;
                     encodeNonEmptyCharacterStringOnFifthBit(ch, 0, length);
                 } else {
-                    encodeNonZeroIntegerOnSecondBitFirstBitOne(index);
+                    // if char array is not in table and could not be added
+                    _b = _nonIdentifyingStringOnFirstBitCES;
+                    encodeNonEmptyCharacterStringOnFifthBit(s);
                 }
             } else {
                 _b = _nonIdentifyingStringOnFirstBitCES;
@@ -1118,12 +1198,27 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
             write(0xFF);
         } else {
             if (addToTable) {
-                int index = map.obtainIndex(ch, offset, length, clone);
-                if (index == KeyIntMap.NOT_PRESENT) {
-                    _b = EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG | _nonIdentifyingStringOnFirstBitCES;
+                // if char array could be added to table
+                boolean canAddCharacterContentToTable = 
+                        canAddCharacterContentToTable(length, map);
+                
+                // obtain/get index
+                int index = canAddCharacterContentToTable ?
+                    map.obtainIndex(ch, offset, length, clone) :
+                    map.get(ch, offset, length);
+                
+                if (index != KeyIntMap.NOT_PRESENT) {
+                    // if char array is in table
+                    encodeNonZeroIntegerOnSecondBitFirstBitOne(index);
+                } else if (canAddCharacterContentToTable) {
+                    // if char array is not in table, but could be added
+                    _b = EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG |
+                            _nonIdentifyingStringOnFirstBitCES;
                     encodeNonEmptyCharacterStringOnFifthBit(ch, offset, length);
                 } else {
-                    encodeNonZeroIntegerOnSecondBitFirstBitOne(index);
+                    // if char array is not in table and could not be added
+                    _b = _nonIdentifyingStringOnFirstBitCES;
+                    encodeNonEmptyCharacterStringOnFifthBit(ch, offset, length);
                 }
             } else {
                 _b = _nonIdentifyingStringOnFirstBitCES;
@@ -1132,23 +1227,41 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
-    protected final void encodeNonIdentifyingStringOnFirstBit(int id, int[] table, String s, boolean addToTable) 
+    protected final void encodeNonIdentifyingStringOnFirstBit(int id, int[] table, 
+            String s, boolean addToTable, boolean mustBeAddedToTable)
             throws IOException, FastInfosetException {
         if (s == null || s.length() == 0) {
             // C.26 an index (first bit '1') with seven '1' bits for an empty string
             write(0xFF);
             return;
-        } else if (addToTable) {
-            final int index = _v.attributeValue.obtainIndex(s);
+        } 
+    
+        if (addToTable || mustBeAddedToTable) {
+            // if attribute value could be added to table
+            boolean canAddAttributeToTable = mustBeAddedToTable || 
+                    canAddAttributeToTable(s.length());
+                
+            // obtain/get index
+            int index = canAddAttributeToTable ?
+                _v.attributeValue.obtainIndex(s) :
+                _v.attributeValue.get(s);
+            
             if (index != KeyIntMap.NOT_PRESENT) {
+                // if attribute value is in table
                 encodeNonZeroIntegerOnSecondBitFirstBitOne(index);
                 return;
+            } else if (canAddAttributeToTable) {
+                // if attribute value is not in table, but could be added
+                _b = EncodingConstants.NISTRING_RESTRICTED_ALPHABET_FLAG | 
+                        EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG;
+            } else {
+                // if attribute value is not in table and could not be added
+                _b = EncodingConstants.NISTRING_RESTRICTED_ALPHABET_FLAG;
             }
+        } else {
+            _b = EncodingConstants.NISTRING_RESTRICTED_ALPHABET_FLAG;
         }
 
-        _b = (addToTable) 
-                ? EncodingConstants.NISTRING_RESTRICTED_ALPHABET_FLAG | EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG
-                : EncodingConstants.NISTRING_RESTRICTED_ALPHABET_FLAG;
         // Encode identification and top four bits of alphabet id
         write (_b | ((id & 0xF0) >> 4));
         // Encode bottom 4 bits of alphabet id
@@ -1334,16 +1447,31 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         // length cannot be zero since sequence of CIIs has to be > 0
 
         if (addToTable) {
-            int index = map.obtainIndex(ch, offset, length, clone);
-            if (index == KeyIntMap.NOT_PRESENT) {
-                _b = EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG | 
+            // if char array could be added to table
+            boolean canAddCharacterContentToTable = 
+                    canAddCharacterContentToTable(length, map);
+                
+            // obtain/get index
+            int index = canAddCharacterContentToTable ?
+                map.obtainIndex(ch, offset, length, clone) :
+                map.get(ch, offset, length);
+
+            if (index != KeyIntMap.NOT_PRESENT) {
+                // if char array is in table
+                _b = EncodingConstants.CHARACTER_CHUNK | 0x20;
+                encodeNonZeroIntegerOnFourthBit(index);
+            } else if (canAddCharacterContentToTable) {
+                // if char array is not in table, but could be added
+                _b = EncodingConstants.CHARACTER_CHUNK_ADD_TO_TABLE_FLAG |
                         _nonIdentifyingStringOnThirdBitCES;
                 encodeNonEmptyCharacterStringOnSeventhBit(ch, offset, length);
             } else {
-                _b = EncodingConstants.CHARACTER_CHUNK | 0x20;
-                encodeNonZeroIntegerOnFourthBit(index);
+                // if char array is not in table and could not be added
+                    _b = _nonIdentifyingStringOnThirdBitCES;
+                    encodeNonEmptyCharacterStringOnSeventhBit(ch, offset, length);
             }
         } else {
+            // char array will not be added to map
             _b = _nonIdentifyingStringOnThirdBitCES;
             encodeNonEmptyCharacterStringOnSeventhBit(ch, offset, length);
         }

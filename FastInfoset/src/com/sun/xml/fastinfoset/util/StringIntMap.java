@@ -176,7 +176,7 @@ public class StringIntMap extends KeyIntMap {
             }
         }
                 
-        return -1;
+        return NOT_PRESENT;
     }
 
 
