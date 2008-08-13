@@ -246,11 +246,17 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     protected int _markIndex = -1;
 
     /**
-     * The limit on the size of [normalized value] of Attribute Information 
+     * The minimum size of [normalized value] of Attribute Information 
      * Items that will be indexed.
      */
-    protected int attributeValueSizeConstraint = FastInfosetSerializer.ATTRIBUTE_VALUE_SIZE_CONSTRAINT;
+    protected int minAttributeValueSize = FastInfosetSerializer.MIN_ATTRIBUTE_VALUE_SIZE;
     
+    /**
+     * The maximum size of [normalized value] of Attribute Information 
+     * Items that will be indexed.
+     */
+    protected int maxAttributeValueSize = FastInfosetSerializer.MAX_ATTRIBUTE_VALUE_SIZE;
+
     /**
      * The limit on the size of indexed Map for attribute values
      * Limit is measured in characters number
@@ -258,11 +264,18 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     protected int attributeValueMapTotalCharactersConstraint = FastInfosetSerializer.ATTRIBUTE_VALUE_MAP_MEMORY_CONSTRAINT / 2;
 
     /**
-     * The limit on the size of character content chunks
-     * of Character Information Items or Comment Information Items that 
+     * The minimum size of character content chunks
+     * of Character Information Items or Comment Information Items that
      * will be indexed.
      */
-    protected int characterContentChunkSizeContraint = FastInfosetSerializer.CHARACTER_CONTENT_CHUNK_SIZE_CONSTRAINT;
+    protected int minCharacterContentChunkSize = FastInfosetSerializer.MIN_CHARACTER_CONTENT_CHUNK_SIZE;
+    
+    /**
+     * The maximum size of character content chunks
+     * of Character Information Items or Comment Information Items that
+     * will be indexed.
+     */
+    protected int maxCharacterContentChunkSize = FastInfosetSerializer.MAX_CHARACTER_CONTENT_CHUNK_SIZE;
 
     /**
      * The limit on the size of indexed Map for character content chunks
@@ -384,19 +397,44 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     /**
      * {@inheritDoc}
      */
-    public void setCharacterContentChunkSizeLimit(int size) {
+    public int getMinCharacterContentChunkSize() {
+        return minCharacterContentChunkSize;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setMinCharacterContentChunkSize(int size) {
         if (size < 0 ) {
             size = 0;
         }
                 
-        characterContentChunkSizeContraint = size;
+        minCharacterContentChunkSize = size;
     }
     
     /**
      * {@inheritDoc}
      */
-    public int getCharacterContentChunkSizeLimit() {
-        return characterContentChunkSizeContraint;
+    public int getMaxCharacterContentChunkSize() {
+        return maxCharacterContentChunkSize;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setMaxCharacterContentChunkSize(int size) {
+        if (size < 0 ) {
+            size = 0;
+        }
+                
+        maxCharacterContentChunkSize = size;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getCharacterContentChunkMapMemoryLimit() {
+        return characterContentChunkMapTotalCharactersConstraint * 2;
     }
 
     /**
@@ -411,20 +449,14 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     }
     
     /**
-     * {@inheritDoc}
-     */
-    public int getCharacterContentChunkMapMemoryLimit() {
-        return characterContentChunkMapTotalCharactersConstraint * 2;
-    }
-
-    /**
      * Checks whether character content chunk (its length) matches length limit
      *
      * @param length the length of character content chunk is checking to be added to Map.
      * @return whether character content chunk length matches limit
      */
     public boolean isCharacterContentChunkLengthMatchesLimit(int length) {
-        return length < characterContentChunkSizeContraint;
+        return length >= minCharacterContentChunkSize &&
+                length <= maxCharacterContentChunkSize;
     }
 
     /**
@@ -443,21 +475,39 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     /**
      * {@inheritDoc}
      */
-    public void setAttributeValueSizeLimit(int size) {
+    public int getMinAttributeValueSize() {
+        return minAttributeValueSize;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setMinAttributeValueSize(int size) {
         if (size < 0 ) {
             size = 0;
         }
-        
-        attributeValueSizeConstraint = size;
+                
+        minAttributeValueSize = size;
     }
     
     /**
      * {@inheritDoc}
      */
-    public int getAttributeValueSizeLimit() {
-        return attributeValueSizeConstraint;
+    public int getMaxAttributeValueSize() {
+        return maxAttributeValueSize;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setMaxAttributeValueSize(int size) {
+        if (size < 0 ) {
+            size = 0;
+        }
+                
+        maxAttributeValueSize = size;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -484,7 +534,8 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
      * @return whether attribute value matches limit
      */
     public boolean isAttributeValueLengthMatchesLimit(int length) {
-        return length < attributeValueSizeConstraint;
+        return length >= minAttributeValueSize &&
+                length <= maxAttributeValueSize;
     }
 
     /**

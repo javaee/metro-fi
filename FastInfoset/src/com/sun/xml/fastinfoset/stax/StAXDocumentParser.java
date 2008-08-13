@@ -62,6 +62,7 @@ import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
 import org.jvnet.fastinfoset.FastInfosetException;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
 import com.sun.xml.fastinfoset.org.apache.xerces.util.XMLChar;
+import com.sun.xml.fastinfoset.util.DuplicateAttributeVerifier;
 import org.jvnet.fastinfoset.stax.FastInfosetStreamReader;
 
 /**
@@ -162,11 +163,13 @@ public class StAXDocumentParser extends Decoder
         _manager = manager;
     }
     
+    @Override
     public void setInputStream(InputStream s) {
         super.setInputStream(s);
         reset();
     }
     
+    @Override
     public void reset() {
         super.reset();
         if (_internalState != INTERNAL_STATE_START_DOCUMENT &&
@@ -1318,7 +1321,7 @@ public class StAXDocumentParser extends Decoder
                     name = processLiteralQualifiedName(
                             b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK,
                             _attributeNameTable.getNext());
-                    name.createAttributeValues(_duplicateAttributeVerifier.MAP_SIZE);
+                    name.createAttributeValues(DuplicateAttributeVerifier.MAP_SIZE);
                     _attributeNameTable.add(name);
                     break;
                 case DecoderStateTables.AII_TERMINATOR_DOUBLE:

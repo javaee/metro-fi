@@ -603,7 +603,7 @@ public abstract class Decoder implements FastInfosetParser {
                     prefixIndex, namespaceNameIndex, localNameIndex,
                     _charBuffer);
             if (isAttribute) {
-                qualifiedName.createAttributeValues(_duplicateAttributeVerifier.MAP_SIZE);
+                qualifiedName.createAttributeValues(DuplicateAttributeVerifier.MAP_SIZE);
             }
             array.add(qualifiedName);
         }
@@ -1891,10 +1891,12 @@ public abstract class Decoder implements FastInfosetParser {
             }
         }
         
+        @Override
         public int read(byte b[]) throws IOException {
             return read(b, 0, b.length);
         }
         
+        @Override
         public int read(byte b[], int off, int len) throws IOException {
             if (b == null) {
                 throw new NullPointerException();

@@ -160,6 +160,48 @@ public class EncodingTest extends TestCase implements
         in.close();
     }
 
+    public void testNamespaceIssue() throws Exception {
+        String envNS = "http://envelope";
+        String bodyNS = "http://body";
+        
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        XMLStreamWriter writer = new StAXDocumentSerializer(out);
+        writer.writeStartDocument();
+        
+        writer.writeStartElement("ns1", "Envelope", envNS);
+        writer.writeNamespace("ns2", envNS);
+        writer.writeNamespace("ns1", envNS);
+        
+        writer.writeStartElement(envNS, "Envelope");
+        writer.writeNamespace("ns1", bodyNS);
+        
+        
+        writer.writeEndElement(); // Close Body
+        writer.writeEndElement(); // Close Envelope
+
+        writer.writeEndDocument();
+        
+        writer.flush();
+        out.flush();
+        out.close();
+        
+        ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
+        XMLStreamReader reader = new StAXDocumentParser(in);
+        
+        assertEquals(START_ELEMENT, reader.next());
+        assertEquals("Envelope", reader.getLocalName());
+        assertEquals(envNS, reader.getNamespaceURI());
+        
+        assertEquals(START_ELEMENT, reader.next());
+        assertEquals("Envelope", reader.getLocalName());
+        assertEquals(envNS, reader.getNamespaceURI());
+        
+        assertEquals(END_ELEMENT, reader.next()); // </Envelope#2>
+        assertEquals(END_ELEMENT, reader.next()); // </Envelope#1>
+        
+        reader.close();
+        in.close();
+    }
 }
 
 
