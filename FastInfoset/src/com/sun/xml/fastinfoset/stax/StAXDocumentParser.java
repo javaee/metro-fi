@@ -828,9 +828,9 @@ public class StAXDocumentParser extends Decoder
         }
         
         try {
-            int bytesToCopy = Math.min(getTextLength(), length);
-            System.arraycopy(_characters, sourceStart, target,
-                    targetStart, bytesToCopy);
+            int bytesToCopy = Math.min(_charBufferLength, length);
+            System.arraycopy(_characters, _charactersOffset + sourceStart,
+                    target, targetStart, bytesToCopy);
             return bytesToCopy;
         } catch (IndexOutOfBoundsException e) {
             throw new XMLStreamException(e);
