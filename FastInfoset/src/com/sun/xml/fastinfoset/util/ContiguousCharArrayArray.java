@@ -139,7 +139,7 @@ public class ContiguousCharArrayArray extends ValueArray {
         if (_readOnlyArray == null) {
             return _length;
         } else {
-            final int[] ra = _readOnlyArray.getCompleteOffsetArray();
+            final int[] ra = _readOnlyArray.getCompleteLengthArray();
             final int[] a = new int[_readOnlyArraySize + _length.length];
             System.arraycopy(ra, 0, a, 0, _readOnlyArraySize);
             return a;
