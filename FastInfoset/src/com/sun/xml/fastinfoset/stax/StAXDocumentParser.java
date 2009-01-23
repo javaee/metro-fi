@@ -374,6 +374,10 @@ public class StAXDocumentParser extends Decoder
                     decodeOctetsOnSeventhBitOfNonIdentifyingStringOnThirdBit(b2);
                     processCIIEncodingAlgorithm(addToTable);
                     
+                    if (_algorithmId == EncodingAlgorithmIndexes.CDATA) {
+                        return _eventType = CDATA;
+                    }
+
                     return _eventType = CHARACTERS;
                 }
                 case DecoderStateTables.CII_INDEX_SMALL:

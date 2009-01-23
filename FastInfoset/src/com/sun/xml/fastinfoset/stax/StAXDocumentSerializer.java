@@ -425,9 +425,36 @@ public class StAXDocumentSerializer extends Encoder
         }
     }
     
-    public void writeCData(String data) throws XMLStreamException {
-        throw new UnsupportedOperationException(CommonResourceBundle.getInstance().getString("message.notImplemented"));
-   }
+    public void writeCData(String text) throws XMLStreamException {
+         try {
+            final int length = text.length();
+            if (length == 0) {
+                return;
+            } else if (length < _charBuffer.length) {
+                if (getIgnoreWhiteSpaceTextContent() &&
+                        isWhiteSpace(text)) return;
+
+                // Warning: this method must be called before any state
+                // is modified, such as the _charBuffer contents,
+                // so the characters of text cannot be copied to _charBuffer
+                // before this call
+                encodeTerminationAndCurrentElement(true);
+
+                text.getChars(0, length, _charBuffer, 0);
+                encodeCIIBuiltInAlgorithmDataAsCDATA(_charBuffer, 0, length);
+            } else {
+                final char ch[] = text.toCharArray();
+                if (getIgnoreWhiteSpaceTextContent() &&
+                        isWhiteSpace(ch, 0, length)) return;
+
+                encodeTerminationAndCurrentElement(true);
+
+                encodeCIIBuiltInAlgorithmDataAsCDATA(ch, 0, length);
+            }
+        } catch (Exception e) {
+            throw new XMLStreamException(e);
+        }
+    }
     
     public void writeDTD(String dtd) throws XMLStreamException {
         throw new UnsupportedOperationException(CommonResourceBundle.getInstance().getString("message.notImplemented"));
