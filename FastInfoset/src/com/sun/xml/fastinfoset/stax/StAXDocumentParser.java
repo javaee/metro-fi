@@ -1634,11 +1634,14 @@ public class StAXDocumentParser extends Decoder
     }
     
     protected final void processAIIEncodingAlgorithm(QualifiedName name, boolean addToTable) throws FastInfosetException, IOException {
+        EncodingAlgorithm ea = null;
         String URI = null;
         if (_identifier >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START) {
             URI = _v.encodingAlgorithm.get(_identifier - EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START);
             if (URI == null) {
                 throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.URINotPresent", new Object[]{Integer.valueOf(_identifier)}));
+            } else if (_registeredEncodingAlgorithms != null) {
+                ea = (EncodingAlgorithm)_registeredEncodingAlgorithms.get(URI);
             }
         } else if (_identifier >= EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
             if (_identifier == EncodingAlgorithmIndexes.CDATA) {
@@ -1649,11 +1652,24 @@ public class StAXDocumentParser extends Decoder
             // TODO should use sax property to decide if event will be
             // reported, allows for support through handler if required.
             throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.identifiers10to31Reserved"));
+        } else {
+            ea = BuiltInEncodingAlgorithmFactory.getAlgorithm(_identifier);
         }
         
-        final byte[] data = new byte[_octetBufferLength];
-        System.arraycopy(_octetBuffer, _octetBufferStart, data, 0, _octetBufferLength);
-        _attributes.addAttributeWithAlgorithmData(name, URI, _identifier, data);
+        Object algorithmData;
+        
+        if (ea != null) {
+            algorithmData = ea.decodeFromBytes(_octetBuffer, _octetBufferStart,
+                    _octetBufferLength);
+        } else {
+            final byte[] data = new byte[_octetBufferLength];
+            System.arraycopy(_octetBuffer, _octetBufferStart, data, 0,
+                    _octetBufferLength);
+            algorithmData = data;
+        }
+        
+        _attributes.addAttributeWithAlgorithmData(name, URI, _identifier,
+                algorithmData);
         if (addToTable) {
             _attributeValueTable.add(_attributes.getValue(_attributes.getIndex(name.qName)));
         }

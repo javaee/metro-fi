@@ -108,7 +108,9 @@ public class AttributesHolder implements EncodingAlgorithmAttributes {
             return value;
         }
         
-        if (_algorithmData[index] == null || _registeredEncodingAlgorithms == null) {
+        if (_algorithmData[index] == null ||
+                (_algorithmIds[index] >= EncodingConstants.ENCODING_ALGORITHM_APPLICATION_START &&
+                _registeredEncodingAlgorithms == null)) {
             return null;
         }
                 
