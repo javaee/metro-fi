@@ -878,15 +878,17 @@ public class AlgorithmTest extends TestCase {
 		_booleanArray = new boolean[arraySize];
 
         for (int i = 0; i < arraySize; i++) {
-            _byteArray[i] = (byte)i;
-            _shortArray[i] = (short)(i * Short.MAX_VALUE / arraySize);
-            _intArray[i] = i * (Integer.MAX_VALUE / arraySize);
-            _longArray[i] = i * (Long.MAX_VALUE / arraySize);
-            _floatArray[i] = (float)(i * Math.E);
-            _doubleArray[i] = i * Math.E;
-            _uuidArray[i] = i * (Long.MAX_VALUE / arraySize);
-            _uuidArray[i * 2] = i * (Long.MAX_VALUE / arraySize);
-            if (i % 2 == 0)
+            final int j = i + 1;
+
+            _byteArray[i] = (byte)j;
+            _shortArray[i] = (short)(j * Short.MAX_VALUE / arraySize);
+            _intArray[i] = j * (Integer.MAX_VALUE / arraySize);
+            _longArray[i] = j * (Long.MAX_VALUE / arraySize);
+            _floatArray[i] = (float)(j * Math.E);
+            _doubleArray[i] = j * Math.E;
+            _uuidArray[i] = j * (Long.MAX_VALUE / arraySize);
+            _uuidArray[i * 2] = j * (Long.MAX_VALUE / arraySize);
+            if (j % 2 == 0)
                _booleanArray[i] = true;
         }
     }
