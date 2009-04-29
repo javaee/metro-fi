@@ -40,7 +40,6 @@
 package com.sun.xml.fastinfoset;
 
 import java.io.UnsupportedEncodingException;
-import org.jvnet.fastinfoset.RestrictedAlphabet;
 
 public final class EncodingConstants {
     static {

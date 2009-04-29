@@ -182,14 +182,10 @@ public class SAXDocumentSerializerWithPrefixMapping extends SAXDocumentSerialize
                             }
                             encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable, mustToBeAddedToTable);
                         } else if (alphabet == RestrictedAlphabet.DATE_TIME_CHARACTERS) {
-                            encodeNonIdentifyingStringOnFirstBit(
-                                    RestrictedAlphabet.DATE_TIME_CHARACTERS_INDEX, 
-                                    DATE_TIME_CHARACTERS_TABLE,
+                            encodeDateTimeNonIdentifyingStringOnFirstBit(
                                     value, addToTable, mustToBeAddedToTable);
-                        } else if (alphabet == RestrictedAlphabet.DATE_TIME_CHARACTERS) {
-                            encodeNonIdentifyingStringOnFirstBit(
-                                    RestrictedAlphabet.NUMERIC_CHARACTERS_INDEX, 
-                                    NUMERIC_CHARACTERS_TABLE,
+                        } else if (alphabet == RestrictedAlphabet.NUMERIC_CHARACTERS) {
+                            encodeNumericNonIdentifyingStringOnFirstBit(
                                     value, addToTable, mustToBeAddedToTable);
                         } else {
                             encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable, mustToBeAddedToTable);

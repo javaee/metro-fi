@@ -41,7 +41,7 @@
  *
  * Copyright (c) 2001 - 2005 freebxml.org.  All rights reserved.
  *
- * $Header: /zpool01/javanet/scm/svn/tmp/cvs2svn/fi/FastInfoset/src/com/sun/xml/fastinfoset/AbstractResourceBundle.java,v 1.3.2.2 2006-10-03 13:38:07 sandoz Exp $
+ * $Header: /zpool01/javanet/scm/svn/tmp/cvs2svn/fi/FastInfoset/src/com/sun/xml/fastinfoset/AbstractResourceBundle.java,v 1.3.2.3 2009-04-29 09:55:48 oleksiys Exp $
  */
 package com.sun.xml.fastinfoset;
 
@@ -59,7 +59,7 @@ import java.util.ResourceBundle;
 public abstract class AbstractResourceBundle extends ResourceBundle {
         
     public static final String LOCALE = "com.sun.xml.fastinfoset.locale";
-    static String _bundleName = null;
+    private static String _bundleName = null;
     
     public static String getBundleName() {
         return _bundleName;

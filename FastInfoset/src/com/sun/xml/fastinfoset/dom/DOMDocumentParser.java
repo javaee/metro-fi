@@ -56,6 +56,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
+import com.sun.xml.fastinfoset.util.DuplicateAttributeVerifier;
 import org.w3c.dom.Text;
 
 /**
@@ -139,7 +140,7 @@ public class DOMDocumentParser extends Decoder {
         boolean documentTypeDeclarationOccured = false;
         while(!_terminate || !firstElementHasOccured) {
             _b = read();
-            switch(DecoderStateTables.DII[_b]) {
+            switch(DecoderStateTables.DII(_b)) {
                 case DecoderStateTables.EII_NO_AIIS_INDEX_SMALL:
                     processEII(_elementNameTable._array[_b], false);
                     firstElementHasOccured = true;
@@ -233,7 +234,7 @@ public class DOMDocumentParser extends Decoder {
         // Decode any remaining Comment IIs, PI IIs
         while(!_terminate) {
             _b = read();
-            switch(DecoderStateTables.DII[_b]) {
+            switch(DecoderStateTables.DII(_b)) {
                 case DecoderStateTables.COMMENT_II:
                     processCommentII();
                     break;
@@ -331,7 +332,7 @@ public class DOMDocumentParser extends Decoder {
         
         while(!_terminate) {
             _b = read();
-            switch(DecoderStateTables.EII[_b]) {
+            switch(DecoderStateTables.EII(_b)) {
                 case DecoderStateTables.EII_NO_AIIS_INDEX_SMALL:
                     processEII(_elementNameTable._array[_b], false);
                     break;
@@ -601,7 +602,7 @@ public class DOMDocumentParser extends Decoder {
                     prefix = decodeIdentifyingNonEmptyStringOnFirstBitAsPrefix(false);
                     a = createAttribute(
                             EncodingConstants.XMLNS_NAMESPACE_NAME,
-                            createQualifiedNameString(XMLNS_NAMESPACE_PREFIX_CHARS, prefix),
+                            createQualifiedNameString(prefix),
                             prefix);
                     a.setValue("");
                     
@@ -614,7 +615,7 @@ public class DOMDocumentParser extends Decoder {
                     prefix = decodeIdentifyingNonEmptyStringOnFirstBitAsPrefix(true);
                     a = createAttribute(
                             EncodingConstants.XMLNS_NAMESPACE_NAME,
-                            createQualifiedNameString(XMLNS_NAMESPACE_PREFIX_CHARS, prefix),
+                            createQualifiedNameString(prefix),
                             prefix);
                     a.setValue(decodeIdentifyingNonEmptyStringOnFirstBitAsNamespaceName(true));
                     
@@ -634,7 +635,7 @@ public class DOMDocumentParser extends Decoder {
         final int end = _namespacePrefixesIndex;
         
         _b = read();
-        switch(DecoderStateTables.EII[_b]) {
+        switch(DecoderStateTables.EII(_b)) {
             case DecoderStateTables.EII_NO_AIIS_INDEX_SMALL:
                 processEII(_elementNameTable._array[_b], hasAttributes);
                 break;
@@ -760,7 +761,7 @@ public class DOMDocumentParser extends Decoder {
         do {
             // AII qualified name
             b = read();
-            switch (DecoderStateTables.AII[b]) {
+            switch (DecoderStateTables.AII(b)) {
                 case DecoderStateTables.AII_INDEX_SMALL:
                     name = _attributeNameTable._array[b];
                     break;
@@ -782,7 +783,7 @@ public class DOMDocumentParser extends Decoder {
                     name = processLiteralQualifiedName(
                             b & EncodingConstants.LITERAL_QNAME_PREFIX_NAMESPACE_NAME_MASK,
                             _attributeNameTable.getNext());
-                    name.createAttributeValues(_duplicateAttributeVerifier.MAP_SIZE);
+                    name.createAttributeValues(DuplicateAttributeVerifier.MAP_SIZE);
                     _attributeNameTable.add(name);
                     break;
                 case DecoderStateTables.AII_TERMINATOR_DOUBLE:
@@ -809,7 +810,7 @@ public class DOMDocumentParser extends Decoder {
             // [normalized value] of AII
             
             b = read();
-            switch(DecoderStateTables.NISTRING[b]) {
+            switch(DecoderStateTables.NISTRING(b)) {
                 case DecoderStateTables.NISTRING_UTF8_SMALL_LENGTH:
                 {
                     final boolean addToTable = (b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0;

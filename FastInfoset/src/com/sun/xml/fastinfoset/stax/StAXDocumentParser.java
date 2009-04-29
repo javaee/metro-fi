@@ -283,7 +283,7 @@ public class StAXDocumentParser extends Decoder
             
             // Process information item
             final int b = read();
-            switch(DecoderStateTables.EII[b]) {
+            switch(DecoderStateTables.EII(b)) {
                 case DecoderStateTables.EII_NO_AIIS_INDEX_SMALL:
                     processEII(_elementNameTable._array[b], false);
                     return _eventType;
@@ -999,7 +999,7 @@ public class StAXDocumentParser extends Decoder
     
     public final int peekNext() throws XMLStreamException {
         try {
-            switch(DecoderStateTables.EII[peek(this)]) {
+            switch(DecoderStateTables.EII(peek(this))) {
                 case DecoderStateTables.EII_NO_AIIS_INDEX_SMALL:
                 case DecoderStateTables.EII_AIIS_INDEX_SMALL:
                 case DecoderStateTables.EII_INDEX_MEDIUM:
@@ -1229,7 +1229,7 @@ public class StAXDocumentParser extends Decoder
         _currentNamespaceAIIsEnd = _namespaceAIIsIndex;
         
         b = read();
-        switch(DecoderStateTables.EII[b]) {
+        switch(DecoderStateTables.EII(b)) {
             case DecoderStateTables.EII_NO_AIIS_INDEX_SMALL:
                 processEII(_elementNameTable._array[b], hasAttributes);
                 break;
@@ -1304,7 +1304,7 @@ public class StAXDocumentParser extends Decoder
         do {
             // AII qualified name
             b = read();
-            switch (DecoderStateTables.AII[b]) {
+            switch (DecoderStateTables.AII(b)) {
                 case DecoderStateTables.AII_INDEX_SMALL:
                     name = _attributeNameTable._array[b];
                     break;
@@ -1348,7 +1348,7 @@ public class StAXDocumentParser extends Decoder
             _duplicateAttributeVerifier.checkForDuplicateAttribute(name.attributeHash, name.attributeId);
             
             b = read();
-            switch(DecoderStateTables.NISTRING[b]) {
+            switch(DecoderStateTables.NISTRING(b)) {
                 case DecoderStateTables.NISTRING_UTF8_SMALL_LENGTH:
                     _octetBufferLength = (b & EncodingConstants.OCTET_STRING_LENGTH_5TH_BIT_SMALL_MASK) + 1;
                     value = decodeUtf8StringAsString();
@@ -1782,7 +1782,7 @@ public class StAXDocumentParser extends Decoder
     public boolean isBase64Follows() throws IOException {
         // Process information item
         int b = peek(this);
-        switch (DecoderStateTables.EII[b]) {
+        switch (DecoderStateTables.EII(b)) {
             case DecoderStateTables.CII_EA:
                 int algorithmId = (b & 0x02) << 6;
                 int b2 = peek2(this);

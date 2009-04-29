@@ -442,8 +442,7 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
             encodeTermination();
 
             final boolean addToTable = isCharacterContentChunkLengthMatchesLimit(length);
-            encodeFourBitCharacters(RestrictedAlphabet.NUMERIC_CHARACTERS_INDEX, NUMERIC_CHARACTERS_TABLE,
-                    ch, start, length, addToTable);
+            encodeNumericFourBitCharacters(ch, start, length, addToTable);
         } catch (IOException e) {
             throw new SAXException(e);
         } catch (FastInfosetException e) {
@@ -460,8 +459,7 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
             encodeTermination();
 
             final boolean addToTable = isCharacterContentChunkLengthMatchesLimit(length);
-            encodeFourBitCharacters(RestrictedAlphabet.DATE_TIME_CHARACTERS_INDEX, DATE_TIME_CHARACTERS_TABLE,
-                    ch, start, length, addToTable);
+            encodeDateTimeFourBitCharacters(ch, start, length, addToTable);
         } catch (IOException e) {
             throw new SAXException(e);
         } catch (FastInfosetException e) {
@@ -548,14 +546,10 @@ public class SAXDocumentSerializer extends Encoder implements FastInfosetWriter 
                         if (alphabet == null) {
                             encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable, mustBeAddedToTable);
                         } else if (alphabet == RestrictedAlphabet.DATE_TIME_CHARACTERS) {
-                            encodeNonIdentifyingStringOnFirstBit(
-                                    RestrictedAlphabet.DATE_TIME_CHARACTERS_INDEX, 
-                                    DATE_TIME_CHARACTERS_TABLE,
+                            encodeDateTimeNonIdentifyingStringOnFirstBit(
                                     value, addToTable, mustBeAddedToTable);
-                        } else if (alphabet == RestrictedAlphabet.DATE_TIME_CHARACTERS) {
-                            encodeNonIdentifyingStringOnFirstBit(
-                                    RestrictedAlphabet.NUMERIC_CHARACTERS_INDEX, 
-                                    NUMERIC_CHARACTERS_TABLE,
+                        } else if (alphabet == RestrictedAlphabet.NUMERIC_CHARACTERS) {
+                            encodeNumericNonIdentifyingStringOnFirstBit(
                                     value, addToTable, mustBeAddedToTable);
                         } else {
                             encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable, mustBeAddedToTable);

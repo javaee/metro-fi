@@ -106,9 +106,9 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
         }
     }
 
-    protected static int[] NUMERIC_CHARACTERS_TABLE;
+    private static int[] NUMERIC_CHARACTERS_TABLE;
     
-    protected static int[] DATE_TIME_CHARACTERS_TABLE;
+    private static int[] DATE_TIME_CHARACTERS_TABLE;
     
     static {
         NUMERIC_CHARACTERS_TABLE = new int[maxCharacter(RestrictedAlphabet.NUMERIC_CHARACTERS) + 1];
@@ -128,7 +128,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
             DATE_TIME_CHARACTERS_TABLE[RestrictedAlphabet.DATE_TIME_CHARACTERS.charAt(i)] = i;
         }
     }
-    
+
     private static int maxCharacter(String alphabet) {
         int c = 0;
         for (int i = 0; i < alphabet.length() ; i++) {
@@ -771,6 +771,44 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
     }
     
     /**
+     * Encode a chunk of Character Information Items using a numeric
+     * alphabet that results in the encoding of a character in 4 bits
+     * (or two characters per octet).
+     *
+     * @param id the restricted alphabet identifier.
+     * @param table the table mapping characters to 4 bit values.
+     * @param ch the array of characters.
+     * @param offset the offset into the array of characters.
+     * @param length the length of characters.
+     * @param addToTable if characters should be added to table.
+     * @throws ArrayIndexOutOfBoundsException.
+     */
+    protected final void encodeNumericFourBitCharacters(char[] ch, int offset, int length,
+            boolean addToTable) throws FastInfosetException, IOException {
+        encodeFourBitCharacters(RestrictedAlphabet.NUMERIC_CHARACTERS_INDEX,
+                NUMERIC_CHARACTERS_TABLE, ch, offset, length, addToTable);
+    }
+
+    /**
+     * Encode a chunk of Character Information Items using a date-time
+     * alphabet that results in the encoding of a character in 4 bits
+     * (or two characters per octet).
+     *
+     * @param id the restricted alphabet identifier.
+     * @param table the table mapping characters to 4 bit values.
+     * @param ch the array of characters.
+     * @param offset the offset into the array of characters.
+     * @param length the length of characters.
+     * @param addToTable if characters should be added to table.
+     * @throws ArrayIndexOutOfBoundsException.
+     */
+    protected final void encodeDateTimeFourBitCharacters(char[] ch, int offset, int length,
+            boolean addToTable) throws FastInfosetException, IOException {
+        encodeFourBitCharacters(RestrictedAlphabet.DATE_TIME_CHARACTERS_INDEX,
+                DATE_TIME_CHARACTERS_TABLE, ch, offset, length, addToTable);
+    }
+
+    /**
      * Encode a chunk of Character Information Items using a restricted 
      * alphabet that results in the encoding of a character in 4 bits 
      * (or two characters per octet).
@@ -1276,6 +1314,24 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
                 encodeNonEmptyCharacterStringOnFifthBit(ch, offset, length);
             }
         }
+    }
+
+    protected final void encodeNumericNonIdentifyingStringOnFirstBit(
+            String s, boolean addToTable, boolean mustBeAddedToTable)
+            throws IOException, FastInfosetException {
+        encodeNonIdentifyingStringOnFirstBit(
+                                    RestrictedAlphabet.NUMERIC_CHARACTERS_INDEX,
+                                    NUMERIC_CHARACTERS_TABLE, s, addToTable,
+                                    mustBeAddedToTable);
+    }
+
+    protected final void encodeDateTimeNonIdentifyingStringOnFirstBit(
+            String s, boolean addToTable, boolean mustBeAddedToTable)
+            throws IOException, FastInfosetException {
+        encodeNonIdentifyingStringOnFirstBit(
+                                    RestrictedAlphabet.DATE_TIME_CHARACTERS_INDEX,
+                                    DATE_TIME_CHARACTERS_TABLE, s, addToTable,
+                                    mustBeAddedToTable);
     }
 
     protected final void encodeNonIdentifyingStringOnFirstBit(int id, int[] table, 

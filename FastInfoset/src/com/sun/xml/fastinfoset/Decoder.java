@@ -83,11 +83,14 @@ import org.jvnet.fastinfoset.FastInfosetParser;
  */
 public abstract class Decoder implements FastInfosetParser {
     
-    protected static final char[] XML_NAMESPACE_NAME_CHARS = EncodingConstants.XML_NAMESPACE_NAME.toCharArray();
+    private static final char[] XML_NAMESPACE_NAME_CHARS =
+            EncodingConstants.XML_NAMESPACE_NAME.toCharArray();
     
-    protected static final char[] XMLNS_NAMESPACE_PREFIX_CHARS = EncodingConstants.XMLNS_NAMESPACE_PREFIX.toCharArray();
+    private static final char[] XMLNS_NAMESPACE_PREFIX_CHARS =
+            EncodingConstants.XMLNS_NAMESPACE_PREFIX.toCharArray();
     
-    protected static final char[] XMLNS_NAMESPACE_NAME_CHARS = EncodingConstants.XMLNS_NAMESPACE_NAME.toCharArray();
+    private static final char[] XMLNS_NAMESPACE_NAME_CHARS =
+            EncodingConstants.XMLNS_NAMESPACE_NAME.toCharArray();
     
     /**
      * String interning system property.
@@ -1798,6 +1801,10 @@ public abstract class Decoder implements FastInfosetParser {
         
     }
     
+    protected String createQualifiedNameString(String second) {
+        return createQualifiedNameString(XMLNS_NAMESPACE_PREFIX_CHARS, second);
+    }
+
     protected String createQualifiedNameString(char[] first, String second) {
         final int l1 = first.length;
         final int l2 = second.length();

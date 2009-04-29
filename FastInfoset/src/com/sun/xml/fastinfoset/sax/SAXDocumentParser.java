@@ -457,7 +457,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         boolean documentTypeDeclarationOccured = false;
         while(!_terminate || !firstElementHasOccured) {
             _b = read();
-            switch(DecoderStateTables.DII[_b]) {
+            switch(DecoderStateTables.DII(_b)) {
                 case DecoderStateTables.EII_NO_AIIS_INDEX_SMALL:
                     processEII(_elementNameTable._array[_b], false);
                     firstElementHasOccured = true;
@@ -551,7 +551,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         // Decode any remaining Comment IIs, PI IIs
         while(!_terminate) {
             _b = read();
-            switch(DecoderStateTables.DII[_b]) {
+            switch(DecoderStateTables.DII(_b)) {
                 case DecoderStateTables.COMMENT_II:
                     processCommentII();
                     break;
@@ -589,7 +589,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         
         while(!_terminate) {
             _b = read();
-            switch(DecoderStateTables.EII[_b]) {
+            switch(DecoderStateTables.EII(_b)) {
                 case DecoderStateTables.EII_NO_AIIS_INDEX_SMALL:
                     processEII(_elementNameTable._array[_b], false);
                     break;
@@ -905,7 +905,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         
         while(!_terminate) {
             _b = read();
-            switch(DecoderStateTables.EII[_b]) {
+            switch(DecoderStateTables.EII(_b)) {
                 case DecoderStateTables.EII_NO_AIIS_INDEX_SMALL:
                     processEII(_elementNameTable._array[_b], false);
                     break;
@@ -1238,7 +1238,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         final int end = _namespacePrefixesIndex;
         
         _b = read();
-        switch(DecoderStateTables.EII[_b]) {
+        switch(DecoderStateTables.EII(_b)) {
             case DecoderStateTables.EII_NO_AIIS_INDEX_SMALL:
                 processEII(_elementNameTable._array[_b], hasAttributes);
                 break;
@@ -1289,7 +1289,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         do {
             // AII qualified name
             b = read();
-            switch (DecoderStateTables.AII[b]) {
+            switch (DecoderStateTables.AII(b)) {
                 case DecoderStateTables.AII_INDEX_SMALL:
                     name = _attributeNameTable._array[b];
                     break;
@@ -1333,7 +1333,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             // [normalized value] of AII
             
             b = read();
-            switch(DecoderStateTables.NISTRING[b]) {
+            switch(DecoderStateTables.NISTRING(b)) {
                 case DecoderStateTables.NISTRING_UTF8_SMALL_LENGTH:
                     _octetBufferLength = (b & EncodingConstants.OCTET_STRING_LENGTH_5TH_BIT_SMALL_MASK) + 1;
                     value = decodeUtf8StringAsString();
