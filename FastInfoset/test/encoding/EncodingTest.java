@@ -83,8 +83,8 @@ public class EncodingTest extends TestCase {
         _finfRefVocabDocumentURL = this.getClass().getClassLoader().getResource(FINF_SPEC_UBL_FINF_REFVOCAB_RESOURCE);
         
         _ds = new SAXDocumentSerializer();
-        _ds.setCharacterContentChunkSizeLimit(6);
-        _ds.setAttributeValueSizeLimit(6);
+        _ds.setMaxCharacterContentChunkSize(6);
+        _ds.setMaxAttributeValueSize(6);
         _initialVocabulary = new SerializerVocabulary();
     }
     

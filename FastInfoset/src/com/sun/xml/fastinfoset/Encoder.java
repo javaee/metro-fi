@@ -456,7 +456,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
      */
     public boolean isCharacterContentChunkLengthMatchesLimit(int length) {
         return length >= minCharacterContentChunkSize &&
-                length <= maxCharacterContentChunkSize;
+                length < maxCharacterContentChunkSize;
     }
 
     /**
@@ -535,7 +535,7 @@ public abstract class Encoder extends DefaultHandler implements FastInfosetSeria
      */
     public boolean isAttributeValueLengthMatchesLimit(int length) {
         return length >= minAttributeValueSize &&
-                length <= maxAttributeValueSize;
+                length < maxAttributeValueSize;
     }
 
     /**

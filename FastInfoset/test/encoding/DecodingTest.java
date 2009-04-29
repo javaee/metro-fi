@@ -39,7 +39,6 @@
 
 package encoding;
 
-import com.sun.xml.fastinfoset.EncodingConstants;
 import com.sun.xml.fastinfoset.sax.AttributesHolder;
 import com.sun.xml.fastinfoset.sax.SAXDocumentParser;
 import com.sun.xml.fastinfoset.sax.SAXDocumentSerializer;
@@ -131,8 +130,8 @@ public class DecodingTest extends TestCase {
         
         
         SAXDocumentSerializer documentSerializer = new SAXDocumentSerializer();
-        documentSerializer.setCharacterContentChunkSizeLimit(6);
-        documentSerializer.setAttributeValueSizeLimit(6);
+        documentSerializer.setMaxCharacterContentChunkSize(6);
+        documentSerializer.setMaxAttributeValueSize(6);
         documentSerializer.setVocabulary(initialVocabulary);        
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         documentSerializer.setOutputStream(baos);
@@ -161,8 +160,8 @@ public class DecodingTest extends TestCase {
         externalVocabularies.put(ev.URI, ev);
                 
         SAXDocumentSerializer documentSerializer = new SAXDocumentSerializer();
-        documentSerializer.setCharacterContentChunkSizeLimit(6);
-        documentSerializer.setAttributeValueSizeLimit(6);
+        documentSerializer.setMaxCharacterContentChunkSize(6);
+        documentSerializer.setMaxAttributeValueSize(6);
         documentSerializer.setExternalVocabulary(ev);        
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         documentSerializer.setOutputStream(baos);
@@ -181,9 +180,9 @@ public class DecodingTest extends TestCase {
         SerializerVocabulary initialVocabulary = new SerializerVocabulary();
 
         SAXDocumentSerializer documentSerializer = new SAXDocumentSerializer();
-        documentSerializer.setCharacterContentChunkSizeLimit(6);
-        documentSerializer.setAttributeValueSizeLimit(6);
-        documentSerializer.setVocabulary(initialVocabulary);        
+        documentSerializer.setMaxCharacterContentChunkSize(6);
+        documentSerializer.setMaxAttributeValueSize(6);
+        documentSerializer.setVocabulary(initialVocabulary);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         documentSerializer.setOutputStream(baos);
 
