@@ -72,7 +72,7 @@ public class DecoderStateTables {
     public final static int TERMINATOR_SINGLE               = 22;
     public final static int TERMINATOR_DOUBLE               = 23;
 
-    /* package */ static final int[] DII = new int[256];
+    private static final int[] DII = new int[256];
     
     private static int[][] DII_RANGES = {
         // EII
@@ -359,7 +359,7 @@ public class DecoderStateTables {
     public final static int AII_TERMINATOR_SINGLE           = 4;
     public final static int AII_TERMINATOR_DOUBLE           = 5;
 
-    /* package */ static final int[] AII = new int[256];
+    private static final int[] AII = new int[256];
 
     private static int[][] AII_RANGES = {
         // %00000000 to %00111111  AII small index
@@ -414,7 +414,7 @@ public class DecoderStateTables {
     public final static int NISTRING_INDEX_LARGE           = 10;
     public final static int NISTRING_EMPTY                 = 11;
 
-    /* package */ static final int[] NISTRING = new int[256];
+    private static final int[] NISTRING = new int[256];
 
     private static int[][] NISTRING_RANGES = {
         // UTF-8 string
@@ -531,7 +531,7 @@ public class DecoderStateTables {
     /* package */ final static int ISTRING_INDEX_MEDIUM        = 4;
     /* package */ final static int ISTRING_INDEX_LARGE         = 5;
 
-    /* package */ static final int[] ISTRING = new int[256];
+    private static final int[] ISTRING = new int[256];
     
     private static int[][] ISTRING_RANGES = {
         // %00000000 to %00111111 small length
@@ -787,6 +787,10 @@ public class DecoderStateTables {
 
     public static final int NISTRING(final int index) {
         return NISTRING[index];
+    }
+
+    public static final int ISTRING(final int index) {
+        return ISTRING[index];
     }
 
     static {

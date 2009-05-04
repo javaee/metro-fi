@@ -769,7 +769,7 @@ public abstract class Decoder implements FastInfosetParser {
      */
     protected final int decodeNonIdentifyingStringOnFirstBit() throws FastInfosetException, IOException {
         final int b = read();
-        switch(DecoderStateTables.NISTRING[b]) {
+        switch(DecoderStateTables.NISTRING(b)) {
             case DecoderStateTables.NISTRING_UTF8_SMALL_LENGTH:
                 _addToTable = (b & EncodingConstants.NISTRING_ADD_TO_TABLE_FLAG) > 0;
                 _octetBufferLength = (b & EncodingConstants.OCTET_STRING_LENGTH_5TH_BIT_SMALL_MASK) + 1;
@@ -858,7 +858,7 @@ public abstract class Decoder implements FastInfosetParser {
         // Remove top 4 bits of restricted alphabet or encoding algorithm integer
         b &= 0x0F;
         // Reuse UTF8 length states
-        switch(DecoderStateTables.NISTRING[b]) {
+        switch(DecoderStateTables.NISTRING(b)) {
             case DecoderStateTables.NISTRING_UTF8_SMALL_LENGTH:
                 _octetBufferLength = b + 1;
                 break;
@@ -915,7 +915,7 @@ public abstract class Decoder implements FastInfosetParser {
      */
     protected final String decodeIdentifyingNonEmptyStringOnFirstBit(StringArray table) throws FastInfosetException, IOException {
         final int b = read();
-        switch(DecoderStateTables.ISTRING[b]) {
+        switch(DecoderStateTables.ISTRING(b)) {
             case DecoderStateTables.ISTRING_SMALL_LENGTH:
             {
                 _octetBufferLength = b + 1;
@@ -1234,7 +1234,7 @@ public abstract class Decoder implements FastInfosetParser {
      */
     protected final void decodeNonEmptyOctetStringLengthOnSecondBit() throws FastInfosetException, IOException {
         final int b = read();
-        switch(DecoderStateTables.ISTRING[b]) {
+        switch(DecoderStateTables.ISTRING(b)) {
             case DecoderStateTables.ISTRING_SMALL_LENGTH:
                 _octetBufferLength = b + 1;
                 break;
@@ -1263,7 +1263,7 @@ public abstract class Decoder implements FastInfosetParser {
      */
     protected final int decodeIntegerIndexOnSecondBit() throws FastInfosetException, IOException {
         final int b = read();
-        switch(DecoderStateTables.ISTRING[b]) {
+        switch(DecoderStateTables.ISTRING(b)) {
             case DecoderStateTables.ISTRING_INDEX_SMALL:
                 return b & EncodingConstants.INTEGER_2ND_BIT_SMALL_MASK;
             case DecoderStateTables.ISTRING_INDEX_MEDIUM:
