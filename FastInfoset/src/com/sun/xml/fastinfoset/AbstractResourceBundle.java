@@ -41,7 +41,7 @@
  *
  * Copyright (c) 2001 - 2005 freebxml.org.  All rights reserved.
  *
- * $Header: /zpool01/javanet/scm/svn/tmp/cvs2svn/fi/FastInfoset/src/com/sun/xml/fastinfoset/AbstractResourceBundle.java,v 1.3.2.3 2009-04-29 09:55:48 oleksiys Exp $
+ * $Header: /zpool01/javanet/scm/svn/tmp/cvs2svn/fi/FastInfoset/src/com/sun/xml/fastinfoset/AbstractResourceBundle.java,v 1.3.2.4 2009-05-13 08:53:01 oleksiys Exp $
  */
 package com.sun.xml.fastinfoset;
 
@@ -54,19 +54,12 @@ import java.util.ResourceBundle;
 /**
  * This class contains methods common to all *ResourceBundle classes
  *
- * @author  Paul Sterk / Sun Microsystems
+ * @author FastInfoset team
  */
 public abstract class AbstractResourceBundle extends ResourceBundle {
         
     public static final String LOCALE = "com.sun.xml.fastinfoset.locale";
-    private static String _bundleName = null;
     
-    public static String getBundleName() {
-        return _bundleName;
-    }
-    public static void setBundleName(String name) {
-        _bundleName = name;
-    }
     /**
      * Gets 'key' from ResourceBundle and format mesage using 'args'.
      *
@@ -76,24 +69,6 @@ public abstract class AbstractResourceBundle extends ResourceBundle {
      */
     public String getString(String key, Object args[]) {
         String pattern = getBundle().getString(key);
-        return MessageFormat.format(pattern, args);
-    }
-    
-    /**
-     * Gets 'key' from ResourceBundle and format mesage using 'args'.
-     *
-     * @param key String key for message.
-     * @param args Array of arguments for message.
-     * @param locale Locale in which to perform key lookup.
-     * @return String formatted message.
-     */
-    public String getString(String key, Object args[], Locale locale) {
-        String pattern = null;
-        if (locale == null) {
-            pattern = getBundle().getString(key);
-        } else {
-            pattern = getBundle(_bundleName, locale).getString(key);
-        }
         return MessageFormat.format(pattern, args);
     }
 
