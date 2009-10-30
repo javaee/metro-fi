@@ -62,7 +62,7 @@ public class EndElementEvent extends EventBase implements EndElement {
         setEventType(END_ELEMENT);
     }
     
-    public EndElementEvent(String namespaceURI, String localpart, String prefix) {
+    public EndElementEvent(String prefix, String namespaceURI, String localpart) {
         _qname = getQName(namespaceURI,localpart,prefix);
         setEventType(END_ELEMENT);
     }
