@@ -72,11 +72,11 @@ final public class NamespaceContextImplementation implements NamespaceContext {
     public String getNamespaceURI(String prefix) {
         if (prefix == null) throw new IllegalArgumentException();
         
-        prefix = prefix.intern();
+//        prefix = prefix.intern();
         
         for (int i = namespacePosition - 1; i >= 0; i--) {
             final String declaredPrefix = prefixes[i];
-            if (declaredPrefix == prefix) {
+            if (declaredPrefix.equals(prefix)) {
                 return namespaceURIs[i];
             }
         }
@@ -91,13 +91,13 @@ final public class NamespaceContextImplementation implements NamespaceContext {
         
         for (int i = namespacePosition - 1; i >= 0; i--) {
             final String declaredNamespaceURI = namespaceURIs[i];
-            if (declaredNamespaceURI == namespaceURI || declaredNamespaceURI.equals(namespaceURI)) {
+            if (declaredNamespaceURI.equals(namespaceURI)) {
                 final String declaredPrefix = prefixes[i];
                 
                 // Check if prefix is out of scope
                 boolean isOutOfScope = false;
                 for (int j = i + 1; j < namespacePosition; j++)
-                    if (declaredPrefix == prefixes[j]) {
+                    if (declaredPrefix.equals(prefixes[j])) {
                         isOutOfScope = true;
                         break;
                     }
@@ -118,13 +118,13 @@ final public class NamespaceContextImplementation implements NamespaceContext {
         
         for (int i = namespacePosition - 1; i >= 0; i--) {
             final String declaredNamespaceURI = namespaceURIs[i];
-            if ((declaredNamespaceURI == namespaceURI || declaredNamespaceURI.equals(namespaceURI)) &&
+            if (declaredNamespaceURI.equals(namespaceURI) &&
                 prefixes[i].length() > 0){
                 final String declaredPrefix = prefixes[i];
                 
                 // Check if prefix is out of scope
                 for (++i; i < namespacePosition; i++)
-                    if (declaredPrefix == prefixes[i])
+                    if (declaredPrefix.equals(prefixes[i]))
                         return null;
                 
                 return declaredPrefix;
@@ -143,12 +143,12 @@ final public class NamespaceContextImplementation implements NamespaceContext {
         
         NAMESPACE_LOOP: for (int i = namespacePosition - 1; i >= 0; i--) {
             final String declaredNamespaceURI = namespaceURIs[i];
-            if (declaredNamespaceURI == namespaceURI || declaredNamespaceURI.equals(namespaceURI)) {
+            if (declaredNamespaceURI.equals(namespaceURI)) {
                 final String declaredPrefix = prefixes[i];
                 
                 // Check if prefix is out of scope
                 for (int j = i + 1; j < namespacePosition; j++)
-                    if (declaredPrefix == prefixes[j])
+                    if (declaredPrefix.equals(prefixes[j]))
                         continue NAMESPACE_LOOP;
                 
                 l.add(declaredPrefix);
