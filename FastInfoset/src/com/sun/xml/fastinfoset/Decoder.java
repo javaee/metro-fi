@@ -438,9 +438,11 @@ public abstract class Decoder implements FastInfosetParser {
     }
     
     protected final void decodeAdditionalData() throws FastInfosetException, IOException {
-        for (int i = 0; i < decodeNumberOfItemsOfSequence(); i++) {
+        final int noOfItems = decodeNumberOfItemsOfSequence();
+        
+        for (int i = 0; i < noOfItems; i++) {
             String URI = decodeNonEmptyOctetStringOnSecondBitAsUtf8String();
-            
+
             decodeNonEmptyOctetStringLengthOnSecondBit();
             ensureOctetBufferSize();
             _octetBufferStart = _octetBufferOffset;
@@ -542,19 +544,25 @@ public abstract class Decoder implements FastInfosetParser {
     }
     
     private void decodeTableItems(StringArray array) throws FastInfosetException, IOException {
-        for (int i = 0; i < decodeNumberOfItemsOfSequence(); i++) {
+        final int noOfItems = decodeNumberOfItemsOfSequence();
+
+        for (int i = 0; i < noOfItems; i++) {
             array.add(decodeNonEmptyOctetStringOnSecondBitAsUtf8String());
         }
     }
     
     private void decodeTableItems(PrefixArray array) throws FastInfosetException, IOException {
-        for (int i = 0; i < decodeNumberOfItemsOfSequence(); i++) {
+        final int noOfItems = decodeNumberOfItemsOfSequence();
+
+        for (int i = 0; i < noOfItems; i++) {
             array.add(decodeNonEmptyOctetStringOnSecondBitAsUtf8String());
         }
     }
     
     private void decodeTableItems(ContiguousCharArrayArray array) throws FastInfosetException, IOException {
-        for (int i = 0; i < decodeNumberOfItemsOfSequence(); i++) {
+        final int noOfItems = decodeNumberOfItemsOfSequence();
+
+        for (int i = 0; i < noOfItems; i++) {
             switch(decodeNonIdentifyingStringOnFirstBit()) {
                 case NISTRING_STRING:
                     array.add(_charBuffer, _charBufferLength);
@@ -566,7 +574,9 @@ public abstract class Decoder implements FastInfosetParser {
     }
     
     private void decodeTableItems(CharArrayArray array) throws FastInfosetException, IOException {
-        for (int i = 0; i < decodeNumberOfItemsOfSequence(); i++) {
+        final int noOfItems = decodeNumberOfItemsOfSequence();
+        
+        for (int i = 0; i < noOfItems; i++) {
             switch(decodeNonIdentifyingStringOnFirstBit()) {
                 case NISTRING_STRING:
                     array.add(new CharArray(_charBuffer, 0, _charBufferLength, true));
@@ -578,7 +588,9 @@ public abstract class Decoder implements FastInfosetParser {
     }
     
     private void decodeTableItems(QualifiedNameArray array, boolean isAttribute) throws FastInfosetException, IOException {
-        for (int i = 0; i < decodeNumberOfItemsOfSequence(); i++) {
+        final int noOfItems = decodeNumberOfItemsOfSequence();
+
+        for (int i = 0; i < noOfItems; i++) {
             final int b = read();
             
             String prefix = "";
@@ -592,7 +604,7 @@ public abstract class Decoder implements FastInfosetParser {
             int namespaceNameIndex = -1;
             if ((b & EncodingConstants.NAME_SURROGATE_NAME_FLAG) > 0) {
                 namespaceNameIndex = decodeIntegerIndexOnSecondBit();
-                namespaceName = _v.prefix.get(prefixIndex);
+                namespaceName = _v.namespaceName.get(namespaceNameIndex);
             }
             
             if (namespaceName == "" && prefix != "") {
@@ -615,9 +627,9 @@ public abstract class Decoder implements FastInfosetParser {
     private int decodeNumberOfItemsOfSequence() throws IOException {
         final int b = read();
         if (b < 128) {
-            return b;
+            return b + 1;
         } else {
-            return ((b & 0x0F) << 16) | (read() << 8) | read();
+            return (((b & 0x0F) << 16) | (read() << 8) | read()) + 129;
         }
     }
     
@@ -1262,7 +1274,7 @@ public abstract class Decoder implements FastInfosetParser {
      * C.25
      */
     protected final int decodeIntegerIndexOnSecondBit() throws FastInfosetException, IOException {
-        final int b = read();
+        final int b = read() | 0x80;
         switch(DecoderStateTables.ISTRING(b)) {
             case DecoderStateTables.ISTRING_INDEX_SMALL:
                 return b & EncodingConstants.INTEGER_2ND_BIT_SMALL_MASK;
