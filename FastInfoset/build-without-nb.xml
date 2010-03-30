@@ -87,6 +87,14 @@
                 <include name="**/*"/>
             </fileset>
 	</zip>
+	<zip destfile="${dist.dir}/fastinfoset-src.zip" >
+            <fileset dir="." includes="nbproject*/**"/>
+            <fileset dir="." includes="src*/**"/>
+            <fileset dir="." includes="zip*/**"/>
+            <fileset dir="." includes="*.xml"/>
+            <fileset dir="." includes="*.properties"/>
+            <fileset dir="." includes="*.txt"/>
+	</zip>
     </target>    
     
     
