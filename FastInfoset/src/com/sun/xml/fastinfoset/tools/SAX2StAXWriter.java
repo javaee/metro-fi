@@ -41,6 +41,8 @@ package com.sun.xml.fastinfoset.tools;
 
 import com.sun.xml.fastinfoset.QualifiedName;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import org.xml.sax.Attributes;
@@ -50,6 +52,7 @@ import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class SAX2StAXWriter extends DefaultHandler implements LexicalHandler {
+    private static final Logger logger = Logger.getLogger(SAX2StAXWriter.class.getName());
         
     /**
      * XML stream writer where events are pushed.
@@ -133,7 +136,7 @@ public class SAX2StAXWriter extends DefaultHandler implements LexicalHandler {
             _writer.writeEndElement();
         }
         catch (XMLStreamException e) {
-            e.printStackTrace();
+            logger.log(Level.FINE, "Exception on endElement", e);
             throw new SAXException(e);
         }        
     }

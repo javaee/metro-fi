@@ -69,6 +69,8 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.DefaultHandler;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.xml.sax.ext.DeclHandler;
 
 /**
@@ -82,6 +84,7 @@ import org.xml.sax.ext.DeclHandler;
  * {@link java.io.InputStream}.
  */
 public class SAXDocumentParser extends Decoder implements FastInfosetReader {
+    private static final Logger logger = Logger.getLogger(SAXDocumentParser.class.getName());
     
     /*
      * Empty lexical handler used by default to report
@@ -343,7 +346,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 parse(s);
             }
         } catch (FastInfosetException e) {
-            e.printStackTrace();
+            logger.log(Level.FINE, "parsing error", e);
             throw new SAXException(e);
         }
     }
@@ -353,7 +356,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             systemId = SystemIdResolver.getAbsoluteURI(systemId);
             parse(new URL(systemId).openStream());
         } catch (FastInfosetException e) {
-            e.printStackTrace();
+            logger.log(Level.FINE, "parsing error", e);
             throw new SAXException(e);
         }
     }
@@ -894,7 +897,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         try {
             _contentHandler.startElement(name.namespaceName, name.localName, name.qName, _attributes);
         } catch (SAXException e) {
-            e.printStackTrace();
+            logger.log(Level.FINE, "processEII error", e);
             throw new FastInfosetException("processEII", e);
         }
         

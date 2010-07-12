@@ -63,6 +63,8 @@ import org.jvnet.fastinfoset.FastInfosetException;
 import com.sun.xml.fastinfoset.CommonResourceBundle;
 import com.sun.xml.fastinfoset.org.apache.xerces.util.XMLChar;
 import com.sun.xml.fastinfoset.util.DuplicateAttributeVerifier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.jvnet.fastinfoset.stax.FastInfosetStreamReader;
 
 /**
@@ -77,6 +79,8 @@ import org.jvnet.fastinfoset.stax.FastInfosetStreamReader;
  */
 public class StAXDocumentParser extends Decoder
         implements XMLStreamReader, FastInfosetStreamReader, OctetBufferListener {
+    private static final Logger logger = Logger.getLogger(StAXDocumentParser.class.getName());
+
     protected static final int INTERNAL_STATE_START_DOCUMENT = 0;
     protected static final int INTERNAL_STATE_START_ELEMENT_TERMINATE = 1;
     protected static final int INTERNAL_STATE_SINGLE_TERMINATE_ELEMENT_WITH_NAMESPACES = 2;
@@ -468,15 +472,15 @@ public class StAXDocumentParser extends Decoder
             }
         } catch (IOException e) {
             resetOnError();
-            e.printStackTrace();
+            logger.log(Level.FINE, "next() exception", e);
             throw new XMLStreamException(e);
         } catch (FastInfosetException e) {
             resetOnError();
-            e.printStackTrace();
+            logger.log(Level.FINE, "next() exception", e);
             throw new XMLStreamException(e);
         } catch (RuntimeException e) {
             resetOnError();
-            e.printStackTrace();
+            logger.log(Level.FINE, "next() exception", e);
             throw e;
         }
     }
