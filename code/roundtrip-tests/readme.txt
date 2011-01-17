@@ -13,6 +13,7 @@ Xerces parser in JDK 5.0.  All xml files that fail the test are removed.
 
 2. Getting well-formed XML files
    a. Download XML test data mentioned above (http://java.net/projects/fi/sources/svn/content/trunk/xml-data.zip)
+to the module's root;
    b. Unpack the archive
    c. Edit RoundTripTests/bin/env.sh and execute to set FI_HOME and FIRTT_HOME as well as paths to
 FI_HOME/bin and FIRTT_HOME/bin;
