@@ -12,14 +12,15 @@ Xerces parser in JDK 5.0.  All xml files that fail the test are removed.
 
 
 2. Getting well-formed XML files
-   a. Dowload XML TS and XBC test corpus;
-   b. Edit RoundTripTests/bin/env.sh and execute to set FI_HOME and FIRTT_HOME as well as paths to
+   a. Download XML test data mentioned above (http://java.net/projects/fi/sources/svn/content/trunk/xml-data.zip)
+   b. Unpack the archive
+   c. Edit RoundTripTests/bin/env.sh and execute to set FI_HOME and FIRTT_HOME as well as paths to
 FI_HOME/bin and FIRTT_HOME/bin;
-   c. Make sure JDK 1.5 is in the path;
-   d. Change to data/xmlconf directory and execute "xercesTest.sh ."
+   d. Make sure JDK 1.5 is in the path;
+   e. Change to data/xmlconf directory and execute "xercesTest.sh ."
 
 3. Running RoundTrip Tests
-   a. Perform 2.b. above if it's not have been performed;
+   a. Perform 2.c. above if it's not have been performed;
    b. Change to FIRTT_HOME/data/xmlconf
    c. Execute "allRoundTripTests.sh xmlts_report.html" to test against the XMLTS suite and generate
 a report "xmlts_report.html" under FIRTT_HOME/data directory
