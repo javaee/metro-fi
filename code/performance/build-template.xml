@@ -1,0 +1,46 @@
+<project name="Build template">
+    <property environment="env"/>
+
+    <!--
+	This is a template project that is designed to be imported into
+        the subdirectories for executing Japex for Japex configuration
+        files.
+    -->
+    <property name="project.dir" value="${basedir}/../../"/>
+
+    <property name="FastInfoset.dir" value="${basedir}/../../FastInfoset"/>
+    <property name="Japex.dir" value="${env.JAPEX_HOME}"/>
+
+    <path id="class.path">
+	<fileset dir="${Japex.dir}" includes="dist/lib/*.jar"/>
+    </path>
+
+    <path id="japex.class.path">
+	<fileset dir="${FastInfoset.dir}" includes="dist/lib/*.jar"/>
+	<fileset dir="${Japex.dir}" includes="dist/jdsl/*.jar"/>
+    </path>
+
+    <property name="japex.classPath" refid="japex.class.path"/>
+
+    <!--
+	This task is designed to be as follwing:
+
+          ant -Dconfig=<Japex configuration file> run
+
+    -->
+    <target name="run"> 
+        <java
+                dir="."
+                fork="true"
+                classname="com.sun.japex.Japex">
+            <jvmarg value="-server"/>
+            <jvmarg value="-XX:+UseJumpTables"/>
+            <jvmarg value="-Xms384m"/>
+            <jvmarg value="-Xmx384m"/>
+            <jvmarg value="-Djapex.classPath=${japex.classPath}"/>
+            <classpath refid="class.path"/>
+            <arg line="${config}"/>
+        </java>
+    </target>
+
+</project>

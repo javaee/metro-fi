@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testSuite name="UBL-parse" xmlns="http://www.sun.com/japex/testSuite">
+
+    <param name="japex.warmupTime" value="5"/>
+    <param name="japex.runTime" value="5"/>
+    <param name="japex.resultUnit" value="ms"/>
+
+    <driver name="FastInfosetSAXDriver">
+        <param name="japex.driverClass" value="com.sun.japex.jdsl.xml.parsing.sax.FastInfosetSAXDriver"/>
+    </driver>
+    <driver name="FastInfosetSAXExtVocabDriver">
+        <param name="japex.driverClass" value="com.sun.japex.jdsl.xml.parsing.sax.FastInfosetSAXDriver"/>
+        <param name="jdsl.externalVocabulary" value="true"/>
+    </driver>
+    <driver name="XercesJAXPSAXDriver" normal="true">
+        <param name="japex.driverClass" value="com.sun.japex.jdsl.xml.parsing.sax.XercesJAXPSAXDriver"/>
+    </driver>
+
+<testCase name="DespatchAdvice.xml">
+<param name="xmlfile" value="data/DespatchAdvice.xml"/>
+</testCase>
+<testCase name="Invoice.xml">
+<param name="xmlfile" value="data/Invoice.xml"/>
+</testCase>
+<testCase name="Order.xml">
+<param name="xmlfile" value="data/Order.xml"/>
+</testCase>
+<testCase name="OrderCancellation.xml">
+<param name="xmlfile" value="data/OrderCancellation.xml"/>
+</testCase>
+<testCase name="OrderChange.xml">
+<param name="xmlfile" value="data/OrderChange.xml"/>
+</testCase>
+<testCase name="OrderResponse.xml">
+<param name="xmlfile" value="data/OrderResponse.xml"/>
+</testCase>
+<testCase name="OrderResponseSimple.xml">
+<param name="xmlfile" value="data/OrderResponseSimple.xml"/>
+</testCase>
+<testCase name="ReceiptAdvice.xml">
+<param name="xmlfile" value="data/ReceiptAdvice.xml"/>
+</testCase>
+<testCase name="UBL-DespatchAdvice-1.0-Joinery-Example.xml">
+<param name="xmlfile" value="data/UBL-DespatchAdvice-1.0-Joinery-Example.xml"/>
+</testCase>
+<testCase name="UBL-DespatchAdvice-1.0-Office-Example.xml">
+<param name="xmlfile" value="data/UBL-DespatchAdvice-1.0-Office-Example.xml"/>
+</testCase>
+<testCase name="UBL-Invoice-1.0-Joinery-Example.xml">
+<param name="xmlfile" value="data/UBL-Invoice-1.0-Joinery-Example.xml"/>
+</testCase>
+<testCase name="UBL-Invoice-1.0-Office-Example.xml">
+<param name="xmlfile" value="data/UBL-Invoice-1.0-Office-Example.xml"/>
+</testCase>
+<testCase name="UBL-Order-1.0-Joinery-Example.xml">
+<param name="xmlfile" value="data/UBL-Order-1.0-Joinery-Example.xml"/>
+</testCase>
+<testCase name="UBL-Order-1.0-Office-Example.xml">
+<param name="xmlfile" value="data/UBL-Order-1.0-Office-Example.xml"/>
+</testCase>
+<testCase name="UBL-OrderCancellation-1.0-Office-Example.xml">
+<param name="xmlfile" value="data/UBL-OrderCancellation-1.0-Office-Example.xml"/>
+</testCase>
+<testCase name="UBL-OrderChange-1.0-Office-Example.xml">
+<param name="xmlfile" value="data/UBL-OrderChange-1.0-Office-Example.xml"/>
+</testCase>
+<testCase name="UBL-OrderResponse-1.0-Joinery-Example.xml">
+<param name="xmlfile" value="data/UBL-OrderResponse-1.0-Joinery-Example.xml"/>
+</testCase>
+<testCase name="UBL-OrderResponseSimple-1.0-Office-Example.xml">
+<param name="xmlfile" value="data/UBL-OrderResponseSimple-1.0-Office-Example.xml"/>
+</testCase>
+<testCase name="UBL-ReceiptAdvice-1.0-Office-Example.xml">
+<param name="xmlfile" value="data/UBL-ReceiptAdvice-1.0-Office-Example.xml"/>
+</testCase>
+
+</testSuite>

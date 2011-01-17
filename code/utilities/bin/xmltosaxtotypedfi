@@ -1,0 +1,2 @@
+#!/bin/sh
+java -cp ${FI_HOME}/dist/FastInfoset.jar:${FI_UTILITIES_HOME}/dist/FastInfosetUtilities.jar:${FI_UTILITIES_HOME}/lib/relaxngDatatype.jar:${FI_UTILITIES_HOME}/lib/xsom.jar:${FI_UTILITIES_HOME}/lib/streambuffer.jar:${FI_UTILITIES_HOME}/lib/jsr173_api.jar com.sun.xml.fastinfoset.utilities.tools.XML_SAX_TYPED_FI $1 $2 $3

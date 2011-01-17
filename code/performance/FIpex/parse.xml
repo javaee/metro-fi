@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testSuite name="FI-parse" xmlns="http://www.sun.com/japex/testSuite">
+
+    <param name="japex.warmupTime" value="5"/>
+    <param name="japex.runTime" value="5"/>
+    <param name="japex.resultUnit" value="ms"/>
+
+    <driver name="FastInfosetSAXDriver">
+	<param name="description" value="Fast Infoset SAX Parser"/>
+        <param name="japex.driverClass" value="com.sun.japex.jdsl.xml.parsing.sax.FastInfosetSAXDriver"/>
+    </driver>
+    <driver name="FastInfoset24IndexedContentSAXDriver">
+	<param name="description" value="Fast Infoset SAX Parser, indexed content less than 24 characters"/>
+        <param name="japex.driverClass" value="com.sun.japex.jdsl.xml.parsing.sax.FastInfosetSAXDriver"/>
+        <param name="jdsl.characterContentChunkSizeLimit" value="24"/>
+        <param name="jdsl.attributeValueSizeLimit" value="24"/>
+    </driver>
+    <driver name="FastInfoset24IndexedContentSAXExtVocabDriver">
+	<param name="description" value="Fast Infoset StAX Parser, indexed content less than 24 characters, external vocabulary"/>
+        <param name="japex.driverClass" value="com.sun.japex.jdsl.xml.parsing.sax.FastInfosetSAXDriver"/>
+        <param name="jdsl.externalVocabulary" value="true"/>
+        <param name="jdsl.characterContentChunkSizeLimit" value="24"/>
+        <param name="jdsl.attributeValueSizeLimit" value="24"/>
+    </driver>
+    <driver name="FastInfosetStAXDriver">
+	<param name="description" value="Fast Infoset StAX Parser"/>
+        <param name="japex.driverClass" value="com.sun.japex.jdsl.xml.parsing.stax.FastInfosetStAXDriver"/>
+    </driver>
+    <driver name="FastInfoset24IndexedContentStAXDriver">
+	<param name="description" value="Fast Infoset StAX Parser, indexed content less than 24 characters"/>
+        <param name="japex.driverClass" value="com.sun.japex.jdsl.xml.parsing.stax.FastInfosetStAXDriver"/>
+        <param name="jdsl.characterContentChunkSizeLimit" value="24"/>
+        <param name="jdsl.attributeValueSizeLimit" value="24"/>
+    </driver>
+    <driver name="XercesJAXPSAXDriver" normal="true">
+	<param name="description" value="XML Xerces JAXP SAX Parser"/>
+        <param name="japex.driverClass" value="com.sun.japex.jdsl.xml.parsing.sax.XercesJAXPSAXDriver"/>
+    </driver>
+    <driver name="SunSJSXPStAXDriver">
+	<param name="description" value="XML SUN SJSXP StAX Parser"/>
+        <param name="japex.driverClass" value="com.sun.japex.jdsl.xml.parsing.stax.SunSJSXPStAXDriver"/>
+    </driver>
+
+    <testCase name="inv1.xml">
+        <param name="xmlfile" value="data/inv1.xml"/>
+    </testCase>
+    <testCase name="inv10.xml">
+        <param name="xmlfile" value="data/inv10.xml"/>
+    </testCase>
+    <testCase name="inv50.xml">
+        <param name="xmlfile" value="data/inv50.xml"/>
+    </testCase>
+    <testCase name="inv100.xml">
+        <param name="xmlfile" value="data/inv100.xml"/>
+    </testCase>
+    <testCase name="inv500.xml">
+        <param name="xmlfile" value="data/inv500.xml"/>
+    </testCase>
+    <testCase name="inv1000.xml">
+        <param name="xmlfile" value="data/inv1000.xml"/>
+    </testCase>
+
+    <testCase name="soap1.xml">
+        <param name="xmlfile" value="data/soap1.xml"/>
+    </testCase>
+    <testCase name="soap2.xml">
+        <param name="xmlfile" value="data/soap2.xml"/>
+    </testCase>
+    <testCase name="soap3.xml">
+        <param name="xmlfile" value="data/soap3.xml"/>
+    </testCase>
+    <testCase name="soap4.xml">
+        <param name="xmlfile" value="data/soap4.xml"/>
+    </testCase>
+
+    <testCase name="db10.xml">
+        <param name="xmlfile" value="data/db10.xml"/>
+    </testCase>
+    <testCase name="db50.xml">
+        <param name="xmlfile" value="data/db50.xml"/>
+    </testCase>
+    <testCase name="db100.xml">
+        <param name="xmlfile" value="data/db100.xml"/>
+    </testCase>
+    <testCase name="db500.xml">
+        <param name="xmlfile" value="data/db500.xml"/>
+    </testCase>
+    <testCase name="db1000.xml">
+        <param name="xmlfile" value="data/db1000.xml"/>
+    </testCase>
+    <testCase name="db10000.xml">
+        <param name="xmlfile" value="data/db10000.xml"/>
+    </testCase>
+
+    <testCase name="xsl1.xml">
+        <param name="xmlfile" value="data/xsl1.xml"/>
+    </testCase>
+    <testCase name="xsl2.xml">
+        <param name="xmlfile" value="data/xsl2.xml"/>
+    </testCase>
+    <testCase name="xsl3.xml">
+        <param name="xmlfile" value="data/xsl3.xml"/>
+    </testCase>
+    <testCase name="xsl4.xml">
+        <param name="xmlfile" value="data/xsl4.xml"/>
+    </testCase>
+
+    <testCase name="periodic.xml">
+        <param name="xmlfile" value="data/periodic.xml"/>
+    </testCase>
+    <testCase name="weblog.xml">
+        <param name="xmlfile" value="data/weblog.xml"/>
+    </testCase>
+    <testCase name="factbook.xml">
+        <param name="xmlfile" value="data/factbook.xml"/>
+    </testCase>
+
+</testSuite>

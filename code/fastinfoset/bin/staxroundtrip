@@ -1,0 +1,11 @@
+#!/bin/sh
+echo -n $1 
+xmltosaxtostaxtofi $1 > $1.stax.finf
+saxtosaxevent $1 > $1.sax-event
+staxtosaxtosaxevent $1.stax.finf > $1.stax.finf.sax-event
+diff $1.sax-event $1.stax.finf.sax-event > $1.stax.sax-event.diff
+if [ -s $1.stax.sax-event.diff ]; then
+	echo : FAILED, see $1.stax.sax-event.diff
+else
+	echo : PASSED
+fi

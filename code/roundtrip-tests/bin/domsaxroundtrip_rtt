@@ -1,0 +1,13 @@
+#!/bin/sh
+echo -n $1
+xmltodomtosaxtofi $1 > $1.dom.sax.finf
+saxtodomtosaxevent $1 > $1.dom.sax-event
+saxtodomtosaxevent $1.dom.sax.finf > $1.dom.sax.finf.sax-event
+diff $1.dom.sax-event $1.dom.sax.finf.sax-event > $1.dom.sax.sax-event.diff
+if [ -s $1.dom.sax.sax-event.diff ]; then
+	#echo : FAILED, see $1.dom.sax.sax-event.diff
+        report ${FIRTT_DATA} $3 $1 $2 domsaxroundtrip failed
+else
+	#echo : PASSED
+        report ${FIRTT_DATA} $3 $1 $2 domsaxroundtrip passed
+fi

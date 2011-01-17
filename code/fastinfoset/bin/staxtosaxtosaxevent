@@ -1,0 +1,2 @@
+#!/bin/sh
+java -cp ${FI_HOME}/dist/FastInfoset.jar:${FI_HOME}/lib/jsr173_api.jar com.sun.xml.fastinfoset.tools.FI_StAX_SAX_Or_XML_SAX_SAXEvent $1

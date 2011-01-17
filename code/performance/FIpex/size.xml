@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testSuite name="FI-size" xmlns="http://www.sun.com/japex/testSuite">
+
+    <param name="japex.resultUnit" value="KBytes"/>
+    <param name="japex.warmupIterations" value="1"/>
+    <param name="japex.runIterations" value="1"/>
+
+    <driver name="FastInfosetSizeDriver">
+	<param name="description" value="Fast Infoset document size"/>
+        <param name="japex.driverClass" value="com.sun.japex.jdsl.xml.size.FastInfosetSizeDriver"/>
+    </driver>
+    <driver name="FastInfosetGZIPSizeDriver">
+	<param name="description" value="Fast Infoset document GZIP size"/>
+        <param name="japex.driverClass" value="com.sun.japex.jdsl.xml.size.FastInfosetSizeDriver"/>
+        <param name="jdsl.GZIP" value="true"/>
+    </driver>
+    <driver name="FastInfosetNoIndexedContentSizeDriver">
+	<param name="description" value="Fast Infoset document, no indexed content, size"/>
+        <param name="japex.driverClass" value="com.sun.japex.jdsl.xml.size.FastInfosetSizeDriver"/>
+        <param name="jdsl.indexedContent" value="none"/>
+    </driver>
+    <driver name="FastInfosetNoIndexedContentGZIPSizeDriver">
+	<param name="description" value="Fast Infoset document, no indexed content, GZIP size"/>
+        <param name="japex.driverClass" value="com.sun.japex.jdsl.xml.size.FastInfosetSizeDriver"/>
+        <param name="jdsl.indexedContent" value="none"/>
+        <param name="jdsl.GZIP" value="true"/>
+    </driver>
+    <driver name="FastInfosetFullIndexedContentSizeDriver">
+	<param name="description" value="Fast Infoset document, full indexed content, size"/>
+        <param name="japex.driverClass" value="com.sun.japex.jdsl.xml.size.FastInfosetSizeDriver"/>
+        <param name="jdsl.indexedContent" value="full"/>
+    </driver>
+    <driver name="FastInfoset24IndexedContentSizeDriver">
+	<param name="description" value="Fast Infoset document, indexed content less than 24 characters, size"/>
+        <param name="japex.driverClass" value="com.sun.japex.jdsl.xml.size.FastInfosetSizeDriver"/>
+        <param name="jdsl.characterContentChunkSizeLimit" value="24"/>
+        <param name="jdsl.attributeValueSizeLimit" value="24"/>
+    </driver>
+    <driver name="FastInfosetFullIndexedContentGZIPSizeDriver">
+	<param name="description" value="Fast Infoset document, full indexed content, GZIP size"/>
+        <param name="japex.driverClass" value="com.sun.japex.jdsl.xml.size.FastInfosetSizeDriver"/>
+        <param name="jdsl.indexedContent" value="full"/>
+        <param name="jdsl.GZIP" value="true"/>
+    </driver>
+    <driver name="FastInfosetExtVocSizeDriver">
+	<param name="description" value="Fast Infoset document, external vocabulary, size"/>
+        <param name="japex.driverClass" value="com.sun.japex.jdsl.xml.size.FastInfosetSizeDriver"/>
+        <param name="jdsl.externalVocabulary" value="true"/>
+    </driver>
+    <driver name="FastInfosetExtVocGZIPSizeDriver">
+	<param name="description" value="Fast Infoset document, external vocabulary, GZIP size"/>
+        <param name="japex.driverClass" value="com.sun.japex.jdsl.xml.size.FastInfosetSizeDriver"/>
+        <param name="jdsl.externalVocabulary" value="true"/>
+        <param name="jdsl.GZIP" value="true"/>
+    </driver>
+    <driver name="FastInfosetExtVocFullIndexedContentSizeDriver">
+	<param name="description" value="Fast Infoset document, full indexed content external vocabulary, size"/>
+        <param name="japex.driverClass" value="com.sun.japex.jdsl.xml.size.FastInfosetSizeDriver"/>
+        <param name="jdsl.externalVocabulary" value="true"/>
+        <param name="jdsl.indexedContent" value="full"/>
+    </driver>
+    <driver name="FastInfosetExtVocFullIndexedContentGZIPSizeDriver">
+	<param name="description" value="Fast Infoset document, full indexed content external vocabulary, GZIP size"/>
+        <param name="japex.driverClass" value="com.sun.japex.jdsl.xml.size.FastInfosetSizeDriver"/>
+        <param name="jdsl.externalVocabulary" value="true"/>
+        <param name="jdsl.indexedContent" value="full"/>
+        <param name="jdsl.GZIP" value="true"/>
+    </driver>
+    <driver name="XMLSizeDriver" normal="true">
+	<param name="description" value="XML document size"/>
+        <param name="japex.driverClass" value="com.sun.japex.jdsl.xml.size.XMLSizeDriver"/>
+    </driver>
+    <driver name="XMLGZIPSizeDriver">
+	<param name="description" value="XML document GZIP size"/>
+        <param name="japex.driverClass" value="com.sun.japex.jdsl.xml.size.XMLSizeDriver"/>
+        <param name="jdsl.GZIP" value="true"/>
+    </driver>
+
+    <testCase name="inv1.xml">
+        <param name="xmlfile" value="data/inv1.xml"/>
+    </testCase>
+    <testCase name="inv10.xml">
+        <param name="xmlfile" value="data/inv10.xml"/>
+    </testCase>
+    <testCase name="inv50.xml">
+        <param name="xmlfile" value="data/inv50.xml"/>
+    </testCase>
+    <testCase name="inv100.xml">
+        <param name="xmlfile" value="data/inv100.xml"/>
+    </testCase>
+    <testCase name="inv500.xml">
+        <param name="xmlfile" value="data/inv500.xml"/>
+    </testCase>
+    <testCase name="inv1000.xml">
+        <param name="xmlfile" value="data/inv1000.xml"/>
+    </testCase>
+
+    <testCase name="soap1.xml">
+        <param name="xmlfile" value="data/soap1.xml"/>
+    </testCase>
+    <testCase name="soap2.xml">
+        <param name="xmlfile" value="data/soap2.xml"/>
+    </testCase>
+    <testCase name="soap3.xml">
+        <param name="xmlfile" value="data/soap3.xml"/>
+    </testCase>
+    <testCase name="soap4.xml">
+        <param name="xmlfile" value="data/soap4.xml"/>
+    </testCase>
+
+    <testCase name="db10.xml">
+        <param name="xmlfile" value="data/db10.xml"/>
+    </testCase>
+    <testCase name="db50.xml">
+        <param name="xmlfile" value="data/db50.xml"/>
+    </testCase>
+    <testCase name="db100.xml">
+        <param name="xmlfile" value="data/db100.xml"/>
+    </testCase>
+    <testCase name="db500.xml">
+        <param name="xmlfile" value="data/db500.xml"/>
+    </testCase>
+    <testCase name="db1000.xml">
+        <param name="xmlfile" value="data/db1000.xml"/>
+    </testCase>
+    <testCase name="db10000.xml">
+        <param name="xmlfile" value="data/db10000.xml"/>
+    </testCase>
+
+    <testCase name="xsl1.xml">
+        <param name="xmlfile" value="data/xsl1.xml"/>
+    </testCase>
+    <testCase name="xsl2.xml">
+        <param name="xmlfile" value="data/xsl2.xml"/>
+    </testCase>
+    <testCase name="xsl3.xml">
+        <param name="xmlfile" value="data/xsl3.xml"/>
+    </testCase>
+    <testCase name="xsl4.xml">
+        <param name="xmlfile" value="data/xsl4.xml"/>
+    </testCase>
+
+    <testCase name="periodic.xml">
+        <param name="xmlfile" value="data/periodic.xml"/>
+    </testCase>
+    <testCase name="weblog.xml">
+        <param name="xmlfile" value="data/weblog.xml"/>
+    </testCase>
+    <testCase name="factbook.xml">
+        <param name="xmlfile" value="data/factbook.xml"/>
+    </testCase>
+
+</testSuite>
