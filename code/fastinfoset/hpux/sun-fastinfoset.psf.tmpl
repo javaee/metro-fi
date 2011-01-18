@@ -1,0 +1,33 @@
+depot
+	layout_version 1.0
+vendor 
+	tag SUN
+	title Sun Microsystems, Inc.
+	description "Java Enterprise System"
+end
+
+product
+	tag 		sun-fastinfoset
+	title		Fast Infoset
+	description 	"Fast Infoset 1.2"
+	copyright	"Copyright 2005 Sun Microsystems, Inc.  All rights reserved.
+Use is subject to license terms."
+	revision	@fi.version@
+	number		@datestamp@
+	architecture	HP-UX_B.11_32/64
+	vendor_tag	SUN
+	machine_type	*
+	os_name 	HP-UX
+	os_release	*
+	os_version	*
+	is_locatable	true
+	directory	/
+
+	fileset
+		tag		sun-fastinfoset
+
+		prerequisite	sun-jaxp
+
+		file -m 0644 -o root -g root @libdir@/FastInfoset.jar /opt/sun/share/lib/FastInfoset.jar
+	end
+end

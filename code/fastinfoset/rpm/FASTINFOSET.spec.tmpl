@@ -1,0 +1,30 @@
+%define _topdir @build.dir@
+Summary: Fast Infoset
+Name: sun-fastinfoset
+Version: @fastinfoset.version@ 
+Release: @fastinfoset.release@ 
+License: Copyright 2005 Sun Microsystems, Inc.  All rights reserved.  Use is subject to license terms.
+Group: Development/Libraries
+Source: %{name}-%{version}.tar
+Distribution: @prod.name@ 
+Vendor: Sun Microsystems, Inc.
+Provides: %{name}-@fastinfoset.version@-@fastinfoset.release@
+Requires: sun-jaxp
+BuildRoot: %{_topdir}/BUILD/%{name}-%{version}
+URL: http://www.sun.com
+
+%description
+Fast Infoset
+
+%prep
+
+%setup
+
+%build
+
+%install
+
+%clean
+
+%files
+%attr(-,root,root) @install.prefix@/share/lib/FastInfoset.jar
