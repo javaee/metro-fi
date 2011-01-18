@@ -1,0 +1,2 @@
+#!/bin/sh
+java -cp ${FIRTT_HOME}/dist/RoundTripTests.jar com.sun.xml.fastinfoset.roundtriptests.RoundTripReport $1 $2 $3 $4 $5 $6
