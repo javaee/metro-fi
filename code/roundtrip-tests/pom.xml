@@ -20,4 +20,11 @@
             </resource>
         </resources>
     </build>
+    <dependencies>
+        <dependency>
+            <groupId>com.sun.xml.fastinfoset</groupId>
+            <artifactId>FastInfoset</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 </project>
