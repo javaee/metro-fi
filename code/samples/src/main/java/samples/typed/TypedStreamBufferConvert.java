@@ -13,10 +13,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import javax.xml.parsers.SAXParserFactory;
 import org.jvnet.fastinfoset.sax.FastInfosetReader;
 import org.jvnet.fastinfoset.sax.FastInfosetWriter;
-import org.xml.sax.XMLReader;
 
 /**
  * Example of converting from lexical space to value space 
