@@ -51,19 +51,21 @@
         <name>Oracle Corpration</name>
         <url>http://www.oracle.com</url>
     </organization>
+    <scm>
+        <connection>scm:svn:https://svn.java.net/svn/fi~svn/trunk/code/</connection>
+        <developerConnection>scm:svn:https://svn.java.net/svn/fi~svn/trunk/code/</developerConnection>
+        <tag>HEAD</tag>
+        <url>http://java.net/projects/fi/sources/svn/show/trunk/code/</url>
+    </scm>
     <repositories>
         <repository>
-            <id>glassfish-repo-archive</id>
-            <name>Nexus repository collection for Glassfish</name>
-            <url>http://maven.glassfish.org/content/groups/glassfish</url>
-            <snapshots>
-                <updatePolicy>never</updatePolicy>
-            </snapshots>
+            <id>m2.dev.java.net</id>
+            <url>http://download.java.net/maven/2</url>
+            <layout>default</layout>
         </repository>
         <repository>
-            <id>glassfish-maven2-repository.dev.java.net</id>
-            <name>Java.net Maven 2 Repository for GlassFish</name>
-            <url>http://download.java.net/maven/glassfish/</url>
+            <id>glassfish.dev.java.net</id>
+            <url>http://download.java.net/maven/glassfish</url>
             <layout>default</layout>
         </repository>
     </repositories>
@@ -79,11 +81,6 @@
                 <groupId>org.jvnet.wagon-svn</groupId>
                 <artifactId>wagon-svn</artifactId>
                 <version>1.9</version>
-            </extension>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ssh-external</artifactId>
-                <version>1.0-beta-2</version>
             </extension>
             <extension>
                 <groupId>org.apache.maven.wagon</groupId>
@@ -156,25 +153,6 @@
             <id>release-profile</id>
             <build>
                 <plugins>
-                    <plugin>
-                        <inherited>true</inherited>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>build-helper-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>add-source</id>
-                                <phase>prepare-package</phase>
-                                <goals>
-                                    <goal>add-source</goal>
-                                </goals>
-                                <configuration>
-                                    <sources>
-                                        <source>src/main/webapp</source>
-                                    </sources>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
                     <plugin>
                         <inherited>true</inherited>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -271,15 +249,9 @@
     <distributionManagement>
         <repository>
             <uniqueVersion>false</uniqueVersion>
-            <id>java.net-m2-repository</id>
-            <url>java-net:/maven2-repository/trunk/repository/</url>
+            <id>java.net-maven2-repository</id>
+            <url>svn:https://svn.java.net/svn/maven2-repository~svn/trunk/repository</url>
         </repository>
-<!--        <repository>
-            <uniqueVersion>false</uniqueVersion>
-             the ID maps to settings.xml, so don't change the ID 
-            <id>rator.sfbay</id>
-            <url>dav:http://glassfish-maven-repository.us.oracle.com/maven/repositories/glassfish/</url>
-        </repository>-->
     </distributionManagement>
     <dependencies>
         <dependency>
