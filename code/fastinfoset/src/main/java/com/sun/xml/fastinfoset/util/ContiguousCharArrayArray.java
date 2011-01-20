@@ -88,6 +88,7 @@ public class ContiguousCharArrayArray extends ValueArray {
             _offset = getCompleteOffsetArray();
             _length = getCompleteLengthArray();
             _size = _readOnlyArraySize;
+            _arrayIndex = _readOnlyArrayIndex;
         }
     }
     
