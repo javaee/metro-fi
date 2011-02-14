@@ -235,7 +235,7 @@ public interface FastInfosetSerializer {
 
     /**
      * Gets the maximum size of character content chunks
-     * that will be indexed.
+     * that might be indexed.
      *
      * @return The maximum character content chunk size.
      */
@@ -243,26 +243,27 @@ public interface FastInfosetSerializer {
 
     /**
      * Sets the maximum size of character content chunks
-     * that will be indexed.
+     * that might be indexed.
      *
      * @param size the maximum character content chunk size.
      */
     public void setMaxCharacterContentChunkSize(int size);
     
     /**
-     * Gets the limit on the memory size of Map of attribute values
-     * that will be indexed.
+     * Gets the limit on the memory size, allocated for indexed character
+     * content chunks.
      *
-     * @return The attribute value size limit.
+     * @return the limit on the memory size, allocated for indexed character
+     * content chunks.
      */
     public int getCharacterContentChunkMapMemoryLimit();
 
     /**
-     * Sets the limit on the memory size of Map of attribute values
-     * that will be indexed.
+     * Sets the limit on the memory size, allocated for indexed character
+     * content chunks.
      *
-     * @param size The attribute value size limit. Any value less
-     * that a length of size limit will be indexed.
+     * @param size the limit on the memory size, allocated for indexed character
+     * content chunks.
      */
     public void setCharacterContentChunkMapMemoryLimit(int size);
     
