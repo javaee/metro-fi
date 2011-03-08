@@ -648,7 +648,7 @@ public class StAXDocumentParser extends Decoder
             char [] ch = this.getTextCharacters();
             int start = this.getTextStart();
             int length = this.getTextLength();
-            for (int i=start; i< length;i++){
+            for (int i = start; i < start + length; i++){
                 if(!XMLChar.isSpace(ch[i])){
                     return false;
                 }
