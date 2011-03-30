@@ -4,7 +4,7 @@
     <artifactId>fastinfoset-project</artifactId>
     <packaging>pom</packaging>
     <name>fastinfoset-project</name>
-    <version>1.2.10-SNAPSHOT</version>
+    <version>1.2.10</version>
     <description>Open Source implementation of the Fast Infoset Standard for Binary XML (http://www.itu.int/ITU-T/asn1/).</description>
     <url>http://fi.java.net</url>
     <issueManagement>
