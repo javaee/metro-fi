@@ -85,7 +85,7 @@
             </testResource>
         </testResources>
         <directory>target</directory>
-        <finalName>${artifactId}-${version}</finalName>
+        <finalName>${project.artifactId}-${project.version}</finalName>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -122,11 +122,11 @@
                             <Specification-Title>ITU-T Rec. X.891 | ISO/IEC 24824-1 (Fast Infoset)</Specification-Title>
                             <Specification-Version>1.0</Specification-Version>
                             <Implementation-Title>Fast Infoset Implementation</Implementation-Title>
-                            <Implementation-Version>${pom.version}</Implementation-Version>
+                            <Implementation-Version>${project.version}</Implementation-Version>
                             <Implementation-Vendor>Oracle</Implementation-Vendor>
                             <Implementation-Vendor-Id>com.oracle</Implementation-Vendor-Id>
                             <Extension-Name>com.sun.xml.fastinfoset</Extension-Name>
-                            <URL>${pom.url}</URL>
+                            <URL>${project.url}</URL>
                         </manifestEntries>
                     </archive>
                     <mavenExecutorId>forked-path</mavenExecutorId>
