@@ -109,7 +109,7 @@
             <plugin>
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
-                    <tagBase>https://www.dev.java.net/svn/fi/tags</tagBase>
+                    <tagBase>https://svn.java.net/svn/fi~svn/tags</tagBase>
                 </configuration>
             </plugin>
             <plugin>
