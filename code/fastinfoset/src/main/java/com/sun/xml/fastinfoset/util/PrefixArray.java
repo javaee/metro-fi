@@ -190,10 +190,18 @@ public class PrefixArray extends ValueArray {
         clear();
     }
     
+    /**
+     * Returns cloned version of internal String[].
+     * @return cloned version of internal String[].
+     */
     public final String[] getArray() {
-        return _array;
+        if (_array == null) return null;
+        
+        final String[] clonedArray = new String[_array.length];
+        System.arraycopy(_array, 0, clonedArray, 0, _array.length);
+        return clonedArray;
     }
-    
+        
     public final void setReadOnlyArray(ValueArray readOnlyArray, boolean clear) {
         if (!(readOnlyArray instanceof PrefixArray)) {
             throw new IllegalArgumentException(CommonResourceBundle.getInstance().
@@ -227,7 +235,9 @@ public class PrefixArray extends ValueArray {
 
     public final String[] getCompleteArray() {
         if (_readOnlyArray == null) {
-            return _array;
+            // Return cloned version of internal _array
+            return getArray();
+//            return _array;
         } else {
             final String[] ra = _readOnlyArray.getCompleteArray();
             final String[] a = new String[_readOnlyArraySize + _array.length];

@@ -41,8 +41,16 @@ public class CharArrayArray extends ValueArray {
         _size = 0;
     }
 
+    /**
+     * Returns cloned version of internal CharArray[].
+     * @return cloned version of internal CharArray[].
+     */
     public final CharArray[] getArray() {
-        return _array;
+        if (_array == null) return null;
+        
+        final CharArray[] clonedArray = new CharArray[_array.length];
+        System.arraycopy(_array, 0, clonedArray, 0, _array.length);
+        return clonedArray;
     }
     
     public final void setReadOnlyArray(ValueArray readOnlyArray, boolean clear) {

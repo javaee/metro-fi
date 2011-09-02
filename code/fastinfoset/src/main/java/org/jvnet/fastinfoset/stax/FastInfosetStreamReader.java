@@ -44,6 +44,13 @@ public interface FastInfosetStreamReader {
     
     public String accessPrefix();
     
+    /**
+     * Returns a cloned char[] representation of the internal char[] buffer.
+     * So be careful, when using this method due to possible performance and
+     * memory inefficiency.
+     * 
+     * @return a cloned char[] representation of the internal char[] buffer.
+     */
     public char[] accessTextCharacters();
     
     public int accessTextStart();

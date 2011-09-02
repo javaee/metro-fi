@@ -94,7 +94,13 @@ public class ContiguousCharArrayArray extends ValueArray {
     
     public final char[] getCompleteCharArray() {
         if (_readOnlyArray == null) {
-            return _array;
+            if (_array == null) return null;
+            
+            // Return cloned version of internal _array
+            final char[] clonedArray = new char[_array.length];
+            System.arraycopy(_array, 0, clonedArray, 0, _array.length);
+            return clonedArray;
+//            return _array;
         } else {
             final char[] ra = _readOnlyArray.getCompleteCharArray();
             final char[] a = new char[_readOnlyArrayIndex + _array.length];
@@ -105,7 +111,13 @@ public class ContiguousCharArrayArray extends ValueArray {
     
     public final int[] getCompleteOffsetArray() {
         if (_readOnlyArray == null) {
-            return _offset;
+            if (_offset == null) return null;
+            
+            // Return cloned version of internal _offset
+            final int[] clonedArray = new int[_offset.length];
+            System.arraycopy(_offset, 0, clonedArray, 0, _offset.length);
+            return clonedArray;
+//            return _offset;
         } else {
             final int[] ra = _readOnlyArray.getCompleteOffsetArray();
             final int[] a = new int[_readOnlyArraySize + _offset.length];
@@ -116,7 +128,13 @@ public class ContiguousCharArrayArray extends ValueArray {
     
     public final int[] getCompleteLengthArray() {
         if (_readOnlyArray == null) {
-            return _length;
+            if (_length == null) return null;
+            
+            // Return cloned version of internal _length
+            final int[] clonedArray = new int[_length.length];
+            System.arraycopy(_length, 0, clonedArray, 0, _length.length);
+            return clonedArray;
+//            return _length;
         } else {
             final int[] ra = _readOnlyArray.getCompleteLengthArray();
             final int[] a = new int[_readOnlyArraySize + _length.length];

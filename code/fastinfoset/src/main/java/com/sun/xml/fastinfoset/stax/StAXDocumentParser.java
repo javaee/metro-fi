@@ -945,8 +945,27 @@ public class StAXDocumentParser extends Decoder
         return _algorithmId;
     }
     
+    public final boolean hasTextAlgorithmBytes() {
+        return _algorithmData != null;
+    }
+    
+    
+    /**
+     * Returns the byte[], which represents text algorithms.
+     * @deprecated was deprecated due to security reasons. Now the method return cloned byte[].
+     * 
+     * @return 
+     */
     public final byte[] getTextAlgorithmBytes() {
-        return _algorithmData;
+        // Do not return the actual _algorithmData due to security reasons
+//        return _algorithmData;
+        if (_algorithmData == null) {
+            return null;
+        }
+        
+        final byte[] algorithmData = new byte[_algorithmData.length];
+        System.arraycopy(_algorithmData, 0, algorithmData, 0, _algorithmData.length);
+        return algorithmData;
     }
     
     public final byte[] getTextAlgorithmBytesClone() {
@@ -1050,7 +1069,12 @@ public class StAXDocumentParser extends Decoder
     }
     
     public final char[] accessTextCharacters() {
-        return _characters;
+        if (_characters == null) return null;
+        
+        // we return a cloned version of _characters
+        final char[] clonedCharacters = new char[_characters.length];
+        System.arraycopy(_characters, 0, clonedCharacters, 0, _characters.length);
+        return clonedCharacters;
     }
     
     public final int accessTextStart() {

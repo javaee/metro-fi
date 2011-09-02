@@ -39,8 +39,16 @@ public class QualifiedNameArray extends ValueArray {
         _size = _readOnlyArraySize;
     }
 
+    /**
+     * Returns cloned version of internal QualifiedName[].
+     * @return cloned version of internal QualifiedName[].
+     */
     public final QualifiedName[] getArray() {
-        return _array;
+        if (_array == null) return null;
+        
+        final QualifiedName[] clonedArray = new QualifiedName[_array.length];
+        System.arraycopy(_array, 0, clonedArray, 0, _array.length);
+        return clonedArray;
     }
     
     public final void setReadOnlyArray(ValueArray readOnlyArray, boolean clear) {
@@ -68,7 +76,9 @@ public class QualifiedNameArray extends ValueArray {
 
     public final QualifiedName[] getCompleteArray() {
         if (_readOnlyArray == null) {
-            return _array;
+            // Return cloned version of internal _array
+            return getArray();
+//            return _array;
         } else {
             final QualifiedName[] ra = _readOnlyArray.getCompleteArray();
             final QualifiedName[] a = new QualifiedName[_readOnlyArraySize + _array.length];
