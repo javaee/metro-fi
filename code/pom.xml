@@ -308,6 +308,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit-version>4.7</junit-version>
         <maven-plugin.version>1.0.0</maven-plugin.version>
-        <findbugs.exclude>${project.basedir}/exclude.xml</findbugs.exclude>
+        <findbugs.exclude/>
     </properties>
 </project>
