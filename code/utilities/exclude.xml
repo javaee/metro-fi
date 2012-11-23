@@ -1,0 +1,10 @@
+<FindBugsFilter>
+
+    <!--
+        String comparison by == is on purpose for performance reasons
+    -->
+    <Match>
+        <Bug pattern="ES_COMPARING_PARAMETER_STRING_WITH_EQ"/>
+    </Match>
+
+</FindBugsFilter>
