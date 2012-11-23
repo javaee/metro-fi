@@ -14,7 +14,10 @@
         String comparison by == is on purpose for performance reasons
     -->
     <Match>
-        <Bug pattern="ES_COMPARING_PARAMETER_STRING_WITH_EQ"/>
+        <Or>
+            <Bug pattern="ES_COMPARING_PARAMETER_STRING_WITH_EQ"/>
+            <Bug pattern="ES_COMPARING_STRINGS_WITH_EQ"/>
+        </Or>
     </Match>
 
 </FindBugsFilter>
