@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2004-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2004-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
@@ -25,6 +25,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLStreamWriter;
@@ -52,6 +53,7 @@ import org.w3c.dom.Document;
  *
  */
 
+    @SuppressWarnings("CallToThreadDumpStack")
 public class XMLToFastInfosetStAXSerializer {
     String _xmlFile;
     Transformer _transformer;
@@ -74,13 +76,17 @@ public class XMLToFastInfosetStAXSerializer {
      *
      *  @param input the XML file input
      */
-    void getDOMSource(File input) {
+    void getDOMSource(File input) throws IOException {
+        FileInputStream fis = null;
         try {
-            FileInputStream fis = new FileInputStream(input);
+            fis = new FileInputStream(input);
             Document document = _docBuilder.parse(fis);
             fis.close();
             _source = new DOMSource(document);
         } catch (Exception e) {
+            if (fis != null) {
+                fis.close();
+            }
             e.printStackTrace();
         }
         
@@ -110,7 +116,7 @@ public class XMLToFastInfosetStAXSerializer {
      *  @param input an XML file input
      *  @param output the FI document output
      */
-    public void write(File input, File output) {
+    public void write(File input, File output) throws IOException {
         getDOMSource(input);
         getSAXResult(output);
         if (_source != null && _result != null) {
@@ -139,7 +145,7 @@ public class XMLToFastInfosetStAXSerializer {
      *
      *  @param args XML input file name and FI output file name
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         if (args.length < 1 || args.length > 2) {
             displayUsageAndExit();
         }

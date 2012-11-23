@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2004-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2004-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
@@ -38,6 +38,7 @@ public class StAXParsingSample {
     /** Creates a new instance of Cursor */
     public StAXParsingSample() {
     }
+    
     /** Starts the sample. The sample takes a FI document that will
      * be read using StAXDocumentParser in the fastinfoset package.
      *
@@ -47,6 +48,11 @@ public class StAXParsingSample {
         if (args.length < 1 || args.length > 1) {
             displayUsageAndExit();
         }
+        
+        if (args[0] == null) {
+            displayUsageAndExit();
+        }
+
         StAXParsingSample streamReader = new StAXParsingSample();
         streamReader.parse(args[0]);
     }
@@ -55,42 +61,38 @@ public class StAXParsingSample {
      *
      *  @param filename FI document name.
      */
+    @SuppressWarnings("CallToThreadDumpStack")
     public void parse(String filename) {
-        File input = null;
-        InputStream document = null;
+        InputStream document;
         XMLStreamReader streamReader = null;
-        try{
-            input = new File(filename);
-            document= new BufferedInputStream(new FileInputStream(filename));
-            
+        try {
+            document = new BufferedInputStream(new FileInputStream(filename));
             streamReader = new StAXDocumentParser(document);
-            
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
-        System.out.println("Reading "+ input.getName() + ": \n");
-        long starttime = System.currentTimeMillis() ;
-        try{
-            int eventType = streamReader.getEventType();
-            
-            while(streamReader.hasNext()){
+
+        System.out.println("Reading " + new File(filename) + ": \n");
+        long starttime = System.currentTimeMillis();
+        try {
+            int eventType;
+            while (streamReader != null && streamReader.hasNext()) {
                 eventType = streamReader.next();
                 Util.printEventType(eventType);
-                Util.printName(streamReader,eventType);
+                Util.printName(streamReader, eventType);
                 Util.printText(streamReader);
-                if(streamReader.isStartElement()){
+                if (streamReader.isStartElement()) {
                     Util.printAttributes(streamReader);
                 }
                 Util.printPIData(streamReader);
                 System.out.println("-----------------------------");
             }
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         long endtime = System.currentTimeMillis();
-        System.out.println(" Parsing Time = " + (endtime - starttime) );
-        
+        System.out.println(" Parsing Time = " + (endtime - starttime));
+
     }
     
     private static void displayUsageAndExit() {

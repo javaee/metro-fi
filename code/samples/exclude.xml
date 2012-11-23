@@ -1,3 +1,16 @@
 <FindBugsFilter>
 
+    <!--
+        Sample code - on purpose.
+    -->
+    <Match>
+        <Or>
+            <Bug pattern="XFB_XML_FACTORY_BYPASS"/>
+        </Or>
+    </Match>
+    
+    <Match>
+        <Class name="samples.typed.TypedStreamBufferConvert"/>
+        <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
+    </Match>
 </FindBugsFilter>

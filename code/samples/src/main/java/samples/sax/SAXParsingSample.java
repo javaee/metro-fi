@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2004-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2004-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
@@ -49,6 +49,7 @@ public class SAXParsingSample extends DefaultHandler {
      *
      * @param argv FI document filename
      */
+    @SuppressWarnings("CallToThreadDumpStack")
     public static void main(String argv[]) {
         if (argv.length != 1) {
             System.err.println("Usage: FastInfosetParser filename");
@@ -77,11 +78,6 @@ public class SAXParsingSample extends DefaultHandler {
         System.exit(0);
     }
     
-    private static void displayUsageAndExit() {
-        System.err.println("Usage: ant FISAXParser or samples.sax.FIParser FI_input_file>");
-        System.exit(1);
-    }
-    
     /** Creates a new instance of FIParser */
     public SAXParsingSample() {
     }
@@ -92,6 +88,7 @@ public class SAXParsingSample extends DefaultHandler {
     /** Handles startDocument event and prints out file header.
      *
      */
+    @Override
     public void startDocument() throws SAXException {
         display("<?xml version='1.0' encoding='UTF-8'?>");
         displayNewLine();
@@ -100,6 +97,7 @@ public class SAXParsingSample extends DefaultHandler {
     /** Handles endDocument event
      *
      */
+    @Override
     public void endDocument() throws SAXException {
         try {
             displayNewLine();
@@ -118,13 +116,14 @@ public class SAXParsingSample extends DefaultHandler {
      *  @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
      *  @param attributes The specified or defaulted attributes.
      */
+    @Override
     public void startElement(String namespaceURI, String localName,
             String qName, Attributes attributes) throws SAXException {
         
         // Print out text accumulated from the characters event
         flushText();
         
-        String name = null;
+        String name;
         
         if (localName.equals("")) {
             name = qName;
@@ -157,6 +156,7 @@ public class SAXParsingSample extends DefaultHandler {
      *  @param localName The local name (without prefix), or the empty string if Namespace processing is not being performed.
      *  @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
      */
+    @Override
     public void endElement(String namespaceURI, String localName, String qName )
     throws SAXException {
         
@@ -179,6 +179,7 @@ public class SAXParsingSample extends DefaultHandler {
      *  @param start The start position in the character array.
      *  @param length The number of characters to use from the character array.
      */
+    @Override
     public void characters(char[] ch, int start, int length)
     throws SAXException {
         String s = new String(ch, start, length);
