@@ -19,5 +19,12 @@
             <Bug pattern="ES_COMPARING_STRINGS_WITH_EQ"/>
         </Or>
     </Match>
-
+    
+    <!--
+        Bit operations on purpose
+    -->
+    <Match>
+        <Bug pattern="BIT_SIGNED_CHECK"/>
+    </Match>
+        
 </FindBugsFilter>
