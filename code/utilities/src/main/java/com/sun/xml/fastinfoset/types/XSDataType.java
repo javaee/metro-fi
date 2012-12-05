@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2004-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2004-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
@@ -19,6 +19,7 @@ package com.sun.xml.fastinfoset.types;
 
 import com.sun.xml.fastinfoset.algorithm.BuiltInEncodingAlgorithm;
 import com.sun.xml.fastinfoset.algorithm.BuiltInEncodingAlgorithmFactory;
+import java.util.Locale;
 import org.jvnet.fastinfoset.EncodingAlgorithmIndexes;
 import org.jvnet.fastinfoset.RestrictedAlphabet;
 
@@ -78,7 +79,7 @@ public enum XSDataType {
     NOTATION;
 
     public final int encodingAlgorithmId;
-    public final BuiltInEncodingAlgorithm encodingAlgorithm;
+    public final transient BuiltInEncodingAlgorithm encodingAlgorithm;
     
     public final String alphabet;
     
@@ -102,7 +103,7 @@ public enum XSDataType {
     
     public static XSDataType create(String s) {
         try {
-            return valueOf(s.toUpperCase());
+            return valueOf(s.toUpperCase(Locale.US));
         } catch (IllegalArgumentException e) {
             return _UNSPECIFIED_;
         }

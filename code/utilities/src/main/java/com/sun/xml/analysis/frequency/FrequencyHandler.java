@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2004-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2004-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
@@ -200,14 +200,14 @@ public class FrequencyHandler extends DefaultHandler {
         }
     }
     
-    private void bucketQNameToNamespace(QName q, Map<String, Set<QName>> m) {
-        Set<QName> subs = m.get(q.getNamespaceURI());
-        if (subs == null) {
-            subs = new HashSet();
-            m.put(q.getNamespaceURI(), subs);
-        }
-        subs.add(q);        
-    }
+//    private void bucketQNameToNamespace(QName q, Map<String, Set<QName>> m) {
+//        Set<QName> subs = m.get(q.getNamespaceURI());
+//        if (subs == null) {
+//            subs = new HashSet();
+//            m.put(q.getNamespaceURI(), subs);
+//        }
+//        subs.add(q);        
+//    }
     
     public void startPrefixMapping(String prefix, String uri) throws SAXException {
         prefixes.add(prefix);
@@ -276,9 +276,10 @@ public class FrequencyHandler extends DefaultHandler {
     
     private void generateQNamesWithPrefix(Map<String, Set<QName>> m, FrequencySet<QName> fhm, 
             Map<String, String> namespaceURIToPrefix) {
-        for (String namespaceURI : m.keySet()) {
+        for (Map.Entry<String, Set<QName>> entry : m.entrySet()) {
+            String namespaceURI = entry.getKey();
             String prefix = namespaceURIToPrefix.get(namespaceURI);
-            for (QName qInSet : m.get(namespaceURI)) {
+            for (QName qInSet : entry.getValue()) {
                 fhm.add0(new QName(namespaceURI, qInSet.getLocalPart(), prefix));
             }
         }

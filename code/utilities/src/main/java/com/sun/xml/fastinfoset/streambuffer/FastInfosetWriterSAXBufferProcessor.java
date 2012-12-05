@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2004-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2004-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
@@ -35,20 +35,20 @@ public final class FastInfosetWriterSAXBufferProcessor extends AbstractProcessor
     /**
      * Reference to Fast Infoset writer.
      */
-    protected FastInfosetWriter _writer;
+    FastInfosetWriter _writer;
     
     /**
      * SAX Namespace attributes features
      */
-    protected boolean _namespacePrefixesFeature = false;
+    boolean _namespacePrefixesFeature = false;
     
-    protected EncodingAlgorithmAttributesImpl _attributes;
+    EncodingAlgorithmAttributesImpl _attributes;
     
-    protected String[] _namespacePrefixes = new String[16];
-    protected int _namespacePrefixesIndex;
+    String[] _namespacePrefixes = new String[16];
+    int _namespacePrefixesIndex;
     
-    protected int[] _namespaceAttributesStack = new int[16];
-    protected int _namespaceAttributesStackIndex;
+    int[] _namespaceAttributesStack = new int[16];
+    int _namespaceAttributesStackIndex;
 
     public FastInfosetWriterSAXBufferProcessor() {
         _attributes = new EncodingAlgorithmAttributesImpl();

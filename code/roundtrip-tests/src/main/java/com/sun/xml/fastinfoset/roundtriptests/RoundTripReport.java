@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2004-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2004-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
@@ -18,10 +18,13 @@
 
 package com.sun.xml.fastinfoset.roundtriptests;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.DataInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -127,17 +130,24 @@ public class RoundTripReport {
         
     }
     public void report(String[] args) {
+        OutputStreamWriter osr = null;
         try {
             //String filename = args[INDEX_REPORT];
             String filename = args[INDEX_HOME]+"/"+args[INDEX_REPORT];
             String content = reportContent(filename, args);
-            OutputStreamWriter osr = new OutputStreamWriter(
+            osr = new OutputStreamWriter(
                     new FileOutputStream(
                     new File(filename)));
             osr.write(content);
-            osr.close();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            if (osr != null) {
+                try {
+                    osr.close();
+                } catch (IOException ignored) {
+                }
+            }
         }
     }
     public String reportContent(String filename, String[] args) {
@@ -187,21 +197,28 @@ public class RoundTripReport {
     }
     
     private String readFromFile(File file) {
-        StringBuffer sb = new StringBuffer();
+        BufferedReader in = null;
+        StringBuilder sb = new StringBuilder();
         try {
             FileInputStream fstream = new FileInputStream(file);
             
             // Convert our input stream to a
             // DataInputStream
-            DataInputStream in = new DataInputStream(fstream);
+            in = new BufferedReader(new InputStreamReader(fstream));
             
-            while (in.available() !=0) {
-                sb.append(in.readLine());
+            String s;
+            while ((s = in.readLine()) != null) {
+                sb.append(s);
             }
-            
-            in.close();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException ignored) {
+                }
+            }
         }
         return sb.toString();
     }
@@ -228,35 +245,36 @@ public class RoundTripReport {
     }
     
     private static String generateReport(int[] passed, int[] failed, Map<String, FailedTestRecord> failedTests) {
-        StringBuffer report = new StringBuffer();
+        StringBuilder report = new StringBuilder();
         report.append("<html>\n<body>\n<b>Roundtrip Tests</b><br><br>");
         report.append("<b>Summary</b>");
         report.append("<table width=\"80%\" border=1>\n");
         report.append("<tr><th></th><th>SAX</th><th>StAX</th><th>DOM</th><th>DOM-SAX</th><th>SAX-StAX</th></tr>\n");
-        report.append("<tr><td>Passed</td>\n"+
-                "<td>"+COUNT_SAXPASSED+getReportValue(passed[SAX_RTT], failed[SAX_RTT])+COUNT_SAXPASSED+"</td>\n"+
-                "<td>"+COUNT_STAXPASSED+getReportValue(passed[STAX_RTT], failed[STAX_RTT])+COUNT_STAXPASSED+"</td>\n"+
-                "<td>"+COUNT_DOMPASSED+getReportValue(passed[DOM_RTT], failed[DOM_RTT])+COUNT_DOMPASSED+"</td>\n"+
-                "<td>"+COUNT_DOMSAXPASSED+getReportValue(passed[DOM_SAX_RTT], failed[DOM_SAX_RTT])+COUNT_DOMSAXPASSED+"</td>\n"+
-                "<td>"+COUNT_SAXSTAXPASSED+getReportValue(passed[SAX_STAX_RTT], failed[SAX_STAX_RTT])+COUNT_SAXSTAXPASSED+"</td></tr>\n");
-        report.append("<tr><td>Failed</td>\n"+
-                "<td>"+COUNT_SAXFAILED+getReportValue(failed[SAX_RTT], passed[SAX_RTT])+COUNT_SAXFAILED+"</td>\n"+
-                "<td>"+COUNT_STAXFAILED+getReportValue(failed[STAX_RTT], passed[STAX_RTT])+COUNT_STAXFAILED+"</td>\n"+
-                "<td>"+COUNT_DOMFAILED+getReportValue(failed[DOM_RTT], passed[DOM_RTT])+COUNT_DOMFAILED+"</td>\n"+
-                "<td>"+COUNT_DOMSAXFAILED+getReportValue(failed[DOM_SAX_RTT], passed[DOM_SAX_RTT])+COUNT_DOMSAXFAILED+"</td>\n"+
-                "<td>"+COUNT_SAXSTAXFAILED+getReportValue(failed[SAX_STAX_RTT], passed[SAX_STAX_RTT])+COUNT_SAXSTAXFAILED+"</td></tr>\n");
-        report.append("<tr><td>Total</td>\n"+
-                "<td>"+ getReportValue(failed[SAX_RTT] + passed[SAX_RTT]) + "</td>\n"+
-                "<td>"+ getReportValue(failed[STAX_RTT] + passed[STAX_RTT]) + "</td>\n"+
-                "<td>"+ getReportValue(failed[DOM_RTT] + passed[DOM_RTT]) + "</td>\n"+
-                "<td>"+ getReportValue(failed[DOM_SAX_RTT] + passed[DOM_SAX_RTT]) + "</td>\n"+
-                "<td>"+ getReportValue(failed[SAX_STAX_RTT] + passed[SAX_STAX_RTT]) + "</td></tr>\n");
+        report.append("<tr><td>Passed</td>\n")
+                .append("<td>").append(COUNT_SAXPASSED).append(getReportValue(passed[SAX_RTT], failed[SAX_RTT])).append(COUNT_SAXPASSED).append("</td>\n")
+                .append("<td>").append(COUNT_STAXPASSED).append(getReportValue(passed[STAX_RTT], failed[STAX_RTT])).append(COUNT_STAXPASSED).append("</td>\n")
+                .append("<td>").append(COUNT_DOMPASSED).append(getReportValue(passed[DOM_RTT], failed[DOM_RTT])).append(COUNT_DOMPASSED).append("</td>\n")
+                .append("<td>").append(COUNT_DOMSAXPASSED).append(getReportValue(passed[DOM_SAX_RTT], failed[DOM_SAX_RTT])).append(COUNT_DOMSAXPASSED).append("</td>\n")
+                .append("<td>").append(COUNT_SAXSTAXPASSED).append(getReportValue(passed[SAX_STAX_RTT], failed[SAX_STAX_RTT])).append(COUNT_SAXSTAXPASSED).append("</td></tr>\n");
+        report.append("<tr><td>Failed</td>\n")
+                .append("<td>").append(COUNT_SAXFAILED).append(getReportValue(failed[SAX_RTT], passed[SAX_RTT])).append(COUNT_SAXFAILED).append("</td>\n")
+                .append("<td>").append(COUNT_STAXFAILED).append(getReportValue(failed[STAX_RTT], passed[STAX_RTT])).append(COUNT_STAXFAILED).append("</td>\n")
+                .append("<td>").append(COUNT_DOMFAILED).append(getReportValue(failed[DOM_RTT], passed[DOM_RTT])).append(COUNT_DOMFAILED).append("</td>\n")
+                .append("<td>").append(COUNT_DOMSAXFAILED).append(getReportValue(failed[DOM_SAX_RTT], passed[DOM_SAX_RTT])).append(COUNT_DOMSAXFAILED).append("</td>\n")
+                .append("<td>").append(COUNT_SAXSTAXFAILED).append(getReportValue(failed[SAX_STAX_RTT], passed[SAX_STAX_RTT])).append(COUNT_SAXSTAXFAILED).append("</td></tr>\n");
+        report.append("<tr><td>Total</td>\n")
+                .append("<td>").append(getReportValue(failed[SAX_RTT] + passed[SAX_RTT])).append("</td>\n")
+                .append("<td>").append(getReportValue(failed[STAX_RTT] + passed[STAX_RTT])).append("</td>\n")
+                .append("<td>").append(getReportValue(failed[DOM_RTT] + passed[DOM_RTT])).append("</td>\n")
+                .append("<td>").append(getReportValue(failed[DOM_SAX_RTT] + passed[DOM_SAX_RTT])).append("</td>\n")
+                .append("<td>").append(getReportValue(failed[SAX_STAX_RTT] + passed[SAX_STAX_RTT])).append("</td></tr>\n");
         report.append(REPORTCOUNT_TOTAL);
         report.append("</table>\n");
         report.append("<br><b>Failed List</b><br><table width=\"80%\" border=1>\n");
         report.append("<tr><th>Name of Testcase</th><th>SAX</th><th>StAX</th><th>DOM</th><th>DOM-SAX</th><th>SAX-StAX</th></tr>\n");
-        for(String testFullPath : failedTests.keySet()) {
-            FailedTestRecord failedRecord = failedTests.get(testFullPath);
+        for(Map.Entry<String, FailedTestRecord> entry : failedTests.entrySet()) {
+            final String testFullPath = entry.getKey();
+            FailedTestRecord failedRecord = entry.getValue();
             String newrow = "<tr><td><a href="+testFullPath+">"+
                     failedRecord.testName+"</a></td>\n"+
                     "<td><!--"+TEST_SAX+"-->" + getResultAsString(!failedRecord.isFailedFor(SAX_RTT))+"</td>\n"+

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2004-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2004-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
@@ -45,9 +45,9 @@ public final class FastInfosetReaderSAXBufferCreator extends AbstractCreator
         implements EntityResolver, DTDHandler, ContentHandler, ErrorHandler, LexicalHandler,
         EncodingAlgorithmContentHandler {
     
-    protected String[] _namespaceAttributes = new String[16 * 2];
+    String[] _namespaceAttributes = new String[16 * 2];
     
-    protected int _namespaceAttributesPtr;
+    int _namespaceAttributesPtr;
     
     public FastInfosetReaderSAXBufferCreator() {
     }

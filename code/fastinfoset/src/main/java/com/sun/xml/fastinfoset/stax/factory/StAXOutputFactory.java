@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2004-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2004-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
@@ -59,29 +59,54 @@ public class StAXOutputFactory extends XMLOutputFactory {
     }
     
     public XMLStreamWriter createXMLStreamWriter(Result result) throws XMLStreamException {
-        if(result instanceof StreamResult){
-            StreamResult streamResult = (StreamResult)result;
-            if( streamResult.getWriter() != null){
+        if (result instanceof StreamResult) {
+            StreamResult streamResult = (StreamResult) result;
+            if (streamResult.getWriter() != null) {
                 return createXMLStreamWriter(streamResult.getWriter());
-            }else if(streamResult.getOutputStream() != null ){
+            } else if (streamResult.getOutputStream() != null) {
                 return createXMLStreamWriter(streamResult.getOutputStream());
-            }else if(streamResult.getSystemId()!= null){
-                try{
-                    FileWriter writer = new FileWriter(new File(streamResult.getSystemId()));
-                    return createXMLStreamWriter(writer);
-                }catch(IOException ie){
+            } else if (streamResult.getSystemId() != null) {
+                FileWriter writer = null;
+                boolean isError = true;
+                
+                try {
+                    writer = new FileWriter(new File(streamResult.getSystemId()));
+                    final XMLStreamWriter streamWriter = createXMLStreamWriter(writer);
+                    isError = false;
+                    
+                    return streamWriter;
+                } catch (IOException ie) {
                     throw new XMLStreamException(ie);
+                } finally {
+                    if (isError && writer != null) {
+                        try {
+                            writer.close();
+                        } catch (IOException ignored) {
+                        }
+                    }
                 }
             }
-        }
-        else {
-            try{
+        } else {
+            FileWriter writer = null;
+            boolean isError = true;
+            
+            try {
                 //xxx: should we be using FileOutputStream - nb.
-                FileWriter writer = new FileWriter(new File(result.getSystemId()));
-                return createXMLStreamWriter(writer);
-            }catch(IOException ie){
+                writer = new FileWriter(new File(result.getSystemId()));
+                final XMLStreamWriter streamWriter = createXMLStreamWriter(writer);
+                isError = false;
+
+                return streamWriter;
+            } catch (IOException ie) {
                 throw new XMLStreamException(ie);
-            }
+                } finally {
+                    if (isError && writer != null) {
+                        try {
+                            writer.close();
+                        } catch (IOException ignored) {
+                        }
+                    }
+                }
         }
         throw new java.lang.UnsupportedOperationException();
     }

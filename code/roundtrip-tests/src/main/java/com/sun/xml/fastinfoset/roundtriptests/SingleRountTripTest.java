@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2004-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2004-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
@@ -24,6 +24,7 @@ import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.Locale;
 
 /**
  * @author Alexey Stashok
@@ -53,7 +54,7 @@ public class SingleRountTripTest {
         report.addResult(test.getName(), passed, srcFolder, srcFile.getName());
         
         String passedStr = passed ? "passed" : "failed";
-        System.out.println(passedStr.toUpperCase());        
+        System.out.println(passedStr.toUpperCase(Locale.US));        
     }
     
     public void processFileOrFolder(File srcFile) {

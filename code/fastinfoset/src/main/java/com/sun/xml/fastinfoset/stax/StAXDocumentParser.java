@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2004-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2004-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
@@ -1614,6 +1614,11 @@ public class StAXDocumentParser extends Decoder
         ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
         String public_identifier = ((b & EncodingConstants.UNEXPANDED_ENTITY_PUBLIC_IDENTIFIER_FLAG) > 0)
         ? decodeIdentifyingNonEmptyStringOnFirstBit(_v.otherURI) : "";
+        
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.log(Level.FINEST, "processUnexpandedEntityReference: entity_reference_name={0} system_identifier={1}public_identifier={2}",
+                    new Object[]{entity_reference_name, system_identifier, public_identifier});
+        }
     }
     
     protected final void processCIIEncodingAlgorithm(boolean addToTable) throws FastInfosetException, IOException {

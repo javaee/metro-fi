@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2004-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2004-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
@@ -42,35 +42,47 @@ public abstract class RoundTripRtt {
     public abstract String getName();
     
     public void transform(String inputFileName, String outputFileName, TransformInputOutput transformer) throws Exception {
-        FileInputStream fis = new FileInputStream(inputFileName);
-        FileOutputStream fos = new FileOutputStream(outputFileName);
+        FileInputStream fis = null;
+        FileOutputStream fos = null;
         try {
+            fis = new FileInputStream(inputFileName);
+            fos = new FileOutputStream(outputFileName);
             transformer.parse(fis, fos);
         } finally {
-            try {
-                fis.close();
-            } catch (IOException ex) {
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException ignored) {
+                }
             }
-            try {
-                fos.close();
-            } catch (IOException ex) {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException ignored) {
+                }
             }
         }
     }
     
     public void transform(String inputFileName, String outputFileName, String workingDirectory, TransformInputOutput transformer) throws Exception {
-        FileInputStream fis = new FileInputStream(inputFileName);
-        FileOutputStream fos = new FileOutputStream(outputFileName);
+        FileInputStream fis = null;
+        FileOutputStream fos = null;
         try {
+            fis = new FileInputStream(inputFileName);
+            fos = new FileOutputStream(outputFileName);
             transformer.parse(fis, fos, workingDirectory);
         } finally {
-            try {
-                fis.close();
-            } catch (IOException ex) {
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException ignored) {
+                }
             }
-            try {
-                fos.close();
-            } catch (IOException ex) {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException ignored) {
+                }
             }
         }
     }
@@ -147,11 +159,15 @@ public abstract class RoundTripRtt {
     }
     
     public boolean diffText(String fileName1, String fileName2, String diffFileName) throws IOException {
-        BufferedReader file1Reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName1)));
-        BufferedReader file2Reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName2)));
-        PrintWriter diffWriter = new PrintWriter(new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(diffFileName))));
+        BufferedReader file1Reader = null;
+        BufferedReader file2Reader = null;
+        PrintWriter diffWriter = null;
         
         try {
+            file1Reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName1)));
+            file2Reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName2)));
+            diffWriter = new PrintWriter(new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(diffFileName))));
+            
             boolean passed = true;
             String line1 = null;
             int lineNumber = 1;
@@ -188,17 +204,22 @@ public abstract class RoundTripRtt {
             
             return passed;
         } finally {
-            try {
-                file1Reader.close();
-            } catch (IOException ex) {
+            if (file1Reader != null) {
+                try {
+                    file1Reader.close();
+                } catch (IOException ex) {
+                }
             }
-            try {
-                file2Reader.close();
-            } catch (IOException ex) {
+            if (file2Reader != null) {
+                try {
+                    file2Reader.close();
+                } catch (IOException ex) {
+                }
             }
             
-            diffWriter.flush();
-            diffWriter.close();
+            if (diffWriter != null) {
+                diffWriter.close();
+            }
         }
     }
     

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2004-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2004-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
@@ -25,7 +25,7 @@ import java.util.ResourceBundle;
 public class CommonResourceBundle extends AbstractResourceBundle {
 
     public static final String BASE_NAME = "com.sun.xml.fastinfoset.resources.ResourceBundle";
-    private static CommonResourceBundle instance = null;
+    private static volatile CommonResourceBundle instance = null;
     private static Locale locale = null;
     private ResourceBundle bundle = null;
     
@@ -46,8 +46,7 @@ public class CommonResourceBundle extends AbstractResourceBundle {
                 //**need to know where to get the locale
                 //String localeString = CommonProperties.getInstance()
                 //                  .getProperty("omar.common.locale");
-                String localeString = null;
-                locale = parseLocale(localeString);
+                locale = parseLocale(/*localeString*/null);
             }
         }
 

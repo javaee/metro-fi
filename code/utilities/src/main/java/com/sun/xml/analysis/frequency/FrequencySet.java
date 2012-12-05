@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2004-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2004-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
@@ -84,7 +84,9 @@ public class FrequencySet<T> extends HashMap<T, Integer> {
      */
     public List<T> createFrequencyBasedList() {
         Set<Map.Entry<T, Integer>> s = new TreeSet(new FrequencyComparator());
-        s.addAll(entrySet());
+        for (Map.Entry<T, Integer> entry : entrySet()) {
+            s.add(entry);
+        }
 
         List<T> l = new ArrayList<T>();
         for (Map.Entry<T, Integer> e : s) {
@@ -103,7 +105,9 @@ public class FrequencySet<T> extends HashMap<T, Integer> {
      */
     public Set<T> createFrequencyBasedSet() {
         Set<Map.Entry<T, Integer>> s = new TreeSet(new FrequencyComparator());
-        s.addAll(entrySet());
+        for (Map.Entry<T, Integer> entry : entrySet()) {
+            s.add(entry);
+        }
 
         Set<T> l = new LinkedHashSet<T>();
         for (Map.Entry<T, Integer> e : s) {

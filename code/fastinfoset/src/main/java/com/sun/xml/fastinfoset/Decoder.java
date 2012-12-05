@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2004-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2004-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
@@ -421,7 +421,7 @@ public abstract class Decoder implements FastInfosetParser {
         final int noOfItems = decodeNumberOfItemsOfSequence();
         
         for (int i = 0; i < noOfItems; i++) {
-            String URI = decodeNonEmptyOctetStringOnSecondBitAsUtf8String();
+            /*String URI = */decodeNonEmptyOctetStringOnSecondBitAsUtf8String();
 
             decodeNonEmptyOctetStringLengthOnSecondBit();
             ensureOctetBufferSize();
@@ -1982,10 +1982,12 @@ public abstract class Decoder implements FastInfosetParser {
     static public boolean isFastInfosetDocument(InputStream s) throws IOException {
         // TODO
         // Check for <?xml declaration with 'finf' encoding
+        final int headerSize = 4;
         
-        final byte[] header = new byte[4];
-        s.read(header);
-        if (header[0] != EncodingConstants.BINARY_HEADER[0] ||
+        final byte[] header = new byte[headerSize];
+        final int readBytesCount = s.read(header);
+        if (readBytesCount < headerSize ||
+                header[0] != EncodingConstants.BINARY_HEADER[0] ||
                 header[1] != EncodingConstants.BINARY_HEADER[1] ||
                 header[2] != EncodingConstants.BINARY_HEADER[2] ||
                 header[3] != EncodingConstants.BINARY_HEADER[3]) {
