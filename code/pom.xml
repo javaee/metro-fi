@@ -124,8 +124,8 @@
                         <format>xml</format>
                     </formats>
                     <check>
-                      <totalLineRate>45</totalLineRate>
-                      <packageLineRate>45</packageLineRate>
+                      <totalLineRate>35</totalLineRate>
+                      <!--packageLineRate>45</packageLineRate-->
                       <haltOnFailure>true</haltOnFailure>
                     </check>
                 </configuration>
