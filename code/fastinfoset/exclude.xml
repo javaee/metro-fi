@@ -31,8 +31,10 @@
         It's dangerous to change this as 3rd party code may depend on that
     -->
     <Match>
-        <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"/>
-        <Bug pattern="MS_MUTABLE_ARRAY"/>
+        <Or>
+            <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"/>
+            <Bug pattern="MS_MUTABLE_ARRAY"/>
+        </Or>
     </Match>
                     
     <!--
@@ -40,7 +42,7 @@
     -->
     <Match>
         <Class name="com.sun.xml.fastinfoset.stax.factory.StAXOutputFactory" />
-        <Method name="createXMLStreamWriter" params="javax.xml.transform.Result"/>
+        <Method name="createXMLStreamWriter" params="javax.xml.transform.Result" returns="javax.xml.stream.XMLStreamWriter" />
         <Bug pattern="OBL_UNSATISFIED_OBLIGATION" />
     </Match>
     
@@ -49,7 +51,7 @@
     -->
     <Match>
         <Class name="com.sun.xml.fastinfoset.stax.events.StAXEventWriter" />
-        <Method name="add" params="javax.xml.stream.events.XMLEvent"/>
+        <Method name="add" params="javax.xml.stream.events.XMLEvent" returns="void" />
         <Bug pattern="BC_UNCONFIRMED_CAST" />
     </Match>        
 
