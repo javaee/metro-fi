@@ -99,14 +99,14 @@ public class StAXOutputFactory extends XMLOutputFactory {
                 return streamWriter;
             } catch (IOException ie) {
                 throw new XMLStreamException(ie);
-                } finally {
-                    if (isError && writer != null) {
-                        try {
-                            writer.close();
-                        } catch (IOException ignored) {
-                        }
+            } finally {
+                if (isError && writer != null) {
+                    try {
+                        writer.close();
+                    } catch (IOException ignored) {
                     }
                 }
+            }
         }
         throw new java.lang.UnsupportedOperationException();
     }

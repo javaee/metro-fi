@@ -44,6 +44,7 @@ import com.sun.xml.xsom.parser.XSOMParser;
 import com.sun.xml.xsom.visitor.XSSimpleTypeVisitor;
 import com.sun.xml.xsom.visitor.XSVisitor;
 import java.io.File;
+import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -69,7 +70,7 @@ import org.xml.sax.SAXParseException;
  */
 public class SchemaProcessor {
     
-    private static class StringComparator implements Comparator {
+    private static class StringComparator implements Comparator, Serializable {
         public int compare(Object o1, Object o2) {
             String s1 = (String)o1;
             String s2 = (String)o2;
@@ -78,7 +79,7 @@ public class SchemaProcessor {
     };
     private StringComparator _stringComparator = new StringComparator();
     
-    private static class QNameComparator implements Comparator {
+    private static class QNameComparator implements Comparator, Serializable {
         public int compare(Object o1, Object o2) {
             QName q1 = (QName)o1;
             QName q2 = (QName)o2;

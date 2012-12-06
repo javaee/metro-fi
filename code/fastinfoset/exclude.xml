@@ -26,5 +26,39 @@
     <Match>
         <Bug pattern="BIT_SIGNED_CHECK"/>
     </Match>
+
+    <!--
+        It's dangerous to change this as 3rd party code may depend on that
+    -->
+    <Match>
+        <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"/>
+        <Bug pattern="MS_MUTABLE_ARRAY"/>
+    </Match>
+                    
+    <!--
+        False positive
+    -->
+    <Match>
+        <Class name="com.sun.xml.fastinfoset.stax.factory.StAXOutputFactory" />
+        <Method name="createXMLStreamWriter" params="javax.xml.transform.Result"/>
+        <Bug pattern="OBL_UNSATISFIED_OBLIGATION" />
+    </Match>
+    
+    <!--
+        False positive. We do check XMLEvent type before casting.
+    -->
+    <Match>
+        <Class name="com.sun.xml.fastinfoset.stax.events.StAXEventWriter" />
+        <Method name="add" params="javax.xml.stream.events.XMLEvent"/>
+        <Bug pattern="BC_UNCONFIRMED_CAST" />
+    </Match>        
+
+    <!--
+        False positive
+    -->
+    <Match>
+        <Class name="com.sun.xml.fastinfoset.util.DuplicateAttributeVerifier" />
+        <Bug pattern="ISC_INSTANTIATE_STATIC_CLASS" />
+    </Match>
         
 </FindBugsFilter>
