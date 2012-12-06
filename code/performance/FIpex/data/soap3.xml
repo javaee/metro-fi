@@ -1,4 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+    Copyright (c) 2012 Oracle and/or its affiliates. All rights reserved.
+
+    Oracle licenses this file to You under the Apache License, Version 2.0
+    (the "License"); you may not use this file except in compliance with
+    the License.  You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+
 <env:Envelope xmlns:env="http://www.w3.org/2002/06/soap-envelope"><env:Header><t:transaction xmlns:t="http://thirdparty.example.org/transaction" env:encodingStyle="http://example.com/encoding" env:mustUnderstand="true">
                5
    </t:transaction></env:Header><env:Body><m:chargeReservation env:encodingStyle="http://www.w3.org/2002/06/soap-encoding" xmlns:m="http://travelcompany.example.org/"><m:reservation xmlns:m="http://travelcompany.example.org/reservation" env:role="http://www.w3.org/2002/06/soap-envelope/role/next" env:mustUnderstand="true"><m:reference>uuid:093a2da1-q345-739r-ba5d-pqff98fe8j7d</m:reference></m:reservation><o:creditCard xmlns:o="http://mycompany.example.com/financial"><n:name xmlns:n="http://mycompany.example.com/employees">
