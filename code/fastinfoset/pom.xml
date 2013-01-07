@@ -2,7 +2,7 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2012 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2012-2013 Oracle and/or its affiliates. All rights reserved.
 
     Oracle licenses this file to You under the Apache License, Version 2.0
     (the "License"); you may not use this file except in compliance with
@@ -46,11 +46,48 @@
         </testResources>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>                        
+                        <manifestEntries>
+                            <Specification-Title>ITU-T Rec. X.891 | ISO/IEC 24824-1 (Fast Infoset)</Specification-Title>
+                            <Specification-Version>1.0</Specification-Version>
+                            <Implementation-Title>Fast Infoset Implementation</Implementation-Title>
+                            <Implementation-Version>${project.version}</Implementation-Version>
+                            <Implementation-Build-Id>${scmBranch}-${buildNumber}, ${timestamp}</Implementation-Build-Id>
+                            <Implementation-Vendor>Oracle</Implementation-Vendor>
+                            <Implementation-Vendor-Id>com.oracle</Implementation-Vendor-Id>
+                            <Extension-Name>com.sun.xml.fastinfoset</Extension-Name>
+                            <URL>${project.url}</URL>
+                        </manifestEntries>
+                    </archive>
+                    <mavenExecutorId>forked-path</mavenExecutorId>
+                    <useReleaseProfile>false</useReleaseProfile>
+                    <arguments>${release.arguments}</arguments>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
                             <goal>test-jar</goal>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>                
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>bundle-manifest</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>manifest</goal>
                         </goals>
                     </execution>
                 </executions>

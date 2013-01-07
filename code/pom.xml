@@ -177,6 +177,16 @@
                     </configuration>
                     <version>2.3.2</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>2.4</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-bundle-plugin</artifactId>
+                    <version>2.0.0</version>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -186,35 +196,6 @@
                 <configuration>
                     <tagBase>https://svn.java.net/svn/fi~svn/tags</tagBase>
                 </configuration>
-            </plugin>
-            
-            <plugin>
-                <inherited>true</inherited>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
-                        <manifest>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                        </manifest>                        
-                        <manifestEntries>
-                            <Specification-Title>ITU-T Rec. X.891 | ISO/IEC 24824-1 (Fast Infoset)</Specification-Title>
-                            <Specification-Version>1.0</Specification-Version>
-                            <Implementation-Title>Fast Infoset Implementation</Implementation-Title>
-                            <Implementation-Version>${project.version}</Implementation-Version>
-                            <Implementation-Build-Id>${scmBranch}-${buildNumber}, ${timestamp}</Implementation-Build-Id>
-                            <Implementation-Vendor>Oracle</Implementation-Vendor>
-                            <Implementation-Vendor-Id>com.oracle</Implementation-Vendor-Id>
-                            <Extension-Name>com.sun.xml.fastinfoset</Extension-Name>
-                            <URL>${project.url}</URL>
-                        </manifestEntries>
-                    </archive>
-                    <mavenExecutorId>forked-path</mavenExecutorId>
-                    <useReleaseProfile>false</useReleaseProfile>
-                    <arguments>${release.arguments}</arguments>
-                </configuration>
-                <version>2.4</version>
             </plugin>
             
             <plugin>
@@ -246,20 +227,6 @@
                     </dependency>
                 </dependencies>
             </plugin>                
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.0.0</version>
-                <executions>
-                    <execution>
-                        <id>bundle-manifest</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>manifest</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
