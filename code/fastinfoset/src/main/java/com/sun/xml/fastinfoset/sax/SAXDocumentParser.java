@@ -1528,7 +1528,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     throw new FastInfosetException(e);
                 }
             } else {
-                StringBuilder buffer = new StringBuilder();
+                StringBuffer buffer = new StringBuffer();
                 processBuiltInEncodingAlgorithmAsCharacters(buffer);
                 
                 try {
@@ -1539,7 +1539,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             }
             
             if (addToTable) {
-                StringBuilder buffer = new StringBuilder();
+                StringBuffer buffer = new StringBuffer();
                 processBuiltInEncodingAlgorithmAsCharacters(buffer);
                 _characterContentChunkTable.add(buffer.toString().toCharArray(), buffer.length());
             }
@@ -1728,7 +1728,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 Object data = processBuiltInEncodingAlgorithmAsObject();
                 _attributes.addAttributeWithAlgorithmData(name, null, _identifier, data);
             } else {
-                StringBuilder buffer = new StringBuilder();
+                StringBuffer buffer = new StringBuffer();
                 processBuiltInEncodingAlgorithmAsCharacters(buffer);
                 _attributes.addAttribute(name, buffer.toString());
             }
@@ -1766,7 +1766,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         }
     }
     
-    protected final void processBuiltInEncodingAlgorithmAsCharacters(StringBuilder buffer) throws FastInfosetException, IOException {
+    protected final void processBuiltInEncodingAlgorithmAsCharacters(StringBuffer buffer) throws FastInfosetException, IOException {
         // TODO not very efficient, need to reuse buffers
         Object array = BuiltInEncodingAlgorithmFactory.getAlgorithm(_identifier).
                 decodeFromBytes(_octetBuffer, _octetBufferStart, _octetBufferLength);

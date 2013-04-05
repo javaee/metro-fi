@@ -255,7 +255,7 @@ public class AttributesHolder implements EncodingAlgorithmAttributes {
         _algorithmData = algorithmData;
     }
     
-    private final StringBuilder convertEncodingAlgorithmDataToString(int identifier, String URI, Object data) throws FastInfosetException, IOException {
+    private final StringBuffer convertEncodingAlgorithmDataToString(int identifier, String URI, Object data) throws FastInfosetException, IOException {
         EncodingAlgorithm ea = null;
         if (identifier < EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
             ea = BuiltInEncodingAlgorithmFactory.getAlgorithm(identifier);
@@ -277,7 +277,7 @@ public class AttributesHolder implements EncodingAlgorithmAttributes {
             throw new EncodingAlgorithmException(CommonResourceBundle.getInstance().getString("message.identifiers10to31Reserved"));
         }
 
-        final StringBuilder sb = new StringBuilder();
+        final StringBuffer sb = new StringBuffer();
         ea.convertToCharacters(data, sb);
         return sb;
     }    
