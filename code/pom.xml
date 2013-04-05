@@ -30,7 +30,7 @@
     <artifactId>fastinfoset-project</artifactId>
     <packaging>pom</packaging>
     <name>fastinfoset-project</name>
-    <version>1.2.13-SNAPSHOT</version>
+    <version>1.2.13</version>
     <description>Open Source implementation of the Fast Infoset Standard for Binary XML (http://www.itu.int/ITU-T/asn1/).</description>
     <url>http://fi.java.net</url>
     <issueManagement>
@@ -79,9 +79,9 @@
         <url>http://www.oracle.com</url>
     </organization>
     <scm>
-        <connection>scm:svn:https://svn.java.net/svn/fi~svn/trunk/code/</connection>
-        <developerConnection>scm:svn:https://svn.java.net/svn/fi~svn/trunk/code/</developerConnection>
-        <url>http://java.net/projects/fi/sources/svn/show/trunk/code/</url>
+        <connection>scm:svn:https://svn.java.net/svn/fi~svn/tags/fastinfoset-project-1.2.13</connection>
+        <developerConnection>scm:svn:https://svn.java.net/svn/fi~svn/tags/fastinfoset-project-1.2.13</developerConnection>
+        <url>http://java.net/projects/fi/sources/svn/show/tags/fastinfoset-project-1.2.13</url>
     </scm>
     <build>
         <extensions>
