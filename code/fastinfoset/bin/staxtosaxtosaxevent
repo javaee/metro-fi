@@ -2,7 +2,7 @@
 #
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 #
-# Copyright (c) 2012 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012-2013 Oracle and/or its affiliates. All rights reserved.
 #
 # Oracle licenses this file to You under the Apache License, Version 2.0
 # (the "License"); you may not use this file except in compliance with
@@ -17,4 +17,4 @@
 # limitations under the License.
 #
 
-java -cp ${FI_HOME}/dist/FastInfoset.jar:${FI_HOME}/lib/jsr173_api.jar com.sun.xml.fastinfoset.tools.FI_StAX_SAX_Or_XML_SAX_SAXEvent $1
+java -cp ${FI_HOME}/dist/FastInfoset.jar com.sun.xml.fastinfoset.tools.FI_StAX_SAX_Or_XML_SAX_SAXEvent $1
