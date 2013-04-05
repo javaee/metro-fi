@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2004-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2004-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
@@ -541,7 +541,7 @@ public class StAXDocumentParser extends Decoder
                     CommonResourceBundle.getInstance().getString("message.mustBeOnSTARTELEMENT"), getLocation());
         }
         int eventType = getEventType();
-        StringBuffer content = new StringBuffer();
+        StringBuilder content = new StringBuilder();
         while(eventType != END_ELEMENT ) {
             if(eventType == CHARACTERS
                     || eventType == CDATA
@@ -1688,7 +1688,7 @@ public class StAXDocumentParser extends Decoder
     }
     
     protected final void convertEncodingAlgorithmDataToCharacters() throws FastInfosetException, IOException {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         if (_algorithmId == EncodingAlgorithmIndexes.BASE64) {
             convertBase64AlorithmDataToCharacters(buffer);
         } else if (_algorithmId < EncodingConstants.ENCODING_ALGORITHM_BUILTIN_END) {
@@ -1728,7 +1728,7 @@ public class StAXDocumentParser extends Decoder
      * Counts with base64 data coming in chunks, aligning input chunks by 3,
      * avoiding double cloning, happening after possible peek, peek2 cloning by Base64 algorithm
      */
-    protected void convertBase64AlorithmDataToCharacters(StringBuffer buffer) throws EncodingAlgorithmException, IOException {
+    protected void convertBase64AlorithmDataToCharacters(StringBuilder buffer) throws EncodingAlgorithmException, IOException {
         // How much new came data was serialized with prev. tale
         int afterTaleOffset = 0;
         
@@ -1773,7 +1773,7 @@ public class StAXDocumentParser extends Decoder
      * Encodes incoming data to Base64 string.
      * Method performs additional input data cloning
      */
-    private void base64DecodeWithCloning(StringBuffer dstBuffer, byte[] data, int offset, int length) throws EncodingAlgorithmException {
+    private void base64DecodeWithCloning(StringBuilder dstBuffer, byte[] data, int offset, int length) throws EncodingAlgorithmException {
         Object array = BuiltInEncodingAlgorithmFactory.base64EncodingAlgorithm.
                 decodeFromBytes(data, offset, length);
         BuiltInEncodingAlgorithmFactory.base64EncodingAlgorithm.convertToCharacters(array, dstBuffer);
@@ -1783,7 +1783,7 @@ public class StAXDocumentParser extends Decoder
      * Encodes incoming data to Base64 string.
      * Avoids input data cloning
      */
-    private void base64DecodeWithoutCloning(StringBuffer dstBuffer, byte[] data, int offset, int length) throws EncodingAlgorithmException {
+    private void base64DecodeWithoutCloning(StringBuilder dstBuffer, byte[] data, int offset, int length) throws EncodingAlgorithmException {
         BuiltInEncodingAlgorithmFactory.base64EncodingAlgorithm.convertToCharacters(data, offset, length, dstBuffer);
     }
     

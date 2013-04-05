@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2004-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2004-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
@@ -51,8 +51,8 @@ public abstract class BuiltInEncodingAlgorithm implements EncodingAlgorithm {
             wl.word(i, cb.length());
     }
     
-    public StringBuffer removeWhitespace(char[] ch, int start, int length) {
-        StringBuffer buf = new StringBuffer();
+    public StringBuilder removeWhitespace(char[] ch, int start, int length) {
+        StringBuilder buf = new StringBuilder();
         int firstNonWS = 0;
         int idx = 0;
         for (; idx < length; ++idx) {

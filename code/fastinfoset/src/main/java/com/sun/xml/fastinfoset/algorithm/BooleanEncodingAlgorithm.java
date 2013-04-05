@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2004-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2004-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
@@ -249,7 +249,7 @@ public class BooleanEncodingAlgorithm extends BuiltInEncodingAlgorithm {
      * @param array The array
      *
      */
-    private final boolean[] generateArrayFromList(List array) {
+    private boolean[] generateArrayFromList(List array) {
         boolean[] bdata = new boolean[array.size()];
         for (int i = 0; i < bdata.length; i++) {
             bdata[i] = ((Boolean)array.get(i)).booleanValue();

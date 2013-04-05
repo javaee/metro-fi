@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2004-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2004-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
@@ -1528,7 +1528,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                     throw new FastInfosetException(e);
                 }
             } else {
-                StringBuffer buffer = new StringBuffer();
+                StringBuilder buffer = new StringBuilder();
                 processBuiltInEncodingAlgorithmAsCharacters(buffer);
                 
                 try {
@@ -1539,7 +1539,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
             }
             
             if (addToTable) {
-                StringBuffer buffer = new StringBuffer();
+                StringBuilder buffer = new StringBuilder();
                 processBuiltInEncodingAlgorithmAsCharacters(buffer);
                 _characterContentChunkTable.add(buffer.toString().toCharArray(), buffer.length());
             }
@@ -1728,7 +1728,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
                 Object data = processBuiltInEncodingAlgorithmAsObject();
                 _attributes.addAttributeWithAlgorithmData(name, null, _identifier, data);
             } else {
-                StringBuffer buffer = new StringBuffer();
+                StringBuilder buffer = new StringBuilder();
                 processBuiltInEncodingAlgorithmAsCharacters(buffer);
                 _attributes.addAttribute(name, buffer.toString());
             }
@@ -1766,7 +1766,7 @@ public class SAXDocumentParser extends Decoder implements FastInfosetReader {
         }
     }
     
-    protected final void processBuiltInEncodingAlgorithmAsCharacters(StringBuffer buffer) throws FastInfosetException, IOException {
+    protected final void processBuiltInEncodingAlgorithmAsCharacters(StringBuilder buffer) throws FastInfosetException, IOException {
         // TODO not very efficient, need to reuse buffers
         Object array = BuiltInEncodingAlgorithmFactory.getAlgorithm(_identifier).
                 decodeFromBytes(_octetBuffer, _octetBufferStart, _octetBufferLength);
