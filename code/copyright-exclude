@@ -50,3 +50,4 @@ xmldsig-core-schema.xsd
 code/performance/FpMLFIpex/data/FpML/Readme
 code/roundtrip-tests/report/readme
 code/fastinfoset/zip/version
+code/fastinfoset/src/main/java/com/sun/xml/fastinfoset/org/apache/xerces/util/XMLChar.java
