@@ -1,7 +1,6 @@
 # About
 
-Welcome to the metro-fi project.
-
+Metro Subproject: Binary encoding for the XML Information Set
 
 
 # IMPORTANT!
