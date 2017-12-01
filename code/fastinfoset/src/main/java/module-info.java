@@ -38,7 +38,7 @@
  * holder.
 */
 
-module java.xml.fastinfoset {
+module com.sun.xml.fastinfoset {
     requires java.logging;
     requires transitive java.xml;
 
