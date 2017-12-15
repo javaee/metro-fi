@@ -2,7 +2,7 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2012-2014 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2012-2017 Oracle and/or its affiliates. All rights reserved.
 
     Oracle licenses this file to You under the Apache License, Version 2.0
     (the "License"); you may not use this file except in compliance with
@@ -22,7 +22,7 @@
     <parent>
         <groupId>net.java</groupId>
         <artifactId>jvnet-parent</artifactId>
-        <version>3</version>
+        <version>5</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -79,9 +79,10 @@
         <url>http://www.oracle.com</url>
     </organization>
     <scm>
-        <connection>scm:svn:https://svn.java.net/svn/fi~svn/trunk/code/</connection>
-        <developerConnection>scm:svn:https://svn.java.net/svn/fi~svn/trunk/code/</developerConnection>
-        <url>http://java.net/projects/fi/sources/svn/show/trunk/code/</url>
+        <connection>scm:git:ssh://git@github.com/javaee/metro-fi.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/javaee/metro-fi.git</developerConnection>
+        <url>https://github.com/javaee/metro-fi</url>
+        <tag>HEAD</tag>
     </scm>
     <build>
         <extensions>
