@@ -2,7 +2,7 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2012-2017 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2012-2018 Oracle and/or its affiliates. All rights reserved.
 
     Oracle licenses this file to You under the Apache License, Version 2.0
     (the "License"); you may not use this file except in compliance with
@@ -309,7 +309,7 @@
     </dependencies>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <junit-version>4.7</junit-version>
+        <junit-version>4.12</junit-version>
         <maven-plugin.version>1.0.0</maven-plugin.version>
         <findbugs.exclude>${project.basedir}/exclude.xml</findbugs.exclude>
         <findbugs.skip>false</findbugs.skip>
